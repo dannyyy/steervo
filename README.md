@@ -32,7 +32,7 @@ Steervo steht unter der **PolyForm Noncommercial License 1.0.0** (siehe [LICENSE
 
 ## Beiträge
 
-Beiträge sind willkommen. Weil Steervo doppelt lizenziert wird, ist für jeden Beitrag die Zustimmung zu einem Contributor License Agreement erforderlich — Details in [CONTRIBUTING.md](CONTRIBUTING.md).
+Beiträge sind willkommen. Weil Steervo doppelt lizenziert wird, ist für jeden Beitrag die Zustimmung zum [Contributor License Agreement](CLA.md) erforderlich — das Eigentum an deinem Code bleibt bei dir. Ablauf und Hinweise in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Gehostete Version
 
