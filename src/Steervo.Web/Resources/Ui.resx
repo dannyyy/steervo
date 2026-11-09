@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+<resheader name="version"><value>2.0</value></resheader>
+<data name="Skip" xml:space="preserve"><value>Zum Inhalt</value></data>
+<data name="Workspace" xml:space="preserve"><value>ARBEITSBEREICH</value></data>
+<data name="Navigation" xml:space="preserve"><value>Hauptnavigation</value></data>
+<data name="Evaluations" xml:space="preserve"><value>Meine Evaluationen</value></data>
+<data name="Account" xml:space="preserve"><value>Mein Konto</value></data>
+<data name="Invitations" xml:space="preserve"><value>Einladungen</value></data>
+<data name="SidebarNote" xml:space="preserve"><value>Gute Entscheidungen beginnen mit den richtigen Fragen.</value></data>
+<data name="SignOut" xml:space="preserve"><value>Abmelden</value></data>
+<data name="WelcomeNote" xml:space="preserve"><value>Raum für deine nächste Fahrzeugentscheidung.</value></data>
+<data name="PersonalWorkspace" xml:space="preserve"><value>Dein persönlicher Arbeitsbereich</value></data>
+<data name="ServerConnected" xml:space="preserve"><value>Mit Server verbunden</value></data>
+<data name="SourceAvailable" xml:space="preserve"><value>Quelloffen</value></data>
+<data name="YourDecision" xml:space="preserve"><value>Deine Kriterien. Deine Entscheidung.</value></data>
+<data name="ConnectionError" xml:space="preserve"><value>Die Verbindung zum Server ist unterbrochen. Deine Eingabe wurde nicht bestätigt. Bitte erneut versuchen.</value></data>
+<data name="SignIn" xml:space="preserve"><value>Anmelden</value></data>
+<data name="WelcomeBack" xml:space="preserve"><value>WILLKOMMEN ZURÜCK</value></data>
+<data name="SignInHeading" xml:space="preserve"><value>Deine nächste Entscheidung beginnt hier.</value></data>
+<data name="SignInIntro" xml:space="preserve"><value>Sammle, was dir wichtig ist. Bringe Ordnung in deine Anforderungen. Und teile deine Überlegungen mit den richtigen Menschen.</value></data>
+<data name="InvitationOnly" xml:space="preserve"><value>Melde dich mit deiner bestätigten oder eingeladenen E-Mail-Adresse an.</value></data>
+<data name="Email" xml:space="preserve"><value>E-Mail-Adresse</value></data>
+<data name="SendCode" xml:space="preserve"><value>Anmeldecode senden</value></data>
+<data name="Or" xml:space="preserve"><value>oder</value></data>
+<data name="SignInPasskey" xml:space="preserve"><value>Mit Passkey anmelden</value></data>
+<data name="RecoveryNote" xml:space="preserve"><value>Passkey verloren? Du kannst dich jederzeit mit einem E-Mail-Code anmelden und einen neuen Passkey hinzufügen.</value></data>
+<data name="Setup" xml:space="preserve"><value>Installation einrichten</value></data>
+<data name="FreshStart" xml:space="preserve"><value>EIN FRISCHER ANFANG</value></data>
+<data name="SetupHeading" xml:space="preserve"><value>Platz für deine eigenen Entscheidungen.</value></data>
+<data name="SetupIntro" xml:space="preserve"><value>Dein Arbeitsbereich beginnt leer. Lege zuerst dein Konto an, dann deine erste Evaluation.</value></data>
+<data name="SetupHelp" xml:space="preserve"><value>Der Einrichtungsschlüssel stammt aus der Konfiguration dieser Installation. Nach der Bestätigung deiner E-Mail-Adresse wird die Einrichtung geschlossen.</value></data>
+<data name="SetupToken" xml:space="preserve"><value>Einrichtungsschlüssel</value></data>
+<data name="Name" xml:space="preserve"><value>Name</value></data>
+<data name="ConfirmEmail" xml:space="preserve"><value>E-Mail-Adresse bestätigen</value></data>
+<data name="EnterCode" xml:space="preserve"><value>Dein Code, bitte.</value></data>
+<data name="CheckInbox" xml:space="preserve"><value>POSTEINGANG PRÜFEN</value></data>
+<data name="CodeSent" xml:space="preserve"><value>Falls diese Adresse zugelassen ist, erhältst du einen sechsstelligen Code. Er gilt zehn Minuten und kann einmal verwendet werden.</value></data>
+<data name="OneTimeCode" xml:space="preserve"><value>Einmalcode</value></data>
+<data name="BackSignIn" xml:space="preserve"><value>Zurück zur Anmeldung</value></data>
+<data name="Overview" xml:space="preserve"><value>ÜBERSICHT</value></data>
+<data name="EvaluationsIntro" xml:space="preserve"><value>Ein klarer Anfang für jede Fahrzeugentscheidung.</value></data>
+<data name="NewEvaluation" xml:space="preserve"><value>Neue Evaluation</value></data>
+<data name="Close" xml:space="preserve"><value>Schliessen</value></data>
+<data name="Cancel" xml:space="preserve"><value>Abbrechen</value></data>
+<data name="YourNextChapter" xml:space="preserve"><value>DEIN NÄCHSTES KAPITEL</value></data>
+<data name="EmptyTitle" xml:space="preserve"><value>Was soll dein nächstes Auto können?</value></data>
+<data name="EmptyEvaluations" xml:space="preserve"><value>Noch ist alles offen. Gib deiner Entscheidung einen Namen und halte fest, worauf es dir ankommt.</value></data>
+<data name="FirstEvaluation" xml:space="preserve"><value>Erste Evaluation anlegen</value></data>
+<data name="CriterionCount" xml:space="preserve"><value>{0} Kriterien</value></data>
+<data name="OpenEvaluation" xml:space="preserve"><value>Kriterien öffnen</value></data>
+<data name="StartWithCriteria" xml:space="preserve"><value>Beginne mit dem, was dir wichtig ist.</value></data>
+<data name="CriteriaGuide" xml:space="preserve"><value>Definiere deine Anforderungen, ordne sie in Gruppen und entscheide, was unverzichtbar ist. Du kannst alles später verändern.</value></data>
+<data name="NewBeginning" xml:space="preserve"><value>NEUER ANFANG</value></data>
+<data name="NewEvaluationHelp" xml:space="preserve"><value>Ein eigener Ort für deine Anforderungen und Überlegungen.</value></data>
+<data name="EvaluationName" xml:space="preserve"><value>Name der Evaluation</value></data>
+<data name="Purpose" xml:space="preserve"><value>Worum geht es?</value></data>
+<data name="OptionalField" xml:space="preserve"><value>optional</value></data>
+<data name="CreateEvaluation" xml:space="preserve"><value>Evaluation anlegen</value></data>
+<data name="PrivateByDefault" xml:space="preserve"><value>Nur du hast Zugriff, bis du die Evaluation ausdrücklich freigibst.</value></data>
+<data name="Owner" xml:space="preserve"><value>Besitzer</value></data>
+<data name="Editor" xml:space="preserve"><value>Bearbeiter</value></data>
+<data name="Reader" xml:space="preserve"><value>Leser</value></data>
+<data name="AllEvaluations" xml:space="preserve"><value>Alle Evaluationen</value></data>
+<data name="Evaluation" xml:space="preserve"><value>EVALUATION</value></data>
+<data name="Criteria" xml:space="preserve"><value>Kriterien</value></data>
+<data name="Access" xml:space="preserve"><value>Freigaben</value></data>
+<data name="CaseSettings" xml:space="preserve"><value>Evaluation bearbeiten</value></data>
+<data name="ReadOnlyNotice" xml:space="preserve"><value>Du hast Lesezugriff. Änderungen und Freigaben verwaltet der Besitzer.</value></data>
+<data name="WhatMatters" xml:space="preserve"><value>Was ist dir wichtig?</value></data>
+<data name="WhatMattersHelp" xml:space="preserve"><value>Dein Anforderungsprofil — so individuell wie deine Entscheidung.</value></data>
+<data name="EmptyCriteriaTitle" xml:space="preserve"><value>Hier beginnt dein Anforderungsprofil.</value></data>
+<data name="EmptyCriteria" xml:space="preserve"><value>Füge dein erstes Kriterium hinzu. Gruppen helfen dir, den Überblick zu behalten.</value></data>
+<data name="Ungrouped" xml:space="preserve"><value>Ohne Gruppe</value></data>
+<data name="Edit" xml:space="preserve"><value>Bearbeiten</value></data>
+<data name="GroupUp" xml:space="preserve"><value>Gruppe {0} nach oben</value></data>
+<data name="GroupDown" xml:space="preserve"><value>Gruppe {0} nach unten</value></data>
+<data name="GroupName" xml:space="preserve"><value>Gruppenname</value></data>
+<data name="Rename" xml:space="preserve"><value>Umbenennen</value></data>
+<data name="RemoveGroupConfirm" xml:space="preserve"><value>Gruppe entfernen? Ihre Kriterien bleiben erhalten und werden ohne Gruppe eingeordnet.</value></data>
+<data name="RemoveGroup" xml:space="preserve"><value>Gruppe auflösen</value></data>
+<data name="EmptyGroup" xml:space="preserve"><value>Diese Gruppe hat noch keine Kriterien.</value></data>
+<data name="CriterionUp" xml:space="preserve"><value>Kriterium {0} nach oben</value></data>
+<data name="CriterionDown" xml:space="preserve"><value>Kriterium {0} nach unten</value></data>
+<data name="EditCriterion" xml:space="preserve"><value>Kriterium bearbeiten</value></data>
+<data name="Save" xml:space="preserve"><value>Speichern</value></data>
+<data name="RemoveCriterionConfirm" xml:space="preserve"><value>Dieses Kriterium endgültig löschen?</value></data>
+<data name="RemoveCriterion" xml:space="preserve"><value>Kriterium löschen</value></data>
+<data name="BuildProfile" xml:space="preserve"><value>PROFIL AUFBAUEN</value></data>
+<data name="AddCriterion" xml:space="preserve"><value>Kriterium hinzufügen</value></data>
+<data name="AddGroup" xml:space="preserve"><value>Gruppe hinzufügen</value></data>
+<data name="GroupHelp" xml:space="preserve"><value>Eine Gruppe ordnet deine Kriterien. Sie hat keine eigene Priorität oder Bewertung.</value></data>
+<data name="GoodToKnow" xml:space="preserve"><value>GUT ZU WISSEN</value></data>
+<data name="NoScore" xml:space="preserve"><value>Keine Note für deine Entscheidung.</value></data>
+<data name="NoScoreHelp" xml:space="preserve"><value>Muss, stark gewünscht oder optional: Du bestimmst, welches Gewicht eine Anforderung für dich hat. Eine Gesamtnote gibt es nicht.</value></data>
+<data name="UnknownHelp" xml:space="preserve"><value>Nicht bekannt ist nicht dasselbe wie nicht erfüllt. Fehlende Bewertungen bleiben ausdrücklich unbekannt.</value></data>
+<data name="Together" xml:space="preserve"><value>GEZIELT ZUSAMMENARBEITEN</value></data>
+<data name="SharingHelp" xml:space="preserve"><value>Gib diese Evaluation für ein bereits bestätigtes Konto frei. Eine Einladung allein teilt keine Daten. Eine erneute Freigabe aktualisiert die Rolle.</value></data>
+<data name="NoShares" xml:space="preserve"><value>Diese Evaluation ist privat. Es gibt noch keine Freigaben.</value></data>
+<data name="Revoke" xml:space="preserve"><value>Entziehen</value></data>
+<data name="Permission" xml:space="preserve"><value>Berechtigung</value></data>
+<data name="GrantAccess" xml:space="preserve"><value>Zugriff freigeben</value></data>
+<data name="OwnerManagesAccess" xml:space="preserve"><value>Nur der Besitzer kann die Freigaben dieser Evaluation verwalten.</value></data>
+<data name="DeleteEvaluationConfirm" xml:space="preserve"><value>Diese Evaluation mit allen Kriterien und Freigaben endgültig löschen?</value></data>
+<data name="DeleteEvaluation" xml:space="preserve"><value>Evaluation löschen</value></data>
+<data name="CriterionName" xml:space="preserve"><value>Bezeichnung</value></data>
+<data name="Priority" xml:space="preserve"><value>Priorität</value></data>
+<data name="Scope" xml:space="preserve"><value>Bezug</value></data>
+<data name="CriterionType" xml:space="preserve"><value>Art des Kriteriums</value></data>
+<data name="Comparison" xml:space="preserve"><value>Bedingung</value></data>
+<data name="Threshold" xml:space="preserve"><value>Schwellenwert</value></data>
+<data name="Unit" xml:space="preserve"><value>Einheit</value></data>
+<data name="Group" xml:space="preserve"><value>Gruppe</value></data>
+<data name="Boolean" xml:space="preserve"><value>Ja / Nein</value></data>
+<data name="Measurement" xml:space="preserve"><value>Messwert mit Schwelle</value></data>
+<data name="Rating" xml:space="preserve"><value>Bewertung 1–5</value></data>
+<data name="Required" xml:space="preserve"><value>Muss</value></data>
+<data name="Preferred" xml:space="preserve"><value>Stark gewünscht</value></data>
+<data name="Optional" xml:space="preserve"><value>Optional</value></data>
+<data name="Vehicle" xml:space="preserve"><value>Fahrzeug</value></data>
+<data name="Offer" xml:space="preserve"><value>Offerte</value></data>
+<data name="AtLeast" xml:space="preserve"><value>Mindestens (≥)</value></data>
+<data name="AtMost" xml:space="preserve"><value>Höchstens (≤)</value></data>
+<data name="Unknown" xml:space="preserve"><value>Unbekannt</value></data>
+<data name="Security" xml:space="preserve"><value>SICHERHEIT</value></data>
+<data name="Passkeys" xml:space="preserve"><value>Deine Passkeys</value></data>
+<data name="PasskeyHelp" xml:space="preserve"><value>Nutze die Gerätesperre oder einen Sicherheitsschlüssel für deine Anmeldung.</value></data>
+<data name="RecentSignInRequired" xml:space="preserve"><value>Bitte melde dich erneut an, um Passkeys zu verwalten. Dafür darf deine letzte Anmeldung höchstens 15 Minuten zurückliegen.</value></data>
+<data name="NoPasskeys" xml:space="preserve"><value>Noch kein Passkey hinterlegt.</value></data>
+<data name="EmailStillWorks" xml:space="preserve"><value>Die Anmeldung per E-Mail-Code steht dir weiterhin zur Verfügung.</value></data>
+<data name="AddedOn" xml:space="preserve"><value>Hinzugefügt am</value></data>
+<data name="Manage" xml:space="preserve"><value>Verwalten</value></data>
+<data name="RemovePasskeyConfirm" xml:space="preserve"><value>Diesen Passkey entfernen? Du kannst dich weiterhin per E-Mail anmelden.</value></data>
+<data name="RemovePasskey" xml:space="preserve"><value>Passkey entfernen</value></data>
+<data name="AddPasskey" xml:space="preserve"><value>Passkey hinzufügen</value></data>
+<data name="AddPasskeyHelp" xml:space="preserve"><value>Gib dem Passkey einen Namen, damit du ihn später wiedererkennst.</value></data>
+<data name="PasskeyName" xml:space="preserve"><value>Name des Passkeys</value></data>
+<data name="Recovery" xml:space="preserve"><value>Zugang wiederherstellen</value></data>
+<data name="Installation" xml:space="preserve"><value>INSTALLATION</value></data>
+<data name="InvitationsIntro" xml:space="preserve"><value>Als Hauptbenutzer kannst du weitere Personen zu dieser Installation einladen.</value></data>
+<data name="SentInvitations" xml:space="preserve"><value>Versendete Einladungen</value></data>
+<data name="NoInvitations" xml:space="preserve"><value>Noch keine Einladungen.</value></data>
+<data name="NoInvitationHelp" xml:space="preserve"><value>Jede eingeladene Person erhält einen eigenen, leeren Arbeitsbereich.</value></data>
+<data name="Accepted" xml:space="preserve"><value>Angenommen</value></data>
+<data name="Expired" xml:space="preserve"><value>Abgelaufen oder entzogen</value></data>
+<data name="Pending" xml:space="preserve"><value>Ausstehend</value></data>
+<data name="ValidUntil" xml:space="preserve"><value>Gültig bis</value></data>
+<data name="InvitePerson" xml:space="preserve"><value>Person einladen</value></data>
+<data name="InvitationHelp" xml:space="preserve"><value>Die Einladung gilt sieben Tage. Die Person bestätigt ihre E-Mail-Adresse mit einem Einmalcode.</value></data>
+<data name="SendInvitation" xml:space="preserve"><value>Einladung senden</value></data>
+<data name="InvitationSent" xml:space="preserve"><value>Die Einladung wurde per E-Mail versendet.</value></data>
+<data name="InvitationRevoked" xml:space="preserve"><value>Die Einladung wurde entzogen.</value></data>
+<data name="ErrorTitle" xml:space="preserve"><value>Das hat leider nicht funktioniert.</value></data>
+<data name="ErrorHelp" xml:space="preserve"><value>Bitte lade die Seite erneut. Wenn das Problem bleibt, wende dich an die Person, die diese Installation betreibt.</value></data>
+<data name="BackOverview" xml:space="preserve"><value>Zur Übersicht</value></data>
+<data name="Saved" xml:space="preserve"><value>Gespeichert.</value></data>
+<data name="InvalidText" xml:space="preserve"><value>Bitte gib einen gültigen Text innerhalb der erlaubten Länge ein.</value></data>
+<data name="InvalidValue" xml:space="preserve"><value>Bitte prüfe deine Eingaben. Ein Wert ist ungültig.</value></data>
+<data name="Forbidden" xml:space="preserve"><value>Du hast keine Berechtigung für diese Aktion.</value></data>
+<data name="NotFound" xml:space="preserve"><value>Der Eintrag wurde nicht gefunden.</value></data>
+<data name="Conflict" xml:space="preserve"><value>Jemand hat diese Evaluation inzwischen geändert. Der aktuelle Stand wurde geladen. Bitte prüfe ihn und wiederhole deine Änderung.</value></data>
+<data name="MeasurementRequired" xml:space="preserve"><value>Für einen Messwert sind ein Schwellenwert und eine Einheit erforderlich.</value></data>
+<data name="InvalidShare" xml:space="preserve"><value>Diese Freigabe ist nicht möglich.</value></data>
+<data name="AccountNotFound" xml:space="preserve"><value>Es gibt noch kein bestätigtes Konto mit dieser E-Mail-Adresse. Die Person muss ihre Einladung zuerst annehmen.</value></data>
+<data name="SetupClosed" xml:space="preserve"><value>Diese Installation wurde bereits eingerichtet.</value></data>
+<data name="InvalidSetupToken" xml:space="preserve"><value>Der Einrichtungsschlüssel ist ungültig oder die Einrichtung ist nicht konfiguriert.</value></data>
+<data name="CodeRateLimit" xml:space="preserve"><value>Bitte warte kurz, bevor du einen neuen Code anforderst. Höchstens fünf Codes pro Stunde sind möglich.</value></data>
+<data name="InvalidCode" xml:space="preserve"><value>Der Code ist ungültig, abgelaufen oder bereits verwendet. Nach fünf Fehlversuchen ist ein neuer Code erforderlich.</value></data>
+<data name="InvitationExpired" xml:space="preserve"><value>Die Einladung ist abgelaufen oder wurde entzogen.</value></data>
+<data name="InvalidAccount" xml:space="preserve"><value>Das Konto konnte nicht angelegt werden.</value></data>
+<data name="AccountExists" xml:space="preserve"><value>Diese Person hat bereits ein Konto.</value></data>
+<data name="InvalidEmail" xml:space="preserve"><value>Bitte gib eine gültige E-Mail-Adresse ein.</value></data>
+<data name="MailQuota" xml:space="preserve"><value>Das konfigurierte E-Mail-Versandlimit ist erreicht. Bitte versuche es nach Ablauf des Zeitfensters erneut.</value></data>
+<data name="MailUnavailable" xml:space="preserve"><value>Die E-Mail konnte nicht versendet werden. Bitte versuche es später erneut. Eine angelegte Einladung bleibt bestehen und kann erneut versendet werden.</value></data>
+<data name="PasskeyFailed" xml:space="preserve"><value>Der Passkey konnte nicht verwendet werden. Bitte versuche es erneut oder nutze einen E-Mail-Code.</value></data>
+<data name="PasskeyCreateFailed" xml:space="preserve"><value>Der Passkey konnte nicht hinzugefügt werden. Bitte versuche es erneut.</value></data>
+<data name="PasskeySecureContextRequired" xml:space="preserve"><value>Passkeys benötigen eine sichere HTTPS-Verbindung. Öffne {0} und melde dich dort an.</value></data>
+<data name="PasskeyOriginMismatch" xml:space="preserve"><value>Passkeys sind für {0} eingerichtet. Öffne diese Adresse und melde dich dort an, um einen Passkey hinzuzufügen oder zu verwenden.</value></data>
+<data name="PasskeyBrowserUnsupported" xml:space="preserve"><value>Dieser Browser unterstützt die benötigten Passkey-Funktionen nicht. Bitte aktualisiere ihn oder verwende einen anderen aktuellen Browser.</value></data>
+<data name="PasskeyCancelled" xml:space="preserve"><value>Der Passkey-Vorgang wurde abgebrochen oder nicht rechtzeitig bestätigt. Du kannst ihn erneut starten.</value></data>
+<data name="PasskeyAlreadyRegistered" xml:space="preserve"><value>Dieser Passkey ist bereits für dein Konto hinterlegt. Verwende bei Bedarf einen anderen Passkey-Anbieter oder ein anderes Gerät.</value></data>
+<data name="PasskeySecurityError" xml:space="preserve"><value>Der Browser hat den Passkey-Aufruf für diese Adresse blockiert. Öffne {0} direkt in einem neuen Tab und versuche es erneut.</value></data>
+<data name="PasskeySessionExpired" xml:space="preserve"><value>Bitte melde dich erneut an und starte den Passkey-Vorgang danach nochmals.</value></data>
+<data name="PasskeyRateLimited" xml:space="preserve"><value>Zu viele Anfragen. Bitte warte eine Minute und versuche es erneut.</value></data>
+<data name="PasskeyLimit" xml:space="preserve"><value>Pro Konto sind höchstens zehn Passkeys möglich.</value></data>
+<data name="CodeSubject" xml:space="preserve"><value>Dein Steervo-Anmeldecode</value></data>
+<data name="CodeBody" xml:space="preserve"><value>Dein Steervo-Code lautet: {0}
+
+Er gilt zehn Minuten und kann einmal verwendet werden. Teile ihn mit niemandem. Falls du keinen Code angefordert hast, kannst du diese Nachricht ignorieren.</value></data>
+<data name="InvitationSubject" xml:space="preserve"><value>Du bist zu Steervo eingeladen</value></data>
+<data name="InvitationBody" xml:space="preserve"><value>Du wurdest zu einer Steervo-Installation eingeladen.
+
+Öffne {0} und fordere mit dieser E-Mail-Adresse einen Anmeldecode an. Die Einladung gilt sieben Tage.
+
+Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich freigegeben.</value></data>
+<data name="ImportEvaluation" xml:space="preserve"><value>Evaluation importieren</value></data>
+<data name="ImportHelp" xml:space="preserve"><value>Ein Export aus dieser Anwendung wird als neue, private Evaluation angelegt. Bestehende Daten bleiben erhalten; Freigaben werden nicht übernommen. Maximale Dateigrösse: 256 kB.</value></data>
+<data name="ExportFile" xml:space="preserve"><value>JSON-Exportdatei</value></data>
+<data name="ImportAsNew" xml:space="preserve"><value>Als neue Evaluation importieren</value></data>
+<data name="ExportEvaluation" xml:space="preserve"><value>Exportieren</value></data>
+<data name="InvalidImport" xml:space="preserve"><value>Die Datei ist kein gültiger Steervo-Evaluationsexport der Version 1 oder überschreitet die erlaubte Grösse.</value></data>
+  <data name="SortingHelp" xml:space="preserve"><value>Am Griff ziehen oder mit den Pfeilen sortieren. Am fokussierten Griff funktionieren auch ↑ und ↓.</value></data>
+  <data name="MoveGroup" xml:space="preserve"><value>Gruppe {0} verschieben</value></data>
+  <data name="MoveCriterion" xml:space="preserve"><value>Kriterium {0} verschieben</value></data>
+</root>

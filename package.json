@@ -1,0 +1,7 @@
+{
+  "name": "steervo-browser-tests",
+  "private": true,
+  "type": "module",
+  "scripts": { "test:e2e": "node tests/browser/journey.mjs" },
+  "devDependencies": { "playwright": "1.65.0" }
+}

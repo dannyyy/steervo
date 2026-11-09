@@ -1,0 +1,25 @@
+@page "/Account"
+@model Steervo.Web.Pages.Account.IndexModel
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+@{ ViewData["Title"] = T["Account"]; var passkeyOrigin = new Uri(Configuration["PublicUrl"] ?? "http://localhost:5180").GetLeftPart(UriPartial.Authority); }
+<div class="page-heading"><div><p class="eyebrow">@T["Security"]</p><h1>@T["Account"]</h1><p class="muted">@User.Identity?.Name</p></div></div>
+<div class="overview-grid"><section class="panel"><h2>@T["Passkeys"]</h2><p class="muted">@T["PasskeyHelp"]</p><div asp-validation-summary="All" class="validation" role="alert"></div>
+@if (Model.Notice is not null) { <p class="notice success" role="status">@Model.Notice</p> }
+@if (!Model.Recent) { <p class="notice">@T["RecentSignInRequired"]</p> }
+@if (Model.Passkeys.Count == 0) { <div class="empty-state"><h3>@T["NoPasskeys"]</h3><p>@T["EmailStillWorks"]</p></div> }
+@foreach (var passkey in Model.Passkeys)
+{
+    <article class="passkey-row"><div><h3>@passkey.Name</h3><p class="micro">@T["AddedOn"] @passkey.CreatedAt.ToString("d")</p></div>
+    @if (Model.Recent) { <details><summary>@T["Manage"]</summary><form method="post"><input type="hidden" name="id" value="@Microsoft.AspNetCore.WebUtilities.WebEncoders.Base64UrlEncode(passkey.CredentialId)" /><input type="hidden" name="action" value="rename" /><label for="key-@Convert.ToHexString(passkey.CredentialId)">@T["Name"]</label><input id="key-@Convert.ToHexString(passkey.CredentialId)" name="name" value="@passkey.Name" required maxlength="80" /><button class="button secondary">@T["Rename"]</button></form><form method="post" data-confirm="@T["RemovePasskeyConfirm"]"><input type="hidden" name="id" value="@Microsoft.AspNetCore.WebUtilities.WebEncoders.Base64UrlEncode(passkey.CredentialId)" /><input type="hidden" name="action" value="remove" /><button class="text-button danger">@T["RemovePasskey"]</button></form></details> }
+    </article>
+}
+</section><aside><section class="panel"><h2>@T["AddPasskey"]</h2><p class="muted">@T["AddPasskeyHelp"]</p>@if (Model.Recent) {
+    <form method="post" data-passkey="create" data-options="/Account?handler=Options" action="/Account?handler=Enroll"
+          data-origin="@passkeyOrigin" data-error="@T["PasskeyCreateFailed"]"
+          data-secure-error="@T["PasskeySecureContextRequired", passkeyOrigin]" data-origin-error="@T["PasskeyOriginMismatch", passkeyOrigin]"
+          data-browser-error="@T["PasskeyBrowserUnsupported"]" data-cancelled-error="@T["PasskeyCancelled"]"
+          data-duplicate-error="@T["PasskeyAlreadyRegistered"]" data-security-error="@T["PasskeySecurityError", passkeyOrigin]"
+          data-session-error="@T["PasskeySessionExpired"]" data-rate-error="@T["PasskeyRateLimited"]">
+        @Html.AntiForgeryToken()<label for="passkey-name">@T["PasskeyName"]</label><input id="passkey-name" name="name" required maxlength="80" /><button class="button primary full">@T["AddPasskey"]</button><p data-passkey-error class="validation" role="alert"></p>
+    </form>
+}</section><div class="help-card"><h3>@T["Recovery"]</h3><p>@T["RecoveryNote"]</p></div></aside></div>

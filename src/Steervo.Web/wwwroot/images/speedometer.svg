@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 24 480 276" width="480" height="276" role="img" aria-labelledby="title">
+<title id="title">Semicircular speedometer</title>
+<g font-family="Avenir Next, Segoe UI, sans-serif" font-weight="500">
+<path d="M 48.00,238.00 A 192 192 0 0 1 432.00,238.00" fill="none" stroke="#e6ecdc" stroke-width="16"/>
+<path d="M 40.00,238.00 A 200 200 0 0 1 440.00,238.00" fill="none" stroke="#c9d7b9" stroke-width="1"/>
+<path d="M 63.00,238.00 L 77.00,238.00" stroke="#516b4c" stroke-width="2" stroke-linecap="round"/>
+<text x="98.00" y="238.00" fill="#516b4c" font-size="15" text-anchor="middle" dominant-baseline="central">0</text>
+<path d="M 63.55,224.11 L 69.53,224.58" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 65.18,210.31 L 71.11,211.25" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 67.89,196.68 L 73.72,198.08" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 71.66,183.30 L 84.98,187.63" stroke="#516b4c" stroke-width="2" stroke-linecap="round"/>
+<path d="M 76.47,170.27 L 82.02,172.56" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 82.29,157.64 L 87.64,160.37" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 89.08,145.52 L 94.20,148.65" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 96.80,133.96 L 108.13,142.19" stroke="#516b4c" stroke-width="2" stroke-linecap="round"/>
+<text x="125.12" y="154.53" fill="#516b4c" font-size="15" text-anchor="middle" dominant-baseline="central">40</text>
+<path d="M 105.41,123.05 L 109.97,126.94" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 114.84,112.84 L 119.08,117.08" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 125.05,103.41 L 128.94,107.97" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 135.96,94.80 L 144.19,106.13" stroke="#516b4c" stroke-width="2" stroke-linecap="round"/>
+<path d="M 147.52,87.08 L 150.65,92.20" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 159.64,80.29 L 162.37,85.64" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 172.27,74.47 L 174.56,80.02" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 185.30,69.66 L 189.63,82.98" stroke="#516b4c" stroke-width="2" stroke-linecap="round"/>
+<text x="196.12" y="102.95" fill="#516b4c" font-size="15" text-anchor="middle" dominant-baseline="central">80</text>
+<path d="M 198.68,65.89 L 200.08,71.72" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 212.31,63.18 L 213.25,69.11" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 226.11,61.55 L 226.58,67.53" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 240.00,61.00 L 240.00,75.00" stroke="#516b4c" stroke-width="2" stroke-linecap="round"/>
+<path d="M 253.89,61.55 L 253.42,67.53" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 267.69,63.18 L 266.75,69.11" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 281.32,65.89 L 279.92,71.72" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 294.70,69.66 L 290.37,82.98" stroke="#516b4c" stroke-width="2" stroke-linecap="round"/>
+<text x="283.88" y="102.95" fill="#516b4c" font-size="15" text-anchor="middle" dominant-baseline="central">120</text>
+<path d="M 307.73,74.47 L 305.44,80.02" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 320.36,80.29 L 317.63,85.64" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 332.48,87.08 L 329.35,92.20" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 344.04,94.80 L 335.81,106.13" stroke="#516b4c" stroke-width="2" stroke-linecap="round"/>
+<path d="M 354.95,103.41 L 351.06,107.97" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 365.16,112.84 L 360.92,117.08" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 374.59,123.05 L 370.03,126.94" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 383.20,133.96 L 371.87,142.19" stroke="#516b4c" stroke-width="2" stroke-linecap="round"/>
+<text x="354.88" y="154.53" fill="#516b4c" font-size="15" text-anchor="middle" dominant-baseline="central">160</text>
+<path d="M 390.92,145.52 L 385.80,148.65" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 397.71,157.64 L 392.36,160.37" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 403.53,170.27 L 397.98,172.56" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 408.34,183.30 L 395.02,187.63" stroke="#516b4c" stroke-width="2" stroke-linecap="round"/>
+<path d="M 412.11,196.68 L 406.28,198.08" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 414.82,210.31 L 408.89,211.25" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 416.45,224.11 L 410.47,224.58" stroke="#a9b99b" stroke-width="1" stroke-linecap="round"/>
+<path d="M 417.00,238.00 L 403.00,238.00" stroke="#516b4c" stroke-width="2" stroke-linecap="round"/>
+<text x="382.00" y="238.00" fill="#516b4c" font-size="15" text-anchor="middle" dominant-baseline="central">200</text>
+<text x="240" y="278" fill="#7b8b70" font-size="13" text-anchor="middle" letter-spacing="1">km/h</text>
+<path d="M 262.84,93.80 L 244.44,238.70 L 237.34,254.79 L 235.56,237.30 Z" fill="#7c9863"/><circle cx="240" cy="238" r="9" fill="#243b32"/><circle cx="240" cy="238" r="3" fill="#7c9863"/>
+
+</g>
+</svg>

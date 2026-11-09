@@ -1,0 +1,28 @@
+name: steervo-tests
+services:
+  postgres17:
+    image: postgres:17-alpine@sha256:c7526c0f6c3f30260a563d7bcf8ad778effac59a44f8ffa86678c35418338609
+    environment: { POSTGRES_USER: steervo, POSTGRES_PASSWORD: steervo-local-only, POSTGRES_DB: steervo }
+    ports: ["127.0.0.1:55437:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U steervo -d steervo"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  postgres18:
+    image: postgres:18-alpine@sha256:d3e1620b530c944afa6e887d22eb899824da68e19c52024bf98f5220c88a65b2
+    environment: { POSTGRES_USER: steervo, POSTGRES_PASSWORD: steervo-local-only, POSTGRES_DB: steervo }
+    ports: ["127.0.0.1:55438:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U steervo -d steervo"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  mail:
+    image: maildev/maildev:2.1.0@sha256:f7429227b8f471b3fe761767d86a8794a2fc7488bccdcda46ea6d5ba5c2c7bf5
+    ports: ["127.0.0.1:52025:1025", "127.0.0.1:52080:1080"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:1080/healthz"]
+      interval: 2s
+      timeout: 2s
+      retries: 30

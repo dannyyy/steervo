@@ -1,0 +1,5 @@
+@page
+@model Steervo.Web.Pages.Auth.VerifyModel
+@{ ViewData["Title"] = T["EnterCode"]; }
+<section class="panel auth-card centered"><p class="eyebrow">@T["CheckInbox"]</p><h1>@T["EnterCode"]</h1><p class="muted">@T["CodeSent"]</p>
+<form method="post"><input asp-for="Id" type="hidden" /><div asp-validation-summary="All" class="validation" role="alert"></div><label asp-for="Code">@T["OneTimeCode"]</label><input asp-for="Code" class="code-input" required pattern="[0-9]{6}" maxlength="6" inputmode="numeric" autocomplete="one-time-code" autofocus /><button class="button primary full">@T["SignIn"] <span aria-hidden="true">→</span></button></form><a class="text-link" asp-page="Login">@T["BackSignIn"]</a></section>

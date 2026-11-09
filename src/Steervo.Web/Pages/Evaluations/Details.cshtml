@@ -1,0 +1,4 @@
+@page "/evaluations/{id:guid}"
+@model Steervo.Web.Pages.Evaluations.DetailsModel
+@{ ViewData["Title"] = Model.Evaluation.Name; }
+<partial name="_Workspace" model="Model" />

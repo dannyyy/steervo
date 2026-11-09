@@ -1,0 +1,8 @@
+**
+!.artifacts
+!.artifacts/publish
+!.artifacts/publish/**
+!deploy
+!deploy/container
+!deploy/container/keys
+!deploy/container/keys/.keep

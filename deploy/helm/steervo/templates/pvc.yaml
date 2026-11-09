@@ -1,0 +1,17 @@
+{{- if not .Values.keyStorage.existingClaim }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "steervo.name" . }}-keys
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+    helm.sh/resource-policy: keep
+spec:
+  accessModes: [ReadWriteOnce]
+  {{- with .Values.keyStorage.storageClassName }}
+  storageClassName: {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.keyStorage.size }}
+{{- end }}

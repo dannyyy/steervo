@@ -1,0 +1,31 @@
+image:
+  repository: steervo
+  tag: "0.1.0"
+  digest: ""
+  pullPolicy: IfNotPresent
+imagePullSecrets: []
+publicUrl: https://steervo.example.org
+existingSecret: steervo-runtime
+trustedProxies: []
+keyStorage:
+  existingClaim: ""
+  storageClassName: ""
+  size: 1Gi
+ingress:
+  enabled: true
+  host: steervo.example.org
+  entryPoint: websecure
+  certResolver: letsencrypt
+resources:
+  requests: { cpu: 100m, memory: 192Mi }
+  limits: { memory: 512Mi }
+smtp:
+  host: smtp.example.org
+  port: 587
+  startTls: true
+  from: steervo@example.org
+  hourlyLimit: 50
+  dailyLimit: 200
+migration:
+  enabled: true
+  activeDeadlineSeconds: 300

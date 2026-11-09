@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: steervo
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/dannyyy/steervo.git
+    targetRevision: REPLACE_WITH_REVIEWED_COMMIT
+    path: deploy/helm/steervo
+    helm:
+      valuesObject:
+        image:
+          repository: registry.example.org/steervo
+          digest: REPLACE_WITH_IMAGE_DIGEST
+        publicUrl: https://steervo.example.org
+        existingSecret: steervo-runtime
+        trustedProxies: []
+        ingress:
+          host: steervo.example.org
+          entryPoint: websecure
+          certResolver: letsencrypt
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: steervo
+  syncPolicy:
+    syncOptions: [CreateNamespace=true]

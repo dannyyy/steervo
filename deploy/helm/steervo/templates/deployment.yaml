@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "steervo.name" . }}
+spec:
+  replicas: 1
+  strategy: { type: Recreate }
+  selector:
+    matchLabels: { app.kubernetes.io/name: {{ include "steervo.name" . }} }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/name: {{ include "steervo.name" . }} }
+      annotations:
+        checksum/config: {{ toJson .Values | sha256sum }}
+    spec:
+      automountServiceAccountToken: false
+      securityContext: { runAsNonRoot: true, runAsUser: 1654, runAsGroup: 1654, fsGroup: 1654 }
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: web
+          image: {{ include "steervo.image" . | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }
+            seccompProfile: { type: RuntimeDefault }
+          env: {{ include "steervo.env" . | nindent 12 }}
+          envFrom:
+            - secretRef: { name: {{ required "existingSecret is required" .Values.existingSecret }} }
+          ports: [{ name: http, containerPort: 8080 }]
+          startupProbe:
+            httpGet: { path: /health/live, port: http, httpHeaders: [{ name: Host, value: {{ .Values.ingress.host | quote }} }] }
+            failureThreshold: 30
+            periodSeconds: 2
+          readinessProbe:
+            httpGet: { path: /health/ready, port: http, httpHeaders: [{ name: Host, value: {{ .Values.ingress.host | quote }} }] }
+          livenessProbe:
+            httpGet: { path: /health/live, port: http, httpHeaders: [{ name: Host, value: {{ .Values.ingress.host | quote }} }] }
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - { name: keys, mountPath: /var/steervo/keys }
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - name: keys
+          persistentVolumeClaim:
+            claimName: {{ .Values.keyStorage.existingClaim | default (printf "%s-keys" (include "steervo.name" .)) }}
+        - name: tmp
+          emptyDir: {}

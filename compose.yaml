@@ -1,0 +1,52 @@
+name: steervo
+services:
+  db:
+    image: postgres:18-alpine@sha256:d3e1620b530c944afa6e887d22eb899824da68e19c52024bf98f5220c88a65b2
+    environment:
+      POSTGRES_USER: steervo
+      POSTGRES_DB: steervo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run scripts/init-local.sh first}
+    ports: ["127.0.0.1:55432:5432"]
+    volumes: ["database:/var/lib/postgresql"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U steervo -d steervo"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  mail:
+    image: maildev/maildev:2.1.0@sha256:f7429227b8f471b3fe761767d86a8794a2fc7488bccdcda46ea6d5ba5c2c7bf5
+    ports: ["127.0.0.1:51025:1025", "127.0.0.1:51080:1080"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:1080/healthz"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+  migrate:
+    image: steervo:local
+    profiles: ["app"]
+    command: ["--migrate"]
+    env_file: .env
+    environment:
+      ConnectionStrings__Database: Host=db;Port=5432;Database=steervo;Username=steervo;Password=${POSTGRES_PASSWORD}
+      DataProtection__Path: /var/steervo/keys
+    volumes: ["keys:/var/steervo/keys"]
+    depends_on:
+      db: { condition: service_healthy }
+  app:
+    image: steervo:local
+    profiles: ["app"]
+    env_file: .env
+    environment:
+      ASPNETCORE_HTTP_PORTS: 8080
+      ConnectionStrings__Database: Host=db;Port=5432;Database=steervo;Username=steervo;Password=${POSTGRES_PASSWORD}
+      DataProtection__Path: /var/steervo/keys
+      Smtp__Host: mail
+      Smtp__Port: 1025
+    ports: ["127.0.0.1:5180:8080"]
+    volumes: ["keys:/var/steervo/keys"]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      mail: { condition: service_healthy }
+volumes:
+  database:
+  keys:

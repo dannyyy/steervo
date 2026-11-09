@@ -1,0 +1,41 @@
+@page
+@model Steervo.Web.Pages.IndexModel
+@inject Steervo.Application.Evaluations.ICurrentUser Current
+@{ ViewData["Title"] = T["Evaluations"]; }
+<div class="page-heading"><div><p class="eyebrow">@T["Overview"]</p><h1>@T["Evaluations"]</h1><p class="muted">@T["EvaluationsIntro"]</p></div>
+@if (Model.Evaluations.Count > 0)
+{
+    <button type="button" data-dialog-open="new-evaluation" aria-haspopup="dialog" class="button primary">＋ @T["NewEvaluation"]</button>
+}
+</div>
+<div class="overview-content">
+    <section>
+    @if (Model.Evaluations.Count == 0)
+    {
+        <div class="empty-hero"><div class="empty-hero-copy"><span class="eyebrow">@T["YourNextChapter"]</span><h2>@T["EmptyTitle"]</h2><p>@T["EmptyEvaluations"]</p><button type="button" data-dialog-open="new-evaluation" aria-haspopup="dialog" class="button primary">@T["FirstEvaluation"] →</button></div><img class="empty-speedometer" src="~/images/speedometer.svg" asp-append-version="true" width="480" height="276" alt="" aria-hidden="true" /></div>
+    }
+    else
+    {
+        <div class="case-grid">@foreach (var evaluation in Model.Evaluations)
+        { <a class="case-card" asp-page="/Evaluations/Details" asp-route-id="@evaluation.Id"><div class="card-top"><span class="badge">@T[evaluation.AccessFor(Current.Id).ToString()!]</span><span aria-hidden="true">↗</span></div><h2>@evaluation.Name</h2><p>@evaluation.Purpose</p><div class="card-bottom"><span>@T["CriterionCount", evaluation.Criteria.Count]</span><span>@T["OpenEvaluation"] →</span></div></a> }</div>
+    }
+    <div class="guide"><span class="step-number">01</span><div><h3>@T["StartWithCriteria"]</h3><p>@T["CriteriaGuide"]</p></div></div>
+    </section>
+</div>
+<details class="panel settings-panel" open="@Model.ImportFailed"><summary>@T["ImportEvaluation"]</summary><p class="muted">@T["ImportHelp"]</p>
+@if (Model.ImportFailed) { <div asp-validation-summary="All" class="validation" role="alert"></div> }
+<form method="post" asp-page-handler="Import" enctype="multipart/form-data"><label for="upload">@T["ExportFile"]</label><input id="upload" name="upload" type="file" accept="application/json,.json" required /><button class="button secondary">@T["ImportAsNew"]</button></form></details>
+
+<dialog id="new-evaluation" class="creation-dialog" aria-labelledby="new-evaluation-title" aria-describedby="new-evaluation-help" data-open-on-load="@(Model.CreationFailed ? "true" : "false")">
+    <button type="button" class="dialog-close" data-dialog-close aria-label="@T["Close"]"><span aria-hidden="true">×</span></button>
+    <p class="eyebrow">@T["NewBeginning"]</p>
+    <h2 id="new-evaluation-title">@T["NewEvaluation"]</h2>
+    <p class="muted" id="new-evaluation-help">@T["NewEvaluationHelp"]</p>
+    <form method="post">
+        @if (Model.CreationFailed) { <div asp-validation-summary="All" class="validation" role="alert"></div> }
+        <label asp-for="Name">@T["EvaluationName"]</label><input asp-for="Name" required maxlength="160" autofocus />
+        <label asp-for="Purpose">@T["Purpose"] <span class="optional">@T["OptionalField"]</span></label><textarea asp-for="Purpose" maxlength="2000" rows="3"></textarea>
+        <p class="micro">@T["PrivateByDefault"]</p>
+        <div class="dialog-actions"><button type="button" class="button secondary" data-dialog-close>@T["Cancel"]</button><button type="submit" class="button primary">@T["CreateEvaluation"] →</button></div>
+    </form>
+</dialog>

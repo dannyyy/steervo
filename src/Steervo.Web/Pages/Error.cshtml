@@ -1,0 +1,4 @@
+@page
+@model Steervo.Web.Pages.ErrorModel
+@{ ViewData["Title"] = T["ErrorTitle"]; }
+<section class="panel centered"><h1>@T["ErrorTitle"]</h1><p>@T["ErrorHelp"]</p><a asp-page="/Index" class="button primary">@T["BackOverview"]</a></section>

@@ -1,0 +1,40 @@
+@inject Steervo.Application.Accounts.IAccountAccess Accounts
+@inject Steervo.Application.Evaluations.ICurrentUser Current
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="htmx-config" content='{"allowEval":false,"includeIndicatorStyles":false,"selfRequestsOnly":true}' />
+    <title>@ViewData["Title"] · Steervo</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script src="~/lib/htmx.min.js" defer></script><script src="~/js/site.js" asp-append-version="true" defer></script><script src="~/js/sorting.js" asp-append-version="true" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">@T["Skip"]</a>
+<div class="shell">
+    <aside class="sidebar">
+        <a class="brand" asp-page="/Index"><span class="mark" aria-hidden="true">//</span> steervo<span class="brand-dot">.</span></a>
+        <div class="edition">COMMUNITY</div>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <div class="nav-label">@T["Workspace"]</div>
+            <nav aria-label="@T["Navigation"]">
+                <a asp-page="/Index" class="nav-item"><span aria-hidden="true">◫</span><span>@T["Evaluations"]</span></a>
+                <a asp-page="/Account/Index" class="nav-item"><span aria-hidden="true">◎</span><span>@T["Account"]</span></a>
+                @if (await Accounts.IsPrimaryAsync(Current.Id)) { <a asp-page="/Account/Invitations" class="nav-item"><span aria-hidden="true">↗</span><span>@T["Invitations"]</span></a> }
+            </nav>
+            <div class="sidebar-note"><span class="route" aria-hidden="true">● ───── ○</span><p>@T["SidebarNote"]</p></div>
+            <div class="profile"><span class="avatar" aria-hidden="true">@User.Identity.Name?[..1]</span><span>@User.Identity.Name</span></div>
+            <form method="post" asp-page="/Account/Logout"><button class="logout">@T["SignOut"]</button></form>
+        }
+        else { <p class="sidebar-note">@T["WelcomeNote"]</p> }
+    </aside>
+    <div class="main-shell">
+        <header class="topbar"><span>@T["PersonalWorkspace"]</span><span class="server-state"><i></i>@T["ServerConnected"]</span></header>
+        <main id="main" tabindex="-1">@RenderBody()</main>
+        <footer><span>Steervo Community · @T["SourceAvailable"]</span><span>@T["YourDecision"]</span></footer>
+    </div>
+</div>
+<div id="connection-error" role="alert" hidden>@T["ConnectionError"]</div>
+</body>
+</html>

@@ -26,3 +26,12 @@ npm-debug.log*
 # Claude Code (lokal)
 .claude/settings.local.json
 CLAUDE.local.md
+
+# .NET and local runtime state
+**/bin/
+**/obj/
+.artifacts/
+.data/
+TestResults/
+playwright-report/
+test-results/
