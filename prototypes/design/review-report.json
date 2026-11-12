@@ -1,0 +1,95 @@
+{
+  "report.json": {
+    "report": [
+      "workspace: capture/compare propagation, zero/unknown distinction, filters, cancel, selection, technical data, notes, add, persistence, desktop/mobile passed",
+      "dossier: capture/compare propagation, zero/unknown distinction, filters, cancel, selection, technical data, notes, add, persistence, desktop/mobile passed"
+    ],
+    "errors": []
+  },
+  "extra-report.json": [
+    "workspace: sticky mobile criterion labels and second candidate editing passed",
+    "dossier: sticky mobile criterion labels and second candidate editing passed",
+    "ink primary contrast 7.31",
+    "petrol primary contrast 6.65",
+    "plum primary contrast 6.50",
+    "Palette switching and persistence; 320/768/1024/1280 px overflow checks passed"
+  ],
+  "contrast-verdict.json": [
+    {
+      "concept": "workspace",
+      "palette": "petrol",
+      "contrast": 5.1,
+      "colors": [
+        "rgb(77, 105, 98)",
+        "rgb(230, 239, 235)"
+      ]
+    },
+    {
+      "concept": "workspace",
+      "palette": "plum",
+      "contrast": 5.21,
+      "colors": [
+        "rgb(107, 93, 107)",
+        "rgb(240, 234, 240)"
+      ]
+    },
+    {
+      "concept": "workspace",
+      "palette": "ink",
+      "contrast": 5.22,
+      "colors": [
+        "rgb(83, 100, 116)",
+        "rgb(233, 238, 243)"
+      ]
+    },
+    {
+      "concept": "workspace",
+      "footerContrast": 4.89,
+      "colors": [
+        "rgb(89, 102, 109)",
+        "rgb(232, 234, 231)"
+      ]
+    },
+    {
+      "concept": "dossier",
+      "palette": "petrol",
+      "contrast": 5.1,
+      "colors": [
+        "rgb(77, 105, 98)",
+        "rgb(230, 239, 235)"
+      ]
+    },
+    {
+      "concept": "dossier",
+      "palette": "plum",
+      "contrast": 5.21,
+      "colors": [
+        "rgb(107, 93, 107)",
+        "rgb(240, 234, 240)"
+      ]
+    },
+    {
+      "concept": "dossier",
+      "palette": "ink",
+      "contrast": 5.22,
+      "colors": [
+        "rgb(83, 100, 116)",
+        "rgb(233, 238, 243)"
+      ]
+    },
+    {
+      "concept": "dossier",
+      "footerContrast": 4.89,
+      "colors": [
+        "rgb(89, 102, 109)",
+        "rgb(232, 234, 231)"
+      ]
+    }
+  ],
+  "independent_review": {
+    "initial_disposition": "fix",
+    "finding": "Secondary text contrast on inline editors and proposal footer",
+    "final_disposition": "ship",
+    "scope": "The single listed contrast correction was scored resolved. Proposal taste approval remains with the user."
+  }
+}

@@ -1,0 +1,565 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-12T20:19:13.718185Z",
+  "title": "Design System: Steervo — Canvas / Tinte",
+  "extensions": {
+    "colorMeta": {
+      "accent": {
+        "role": "primary",
+        "displayName": "Tinte",
+        "tonalRamp": [
+          "oklch(15% 0.0123 254.1)",
+          "oklch(25% 0.0276 254.1)",
+          "oklch(35% 0.0430 254.1)",
+          "oklch(45% 0.0553 254.1)",
+          "oklch(55% 0.0614 254.1)",
+          "oklch(65% 0.0522 254.1)",
+          "oklch(80% 0.0338 254.1)",
+          "oklch(95% 0.0092 254.1)"
+        ]
+      },
+      "accent-hover": {
+        "role": "primary",
+        "displayName": "Dunkle Tinte",
+        "tonalRamp": [
+          "oklch(15% 0.0107 251.2)",
+          "oklch(25% 0.0240 251.2)",
+          "oklch(35% 0.0374 251.2)",
+          "oklch(45% 0.0481 251.2)",
+          "oklch(55% 0.0534 251.2)",
+          "oklch(65% 0.0454 251.2)",
+          "oklch(80% 0.0294 251.2)",
+          "oklch(95% 0.0080 251.2)"
+        ]
+      },
+      "soft": {
+        "role": "primary",
+        "displayName": "Helle Tinte",
+        "tonalRamp": [
+          "oklch(15% 0.0017 247.9)",
+          "oklch(25% 0.0039 247.9)",
+          "oklch(35% 0.0060 247.9)",
+          "oklch(45% 0.0078 247.9)",
+          "oklch(55% 0.0086 247.9)",
+          "oklch(65% 0.0073 247.9)",
+          "oklch(80% 0.0047 247.9)",
+          "oklch(95% 0.0013 247.9)"
+        ]
+      },
+      "focus": {
+        "role": "primary",
+        "displayName": "Fokus-Tinte",
+        "tonalRamp": [
+          "oklch(15% 0.0123 254.1)",
+          "oklch(25% 0.0276 254.1)",
+          "oklch(35% 0.0430 254.1)",
+          "oklch(45% 0.0553 254.1)",
+          "oklch(55% 0.0614 254.1)",
+          "oklch(65% 0.0522 254.1)",
+          "oklch(80% 0.0338 254.1)",
+          "oklch(95% 0.0092 254.1)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Texttinte",
+        "tonalRamp": [
+          "oklch(15% 0.0030 244.2)",
+          "oklch(25% 0.0066 244.2)",
+          "oklch(35% 0.0103 244.2)",
+          "oklch(45% 0.0133 244.2)",
+          "oklch(55% 0.0148 244.2)",
+          "oklch(65% 0.0125 244.2)",
+          "oklch(80% 0.0081 244.2)",
+          "oklch(95% 0.0022 244.2)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Sekundärtext",
+        "tonalRamp": [
+          "oklch(15% 0.0035 235.6)",
+          "oklch(25% 0.0078 235.6)",
+          "oklch(35% 0.0121 235.6)",
+          "oklch(45% 0.0155 235.6)",
+          "oklch(55% 0.0173 235.6)",
+          "oklch(65% 0.0147 235.6)",
+          "oklch(80% 0.0095 235.6)",
+          "oklch(95% 0.0026 235.6)"
+        ]
+      },
+      "editor-muted": {
+        "role": "neutral",
+        "displayName": "Editor-Sekundärtext",
+        "tonalRamp": [
+          "oklch(15% 0.0066 246.9)",
+          "oklch(25% 0.0149 246.9)",
+          "oklch(35% 0.0231 246.9)",
+          "oklch(45% 0.0297 246.9)",
+          "oklch(55% 0.0330 246.9)",
+          "oklch(65% 0.0281 246.9)",
+          "oklch(80% 0.0182 246.9)",
+          "oklch(95% 0.0050 246.9)"
+        ]
+      },
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Canvas",
+        "tonalRamp": [
+          "oklch(15% 0.0011 106.5)",
+          "oklch(25% 0.0024 106.5)",
+          "oklch(35% 0.0037 106.5)",
+          "oklch(45% 0.0048 106.5)",
+          "oklch(55% 0.0053 106.5)",
+          "oklch(65% 0.0045 106.5)",
+          "oklch(80% 0.0029 106.5)",
+          "oklch(95% 0.0008 106.5)"
+        ]
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "Arbeitsfläche",
+        "tonalRamp": [
+          "oklch(15% 0.0000 89.9)",
+          "oklch(25% 0.0000 89.9)",
+          "oklch(35% 0.0000 89.9)",
+          "oklch(45% 0.0000 89.9)",
+          "oklch(55% 0.0000 89.9)",
+          "oklch(65% 0.0000 89.9)",
+          "oklch(80% 0.0000 89.9)",
+          "oklch(95% 0.0000 89.9)"
+        ]
+      },
+      "nav-surface": {
+        "role": "neutral",
+        "displayName": "Navigation",
+        "tonalRamp": [
+          "oklch(15% 0.0008 121.6)",
+          "oklch(25% 0.0018 121.6)",
+          "oklch(35% 0.0029 121.6)",
+          "oklch(45% 0.0037 121.6)",
+          "oklch(55% 0.0041 121.6)",
+          "oklch(65% 0.0035 121.6)",
+          "oklch(80% 0.0022 121.6)",
+          "oklch(95% 0.0006 121.6)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Trennlinie",
+        "tonalRamp": [
+          "oklch(15% 0.0007 145.5)",
+          "oklch(25% 0.0015 145.5)",
+          "oklch(35% 0.0024 145.5)",
+          "oklch(45% 0.0031 145.5)",
+          "oklch(55% 0.0034 145.5)",
+          "oklch(65% 0.0029 145.5)",
+          "oklch(80% 0.0019 145.5)",
+          "oklch(95% 0.0005 145.5)"
+        ]
+      },
+      "field-border": {
+        "role": "neutral",
+        "displayName": "Feldkontur",
+        "tonalRamp": [
+          "oklch(15% 0.0019 161.3)",
+          "oklch(25% 0.0042 161.3)",
+          "oklch(35% 0.0066 161.3)",
+          "oklch(45% 0.0084 161.3)",
+          "oklch(55% 0.0094 161.3)",
+          "oklch(65% 0.0080 161.3)",
+          "oklch(80% 0.0051 161.3)",
+          "oklch(95% 0.0014 161.3)"
+        ]
+      },
+      "filter-surface": {
+        "role": "neutral",
+        "displayName": "Filterfläche",
+        "tonalRamp": [
+          "oklch(15% 0.0005 165.1)",
+          "oklch(25% 0.0011 165.1)",
+          "oklch(35% 0.0017 165.1)",
+          "oklch(45% 0.0022 165.1)",
+          "oklch(55% 0.0025 165.1)",
+          "oklch(65% 0.0021 165.1)",
+          "oklch(80% 0.0014 165.1)",
+          "oklch(95% 0.0004 165.1)"
+        ]
+      },
+      "neutral-surface": {
+        "role": "neutral",
+        "displayName": "Neutrale Statusfläche",
+        "tonalRamp": [
+          "oklch(15% 0.0004 197.1)",
+          "oklch(25% 0.0010 197.1)",
+          "oklch(35% 0.0015 197.1)",
+          "oklch(45% 0.0019 197.1)",
+          "oklch(55% 0.0021 197.1)",
+          "oklch(65% 0.0018 197.1)",
+          "oklch(80% 0.0012 197.1)",
+          "oklch(95% 0.0003 197.1)"
+        ]
+      },
+      "group-surface": {
+        "role": "neutral",
+        "displayName": "Gruppenfläche",
+        "tonalRamp": [
+          "oklch(15% 0.0006 128.5)",
+          "oklch(25% 0.0013 128.5)",
+          "oklch(35% 0.0020 128.5)",
+          "oklch(45% 0.0026 128.5)",
+          "oklch(55% 0.0028 128.5)",
+          "oklch(65% 0.0024 128.5)",
+          "oklch(80% 0.0016 128.5)",
+          "oklch(95% 0.0004 128.5)"
+        ]
+      },
+      "row-hover": {
+        "role": "neutral",
+        "displayName": "Zeilen-Hover",
+        "tonalRamp": [
+          "oklch(15% 0.0007 145.5)",
+          "oklch(25% 0.0015 145.5)",
+          "oklch(35% 0.0024 145.5)",
+          "oklch(45% 0.0030 145.5)",
+          "oklch(55% 0.0034 145.5)",
+          "oklch(65% 0.0029 145.5)",
+          "oklch(80% 0.0019 145.5)",
+          "oklch(95% 0.0005 145.5)"
+        ]
+      },
+      "warning": {
+        "role": "semantic",
+        "displayName": "Noch offen",
+        "tonalRamp": [
+          "oklch(15% 0.0194 77.5)",
+          "oklch(25% 0.0437 77.5)",
+          "oklch(35% 0.0679 77.5)",
+          "oklch(45% 0.0874 77.5)",
+          "oklch(55% 0.0971 77.5)",
+          "oklch(65% 0.0825 77.5)",
+          "oklch(80% 0.0534 77.5)",
+          "oklch(95% 0.0146 77.5)"
+        ]
+      },
+      "warning-bg": {
+        "role": "semantic",
+        "displayName": "Fläche: Noch offen",
+        "tonalRamp": [
+          "oklch(15% 0.0042 85.9)",
+          "oklch(25% 0.0095 85.9)",
+          "oklch(35% 0.0148 85.9)",
+          "oklch(45% 0.0190 85.9)",
+          "oklch(55% 0.0212 85.9)",
+          "oklch(65% 0.0180 85.9)",
+          "oklch(80% 0.0116 85.9)",
+          "oklch(95% 0.0032 85.9)"
+        ]
+      },
+      "negative": {
+        "role": "semantic",
+        "displayName": "Nicht erfüllt",
+        "tonalRamp": [
+          "oklch(15% 0.0229 28.4)",
+          "oklch(25% 0.0516 28.4)",
+          "oklch(35% 0.0802 28.4)",
+          "oklch(45% 0.1032 28.4)",
+          "oklch(55% 0.1146 28.4)",
+          "oklch(65% 0.0974 28.4)",
+          "oklch(80% 0.0630 28.4)",
+          "oklch(95% 0.0172 28.4)"
+        ]
+      },
+      "negative-bg": {
+        "role": "semantic",
+        "displayName": "Fläche: Nicht erfüllt",
+        "tonalRamp": [
+          "oklch(15% 0.0027 28.9)",
+          "oklch(25% 0.0060 28.9)",
+          "oklch(35% 0.0093 28.9)",
+          "oklch(45% 0.0120 28.9)",
+          "oklch(55% 0.0133 28.9)",
+          "oklch(65% 0.0113 28.9)",
+          "oklch(80% 0.0073 28.9)",
+          "oklch(95% 0.0020 28.9)"
+        ]
+      },
+      "positive": {
+        "role": "semantic",
+        "displayName": "Erfüllt",
+        "tonalRamp": [
+          "oklch(15% 0.0138 165.6)",
+          "oklch(25% 0.0311 165.6)",
+          "oklch(35% 0.0483 165.6)",
+          "oklch(45% 0.0621 165.6)",
+          "oklch(55% 0.0690 165.6)",
+          "oklch(65% 0.0587 165.6)",
+          "oklch(80% 0.0380 165.6)",
+          "oklch(95% 0.0104 165.6)"
+        ]
+      },
+      "positive-bg": {
+        "role": "semantic",
+        "displayName": "Fläche: Erfüllt",
+        "tonalRamp": [
+          "oklch(15% 0.0021 158.8)",
+          "oklch(25% 0.0048 158.8)",
+          "oklch(35% 0.0075 158.8)",
+          "oklch(45% 0.0097 158.8)",
+          "oklch(55% 0.0107 158.8)",
+          "oklch(65% 0.0091 158.8)",
+          "oklch(80% 0.0059 158.8)",
+          "oklch(95% 0.0016 158.8)"
+        ]
+      },
+      "feedback-bg": {
+        "role": "neutral",
+        "displayName": "Rückmeldung",
+        "tonalRamp": [
+          "oklch(15% 0.0051 188.2)",
+          "oklch(25% 0.0116 188.2)",
+          "oklch(35% 0.0180 188.2)",
+          "oklch(45% 0.0232 188.2)",
+          "oklch(55% 0.0257 188.2)",
+          "oklch(65% 0.0219 188.2)",
+          "oklch(80% 0.0142 188.2)",
+          "oklch(95% 0.0039 188.2)"
+        ]
+      },
+      "dialog-scrim": {
+        "role": "neutral",
+        "displayName": "Dialogabdunklung",
+        "tonalRamp": [
+          "oklch(15% 0.0043 166.8 / 0.333)",
+          "oklch(25% 0.0097 166.8 / 0.333)",
+          "oklch(35% 0.0151 166.8 / 0.333)",
+          "oklch(45% 0.0195 166.8 / 0.333)",
+          "oklch(55% 0.0216 166.8 / 0.333)",
+          "oklch(65% 0.0184 166.8 / 0.333)",
+          "oklch(80% 0.0119 166.8 / 0.333)",
+          "oklch(95% 0.0032 166.8 / 0.333)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Fahrzeugname",
+        "purpose": "Hauptname in der Canvas-Einleitung; responsive verkleinert."
+      },
+      "headline": {
+        "displayName": "Vergleichstitel",
+        "purpose": "Hauptüberschrift des Vergleichs."
+      },
+      "context-title": {
+        "displayName": "Evaluationskontext",
+        "purpose": "Evaluationstitel über der Fahrzeugakte; andere Ansichten kompakter."
+      },
+      "title": {
+        "displayName": "Editortitel",
+        "purpose": "Überschrift der Bewertung oder des Seitenpanels."
+      },
+      "section-title": {
+        "displayName": "Abschnittstitel",
+        "purpose": "Titel einer Arbeitssektion."
+      },
+      "body": {
+        "displayName": "Grundschrift",
+        "purpose": "Text und Eingabewerte."
+      },
+      "label": {
+        "displayName": "Aktionsbeschriftung",
+        "purpose": "Standardbuttons und vergleichbare Aktionen."
+      },
+      "field-label": {
+        "displayName": "Feldbeschriftung",
+        "purpose": "Sichtbares Label eines Eingabefeldes."
+      },
+      "metadata": {
+        "displayName": "Zusatzangaben",
+        "purpose": "Quellen und ergänzende Hinweise."
+      },
+      "value": {
+        "displayName": "Bewertungswert",
+        "purpose": "Erfasster Wert mit tabellarischen Ziffern."
+      }
+    },
+    "shadows": [
+      {
+        "name": "surface",
+        "value": "0 6px 22px #26352f07, 0 1px 3px #26352f07",
+        "purpose": "Gemeinsame Akte und Vergleich; vorhandener Token --shadow."
+      },
+      {
+        "name": "candidate-selected",
+        "value": "0 2px 6px #26352f0c",
+        "purpose": "Aktiver Kandidat im horizontalen Wechsel."
+      },
+      {
+        "name": "filter-selected",
+        "value": "0 2px 4px #26352f0a",
+        "purpose": "Aktive Teilfläche einer Filtergruppe."
+      },
+      {
+        "name": "side-sheet",
+        "value": "-12px 0 50px #15261d25",
+        "purpose": "Modales Seitenpanel vor der abgedunkelten Seite."
+      },
+      {
+        "name": "feedback",
+        "value": "0 8px 28px #15261d25",
+        "purpose": "Bestätigungshinweis über der Arbeitsfläche."
+      }
+    ],
+    "motion": [
+      {
+        "name": "button-background",
+        "value": "background 150ms ease",
+        "purpose": "Vorhandener Hintergrundwechsel eines Buttons."
+      },
+      {
+        "name": "inline-reveal",
+        "value": "240ms cubic-bezier(.16,1,.3,1)",
+        "purpose": "Lokaler Reveal über clip-path und brightness; nur bei prefers-reduced-motion: no-preference."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation: none; transition: none; scroll-behavior: auto",
+        "purpose": "Reduzierte Bewegung deaktiviert Animationen und Übergänge."
+      },
+      {
+        "name": "feedback-duration",
+        "value": "3200ms",
+        "purpose": "Sichtdauer der prototypischen Speicherbestätigung; keine Fehler- oder Pflichtmeldung."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "canvas-compact-max",
+        "value": "1200px"
+      },
+      {
+        "name": "canvas-stacked-aside-max",
+        "value": "980px"
+      },
+      {
+        "name": "canvas-mobile-max",
+        "value": "700px"
+      },
+      {
+        "name": "canvas-narrow-navigation-max",
+        "value": "360px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primärer Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Tintenfarbene Hauptaktion mit Hover, Tastaturfokus und deaktiviertem Zustand.",
+      "html": "<button type=\"button\" class=\"ds-primary\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"m5 12 4 4L19 6\"/></svg>Speichern</button>",
+      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:42px;padding:10px 14px;border-radius:9px;font-size:13px;font-weight:550;line-height:1.5;cursor:pointer;transition:background .15s;font-family:Geist,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;border:1px solid transparent;background:var(--accent,#3e5878);color:var(--white,#ffffff)}.ds-primary:hover{background:var(--accent-hover,#304862)}.ds-primary:focus-visible{outline:3px solid var(--focus,#3e5878);outline-offset:3px;}.ds-primary:disabled{opacity:.45;cursor:default}.ds-primary .ds-icon{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}@media(prefers-reduced-motion:reduce){.ds-primary,.ds-secondary,.ds-text,.ds-inline{transition:none;animation:none}}"
+    },
+    {
+      "name": "Sekundärer Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Weisse Aktion mit Kontur für Abbrechen oder eine ergänzende Handlung.",
+      "html": "<button type=\"button\" class=\"ds-secondary\">Abbrechen</button>",
+      "css": ".ds-secondary{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:42px;padding:10px 14px;border-radius:9px;font-size:13px;font-weight:550;line-height:1.5;cursor:pointer;transition:background .15s;font-family:Geist,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;border:1px solid var(--line,#e5e7e5);background:var(--white,#ffffff);color:var(--ink,#252c32)}.ds-secondary:hover{background:var(--soft,#e9eef3)}.ds-secondary:focus-visible{outline:3px solid var(--focus,#3e5878);outline-offset:3px;}.ds-secondary:disabled{opacity:.45;cursor:default}@media(prefers-reduced-motion:reduce){.ds-primary,.ds-secondary,.ds-text,.ds-inline{transition:none;animation:none}}"
+    },
+    {
+      "name": "Textbutton",
+      "kind": "button",
+      "refersTo": "button-text",
+      "description": "Zurückhaltende, beschriftete Aktion in Tinte.",
+      "html": "<button type=\"button\" class=\"ds-text\">Vergleich öffnen <svg class=\"ds-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M4 12h16m-6-6 6 6-6 6\"/></svg></button>",
+      "css": ".ds-text{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:42px;padding:10px 14px;border-radius:9px;font-size:13px;font-weight:550;line-height:1.5;cursor:pointer;transition:background .15s;font-family:Geist,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;border:1px solid transparent;background:transparent;color:var(--accent,#3e5878)}.ds-text:hover{background:var(--soft,#e9eef3)}.ds-text:focus-visible{outline:3px solid var(--focus,#3e5878);outline-offset:3px;}.ds-text:disabled{opacity:.45;cursor:default}.ds-text .ds-icon{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}@media(prefers-reduced-motion:reduce){.ds-primary,.ds-secondary,.ds-text,.ds-inline{transition:none;animation:none}}"
+    },
+    {
+      "name": "Beschriftetes Zahlenfeld",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "Wert mit Einheit und ausdrücklichem Hinweis auf unbekannt; mobil mit 16px Eingabeschrift.",
+      "html": "<div class=\"ds-field\"><label for=\"ds-boot\">Deine Angabe (l)</label><input id=\"ds-boot\" type=\"number\" min=\"0\" step=\"any\" inputmode=\"decimal\" placeholder=\"Noch offen\" aria-describedby=\"ds-boot-help\"><small id=\"ds-boot-help\">Leeres Feld = unbekannt · l</small></div>",
+      "css": ".ds-field{display:grid;gap:7px;max-width:340px;color:var(--ink,#252c32);font-family:Geist,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;}.ds-field label{font-size:12px;font-weight:550}.ds-field input{box-sizing:border-box;width:100%;max-width:100%;min-height:43px;border:1px solid #cbd2ce;background:var(--white,#ffffff);border-radius:8px;padding:10px 12px;font:inherit;font-size:14px;caret-color:var(--accent,#3e5878)}.ds-field input::placeholder{color:var(--muted,#657077)}.ds-field input:focus-visible{outline:3px solid var(--focus,#3e5878);outline-offset:3px;}.ds-field small{font-size:11px;color:var(--muted,#657077)}@media(max-width:700px){.ds-field input{font-size:16px}}"
+    },
+    {
+      "name": "Horizontale Navigation",
+      "kind": "nav",
+      "refersTo": "navigation-active",
+      "description": "Beschriftete Evaluationsnavigation mit semantisch aktuellem Eintrag.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Evaluation\"><button type=\"button\" aria-current=\"page\">Garage</button><button type=\"button\">Vergleich</button><button type=\"button\">Kriterien</button><button type=\"button\">Offerten</button></nav>",
+      "css": ".ds-nav{display:flex;align-items:center;gap:10px;padding:12px;background:#fafbf8;font-family:Geist,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;}.ds-nav button{padding:10px 15px;border:0;border-radius:8px;background:transparent;color:var(--muted,#657077);font:inherit;font-size:13px;cursor:pointer}.ds-nav button[aria-current=page]{background:var(--soft,#e9eef3);color:var(--accent,#3e5878);font-weight:600}.ds-nav button:hover{background:var(--soft,#e9eef3)}.ds-nav button:focus-visible{outline:3px solid var(--focus,#3e5878);outline-offset:3px;}@media(max-width:700px){.ds-nav{gap:2px;justify-content:space-between;padding:12px 0}.ds-nav button{font-size:11px;padding:9px 10px}}@media(max-width:360px){.ds-nav button{padding:9px 8px}}"
+    },
+    {
+      "name": "Bewertungsstatus",
+      "kind": "chip",
+      "refersTo": "status-positive",
+      "description": "Nicht interaktive Statuswörter; Farbe und Text tragen dieselbe Bedeutung.",
+      "html": "<div class=\"ds-status-set\"><span class=\"ds-status\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"m5 12 4 4L19 6\"/></svg>Erfüllt</span><span class=\"ds-status ds-open\">Noch offen</span><span class=\"ds-status ds-negative\">Nicht erfüllt</span><span class=\"ds-status ds-personal\">Persönlich</span></div>",
+      "css": ".ds-status-set{display:flex;flex-wrap:wrap;gap:8px;font-family:Geist,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;}.ds-status{display:inline-flex;align-items:center;gap:5px;max-width:100%;padding:4px 7px;border-radius:6px;font-size:11px;font-weight:500;line-height:1.5;white-space:nowrap;background:var(--positive-bg,#edf5f0);color:var(--positive,#39705a)}.ds-status .ds-icon{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}.ds-open{background:var(--warning-bg,#fbf4e5);color:var(--warning,#8b641f)}.ds-negative{background:var(--negative-bg,#fbefed);color:var(--negative,#a34e44)}.ds-personal{background:#f1f3f3;color:var(--muted,#657077)}"
+    },
+    {
+      "name": "Arbeitsfläche mit Bewertungszeile",
+      "kind": "card",
+      "refersTo": "record",
+      "description": "Gemeinsame weisse Fläche und flache bearbeitbare Zeile; die Beispieldaten sind illustrativ.",
+      "html": "<section class=\"ds-record\" aria-labelledby=\"ds-record-title\"><h3 id=\"ds-record-title\">Passt zu deinem Alltag?</h3><p>Deine Anforderungen an dieses Auto.</p><button type=\"button\" class=\"ds-assessment\" aria-label=\"Kofferraum bearbeiten, 585 l\"><span class=\"ds-criterion\">Kofferraum<small>Mindestens 550 l · Muss</small></span><span class=\"ds-value\">585 l<small>Herstellerangabe</small><small class=\"ds-mobile-status\">Erfüllt</small></span><span class=\"ds-row-status\">Erfüllt</span><svg class=\"ds-edit-icon\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"m14 5 5 5M4 20l5-1L21 7l-5-5L4 14v6Z\"/></svg></button></section>",
+      "css": ".ds-record{padding:30px 34px;border-radius:16px;background:var(--white,#ffffff);color:var(--ink,#252c32);box-shadow:var(--shadow,0 6px 22px #26352f07,0 1px 3px #26352f07);font-family:Geist,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;}.ds-record h3{margin:0;font-size:19px;font-weight:560;line-height:1.2;letter-spacing:-.025em}.ds-record>p{margin:7px 0 21px;color:var(--muted,#657077);font-size:12px}.ds-assessment{display:grid;grid-template-columns:minmax(130px,1.15fr) minmax(94px,.7fr) auto 14px;gap:13px;align-items:center;width:100%;min-height:83px;padding:17px 0;border:0;border-bottom:1px solid var(--line,#e5e7e5);background:transparent;color:inherit;text-align:left;font:inherit;cursor:pointer}.ds-assessment:hover{background:#f6f8f6}.ds-assessment:focus-visible{outline:3px solid var(--focus,#3e5878);outline-offset:3px;}.ds-criterion{font-size:14px;font-weight:550;line-height:1.5}.ds-value{font-size:18px;font-weight:560;letter-spacing:-.02em;font-variant-numeric:tabular-nums}.ds-criterion small,.ds-value small{display:block;margin-top:5px;font-size:11px;font-weight:400;letter-spacing:0;line-height:1.6;color:var(--muted,#657077)}.ds-row-status{padding:4px 6px;border-radius:6px;font-size:10px;background:var(--positive-bg,#edf5f0);color:var(--positive,#39705a)}.ds-edit-icon{width:13px;height:13px;fill:none;stroke:var(--muted,#657077);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}.ds-value .ds-mobile-status{display:none}@media(max-width:700px){.ds-record{padding:19px;border-radius:14px}.ds-assessment{grid-template-columns:minmax(135px,1.1fr) minmax(85px,.75fr) 13px;gap:11px;min-height:91px;padding:16px 0}.ds-criterion{font-size:12px}.ds-value{font-size:16px}.ds-criterion small,.ds-value small{font-size:10px}.ds-row-status{display:none}.ds-value .ds-mobile-status{display:block;color:var(--positive,#39705a)}}"
+    },
+    {
+      "name": "Inline-Bewertung",
+      "kind": "custom",
+      "refersTo": "inline-editor",
+      "description": "Getönter Editor mit korrigiertem Sekundärtext, Kontext und einspaltiger mobiler Eingabe; das Beispiel zeigt die Darstellung ohne Speicherlogik.",
+      "html": "<section class=\"ds-inline\" role=\"region\" aria-label=\"Bewertung bearbeiten\"><div class=\"ds-editor-heading\"><div><h2>Kofferraum</h2><p>Beispielkandidat · Bewertung bearbeiten</p></div><button type=\"button\" class=\"ds-editor-close\" aria-label=\"Bearbeitung schliessen\"><svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"m6 6 12 12M18 6 6 18\"/></svg></button></div><p class=\"ds-editor-context\">Muss · Mindestens 550 l</p><div class=\"ds-editor-grid\"><div class=\"ds-editor-field\"><label for=\"ds-editor-value\">Deine Angabe (l)</label><input id=\"ds-editor-value\" type=\"number\" value=\"585\" min=\"0\" step=\"any\" inputmode=\"decimal\" aria-describedby=\"ds-editor-help\"><small id=\"ds-editor-help\">Leeres Feld = unbekannt · l</small></div><div class=\"ds-editor-field\"><label for=\"ds-editor-source\">Grundlage</label><select id=\"ds-editor-source\"><option>Herstellerangabe</option><option>Noch offen</option><option>Offerte</option><option>Probefahrt</option><option>Eigene Recherche</option></select></div></div><div class=\"ds-editor-field\"><label for=\"ds-editor-note\">Notiz <span>(optional)</span></label><textarea id=\"ds-editor-note\" rows=\"3\" placeholder=\"Was möchtest du dazu festhalten?\"></textarea></div><div class=\"ds-editor-actions\"><button type=\"button\">Abbrechen</button><button type=\"button\" class=\"ds-editor-save\">Speichern</button></div></section>",
+      "css": ".ds-inline{--muted:#536474;padding:24px;border-radius:12px;background:var(--soft,#e9eef3);color:var(--ink,#252c32);font-family:Geist,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;}.ds-editor-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;margin-bottom:18px}.ds-editor-heading h2{margin:0;font-size:22px;font-weight:600;line-height:1.2;letter-spacing:-.025em}.ds-editor-heading p{margin:7px 0 0;font-size:12px;color:var(--muted)}.ds-editor-context{margin:0 0 20px;color:var(--muted);font-size:12px}.ds-editor-close{display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:8px;background:transparent;color:var(--muted);cursor:pointer}.ds-editor-close svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round}.ds-editor-close:hover{background:var(--soft,#e9eef3);color:var(--accent,#3e5878)}.ds-editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.ds-editor-field{display:grid;gap:7px;margin-bottom:18px;min-width:0}.ds-editor-field label{font-size:12px;font-weight:550}.ds-editor-field label span,.ds-editor-field small{color:var(--muted);font-size:11px}.ds-editor-field input,.ds-editor-field select,.ds-editor-field textarea{box-sizing:border-box;width:100%;min-width:0;min-height:43px;padding:10px 12px;border:1px solid #cbd2ce;border-radius:8px;background:var(--white,#ffffff);color:var(--ink,#252c32);font:inherit;font-size:14px;caret-color:var(--accent,#3e5878)}.ds-editor-field textarea{resize:vertical;min-height:75px}.ds-editor-field textarea::placeholder{color:var(--muted)}.ds-editor-actions{display:flex;justify-content:flex-end;gap:9px;padding-top:15px;border-top:1px solid #cbd2ce}.ds-editor-actions button{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:42px;padding:10px 14px;border-radius:9px;font-size:13px;font-weight:550;line-height:1.5;cursor:pointer;transition:background .15s;font-family:Geist,-apple-system,BlinkMacSystemFont,\"Segoe UI\",sans-serif;border:1px solid var(--line,#e5e7e5);background:var(--white,#ffffff);color:var(--ink,#252c32)}.ds-editor-actions button:hover{background:var(--soft,#e9eef3)}.ds-editor-actions .ds-editor-save{border-color:transparent;background:var(--accent,#3e5878);color:var(--white,#ffffff)}.ds-editor-actions .ds-editor-save:hover{background:var(--accent-hover,#304862)}.ds-inline button:focus-visible,.ds-inline input:focus-visible,.ds-inline select:focus-visible,.ds-inline textarea:focus-visible{outline:3px solid var(--focus,#3e5878);outline-offset:3px;}@media(max-width:700px){.ds-inline{padding:19px 14px}.ds-editor-grid{grid-template-columns:1fr;gap:0}.ds-editor-heading h2{font-size:21px;line-height:1.25}.ds-editor-heading p,.ds-editor-context{font-size:11px;line-height:1.6}.ds-editor-field input,.ds-editor-field select,.ds-editor-field textarea{font-size:16px}.ds-editor-actions button{font-size:12px}}@media(prefers-reduced-motion:no-preference){.ds-inline{animation:ds-edit-open .24s cubic-bezier(.16,1,.3,1)}@keyframes ds-edit-open{from{clip-path:inset(0 0 5% 0 round 12px);filter:brightness(.98)}to{clip-path:inset(0 0 0 0 round 12px);filter:brightness(1)}}}@media(prefers-reduced-motion:reduce){.ds-inline,.ds-inline button{animation:none;transition:none;scroll-behavior:auto}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Canvas und Tinte",
+    "overview": "Canvas und Tinte bilden das bestätigte Zielsystem von Steervo. Eine ruhige, warme Grundfläche trägt zusammenhängende weisse Arbeitsflächen; der gedämpfte Tintenakzent kennzeichnet Handlungen, Auswahl und Fokus. Fahrzeugdaten, Anforderungen und persönliche Eindrücke bleiben gut unterscheidbar und stehen trotzdem in einem gemeinsamen Arbeitskontext.\n\nDie Gestaltung ist offen, übersichtlich und zurückhaltend. Horizontale Navigation, klare Schriftgrössen, schmale Trennlinien und weiche Flächenschatten schaffen Hierarchie. Wiederkehrende Aufgaben verwenden dieselben Steuerelemente und Rückmeldungen; Farbe unterstützt die Bedeutung, ersetzt aber weder Statuswörter noch Quellen und Einheiten.",
+    "keyCharacteristics": [
+      "Horizontale Navigation und eine zusammenhängende Fahrzeugakte.",
+      "Geist für Überschriften, Texte, Bedienelemente und tabellarische Zahlen.",
+      "Tinte für Interaktion; eigene semantische Farben für offen, erfüllt und nicht erfüllt.",
+      "Bewertungen direkt im Kontext bearbeiten, auch im mobilen Vergleich.",
+      "Weisse Flächen, zurückhaltende Rundungen und geringe, funktionale Tiefe."
+    ],
+    "rules": [
+      {
+        "name": "Bedeutung vor Farbe",
+        "body": "Jeder fachliche Zustand hat eine lesbare Bezeichnung. Unbekannt, Nein und null bleiben unterscheidbar; persönliche Bewertungen erhalten keine objektive Erfüllungsfarbe.",
+        "section": "colors"
+      },
+      {
+        "name": "Ein Schriftbild",
+        "body": "Geist trägt die gesamte Oberfläche. Zahlen werden über tabellarische Ziffern ausgerichtet, nicht durch eine zusätzliche Monospace-Schrift.",
+        "section": "typography"
+      },
+      {
+        "name": "Zusammenhängende Fläche",
+        "body": "Eine Fahrzeugakte bleibt eine gemeinsame Arbeitsfläche. Trennlinien und Abstand gliedern ihre Inhalte; zusätzliche Schatten gehören nur an tatsächlich getrennte Ebenen.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do Canvas mit Tinte als visuelle Grundlage für die bestehende Anwendung verwenden und den vollständigen vorhandenen Funktionsumfang erhalten.",
+      "Do dieselben Buttons, Felder, Statusbegriffe und Rückmeldungen beim Erfassen und Vergleichen verwenden.",
+      "Do Quellen, Einheiten, persönliche Einschätzungen und offene Angaben sichtbar voneinander unterscheiden.",
+      "Do den Fokus mit einer 3px-Kontur und 3px Abstand zeigen, beim Schliessen zum Auslöser zurückführen und reduzierte Bewegung respektieren.",
+      "Do den Vergleich auf kleinen Bildschirmen innerhalb seiner Region scrollen lassen und den Editor ausserhalb dieser Region halten.",
+      "Do sekundären Text im getönten Inline-Editor mit dem korrigierten Token editor-muted darstellen.",
+      "Do die Fahrzeugakte ohne Bilder vollständig benutzbar halten und den bestehenden Umfang vor neuen Funktionen migrieren."
+    ],
+    "donts": [
+      "Don't Studio, Galeriebedienung, alternative Paletten oder frühere Entwurfsrunden in das gewählte Zielsystem übernehmen.",
+      "Don't Farben allein als Status verwenden, unbekannte Angaben als null darstellen oder persönliche Einschätzungen als objektiv erfüllt bewerten.",
+      "Don't aus einem verfehlten Muss einen automatischen Ausschluss oder aus Einzelbewertungen eine Gesamtnote ableiten.",
+      "Don't die korrigierte Editor-Textfarbe durch den allgemeinen muted-Token ersetzen.",
+      "Don't Beispielbilder, Demowerte oder Session-Storage-Verhalten als Produktionsanforderungen behandeln.",
+      "Don't unverifizierte Fehler-, Lade- oder Dialogzustände als bereits gestaltete und getestete Produktionskomponenten ausgeben."
+    ]
+  }
+}

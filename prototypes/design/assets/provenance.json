@@ -1,0 +1,21 @@
+{
+  "enyaq.jpg": {
+    "origin": "https://cdn.skoda-storyboard.com/2024/12/53_New_Skoda_Enyaq_Sportline_42759bfd.jpg",
+    "attribution": "Škoda Auto / Škoda Storyboard",
+    "use": "Illustrative model image in local unpublished design proposal"
+  },
+  "id7.jpg": {
+    "origin": "https://www.bilia.se/siteassets/bilar/volkswagen/modeller/id.7-tourer/id.7_tourer_studio_nav-sok.jpg",
+    "attribution": "Volkswagen / Bilia",
+    "use": "Illustrative model image in local unpublished design proposal"
+  },
+  "i5.jpg": {
+    "origin": "https://images.caradisiac.com/logos/1/3/2/9/281329/S8-presentation-video-bmw-i5-touring-2024-le-premier-break-electrique-premium-du-marche-207105.jpg",
+    "attribution": "Caradisiac",
+    "use": "Illustrative model image in local unpublished design proposal"
+  },
+  "geist.woff2": {
+    "origin": "https://raw.githubusercontent.com/vercel/geist-font/main/fonts/Geist/webfonts/Geist%5Bwght%5D.woff2",
+    "license": "SIL Open Font License 1.1; see OFL.txt"
+  }
+}
