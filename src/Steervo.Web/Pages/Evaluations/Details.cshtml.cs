@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Localization;
 using Steervo.Application.Evaluations;
 using Steervo.Core;
+using Steervo.Application.Documents;
 
 namespace Steervo.Web.Pages.Evaluations;
 
-public sealed class DetailsModel(EvaluationWorkspace workspace, EvaluationTransfer transfer, ICurrentUser current, IAccountDirectory accounts, IStringLocalizer<Ui> text) : PageModel
+public sealed class DetailsModel(EvaluationWorkspace workspace, EvaluationArchive transfer, ICurrentUser current, IAccountDirectory accounts, IStringLocalizer<Ui> text) : PageModel
 {
     public Evaluation Evaluation { get; private set; } = null!;
     public AccessLevel Access => Evaluation.AccessFor(current.Id)!.Value;
@@ -20,8 +21,12 @@ public sealed class DetailsModel(EvaluationWorkspace workspace, EvaluationTransf
     }
     public async Task<IActionResult> OnGetExportAsync(Guid id)
     {
-        try { return File(await transfer.ExportAsync(id), "application/json", $"evaluation-{id}.json"); }
-        catch (RuleException error) { return StatusCode(error.Message == "Forbidden" ? 403 : 404); }
+        try { var result = await transfer.ExportAsync(id, HttpContext.RequestAborted); return File(result.Content, result.ContentType, result.FileName); }
+        catch (RuleException error)
+        {
+            if (error.Message is "Forbidden" or "NotFound") return StatusCode(error.Message == "Forbidden" ? 403 : 404);
+            await LoadAsync(id); Failed = true; Notice = text[error.Message]; Response.StatusCode = 422; return Page();
+        }
     }
     public async Task<IActionResult> OnPostAsync(Guid id, long version, string action, Guid itemId, string name, string? purpose,
         Guid? groupId, int direction, int position, CriterionType type, Priority priority, CriterionScope scope, string? threshold, string? unit, Comparison comparison, string email, AccessLevel access, string userId)

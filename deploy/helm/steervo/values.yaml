@@ -1,12 +1,16 @@
 image:
   repository: steervo
-  tag: "0.1.0"
+  tag: "0.2.0"
   digest: ""
   pullPolicy: IfNotPresent
 imagePullSecrets: []
 publicUrl: https://steervo.example.org
 existingSecret: steervo-runtime
 trustedProxies: []
+documentStorage:
+  endpoint: http://garage:3900
+  region: garage
+  bucket: steervo
 keyStorage:
   existingClaim: ""
   storageClassName: ""

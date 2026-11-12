@@ -1,0 +1,21 @@
+@model Steervo.Web.Pages.Evaluations.Offers.OfferAssessmentRow
+@using System.Globalization
+@{ var c = Model.Criterion; var value = Model.Assessment; var field = Model.FieldId; }
+<article class="assessment-row" id="@field" data-offer-assessment="@c.Id" data-result="@Model.Result" data-stale="@Model.Stale.ToString().ToLowerInvariant()">
+<div class="assessment-heading"><div><h4>@c.Name</h4><span class="priority @c.Priority.ToString().ToLowerInvariant()">@T[c.Priority.ToString()]</span><span class="micro">@T[c.Type.ToString()] @if (c.Type == CriterionType.Measurement) { <span> · @(c.Comparison == Comparison.AtLeast ? "≥" : "≤") @c.Threshold @c.Unit</span> }</span></div><span class="fulfillment @Model.Result.ToString().ToLowerInvariant()">@T["Fulfillment" + Model.Result]</span></div>
+@if (Model.Stale) { <p class="notice offer-review">@T["OfferAssessmentStale", value!.RevisionNumber]</p> }
+@if (Model.Access >= AccessLevel.Editor && !Model.Offer.Archived)
+{
+<form method="post" action="@Model.PostUrl" asp-antiforgery="true" hx-post="@Model.PostUrl" class="assessment-form"><input type="hidden" name="version" value="@Model.Evaluation.Version" /><input type="hidden" name="action" value="assess-offer" /><input type="hidden" name="offerId" value="@Model.Offer.Id" /><input type="hidden" name="criterionId" value="@c.Id" /><div class="assessment-value"><label for="@(field)-value">@T["AssessmentValue"]</label>
+@if (c.Type == CriterionType.Boolean) { <select id="@(field)-value" name="booleanValue"><option value="" selected="@(value?.BooleanValue is null)">@T["FulfillmentUnknown"]</option><option value="true" selected="@(value?.BooleanValue == true)">@T["Yes"]</option><option value="false" selected="@(value?.BooleanValue == false)">@T["No"]</option></select> }
+else if (c.Type == CriterionType.Rating) { <select id="@(field)-value" name="ratingValue"><option value="">@T["FulfillmentUnknown"]</option>@for (var rating = 1; rating <= 5; rating++) { <option value="@rating" selected="@(value?.RatingValue == rating)">@rating / 5</option> }</select> }
+else { <input id="@(field)-value" name="measurementValue" type="number" step="any" value="@value?.MeasurementValue?.ToString(CultureInfo.InvariantCulture)" /><span class="micro">@c.Unit</span> }
+</div><div class="assessment-source"><label for="@(field)-source">@T["AssessmentSource"]</label><select id="@(field)-source" name="source">@foreach (var source in Enum.GetValues<AssessmentSource>()) { <option value="@source" selected="@(source == (value?.Source ?? AssessmentSource.Unknown))">@T["AssessmentSource" + source]</option> }</select></div><button class="button secondary">@T[Model.Stale ? "OfferAssessmentReview" : "OfferAssessmentSave"]</button><details class="assessment-note" id="@(field)-note"><summary>@T["AssessmentNoteHelp"]</summary><label for="@(field)-notes">@T["AssessmentNoteHelp"]</label><textarea id="@(field)-notes" name="notes" maxlength="4000" rows="2">@value?.Notes</textarea></details></form>
+@if (value is not null) { <form method="post" action="@Model.PostUrl" asp-antiforgery="true" hx-post="@Model.PostUrl" class="assessment-reset" data-confirm="@T["ClearAssessmentConfirm"]"><input type="hidden" name="version" value="@Model.Evaluation.Version" /><input type="hidden" name="action" value="clear-assessment" /><input type="hidden" name="offerId" value="@Model.Offer.Id" /><input type="hidden" name="criterionId" value="@c.Id" /><button class="text-button">@T["OfferAssessmentReset"]</button></form> }
+}
+else
+{
+    <p>@(c.Type == CriterionType.Boolean ? T[value?.BooleanValue is { } boolean ? boolean ? "Yes" : "No" : "FulfillmentUnknown"].Value : c.Type == CriterionType.Rating ? value?.RatingValue?.ToString() ?? T["FulfillmentUnknown"].Value : value?.MeasurementValue?.ToString() ?? T["FulfillmentUnknown"].Value) @if (c.Type == CriterionType.Measurement) { <span>@c.Unit</span> }</p>
+    @if (value is not null) { <p class="micro">@T["AssessmentSource" + value.Source]</p><p class="offer-note">@value.Notes</p> }
+}
+</article>

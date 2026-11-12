@@ -1,0 +1,14 @@
+@model Steervo.Web.Pages.Evaluations.Offers.OfferSnapshot
+@if (Model.Revision.Lines.Count == 0) { <p class="muted">@T["OfferNoLines"]</p> }
+else
+{
+<ul class="offer-lines">
+@foreach (var line in Model.Revision.Lines.OrderBy(line => line.Position))
+{
+<li data-offer-line-kind="@line.Kind"><div><span class="micro">@T["OfferLineKind" + line.Kind]</span><strong>@line.Name</strong><span class="offer-line-price">@(line.PriceKind == OfferPriceKind.Amount ? $"{line.Amount:N2} {Model.Currency}" : T["OfferPriceKind" + line.PriceKind].Value)</span></div>
+@if (line.Kind == OfferLineKind.Benefit) { <p class="micro">@(line.Effect.HasValue ? T["OfferBenefitEffect" + line.Effect].Value : T["OfferOpen"].Value) @if (line.CostCategory.HasValue) { <span> · @T["CostCategory" + line.CostCategory]</span> } · @(line.DurationMonths.HasValue ? T["OfferDuration", line.DurationMonths.Value].Value : T["OfferDurationOpen"].Value)</p> }
+@if (line.Notes.Length > 0) { <p class="offer-note">@line.Notes</p> }
+</li>
+}
+</ul>
+}

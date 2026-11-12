@@ -1,5 +1,10 @@
 import { chromium } from 'playwright';
 import { checkSorting } from './sorting.mjs';
+import { checkCandidates } from './candidates.mjs';
+import { checkOffers } from './offers.mjs';
+import { checkDocuments } from './documents.mjs';
+import { checkCosts } from './costs.mjs';
+import { checkScenarios } from './scenarios.mjs';
 import assert from 'node:assert/strict';
 import { spawn, execFileSync } from 'node:child_process';
 import { once } from 'node:events';
@@ -23,12 +28,13 @@ const token = 'browser-test-only-single-use-installation-token';
 const environment = {
   ...process.env, ASPNETCORE_ENVIRONMENT: 'Development', ASPNETCORE_URLS: listenOrigin,
   ConnectionStrings__Database: database, PublicUrl: origin, AllowedHosts: '*',
-  Setup__Token: token, DataProtection__Path: keys, Smtp__Host: 'localhost', Smtp__Port: process.env.STEERVO_E2E_SMTP_PORT || '52025',
+  Setup__Token: token, DataProtection__Path: keys, DocumentStorage__Path: join(keys, 'documents'), Smtp__Host: 'localhost', Smtp__Port: process.env.STEERVO_E2E_SMTP_PORT || '52025',
   Smtp__StartTls: 'false', Smtp__From: 'steervo@example.test', Smtp__HourlyLimit: '100', Smtp__DailyLimit: '200'
 };
 const application = resolve('src/Steervo.Web/bin/Debug/net10.0/Steervo.Web.dll');
 const containerName = `steervo-browser-${process.pid}-${Date.now()}`;
 const keyVolume = `${containerName}-keys`;
+const documentVolume = `${containerName}-documents`;
 let server;
 let browser;
 let httpsProxy;
@@ -45,11 +51,12 @@ function runApplication(migrate = false) {
   const settings = {
     ASPNETCORE_ENVIRONMENT: 'Development', ASPNETCORE_URLS: 'http://+:8080', PublicUrl: origin, AllowedHosts: '*',
     ConnectionStrings__Database: process.env.STEERVO_E2E_CONTAINER_DATABASE || database.replace(/Host=[^;]+/i, 'Host=postgres18').replace(/Port=[^;]+/i, 'Port=5432'),
-    Setup__Token: token, DataProtection__Path: '/var/steervo/keys', TrustedProxies__0: proxyAddress,
+    Setup__Token: token, DataProtection__Path: '/var/steervo/keys', DocumentStorage__Path: '/var/steervo/documents', TrustedProxies__0: proxyAddress,
     Smtp__Host: 'mail', Smtp__Port: '1025', Smtp__StartTls: 'false', Smtp__From: 'steervo@example.test', Smtp__HourlyLimit: '100', Smtp__DailyLimit: '200'
   };
   return spawn('docker', ['run', '--rm', '--pull=never', '--name', migrate ? `${containerName}-migrate` : containerName,
     '--network', 'steervo-tests_default', '--mount', `type=volume,source=${keyVolume},target=/var/steervo/keys`,
+    '--mount', `type=volume,source=${documentVolume},target=/var/steervo/documents`,
     ...(!migrate ? ['-p', `127.0.0.1:${new URL(listenOrigin).port}:8080`] : []),
     ...Object.entries(settings).flatMap(([key, value]) => ['--env', `${key}=${value}`]),
     process.env.STEERVO_IMAGE || 'steervo:local', ...(migrate ? ['--migrate'] : [])], processOptions);
@@ -284,6 +291,20 @@ try {
   await page.setViewportSize({ width: 1440, height: 1050 });
   record('Responsive layout at desktop and 390px mobile width');
 
+  // Run the candidate journey in a fresh request-rate window while retaining data and sessions.
+  await stopServer(); await startServer();
+  await page.goto(`${origin}${casePath}`);
+  const candidateChecks = await checkCandidates({ page, reader, origin, output, post, browserRequest, record });
+  await stopServer(); await startServer();
+  const offerChecks = await checkOffers({ page, reader, readerEmail, origin, output, post, browserRequest, record });
+  await stopServer(); await startServer();
+  await checkDocuments({ page, reader, readerEmail, origin, output, post, browserRequest, record, restart: async () => { await stopServer(); await startServer(); } });
+  await stopServer(); await startServer();
+  await checkCosts({ page, reader, readerEmail, origin, output, post, browserRequest, record, restart: async () => { await stopServer(); await startServer(); } });
+  await stopServer(); await startServer();
+  await checkScenarios({ page, reader, readerEmail, origin, output, post, browserRequest, record, restart: async () => { await stopServer(); await startServer(); } });
+  await stopServer(); await startServer();
+
   if (httpsMode) {
     for (const [address, expected] of [
       ['https://other.steervo-browser.test:5190', 'Passkeys sind für'],
@@ -333,6 +354,13 @@ try {
   await page.goto(`${origin}${casePath}`);
   assert.equal(await page.locator('.criterion').count(), 3);
   assert.equal(await original.getAttribute('data-criterion-id'), criterionId);
+  const persistedCandidates = JSON.parse(await (await browserRequest(page, `${casePath}?handler=Export`)).text());
+  const persistedOffers = JSON.parse(await (await browserRequest(page, `${offerChecks.casePath}?handler=Export`)).text());
+  assert.equal(persistedOffers.currency, 'EUR');
+  assert.equal(persistedOffers.offers.find(offer => offer.id === offerChecks.firstId).revisions.length, 3);
+  assert.equal(persistedCandidates.candidates.length, 8);
+  assert.equal(persistedCandidates.candidates.find(item => item.id === candidateChecks.firstId).specifications.kerbWeightKg, 2100);
+  assert.equal(persistedCandidates.assessments.find(item => item.candidateId === candidateChecks.firstId && item.criterionId === candidateChecks.rating).ratingValue, 2);
   record(`${process.env.STEERVO_E2E_DATABASE_CONTAINER ? 'Application and database' : 'Application'} restart preserves session keys, cases, criteria, ordering and shares`);
 
   await page.goto(`${origin}/Account`); await page.locator('.passkey-row summary').click();
@@ -361,16 +389,21 @@ try {
   const exportFile = join(output, 'evaluation.json'); await download.saveAs(exportFile);
   await page.goto(origin);
   await page.locator('details').filter({ has: page.getByText('Evaluation importieren', { exact: true }) }).locator('summary').click();
-  await page.getByLabel('JSON-Exportdatei').setInputFiles({ name: 'invalid.json', mimeType: 'application/json', buffer: Buffer.from('{invalid') });
+  await page.getByLabel('Exportdatei (JSON oder ZIP)').setInputFiles({ name: 'invalid.json', mimeType: 'application/json', buffer: Buffer.from('{invalid') });
   await page.getByRole('button', { name: 'Als neue Evaluation importieren', exact: true }).click();
   await page.locator('details[open] .validation-summary-errors').waitFor();
   assert.equal(await page.locator('dialog').isVisible(), false);
-  await page.getByLabel('JSON-Exportdatei').setInputFiles(exportFile);
+  await page.getByLabel('Exportdatei (JSON oder ZIP)').setInputFiles(exportFile);
   await page.getByRole('button', { name: 'Als neue Evaluation importieren', exact: true }).click();
   await page.waitForURL(/\/evaluations\//);
   assert.notEqual(new URL(page.url()).pathname, casePath);
   assert.equal(await page.locator('.criterion').count(), 3);
   assert.equal(await page.locator('.share-row').count(), 0);
+  const importedCandidates = JSON.parse(await (await browserRequest(page, `${new URL(page.url()).pathname}?handler=Export`)).text());
+  assert.equal(importedCandidates.candidates.length, 8);
+  assert.equal(importedCandidates.candidates.find(item => item.model === "Nord").specifications.accelerationSeconds, 4.5);
+  assert.ok(importedCandidates.assessments.length >= 6);
+  assert.ok(importedCandidates.candidates.every(item => item.id !== candidateChecks.firstId));
   record('Authorized JSON export and import as an independent private evaluation');
   assert.deepEqual(errors, []);
   await writeFile(join(output, 'results.json'), JSON.stringify({ checks, browserErrors: errors }, null, 2));
@@ -387,7 +420,7 @@ try {
     for (const name of [containerName, `${containerName}-migrate`]) {
       try { execFileSync('docker', ['rm', '-f', name], { stdio: 'ignore' }); } catch {}
     }
-    try { execFileSync('docker', ['volume', 'rm', keyVolume], { stdio: 'ignore' }); } catch {}
+    try { execFileSync('docker', ['volume', 'rm', keyVolume, documentVolume], { stdio: 'ignore' }); } catch {}
   }
   await rm(keys, { recursive: true, force: true });
 }

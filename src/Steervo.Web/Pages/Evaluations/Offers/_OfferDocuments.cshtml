@@ -1,0 +1,24 @@
+@model Steervo.Web.Pages.Evaluations.Offers.DetailsModel
+@{ var e = Model.Evaluation; var offer = Model.Offer; var edit = Model.Current && !offer.Archived && Model.Access >= AccessLevel.Editor;
+   var documents = e.Documents.Where(d => d.OfferId == offer.Id && d.Revisions.Any(r => r.OfferRevisionNumber <= Model.Revision.Number)).OrderBy(d => d.Name).ToArray(); }
+<section class="panel offer-documents" id="documents">
+<div class="section-heading"><div><h3>@T["Documents"]</h3><p class="micro">@T["DocumentsHelp"]</p></div>
+@if (edit) { <a class="button secondary" asp-page="Upload" asp-route-id="@e.Id" asp-route-offerId="@offer.Id">@T["DocumentAdd"]</a> }</div>
+@if (documents.Length == 0) { <p class="muted">@T["DocumentsEmpty"]</p> }
+@foreach (var document in documents)
+{
+    var history = document.Revisions.Where(r => r.OfferRevisionNumber <= Model.Revision.Number).OrderByDescending(r => r.Number).ToArray(); var latest = history[0];
+    <article class="document-row" data-document-id="@document.Id">
+    <div class="document-heading"><div><h4>@document.Name</h4><p class="micro">@latest.File.FileName · @((latest.File.Length / 1024m).ToString("N1")) KiB · @T["DocumentVersion", latest.Number]</p></div>
+    <div class="document-actions"><a class="button secondary" asp-page="/Evaluations/Document" asp-route-id="@e.Id" asp-route-documentId="@document.Id" asp-route-number="@latest.Number">@T["DocumentDownload"]</a>
+    @if (edit) { <a asp-page="Upload" asp-route-id="@e.Id" asp-route-offerId="@offer.Id" asp-route-documentId="@document.Id">@T["DocumentReplace"]</a> }</div></div>
+    <details><summary>@T["DocumentHistory", history.Length]</summary><ol class="document-history">
+    @foreach (var item in history) {
+        <li data-document-version="@item.Number"><div><a asp-page="/Evaluations/Document" asp-route-id="@e.Id" asp-route-documentId="@document.Id" asp-route-number="@item.Number">@T["DocumentVersion", item.Number] · @item.File.FileName</a><span class="micro">@T["OfferVersion", item.OfferRevisionNumber] · <time datetime="@item.CreatedAt.ToString("O")">@item.CreatedAt.ToString("dd.MM.yyyy HH:mm 'UTC'")</time></span></div>
+        @if (item.Note.Length > 0) { <p>@item.Note</p> }</li>
+    }
+    </ol></details>
+    @if (edit) { <form method="post" hx-post="/evaluations/@e.Id/offers/@offer.Id" data-confirm="@T["DocumentDeleteConfirm"]" class="document-delete"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="remove-document" /><input type="hidden" name="documentId" value="@document.Id" /><button class="text-button danger">@T["DocumentDelete"]</button></form> }
+    </article>
+}
+</section>

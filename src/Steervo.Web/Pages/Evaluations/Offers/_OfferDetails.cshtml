@@ -1,0 +1,48 @@
+@model Steervo.Web.Pages.Evaluations.Offers.DetailsModel
+@using Steervo.Web.Pages.Evaluations.Offers
+@{ var e = Model.Evaluation; var offer = Model.Offer; var revision = Model.Revision; var terms = revision.Terms; var candidate = e.FindCandidate(offer.CandidateId); var edit = Model.Access >= AccessLevel.Editor; var missing = terms.MissingFields().ToArray(); var url = $"/evaluations/{e.Id}/offers/{offer.Id}"; }
+<div id="offer-workspace" data-version="@e.Version" data-offer-id="@offer.Id" data-revision="@revision.Number" data-preserve-viewport hx-target="#offer-workspace" hx-swap="outerHTML show:none focus-scroll:false" hx-sync="this:drop">
+<partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "offers")' />
+@if (Model.Notice is not null) { <div class="notice workspace-notice @(Model.Failed ? "failure" : "success")" role="status" tabindex="-1">@Model.Notice</div> }
+<a class="back-link" asp-page="Index" asp-route-id="@e.Id" asp-route-candidateId="@candidate.Id">← @T["AllOffers"]</a>
+<div class="candidate-heading"><div><p class="eyebrow"><a asp-page="/Evaluations/Candidates/Details" asp-route-id="@e.Id" asp-route-candidateId="@candidate.Id">@candidate.DisplayName ↗</a></p><h2>@terms.Name</h2><div class="offer-badges"><span class="badge">@T["OfferKind" + terms.Kind]</span><span class="badge">@T["OfferCommitment" + terms.Commitment]</span><span class="badge">@T["OfferVersion", revision.Number]</span><span class="badge">@e.Currency</span></div></div><div class="offer-card-actions">@if (edit && Model.Current && !offer.Archived) { <a class="button" asp-page="Edit" asp-route-id="@e.Id" asp-route-offerId="@offer.Id">@T["OfferEdit"]</a> }<a class="button secondary" asp-page="Compare" asp-route-id="@e.Id" asp-route-first="@offer.Id">@T["OfferCompare"]</a></div></div>
+@if (!Model.Current) { <p class="notice">@T["OfferHistorical"] <a asp-page="Details" asp-route-id="@e.Id" asp-route-offerId="@offer.Id">@T["OfferBackToCurrent"] →</a></p> }
+@if (offer.Archived) { <p class="notice">@T["OfferArchived"]</p> }
+@if (missing.Length > 0) { <section class="offer-missing"><h3>@T["OfferOpenFields"]</h3><ul>@foreach (var field in missing) { <li>@T["Offer" + field]</li> }</ul></section> }
+else { <p class="micro">@T["OfferNoOpenFields"]</p> }
+<partial name="_OfferValues" model="new OfferSnapshot(revision, e.Currency)" />
+<section class="panel offer-positions"><h3>@T["OfferLines"]</h3><partial name="_OfferLines" model="new OfferSnapshot(revision, e.Currency)" /></section>
+@if (revision.Number > 1)
+{
+    var previous = offer.Revision(revision.Number - 1);
+    <details class="panel offer-diff" id="offer-differences" open><summary>@T["OfferChanges"]</summary><dl class="offer-differences">
+    @if (terms.Kind != previous.Terms.Kind) { <div><dt>@T["OfferKind"]</dt><dd><del>@T["OfferKind" + previous.Terms.Kind]</del> → <ins>@T["OfferKind" + terms.Kind]</ins></dd></div> }
+    @if (terms.Commitment != previous.Terms.Commitment) { <div><dt>@T["OfferCommitment"]</dt><dd><del>@T["OfferCommitment" + previous.Terms.Commitment]</del> → <ins>@T["OfferCommitment" + terms.Commitment]</ins></dd></div> }
+    @foreach (var field in OfferFields.All.Where(field => !Equals(field.Raw(previous.Terms), field.Raw(terms))))
+    {
+        <div data-offer-change="@field.Name"><dt>@T[field.Label]</dt><dd><del>@(string.IsNullOrEmpty(field.Display(previous.Terms)) ? T["OfferOpen"].Value : field.Display(previous.Terms))</del> → <ins>@(string.IsNullOrEmpty(field.Display(terms)) ? T["OfferOpen"].Value : field.Display(terms))</ins> @if (field.Type is "money" or "unitprice") { <span>@e.Currency</span> }</dd></div>
+    }
+    </dl>
+    @if (!previous.Lines.OrderBy(line => line.Position).Select(line => line.ToInput()).SequenceEqual(revision.Lines.OrderBy(line => line.Position).Select(line => line.ToInput())))
+    {
+        <p>@T["OfferLinesChanged"]</p><div class="offer-line-diff"><section><h4>@T["OfferVersion", previous.Number]</h4><partial name="_OfferLines" model="new OfferSnapshot(previous, e.Currency)" /></section><section><h4>@T["OfferVersion", revision.Number]</h4><partial name="_OfferLines" model="new OfferSnapshot(revision, e.Currency)" /></section></div>
+    }
+    @if (revision.ChangeNote.Length > 0) { <p class="offer-note">@revision.ChangeNote</p> }
+    </details>
+}
+@if (Model.Current)
+{
+<section class="offer-assessments"><div class="section-heading"><h3>@T["OfferAssessmentTitle"]</h3><p class="muted">@T["OfferAssessmentHelp"]</p></div>
+@foreach (var group in e.Groups.OrderBy(group => group.Position).Cast<CriterionGroup?>().Append(null))
+{
+    var criteria = e.Criteria.Where(criterion => criterion.Scope == CriterionScope.Offer && criterion.GroupId == group?.Id).OrderBy(criterion => criterion.Position).ToList();
+    if (criteria.Count == 0) { continue; }
+    <section class="assessment-group"><h4>@(group?.Name ?? T["Ungrouped"].Value)</h4>@foreach (var criterion in criteria) { <partial name="_OfferAssessment" model="new OfferAssessmentRow(e, offer, criterion, Model.Access)" /> }</section>
+}
+@if (!e.Criteria.Any(criterion => criterion.Scope == CriterionScope.Offer)) { <p class="muted">@T["OfferNoCriteria"] <a asp-page="/Evaluations/Details" asp-route-id="@e.Id">@T["EditCriteria"] →</a></p> }
+</section>
+}
+<partial name="_OfferDocuments" model="Model" />
+<section class="panel offer-history"><h3>@T["OfferHistory"]</h3><p class="micro">@T["OfferHistoryHelp"]</p><ol>@foreach (var item in offer.Revisions.OrderByDescending(item => item.Number)) { <li data-offer-version="@item.Number"><div><a asp-page="Details" asp-route-id="@e.Id" asp-route-offerId="@offer.Id" asp-route-revision="@item.Number" aria-current="@(item.Number == revision.Number ? "page" : null)">@T["OfferVersion", item.Number]</a> <time datetime="@item.CreatedAt.ToString("O")">@item.CreatedAt.ToString("dd.MM.yyyy HH:mm 'UTC'")</time>@if (item.Number == offer.Latest.Number) { <span class="badge">@T["OfferCurrent"]</span> }</div><p>@(item.ChangeNote.Length > 0 ? item.ChangeNote : T["OfferNoChangeNote"].Value)</p></li> }</ol></section>
+@if (edit && Model.Current) { <form method="post" hx-post="@url" class="offer-archive"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="@(offer.Archived ? "restore-offer" : "archive-offer")" /><input type="hidden" name="offerId" value="@offer.Id" /><button class="button secondary">@T[offer.Archived ? "OfferRestore" : "OfferArchive"]</button></form> }
+</div>

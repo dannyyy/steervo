@@ -1,0 +1,20 @@
+@page "/evaluations/{id:guid}/costs/edit/{costId:guid?}"
+@model Steervo.Web.Pages.Evaluations.Costs.EditModel
+@{ ViewData["Title"] = T[Model.Cost is null ? "CostAdd" : "CostEdit"].Value; var e = Model.Evaluation; }
+<a class="back-link" asp-page="Index" asp-route-id="@e.Id" asp-route-candidateId="@Model.Input.CandidateId">← @T["CostPlanningTitle"]</a>
+<section class="panel cost-editor"><p class="eyebrow">@e.Name · @e.Currency</p><h1>@ViewData["Title"]</h1><p class="muted">@T["CostEditHelp"]</p>
+@if (Model.Notice is not null) { <p class="notice failure" role="alert">@Model.Notice</p> }
+<form method="post" data-cost-form><input asp-for="Version" type="hidden" />
+<label asp-for="Input.Name">@T["CostName"]</label><input asp-for="Input.Name" maxlength="200" required />
+<div class="field-pair"><div><label asp-for="Input.CandidateId">@T["CostScope"]</label><select asp-for="Input.CandidateId"><option value="">@T["CostCommon"]</option>@foreach (var candidate in e.Candidates.OrderBy(c => c.Position)) { <option value="@candidate.Id">@candidate.DisplayName</option> }</select></div>
+<div><label asp-for="Input.Category">@T["OfferLineCostCategory"]</label><select asp-for="Input.Category">@foreach (var category in Enum.GetValues<CostCategory>()) { <option value="@category">@T["CostCategory" + category]</option> }</select></div></div>
+<div class="field-pair"><div><label asp-for="Input.Frequency">@T["CostFrequency"]</label><select asp-for="Input.Frequency" data-cost-frequency>@foreach (var frequency in Enum.GetValues<CostFrequency>()) { <option value="@frequency">@T["CostFrequency" + frequency]</option> }</select></div>
+<div><label asp-for="Input.Direction">@T["CostDirection"]</label><select asp-for="Input.Direction" data-cost-direction>@foreach (var direction in Enum.GetValues<CostDirection>()) { <option value="@direction">@T["CostDirection" + direction]</option> }</select></div></div>
+<div data-cost-amount><label asp-for="Input.Amount">@T["CostAmount"] (@e.Currency) <span class="optional">@T["Optional"]</span></label><input asp-for="Input.Amount" type="number" min="0" max="1000000000000" step="0.01" inputmode="decimal" aria-describedby="cost-amount-help" /><p class="micro" id="cost-amount-help">@T["CostAmountHelp"]</p></div>
+<div class="field-pair"><div><label asp-for="Input.StartMonth">@T["CostFirstMonth"]</label><input asp-for="Input.StartMonth" type="number" min="1" max="1200" step="1" required /></div>
+<div data-cost-end><label asp-for="Input.EndMonth">@T["CostLastMonth"] <span class="optional">@T["Optional"]</span></label><input asp-for="Input.EndMonth" type="number" min="1" max="1200" step="1" /></div></div>
+@if (e.CostPlanning is { } plan) { <p class="micro">@T["CostTimingHelp", plan.Start.ToString("MM.yyyy"), plan.Months]</p> }
+<label asp-for="Input.Notes">@T["CostNotes"] <span class="optional">@T["Optional"]</span></label><textarea asp-for="Input.Notes" maxlength="2000" rows="3"></textarea>
+<div class="cost-editor-actions"><button class="button primary" id="save-cost">@T["Save"]</button><a class="button secondary" asp-page="Index" asp-route-id="@e.Id" asp-route-candidateId="@Model.Input.CandidateId">@T["Cancel"]</a></div>
+</form></section>
+@section Scripts { <script src="~/js/costs.js" asp-append-version="true" defer></script> }

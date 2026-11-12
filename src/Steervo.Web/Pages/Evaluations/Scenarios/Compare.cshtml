@@ -1,0 +1,22 @@
+@page "/evaluations/{id:guid}/scenarios/compare"
+@model Steervo.Web.Pages.Evaluations.Scenarios.CompareModel
+@{ var e = Model.Evaluation; ViewData["Title"] = T["ScenarioCompare"].Value; }
+<partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "scenarios")' />
+<a class="back-link" asp-page="Index" asp-route-id="@e.Id">← @T["ScenarioAll"]</a><h2>@T["ScenarioCompare"]</h2><p class="muted">@T["ScenarioCompareHelp"]</p>
+<form method="get" class="scenario-compare-picker"><div><label for="scenario-left">@T["ScenarioLeft"]</label><select id="scenario-left" name="leftId" required><option value="">@T["Choose"]</option>@foreach (var s in e.Scenarios.OrderBy(s => s.Name)) { <option value="@s.Id" selected="@(s.Id == Model.LeftId)">@s.Name</option> }</select></div><div><label for="scenario-right">@T["ScenarioRight"]</label><select id="scenario-right" name="rightId" required><option value="">@T["Choose"]</option>@foreach (var s in e.Scenarios.OrderBy(s => s.Name)) { <option value="@s.Id" selected="@(s.Id == Model.RightId)">@s.Name</option> }</select></div><div><label for="compare-month">@T["ScenarioCheckpoint"]</label><input id="compare-month" name="month" value="@Model.Month" type="number" min="1" max="@e.CostPlanning!.Months" required /></div><button class="button primary">@T["ScenarioCalculate"]</button></form>
+@if (Model.Left is { } left && Model.Right is { } right)
+{
+    if (left.Result.ExpectedCost is { } a && right.Result.ExpectedCost is { } b)
+    {
+        var difference = Math.Abs(a - b);
+        <div class="scenario-comparison-summary" data-cost-difference="@difference.ToString(System.Globalization.CultureInfo.InvariantCulture)">
+        @if (difference < .005m) { <h3>@T["ScenarioEqualCost"]</h3> }
+        else { <h3>@T["ScenarioDifference", a < b ? left.Scenario.Name : right.Scenario.Name, difference.ToString("N2"), e.Currency!]</h3><p>@T["ScenarioMonthlyDifference", (difference / Model.Month).ToString("N2"), e.Currency!, Model.Month]</p> }
+        <p class="micro">@T["ScenarioCompareBandHelp"]</p>
+        @if (left.Result.ExpectedResidual is { } residual && left.Scenario.Terms.Mode != AcquisitionMode.LeaseReturn && Model.LeftId != Model.RightId)
+        { var threshold = residual + a - b; <p class="scenario-threshold">@T[threshold >= 0 ? "ScenarioResidualThreshold" : "ScenarioResidualThresholdBelowZero", left.Scenario.Name, threshold.ToString("N2"), e.Currency!, right.Scenario.Name]</p> }
+        </div>
+    }
+    else { <p class="notice scenario-convention">@T["ScenarioCompareIncomplete"]</p> }
+    <div class="scenario-comparison-grid"><div><partial name="_Result" model="left" /><a class="button secondary" asp-page="Details" asp-route-id="@e.Id" asp-route-scenarioId="@left.Scenario.Id" asp-route-month="@Model.Month">@T["ScenarioOpen"] →</a></div><div><partial name="_Result" model="right" /><a class="button secondary" asp-page="Details" asp-route-id="@e.Id" asp-route-scenarioId="@right.Scenario.Id" asp-route-month="@Model.Month">@T["ScenarioOpen"] →</a></div></div>
+}

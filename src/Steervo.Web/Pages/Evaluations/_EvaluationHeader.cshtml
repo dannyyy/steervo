@@ -1,0 +1,15 @@
+@model Steervo.Web.Pages.Evaluations.EvaluationHeader
+@{ var e = Model.Evaluation; }
+<a asp-page="/Index" class="back-link">← @T["AllEvaluations"]</a>
+<a asp-page="/Evaluations/Details" asp-page-handler="Export" asp-route-id="@e.Id" class="export-link">@T["ExportEvaluation"] ↓</a>
+<div class="page-heading"><div><p class="eyebrow">@T["Evaluation"] · @T[Model.Access.ToString()]</p><h1>@e.Name</h1><p class="muted">@e.Purpose</p></div><div class="evaluation-counts"><span class="badge">@T["CriterionCount", e.Criteria.Count]</span><span class="badge">@T[e.Candidates.Count == 1 ? "CandidateCountSingle" : "CandidateCount", e.Candidates.Count]</span></div></div>
+<nav class="section-nav" aria-label="@T["EvaluationSteps"]">
+    <a asp-page="/Evaluations/Details" asp-route-id="@e.Id" class="@(Model.Active == "criteria" ? "active" : null)" aria-current="@(Model.Active == "criteria" ? "page" : null)">01 <strong>@T["Criteria"]</strong></a>
+    <a asp-page="/Evaluations/Candidates/Index" asp-route-id="@e.Id" class="@(Model.Active == "candidates" ? "active" : null)" aria-current="@(Model.Active == "candidates" ? "page" : null)">02 <strong>@T["Candidates"]</strong></a>
+    <a asp-page="/Evaluations/Candidates/Compare" asp-route-id="@e.Id" class="@(Model.Active == "comparison" ? "active" : null)" aria-current="@(Model.Active == "comparison" ? "page" : null)">03 <strong>@T["CompareCandidates"]</strong></a>
+    <a asp-page="/Evaluations/Offers/Index" asp-route-id="@e.Id" class="@(Model.Active == "offers" ? "active" : null)" aria-current="@(Model.Active == "offers" ? "page" : null)">04 <strong>@T["Offers"]</strong></a>
+    <a asp-page="/Evaluations/Costs/Index" asp-route-id="@e.Id" class="@(Model.Active == "costs" ? "active" : null)" aria-current="@(Model.Active == "costs" ? "page" : null)">05 <strong>@T["Costs"]</strong></a>
+    <a asp-page="/Evaluations/Scenarios/Index" asp-route-id="@e.Id" class="@(Model.Active == "scenarios" ? "active" : null)" aria-current="@(Model.Active == "scenarios" ? "page" : null)">06 <strong>@T["Calculations"]</strong></a>
+    <a asp-page="/Evaluations/Details" asp-route-id="@e.Id" asp-fragment="sharing">@T["Access"]</a>
+    @if (Model.Access >= AccessLevel.Editor) { <a asp-page="/Evaluations/Details" asp-route-id="@e.Id" asp-fragment="case-settings">@T["CaseSettings"]</a> }
+</nav>

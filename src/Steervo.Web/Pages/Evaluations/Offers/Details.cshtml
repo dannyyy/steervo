@@ -1,0 +1,4 @@
+@page "/evaluations/{id:guid}/offers/{offerId:guid}"
+@model Steervo.Web.Pages.Evaluations.Offers.DetailsModel
+@{ ViewData["Title"] = Model.Revision.Terms.Name; }
+<partial name="_OfferDetails" model="Model" />

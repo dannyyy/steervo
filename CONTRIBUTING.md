@@ -29,7 +29,7 @@ Eröffne zuerst ein Issue und beschreibe, was du vorhast. Das Projekt hat eine k
 Besonders willkommen sind:
 
 - Fehlerberichte mit nachvollziehbarer Beschreibung
-- Verbesserungen an Evaluationen, Kriterien, Sortierung und Zugriffsrechten mit nachvollziehbarer Prüfung
+- Verbesserungen an Evaluationen, Kandidaten, Offerten, Kostenplanung und Zugriffsrechten mit nachvollziehbarer Prüfung
 - Verbesserungen an Bedienbarkeit und Barrierefreiheit auf Desktop und Mobilgeräten
 - Korrekturen an Dokumentation und Übersetzungen
 
@@ -43,7 +43,7 @@ Besonders willkommen sind:
 
 Die Start- und Prüfbefehle stehen in der [README](README.md#prüfen). Benötigt werden ein vorhandenes .NET-10-SDK, Docker Compose und für Browserprüfungen Node.js mit Playwright.
 
-Fachregeln und Zugriffsrechte werden mit automatisierten Tests geprüft, einschliesslich ungültiger Eingaben, gleichzeitiger Änderungen und unzulässiger direkter Requests. Die Integrationstests verwenden eigene Datenbanken auf PostgreSQL 17 und 18. Niemals eine Produktivdatenbank als Testinstanz verwenden.
+Fachregeln und Zugriffsrechte werden mit automatisierten Tests geprüft, einschliesslich ungültiger Eingaben, gleichzeitiger Änderungen und unzulässiger direkter Requests. Die Integrationstests verwenden eigene Datenbanken auf PostgreSQL 17 und 18. Berechnungsänderungen mit unabhängig hergeleiteten Erwartungen für Zahlungszeitpunkte, Zinseszins, Restschuld und offene Angaben prüfen. Dokumenttests verwenden einen separaten S3-Testserver. Niemals eine Produktivdatenbank als Testinstanz verwenden.
 
 Änderungen an der Oberfläche mit Playwright auf Desktop und Mobilgeräten prüfen. Bei Sortierung und Formularen gehören Tastaturfokus, Scrollposition und erhaltene Eingaben zur Prüfung. Die Browserprüfungen verwenden isolierte Kontexte; Screenshots, Logs und Testdaten unter `.artifacts/` werden nicht eingecheckt.
 

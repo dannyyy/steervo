@@ -1,0 +1,31 @@
+@page "/evaluations/{id:guid}/scenarios"
+@model Steervo.Web.Pages.Evaluations.Scenarios.IndexModel
+@{ ViewData["Title"] = T["Calculations"].Value; var e = Model.Evaluation; var edit = Model.Access >= AccessLevel.Editor; }
+<div id="scenario-workspace" data-version="@e.Version">
+<partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "scenarios")' />
+<div class="candidate-heading"><div><p class="eyebrow">@T["ScenarioEyebrow"]</p><h2>@T["ScenarioTitle"]</h2><p class="muted">@T["ScenarioIntro"]</p></div>
+@if (edit && e.CostPlanning is not null && e.Currency is not null) { <a class="button primary" asp-page="Edit" asp-route-id="@e.Id">+ @T["ScenarioAdd"]</a> }</div>
+@if (Model.Notice is not null) { <p class="notice failure" role="alert">@Model.Notice</p> }
+@if (e.CostPlanning is null || e.Currency is null) { <p class="notice scenario-convention">@T["ScenarioPlanningRequired"] <a asp-page="/Evaluations/Costs/Index" asp-route-id="@e.Id">@T["Costs"] →</a></p> }
+@if (edit)
+{
+<details class="panel scenario-settings" open="@(e.CalculationSettings is null || Model.Notice is not null)"><summary>@T["ScenarioSharedAssumption"] @if (e.CalculationSettings is { } settings) { <span class="micro">@settings.AnnualReturnPercent.ToString("0.####") %</span> }</summary>
+<form method="post" class="scenario-return-form"><input type="hidden" name="action" value="settings" /><input asp-for="Version" type="hidden" /><div><label asp-for="AnnualReturn">@T["ScenarioAnnualReturn"]</label><input asp-for="AnnualReturn" type="number" step="0.0001" min="-99" max="100" required /></div><button class="button primary">@T["Save"]</button></form><p class="micro">@T["ScenarioReturnHelp"]</p></details>
+}
+else { <p class="notice scenario-convention">@T["ScenarioAnnualReturn"]: @(e.CalculationSettings is null ? T["OfferOpen"].Value : e.CalculationSettings.AnnualReturnPercent.ToString("0.####") + " %")</p> }
+@if (e.Scenarios.Count == 0) { <div class="candidate-empty"><div><h3>@T["ScenarioEmpty"]</h3><p>@T["ScenarioEmptyHelp"]</p></div></div> }
+else
+{
+<div class="scenario-list-actions"><a class="button secondary" asp-page="Compare" asp-route-id="@e.Id">@T["ScenarioCompare"] →</a><p class="micro">@T["ScenarioLiveCosts"]</p></div>
+<div class="candidate-grid">
+@foreach (var scenario in e.Scenarios.OrderBy(s => s.Name))
+{
+    var offer = e.FindOffer(scenario.OfferId);
+    <article class="candidate-card scenario-card" data-scenario-id="@scenario.Id"><p class="eyebrow">@T["Acquisition" + scenario.Terms.Mode]</p><h3><a asp-page="Details" asp-route-id="@e.Id" asp-route-scenarioId="@scenario.Id">@scenario.Name</a></h3><p class="muted">@e.FindCandidate(offer.CandidateId).DisplayName</p><p class="micro">@offer.Revision(scenario.RevisionNumber).Terms.Name · @T["ScenarioVersion", scenario.RevisionNumber]</p>
+    @if (offer.Latest.Number != scenario.RevisionNumber) { <p class="candidate-warning">@T["ScenarioNewOfferVersion", offer.Latest.Number]</p> }
+    <a class="candidate-open" asp-page="Details" asp-route-id="@e.Id" asp-route-scenarioId="@scenario.Id">@T["ScenarioOpen"] →</a>
+    @if (edit) { <div class="scenario-card-actions"><a asp-page="Edit" asp-route-id="@e.Id" asp-route-scenarioId="@scenario.Id">@T["Edit"]</a><form method="post" data-confirm="@T["ScenarioDeleteConfirm"]"><input type="hidden" name="action" value="remove" /><input type="hidden" name="scenarioId" value="@scenario.Id" /><input type="hidden" name="Version" value="@e.Version" /><button class="text-button danger">@T["ScenarioDelete"]</button></form></div> }</article>
+}
+</div>
+}
+</div>

@@ -1,0 +1,18 @@
+@model Steervo.Web.Pages.Evaluations.Scenarios.ScenarioPanel
+@{ var r = Model.Result; var e = Model.Evaluation; var s = Model.Scenario; string Money(decimal? value) => value.HasValue ? $"{value:N2} {e.Currency}" : T["OfferOpen"].Value; }
+<section class="scenario-result @(r.Complete ? "complete" : "incomplete")" data-result-scenario="@s.Id" data-result-complete="@r.Complete.ToString().ToLowerInvariant()">
+<p class="eyebrow">@T["Acquisition" + s.Terms.Mode]</p><h3>@s.Name</h3><p class="micro">@T["ScenarioAtMonth", r.Month, e.CostPlanning!.DateFor(r.Month).ToString("MM.yyyy")]</p>
+<p class="scenario-result-label">@T["CalculationEffectiveCost"]</p><p class="scenario-result-total" data-effective-cost="@r.ExpectedCost?.ToString(System.Globalization.CultureInfo.InvariantCulture)">@Money(r.ExpectedCost)</p>
+@if (r.ExpectedCost.HasValue) { <p class="scenario-monthly">@Money(r.ExpectedCost / r.Month) @T["CalculationPerMonth"]</p> }
+@if (r.Issues.Count > 0 || (r.ExpectedResidual is null && s.Terms.Mode != AcquisitionMode.LeaseReturn))
+{ <div class="scenario-gaps"><strong>@T["ScenarioIncomplete"]</strong><ul>@foreach (var issue in r.Issues) { <li>@T[issue.Code] @issue.Detail</li> } @if (r.ExpectedResidual is null && s.Terms.Mode != AcquisitionMode.LeaseReturn) { <li>@T["ScenarioResidualMissing", r.Month]</li> }</ul></div> }
+<dl class="scenario-result-values">
+<div><dt>@T["CalculationNetPayments"]</dt><dd>@Money(r.Months.Count == 0 ? null : r.NetPayments)</dd></div>
+<div><dt>@T["CalculationOpportunity"]</dt><dd>@(r.Issues.Count == 0 ? Money(r.OpportunityCost) : T["OfferOpen"].Value)</dd></div>
+<div><dt>@T["CalculationRemainingDebt"]</dt><dd>@(r.Issues.Count == 0 ? Money(r.Debt) : T["OfferOpen"].Value)</dd></div>
+<div><dt>@T["CalculationResidualDeduction"]</dt><dd>@Money(r.ExpectedResidual)</dd></div>
+</dl>
+@if (s.Terms.Mode != AcquisitionMode.LeaseReturn)
+{ <div class="scenario-band"><div><span>@T["ResidualLow"]</span><strong>@Money(r.PessimisticCost)</strong></div><div><span>@T["ResidualExpected"]</span><strong>@Money(r.ExpectedCost)</strong></div><div><span>@T["ResidualHigh"]</span><strong>@Money(r.OptimisticCost)</strong></div></div><p class="micro">@T["ScenarioBandHelp"]</p> }
+<details class="scenario-wealth"><summary>@T["CalculationWealth"]</summary><dl class="scenario-result-values"><div><dt>@T["CalculationReferenceCapital"]</dt><dd>@Money(r.ReferenceCapital)</dd></div><div><dt>@T["CalculationAccount"]</dt><dd>@Money(r.Account)</dd></div><div><dt>@T["CalculationFinalWealth"]</dt><dd>@Money(r.ExpectedWealth)</dd></div></dl><p class="micro">@T["CalculationReferenceHelp"]</p></details>
+</section>

@@ -1,0 +1,37 @@
+@model Steervo.Web.Pages.Evaluations.Candidates.DetailsModel
+@{ var e = Model.Evaluation; var c = Model.Candidate; var edit = Model.Access >= AccessLevel.Editor; var url = $"/evaluations/{e.Id}/candidates/{c.Id}"; var vehicleCriteria = e.Criteria.Where(x => x.Scope == CriterionScope.Vehicle).ToList(); var failures = vehicleCriteria.Where(x => x.Priority == Priority.Required && e.ResultFor(c.Id, x.Id) == Fulfillment.Unmet).ToList(); }
+<div id="candidate-workspace" data-version="@e.Version" data-preserve-viewport hx-target="#candidate-workspace" hx-swap="outerHTML show:none focus-scroll:false" hx-sync="this:drop">
+<partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "candidates")' />
+@if (Model.Notice is not null) { <div class="notice workspace-notice @(Model.Failed ? "failure" : "success")" role="status" tabindex="-1">@Model.Notice</div> }
+<a asp-page="Index" asp-route-id="@e.Id" class="back-link">← @T["AllCandidates"]</a>
+<div class="candidate-detail-heading"><div><span class="candidate-status @c.Status.ToString().ToLowerInvariant()">@T["CandidateStatus" + c.Status]</span><h2>@c.DisplayName</h2><p class="muted">@T["Condition" + c.Condition] @if (c.Year.HasValue) { <span> · @c.Year</span> } @if (c.Mileage.HasValue) { <span> · @c.Mileage.Value.ToString("N0") km</span> }</p></div><a asp-page="Compare" asp-route-id="@e.Id" asp-route-first="@c.Id" class="button secondary">@T["CompareCandidate"] →</a></div>
+@if (failures.Count > 0) { <div class="candidate-warning"><strong>@T["RequiredNotMet"]</strong><p>@string.Join(" · ", failures.Select(x => x.Name))</p><p class="micro">@T["NoAutomaticExclusion"]</p></div> }
+<p class="candidate-offer-link"><a asp-page="/Evaluations/Offers/Index" asp-route-id="@e.Id" asp-route-candidateId="@c.Id">@T["OfferForCandidate"] →</a></p>
+<partial name="_Specifications" model="c.Specifications" />
+<div class="assessment-layout"><section class="assessment-main"><div class="section-heading"><h3>@T["AssessCandidateTitle"]</h3><p class="muted">@T["AssessCandidateHelp"]</p></div>
+@if (vehicleCriteria.Count == 0) { <div class="empty-state"><h3>@T["NoVehicleCriteria"]</h3><p>@T["NoVehicleCriteriaHelp"]</p><a asp-page="/Evaluations/Details" asp-route-id="@e.Id" class="button secondary">@T["EditCriteria"] →</a></div> }
+@foreach (var group in e.Groups.OrderBy(x => x.Position).Cast<CriterionGroup?>().Append(null))
+{
+    var criteria = vehicleCriteria.Where(x => x.GroupId == group?.Id).OrderBy(x => x.Position).ToList();
+    if (criteria.Count == 0) { continue; }
+    <section class="assessment-group"><h3>@(group?.Name ?? T["Ungrouped"].Value)</h3><div class="assessment-list">@foreach (var criterion in criteria) { <partial name="_AssessmentRow" model="new Steervo.Web.Pages.Evaluations.Candidates.AssessmentRow(e, c, criterion, Model.Access, url)" /> }</div></section>
+}
+@if (e.Criteria.Any(x => x.Scope == CriterionScope.Offer)) { <p class="notice"><a asp-page="/Evaluations/Offers/Index" asp-route-id="@e.Id" asp-route-candidateId="@c.Id">@T["OfferCriteriaSeparateLink"] →</a></p> }
+<p class="micro rating-explanation">@T["RatingIsSubjective"]</p>
+</section><aside class="candidate-aside">
+<section class="panel"><h3>@T["CandidateClassification"]</h3>
+@if (edit)
+{
+    <form method="post" hx-post="@url"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="classify-candidate" /><label for="candidate-status">@T["CandidateStatus"]</label><select id="candidate-status" name="status">@foreach (var status in Enum.GetValues<CandidateStatus>()) { <option value="@status" selected="@(status == c.Status)">@T["CandidateStatus" + status]</option> }</select><label for="candidate-reason">@T["CandidateReason"]</label><textarea id="candidate-reason" name="reason" maxlength="2000" rows="3" aria-describedby="candidate-reason-help">@c.StatusReason</textarea><p id="candidate-reason-help" class="micro">@T["CandidateReasonHelp"]</p><button id="save-classification" class="button secondary full">@T["SaveClassification"]</button></form>
+}
+else { <p class="candidate-reason">@(c.StatusReason.Length > 0 ? c.StatusReason : T["NoCandidateReason"].Value)</p> }
+</section>
+<section class="panel"><h3>@T["CandidateNotes"]</h3><p class="candidate-notes">@(c.Notes.Length > 0 ? c.Notes : T["NoCandidateNotes"].Value)</p>
+@if (c.SourceLinks.Any()) { <h4>@T["CandidateLinks"]</h4><ul class="candidate-links">@foreach (var link in c.SourceLinks) { <li><a href="@link" target="_blank" rel="noopener noreferrer">@link ↗</a></li> }</ul> }
+</section>
+@if (edit)
+{
+    <details class="panel" id="candidate-edit" open="@(Model.FailedAction == "edit-candidate")"><summary>@T["EditCandidate"]</summary><form method="post" hx-post="@url"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="edit-candidate" /><partial name="_CandidateFields" model="Model.Input" /><button id="save-candidate-details" class="button secondary full">@T["SaveCandidate"]</button></form></details>
+}
+</aside></div>
+</div>

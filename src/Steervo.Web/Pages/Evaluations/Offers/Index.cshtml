@@ -1,0 +1,20 @@
+@page "/evaluations/{id:guid}/offers"
+@model Steervo.Web.Pages.Evaluations.Offers.IndexModel
+@{ ViewData["Title"] = T["Offers"]; var e = Model.Evaluation; }
+<partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "offers")' />
+<div class="candidate-heading"><div><h2>@T["OfferHeading"]</h2><p class="muted">@T["OffersHelp"]</p></div>@if (Model.Access >= AccessLevel.Editor && e.Candidates.Count > 0) { <a asp-page="Edit" asp-route-id="@e.Id" asp-route-candidateId="@Model.CandidateId" class="button">+ @T["NewOffer"]</a> }</div>
+@if (e.Candidates.Count == 0) { <p class="notice">@T["OffersNeedCandidate"] <a asp-page="/Evaluations/Candidates/Index" asp-route-id="@e.Id">@T["Candidates"] →</a></p> }
+else
+{
+<form method="get" class="offer-filter"><div><label for="offer-candidate-filter">@T["OfferCandidate"]</label><select id="offer-candidate-filter" name="candidateId"><option value="">@T["AllCandidates"]</option>@foreach (var candidate in e.Candidates.OrderBy(candidate => candidate.Position)) { <option value="@candidate.Id" selected="@(candidate.Id == Model.CandidateId)">@candidate.DisplayName</option> }</select></div><label class="offer-checkbox"><input type="checkbox" name="showArchived" value="true" checked="@Model.ShowArchived" />@T["ShowArchivedOffers"]</label><button class="button secondary">@T["ShowComparison"]</button></form>
+@if (!Model.Offers.Any()) { <div class="candidate-empty"><div><h3>@T["NoOffers"]</h3><p>@T["NoOffersHelp"]</p></div></div> }
+<div class="candidate-grid">
+@foreach (var offer in Model.Offers)
+{
+    var revision = offer.Latest; var candidate = e.FindCandidate(offer.CandidateId); var missing = revision.Terms.MissingFields().ToArray();
+    <article class="candidate-card offer-card" data-offer-id="@offer.Id"><p class="eyebrow">@candidate.DisplayName</p><h3><a asp-page="Details" asp-route-id="@e.Id" asp-route-offerId="@offer.Id">@revision.Terms.Name</a></h3><p>@(string.IsNullOrEmpty(revision.Terms.Provider) ? T["OfferOpen"].Value : revision.Terms.Provider)</p><div class="offer-badges"><span class="badge">@T["OfferKind" + revision.Terms.Kind]</span><span class="badge">@T["OfferCommitment" + revision.Terms.Commitment]</span><span class="badge">@T["OfferVersion", revision.Number]</span>@if (offer.Archived) { <span class="badge">@T["OfferArchivedLabel"]</span> }</div><dl class="offer-card-prices"><div><dt>@T["OfferBasePrice"]</dt><dd>@(revision.Terms.BasePrice.HasValue ? $"{revision.Terms.BasePrice:N2} {e.Currency}" : T["OfferOpen"].Value)</dd></div>@if (revision.Terms.Kind is OfferKind.Leasing or OfferKind.Financing) { <div><dt>@T["OfferMonthlyPayment"]</dt><dd>@(revision.Terms.MonthlyPayment.HasValue ? $"{revision.Terms.MonthlyPayment:N2} {e.Currency}" : T["OfferOpen"].Value)</dd></div> }</dl>
+    @if (missing.Length > 0) { <p class="micro offer-gaps">@T["OfferOpenFields"]: @string.Join(" · ", missing.Select(field => T["Offer" + field].Value))</p> }
+    <div class="offer-card-actions"><a asp-page="Details" asp-route-id="@e.Id" asp-route-offerId="@offer.Id">@T["Offer"] →</a><a asp-page="Compare" asp-route-id="@e.Id" asp-route-first="@offer.Id">@T["OfferCompare"] →</a></div></article>
+}
+</div>
+}

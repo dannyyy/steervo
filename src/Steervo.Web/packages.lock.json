@@ -19,6 +19,19 @@
           "Newtonsoft.Json": "13.0.3"
         }
       },
+      "AWSSDK.Core": {
+        "type": "Transitive",
+        "resolved": "3.7.400.58",
+        "contentHash": "tsNRJMOxCpd6FXZq/3y3ei3MMEWmHO6uFgIg8GAkZS74hxtfDB6zyycAqd9vbo9UJBbX7lmtYfDPQ0sg2CUDRw=="
+      },
+      "AWSSDK.S3": {
+        "type": "Transitive",
+        "resolved": "3.7.409",
+        "contentHash": "x5SCzff9bg8mDYezU9+3eVFmdF0TB8MUC0sdS/l5yHfyF3eR4IUPIbct1ToZlXpJbqJaZ1I5CyTXLZGEXfb5Nw==",
+        "dependencies": {
+          "AWSSDK.Core": "[3.7.400.58, 4.0.0)"
+        }
+      },
       "Humanizer.Core": {
         "type": "Transitive",
         "resolved": "2.14.1",
@@ -218,7 +231,14 @@
       "steervo.application": {
         "type": "Project",
         "dependencies": {
-          "Steervo.Core": "[1.0.0, )"
+          "Steervo.Calculations": "[0.1.0, )",
+          "Steervo.Core": "[0.1.0, )"
+        }
+      },
+      "steervo.calculations": {
+        "type": "Project",
+        "dependencies": {
+          "Steervo.Core": "[0.1.0, )"
         }
       },
       "steervo.core": {
@@ -227,11 +247,12 @@
       "steervo.infrastructure": {
         "type": "Project",
         "dependencies": {
+          "AWSSDK.S3": "[3.7.409, )",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "[10.0.10, )",
           "Microsoft.EntityFrameworkCore": "[10.0.10, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.3, )",
-          "Steervo.Application": "[1.0.0, )",
-          "Steervo.Core": "[1.0.0, )"
+          "Steervo.Application": "[0.1.0, )",
+          "Steervo.Core": "[0.1.0, )"
         }
       }
     }

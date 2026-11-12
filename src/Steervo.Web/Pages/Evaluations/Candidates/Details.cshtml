@@ -1,0 +1,4 @@
+@page "/evaluations/{id:guid}/candidates/{candidateId:guid}"
+@model Steervo.Web.Pages.Evaluations.Candidates.DetailsModel
+@{ ViewData["Title"] = Model.Candidate.DisplayName; }
+<partial name="_CandidateDetails" model="Model" />

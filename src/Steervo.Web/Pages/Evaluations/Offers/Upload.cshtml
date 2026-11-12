@@ -1,0 +1,18 @@
+@page "/evaluations/{id:guid}/offers/{offerId:guid}/documents/upload/{documentId:guid?}"
+@model Steervo.Web.Pages.Evaluations.Offers.UploadModel
+@{ ViewData["Title"] = T[Model.Document is null ? "DocumentAdd" : "DocumentReplace"].Value; }
+<a class="back-link" asp-page="Details" asp-route-id="@Model.Evaluation.Id" asp-route-offerId="@Model.Offer.Id" asp-fragment="documents">← @Model.Offer.Latest.Terms.Name</a>
+<section class="panel document-upload">
+<p class="eyebrow">@T["OfferVersion", Model.Offer.Latest.Number]</p><h1>@ViewData["Title"]</h1>
+<p class="muted">@T["DocumentUploadHelp"]</p>
+<div asp-validation-summary="All" class="validation" role="alert"></div>
+<form method="post" enctype="multipart/form-data">
+<input asp-for="Version" type="hidden" />
+@if (Model.Document is null) { <label asp-for="Name">@T["DocumentName"]</label><input asp-for="Name" maxlength="160" required /> }
+else { <p><strong>@Model.Document.Name</strong> · @T["DocumentVersion", Model.Document.Latest.Number]</p><input asp-for="Name" type="hidden" /> }
+<label for="upload">@T["DocumentFile"]</label><input id="upload" name="upload" type="file" required aria-describedby="document-limits" />
+<p class="micro" id="document-limits">@T["DocumentLimits"]</p>
+<label asp-for="Note">@T["DocumentNote"] <span class="optional">@T["Optional"]</span></label><textarea asp-for="Note" maxlength="2000" rows="3"></textarea>
+<div class="form-actions"><button class="button primary">@T["DocumentUpload"]</button><a class="button secondary" asp-page="Details" asp-route-id="@Model.Evaluation.Id" asp-route-offerId="@Model.Offer.Id" asp-fragment="documents">@T["Cancel"]</a></div>
+</form>
+</section>

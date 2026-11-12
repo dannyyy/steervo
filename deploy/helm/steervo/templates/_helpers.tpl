@@ -19,6 +19,14 @@
   value: {{ .Values.ingress.host | quote }}
 - name: DataProtection__Path
   value: /var/steervo/keys
+- name: DocumentStorage__Provider
+  value: S3
+- name: DocumentStorage__Endpoint
+  value: {{ required "documentStorage.endpoint is required" .Values.documentStorage.endpoint | quote }}
+- name: DocumentStorage__Region
+  value: {{ .Values.documentStorage.region | quote }}
+- name: DocumentStorage__Bucket
+  value: {{ required "documentStorage.bucket is required" .Values.documentStorage.bucket | quote }}
 - name: Smtp__Host
   value: {{ .Values.smtp.host | quote }}
 - name: Smtp__Port

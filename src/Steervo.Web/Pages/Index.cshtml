@@ -17,14 +17,14 @@
     else
     {
         <div class="case-grid">@foreach (var evaluation in Model.Evaluations)
-        { <a class="case-card" asp-page="/Evaluations/Details" asp-route-id="@evaluation.Id"><div class="card-top"><span class="badge">@T[evaluation.AccessFor(Current.Id).ToString()!]</span><span aria-hidden="true">↗</span></div><h2>@evaluation.Name</h2><p>@evaluation.Purpose</p><div class="card-bottom"><span>@T["CriterionCount", evaluation.Criteria.Count]</span><span>@T["OpenEvaluation"] →</span></div></a> }</div>
+        { <a class="case-card" asp-page="/Evaluations/Details" asp-route-id="@evaluation.Id"><div class="card-top"><span class="badge">@T[evaluation.AccessFor(Current.Id).ToString()!]</span><span aria-hidden="true">↗</span></div><h2>@evaluation.Name</h2><p>@evaluation.Purpose</p><div class="card-bottom"><span>@T["CriterionCount", evaluation.Criteria.Count] · @T[evaluation.Candidates.Count == 1 ? "CandidateCountSingle" : "CandidateCount", evaluation.Candidates.Count]</span><span>@T["OpenEvaluation"] →</span></div></a> }</div>
     }
     <div class="guide"><span class="step-number">01</span><div><h3>@T["StartWithCriteria"]</h3><p>@T["CriteriaGuide"]</p></div></div>
     </section>
 </div>
 <details class="panel settings-panel" open="@Model.ImportFailed"><summary>@T["ImportEvaluation"]</summary><p class="muted">@T["ImportHelp"]</p>
 @if (Model.ImportFailed) { <div asp-validation-summary="All" class="validation" role="alert"></div> }
-<form method="post" asp-page-handler="Import" enctype="multipart/form-data"><label for="upload">@T["ExportFile"]</label><input id="upload" name="upload" type="file" accept="application/json,.json" required /><button class="button secondary">@T["ImportAsNew"]</button></form></details>
+<form method="post" asp-page-handler="Import" enctype="multipart/form-data"><label for="upload">@T["ExportFile"]</label><input id="upload" name="upload" type="file" accept="application/json,application/zip,.json,.zip" required /><button class="button secondary">@T["ImportAsNew"]</button></form></details>
 
 <dialog id="new-evaluation" class="creation-dialog" aria-labelledby="new-evaluation-title" aria-describedby="new-evaluation-help" data-open-on-load="@(Model.CreationFailed ? "true" : "false")">
     <button type="button" class="dialog-close" data-dialog-close aria-label="@T["Close"]"><span aria-hidden="true">×</span></button>

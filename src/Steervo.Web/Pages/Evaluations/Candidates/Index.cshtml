@@ -1,0 +1,4 @@
+@page "/evaluations/{id:guid}/candidates"
+@model Steervo.Web.Pages.Evaluations.Candidates.IndexModel
+@{ ViewData["Title"] = T["Candidates"]; }
+<partial name="_CandidateList" model="Model" />

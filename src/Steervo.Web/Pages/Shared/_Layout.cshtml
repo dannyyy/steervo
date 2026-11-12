@@ -7,7 +7,8 @@
     <meta name="htmx-config" content='{"allowEval":false,"includeIndicatorStyles":false,"selfRequestsOnly":true}' />
     <title>@ViewData["Title"] · Steervo</title>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <script src="~/lib/htmx.min.js" defer></script><script src="~/js/site.js" asp-append-version="true" defer></script><script src="~/js/sorting.js" asp-append-version="true" defer></script>
+    <script src="~/lib/htmx.min.js" defer></script><script src="~/js/site.js" asp-append-version="true" defer></script><script src="~/js/sorting.js" asp-append-version="true" defer></script><script src="~/js/workspace.js" asp-append-version="true" defer></script><script src="~/js/specifications.js" asp-append-version="true" defer></script><script src="~/js/offers.js" asp-append-version="true" defer></script>
+    @await RenderSectionAsync("Scripts", required: false)
 </head>
 <body>
 <a class="skip" href="#main">@T["Skip"]</a>

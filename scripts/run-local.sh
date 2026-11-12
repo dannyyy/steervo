@@ -6,5 +6,6 @@ set -a
 source .env
 set +a
 export DataProtection__Path="$PWD/.data/keys"
+export DocumentStorage__Path="$PWD/.data/documents"
 dotnet run --project src/Steervo.Web --no-launch-profile -- --migrate
 exec dotnet run --project src/Steervo.Web --no-launch-profile --urls http://localhost:5180

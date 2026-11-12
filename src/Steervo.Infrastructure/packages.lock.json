@@ -2,6 +2,15 @@
   "version": 1,
   "dependencies": {
     "net10.0": {
+      "AWSSDK.S3": {
+        "type": "Direct",
+        "requested": "[3.7.409, )",
+        "resolved": "3.7.409",
+        "contentHash": "x5SCzff9bg8mDYezU9+3eVFmdF0TB8MUC0sdS/l5yHfyF3eR4IUPIbct1ToZlXpJbqJaZ1I5CyTXLZGEXfb5Nw==",
+        "dependencies": {
+          "AWSSDK.Core": "[3.7.400.58, 4.0.0)"
+        }
+      },
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
         "type": "Direct",
         "requested": "[10.0.10, )",
@@ -48,6 +57,11 @@
           "Microsoft.EntityFrameworkCore.Relational": "[10.0.4, 11.0.0)",
           "Npgsql": "10.0.3"
         }
+      },
+      "AWSSDK.Core": {
+        "type": "Transitive",
+        "resolved": "3.7.400.58",
+        "contentHash": "tsNRJMOxCpd6FXZq/3y3ei3MMEWmHO6uFgIg8GAkZS74hxtfDB6zyycAqd9vbo9UJBbX7lmtYfDPQ0sg2CUDRw=="
       },
       "Humanizer.Core": {
         "type": "Transitive",
@@ -221,7 +235,14 @@
       "steervo.application": {
         "type": "Project",
         "dependencies": {
-          "Steervo.Core": "[1.0.0, )"
+          "Steervo.Calculations": "[0.1.0, )",
+          "Steervo.Core": "[0.1.0, )"
+        }
+      },
+      "steervo.calculations": {
+        "type": "Project",
+        "dependencies": {
+          "Steervo.Core": "[0.1.0, )"
         }
       },
       "steervo.core": {

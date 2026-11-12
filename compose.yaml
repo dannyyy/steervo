@@ -40,13 +40,16 @@ services:
       ASPNETCORE_HTTP_PORTS: 8080
       ConnectionStrings__Database: Host=db;Port=5432;Database=steervo;Username=steervo;Password=${POSTGRES_PASSWORD}
       DataProtection__Path: /var/steervo/keys
+      DocumentStorage__Provider: ${DocumentStorage__Provider:-FileSystem}
+      DocumentStorage__Path: /var/steervo/documents
       Smtp__Host: mail
       Smtp__Port: 1025
     ports: ["127.0.0.1:5180:8080"]
-    volumes: ["keys:/var/steervo/keys"]
+    volumes: ["keys:/var/steervo/keys", "documents:/var/steervo/documents"]
     depends_on:
       migrate: { condition: service_completed_successfully }
       mail: { condition: service_healthy }
 volumes:
   database:
+  documents:
   keys:

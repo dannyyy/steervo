@@ -1,0 +1,46 @@
+@model Steervo.Web.Pages.Evaluations.Candidates.CompareModel
+@{ var e = Model.Evaluation; var edit = Model.Access >= AccessLevel.Editor; var url = $"/evaluations/{e.Id}/compare?first={Model.First?.Id}&second={Model.Second?.Id}"; var selected = Model.Selected; }
+<div id="candidate-workspace" data-version="@e.Version" data-preserve-viewport hx-target="#candidate-workspace" hx-swap="outerHTML show:none focus-scroll:false" hx-sync="this:drop">
+<partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "comparison")' />
+@if (Model.Notice is not null) { <div class="notice workspace-notice @(Model.Failed ? "failure" : "success")" role="status" tabindex="-1">@Model.Notice</div> }
+<div class="section-heading"><h2>@T["ComparisonTitle"]</h2><p class="muted">@T["ComparisonHelp"]</p></div>
+@if (selected.Count == 0)
+{
+    <div class="candidate-empty"><span class="step-number">03</span><div><h3>@T["NoComparisonCandidates"]</h3><p>@T["NoComparisonCandidatesHelp"]</p><a asp-page="Index" asp-route-id="@e.Id" class="button secondary">@T["Candidates"] →</a></div></div>
+}
+else
+{
+    <form method="get" class="comparison-picker"><div><label for="compare-first">@T["FirstCandidate"]</label><select id="compare-first" name="first">@foreach (var candidate in e.Candidates.OrderBy(x => x.Position)) { <option value="@candidate.Id" selected="@(candidate.Id == Model.First?.Id)">@candidate.DisplayName · @T["CandidateStatus" + candidate.Status]</option> }</select></div><div><label for="compare-second">@T["SecondCandidate"]</label><select id="compare-second" name="second"><option value="">@T["SelectCandidate"]</option>@foreach (var candidate in e.Candidates.OrderBy(x => x.Position)) { <option value="@candidate.Id" selected="@(candidate.Id == Model.Second?.Id)">@candidate.DisplayName · @T["CandidateStatus" + candidate.Status]</option> }</select></div><button class="button secondary">@T["ShowComparison"]</button></form>
+    @if (selected.Count == 1) { <p class="notice">@T["OneCandidateComparison"]</p> }
+    <div class="comparison @(selected.Count == 1 ? "comparison-single" : null)">
+        <div class="comparison-header"><span>@T["CompareCandidates"]</span>@foreach (var candidate in selected) { <div><a asp-page="Details" asp-route-id="@e.Id" asp-route-candidateId="@candidate.Id">@candidate.DisplayName ↗</a><span class="candidate-status @candidate.Status.ToString().ToLowerInvariant()">@T["CandidateStatus" + candidate.Status]</span>@if (candidate.StatusReason.Length > 0) { <p class="micro">@candidate.StatusReason</p> }</div> }</div>
+        <partial name="_SpecificationsComparison" model="selected" />
+        <div class="specification-comparison-heading"><h3>@T["ComparisonAssessmentsTitle"]</h3></div>
+        @foreach (var group in e.Groups.OrderBy(x => x.Position).Cast<CriterionGroup?>().Append(null))
+        {
+            var criteria = e.Criteria.Where(x => x.Scope == CriterionScope.Vehicle && x.GroupId == group?.Id).OrderBy(x => x.Position).ToList();
+            if (criteria.Count == 0) { continue; }
+            <section class="comparison-group"><h3>@(group?.Name ?? T["Ungrouped"].Value)</h3>
+            @foreach (var criterion in criteria)
+            {
+                <div class="comparison-row" data-comparison-criterion="@criterion.Id"><div class="comparison-criterion"><h4>@criterion.Name</h4><span class="priority @criterion.Priority.ToString().ToLowerInvariant()">@T[criterion.Priority.ToString()]</span><p class="micro">@T[criterion.Type.ToString()] @if (criterion.Type == CriterionType.Measurement) { <span> · @(criterion.Comparison == Comparison.AtLeast ? "≥" : "≤") @criterion.Threshold @criterion.Unit</span> }</p></div>
+                @foreach (var candidate in selected)
+                {
+                    var row = new Steervo.Web.Pages.Evaluations.Candidates.AssessmentRow(e, candidate, criterion, Model.Access, url);
+                    <div class="comparison-cell @row.Result.ToString().ToLowerInvariant()" role="group" aria-label="@T["CriterionForCandidate", criterion.Name, candidate.DisplayName]" data-comparison-candidate="@candidate.Id">
+                        <strong class="comparison-value">@(criterion.Type == CriterionType.Boolean ? T[row.Assessment?.BooleanValue is { } boolean ? boolean ? "Yes" : "No" : "FulfillmentUnknown"].Value : row.ValueText.Length > 0 ? row.ValueText : T["FulfillmentUnknown"].Value)</strong><span class="fulfillment @row.Result.ToString().ToLowerInvariant()">@T["Fulfillment" + row.Result]</span>
+                        @if (row.Assessment?.Source is { } source && source != AssessmentSource.Unknown) { <p class="micro">@T["AssessmentSource" + source]</p> }
+                        @if (!string.IsNullOrEmpty(row.Assessment?.Notes)) { <p class="comparison-note">@row.Assessment.Notes</p> }
+                        @if (edit) { <details class="comparison-editor" id="compare-edit-@candidate.Id-@criterion.Id"><summary>@T["EditAssessment"]</summary><partial name="_AssessmentRow" model="row" /></details> }
+                    </div>
+                }
+                </div>
+            }
+            </section>
+        }
+        @if (!e.Criteria.Any(x => x.Scope == CriterionScope.Vehicle)) { <p class="notice">@T["NoVehicleCriteriaHelp"]</p> }
+    </div>
+    <div class="comparison-explanation"><p>@T["NoAutomaticExclusion"]</p><p>@T["RatingIsSubjective"]</p><a asp-page="/Evaluations/Details" asp-route-id="@e.Id">@T["EditCriteria"] →</a></div>
+    @if (e.Criteria.Any(x => x.Scope == CriterionScope.Offer)) { <p class="notice"><a asp-page="/Evaluations/Offers/Index" asp-route-id="@e.Id">@T["OfferCriteriaSeparateLink"] →</a></p> }
+}
+</div>

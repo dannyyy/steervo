@@ -85,7 +85,7 @@
 <data name="CriterionDown" xml:space="preserve"><value>Kriterium {0} nach unten</value></data>
 <data name="EditCriterion" xml:space="preserve"><value>Kriterium bearbeiten</value></data>
 <data name="Save" xml:space="preserve"><value>Speichern</value></data>
-<data name="RemoveCriterionConfirm" xml:space="preserve"><value>Dieses Kriterium endgültig löschen?</value></data>
+<data name="RemoveCriterionConfirm" xml:space="preserve"><value>Dieses Kriterium und alle zugehörigen Bewertungen endgültig löschen?</value></data>
 <data name="RemoveCriterion" xml:space="preserve"><value>Kriterium löschen</value></data>
 <data name="BuildProfile" xml:space="preserve"><value>PROFIL AUFBAUEN</value></data>
 <data name="AddCriterion" xml:space="preserve"><value>Kriterium hinzufügen</value></data>
@@ -102,7 +102,7 @@
 <data name="Permission" xml:space="preserve"><value>Berechtigung</value></data>
 <data name="GrantAccess" xml:space="preserve"><value>Zugriff freigeben</value></data>
 <data name="OwnerManagesAccess" xml:space="preserve"><value>Nur der Besitzer kann die Freigaben dieser Evaluation verwalten.</value></data>
-<data name="DeleteEvaluationConfirm" xml:space="preserve"><value>Diese Evaluation mit allen Kriterien und Freigaben endgültig löschen?</value></data>
+<data name="DeleteEvaluationConfirm" xml:space="preserve"><value>Diese Evaluation mit allen Autos, Kriterien, Bewertungen, Offerten samt Versionshistorie und Dokumenten, Kostenpositionen und Freigaben endgültig löschen?</value></data>
 <data name="DeleteEvaluation" xml:space="preserve"><value>Evaluation löschen</value></data>
 <data name="CriterionName" xml:space="preserve"><value>Bezeichnung</value></data>
 <data name="Priority" xml:space="preserve"><value>Priorität</value></data>
@@ -195,12 +195,555 @@ Er gilt zehn Minuten und kann einmal verwendet werden. Teile ihn mit niemandem. 
 
 Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich freigegeben.</value></data>
 <data name="ImportEvaluation" xml:space="preserve"><value>Evaluation importieren</value></data>
-<data name="ImportHelp" xml:space="preserve"><value>Ein Export aus dieser Anwendung wird als neue, private Evaluation angelegt. Bestehende Daten bleiben erhalten; Freigaben werden nicht übernommen. Maximale Dateigrösse: 256 kB.</value></data>
-<data name="ExportFile" xml:space="preserve"><value>JSON-Exportdatei</value></data>
+<data name="ImportHelp" xml:space="preserve"><value>Importiere einen JSON- oder ZIP-Export als neue private Evaluation. JSON: maximal 5 MB; ZIP mit Dokumenten: maximal 250 MiB. Freigaben werden nicht übernommen.</value></data>
+<data name="ExportFile" xml:space="preserve"><value>Exportdatei (JSON oder ZIP)</value></data>
 <data name="ImportAsNew" xml:space="preserve"><value>Als neue Evaluation importieren</value></data>
 <data name="ExportEvaluation" xml:space="preserve"><value>Exportieren</value></data>
-<data name="InvalidImport" xml:space="preserve"><value>Die Datei ist kein gültiger Steervo-Evaluationsexport der Version 1 oder überschreitet die erlaubte Grösse.</value></data>
+<data name="InvalidImport" xml:space="preserve"><value>Die Datei ist kein gültiger Steervo-Evaluationsexport (JSON oder ZIP), enthält ungültige Angaben oder überschreitet die erlaubte Grösse.</value></data>
   <data name="SortingHelp" xml:space="preserve"><value>Am Griff ziehen oder mit den Pfeilen sortieren. Am fokussierten Griff funktionieren auch ↑ und ↓.</value></data>
   <data name="MoveGroup" xml:space="preserve"><value>Gruppe {0} verschieben</value></data>
   <data name="MoveCriterion" xml:space="preserve"><value>Kriterium {0} verschieben</value></data>
+  <data name="CandidateCount" xml:space="preserve"><value>{0} Autos</value></data>
+  <data name="EvaluationSteps" xml:space="preserve"><value>Schritte dieser Evaluation</value></data>
+  <data name="Candidates" xml:space="preserve"><value>Autos</value></data>
+  <data name="CompareCandidates" xml:space="preserve"><value>Vergleichen</value></data>
+  <data name="CandidatesTitle" xml:space="preserve"><value>Welche Autos kommen in Frage?</value></data>
+  <data name="CandidatesHelp" xml:space="preserve"><value>Sammle deine Kandidaten. Ausstattung und offene Fragen hältst du bei jedem Auto fest.</value></data>
+  <data name="AddCandidate" xml:space="preserve"><value>Auto hinzufügen</value></data>
+  <data name="EmptyCandidatesTitle" xml:space="preserve"><value>Deine Auswahl beginnt hier.</value></data>
+  <data name="EmptyCandidatesHelp" xml:space="preserve"><value>Ein Modell reicht für den Anfang. Ausführung, Zustand und weitere Angaben kannst du ergänzen, sobald du sie kennst.</value></data>
+  <data name="CandidateBrand" xml:space="preserve"><value>Marke</value></data>
+  <data name="CandidateModel" xml:space="preserve"><value>Modell / Bezeichnung</value></data>
+  <data name="CandidateVariant" xml:space="preserve"><value>Ausführung</value></data>
+  <data name="CandidateCondition" xml:space="preserve"><value>Zustand</value></data>
+  <data name="ConditionUnknown" xml:space="preserve"><value>Zustand offen</value></data>
+  <data name="ConditionNew" xml:space="preserve"><value>Neu</value></data>
+  <data name="ConditionUsed" xml:space="preserve"><value>Occasion</value></data>
+  <data name="CandidateYear" xml:space="preserve"><value>Jahrgang</value></data>
+  <data name="CandidateMileage" xml:space="preserve"><value>Kilometerstand (km)</value></data>
+  <data name="CandidateNotes" xml:space="preserve"><value>Notizen</value></data>
+  <data name="CandidateLinks" xml:space="preserve"><value>Quellen und Links</value></data>
+  <data name="CandidateLinksHelp" xml:space="preserve"><value>Eine vollständige http- oder https-Adresse pro Zeile, höchstens zehn Links.</value></data>
+  <data name="CandidateStatusWatching" xml:space="preserve"><value>Beobachtet</value></data>
+  <data name="CandidateStatusAlternative" xml:space="preserve"><value>Alternative</value></data>
+  <data name="CandidateStatusFavorite" xml:space="preserve"><value>Favorit</value></data>
+  <data name="CandidateStatusDeferred" xml:space="preserve"><value>Zurückgestellt</value></data>
+  <data name="CandidateStatusExcluded" xml:space="preserve"><value>Ausgeschieden</value></data>
+  <data name="CandidateUp" xml:space="preserve"><value>Auto {0} nach oben</value></data>
+  <data name="CandidateDown" xml:space="preserve"><value>Auto {0} nach unten</value></data>
+  <data name="RequiredNotMet" xml:space="preserve"><value>Diese Muss-Anforderungen werden verfehlt</value></data>
+  <data name="CandidateNeedsAssessment" xml:space="preserve"><value>Halte fest, was du bereits weisst. Offene Fragen bleiben als unbekannt sichtbar.</value></data>
+  <data name="CandidateReadyToReview" xml:space="preserve"><value>Prüfe deine Einschätzungen im direkten Vergleich.</value></data>
+  <data name="AssessCandidate" xml:space="preserve"><value>Ausstattung prüfen</value></data>
+  <data name="ViewCandidate" xml:space="preserve"><value>Auto ansehen</value></data>
+  <data name="CandidateActions" xml:space="preserve"><value>Weitere Aktionen</value></data>
+  <data name="CopyCandidateName" xml:space="preserve"><value>Bezeichnung der Kopie</value></data>
+  <data name="CopyCandidateHelp" xml:space="preserve"><value>Stammdaten, Quellen, Bewertungen und fahrzeugspezifische Kostenpositionen werden kopiert. Die Kopie erhält eine eigene Einstufung. Prüfe die übernommenen Angaben.</value></data>
+  <data name="CopyCandidate" xml:space="preserve"><value>Auto kopieren</value></data>
+  <data name="RemoveCandidate" xml:space="preserve"><value>Auto entfernen</value></data>
+  <data name="RemoveCandidateConfirm" xml:space="preserve"><value>Dieses Auto mit seinen Bewertungen, Kostenpositionen und allen Offerten samt Versionshistorie und Dokumenten unwiderruflich entfernen?</value></data>
+  <data name="CompareNextTitle" xml:space="preserve"><value>Lege zwei Kandidaten nebeneinander.</value></data>
+  <data name="CompareNextHelp" xml:space="preserve"><value>Sieh die Unterschiede bei deinen Anforderungen und halte neue Erkenntnisse direkt fest.</value></data>
+  <data name="NewCandidateHelp" xml:space="preserve"><value>Erfasse ein Modell oder eine konkrete Ausführung. Unbekannte Angaben dürfen offen bleiben.</value></data>
+  <data name="CreateCandidate" xml:space="preserve"><value>Auto anlegen</value></data>
+  <data name="AssessmentValue" xml:space="preserve"><value>Deine Angabe</value></data>
+  <data name="AssessmentSource" xml:space="preserve"><value>Grundlage</value></data>
+  <data name="AssessmentSourceUnknown" xml:space="preserve"><value>Grundlage offen</value></data>
+  <data name="AssessmentSourceManufacturer" xml:space="preserve"><value>Herstellerangabe</value></data>
+  <data name="AssessmentSourceOffer" xml:space="preserve"><value>Offerte</value></data>
+  <data name="AssessmentSourceInspection" xml:space="preserve"><value>Besichtigung / Probesitzen</value></data>
+  <data name="AssessmentSourceTestDrive" xml:space="preserve"><value>Probefahrt</value></data>
+  <data name="AssessmentSourceResearch" xml:space="preserve"><value>Eigene Recherche</value></data>
+  <data name="Yes" xml:space="preserve"><value>Ja</value></data>
+  <data name="No" xml:space="preserve"><value>Nein</value></data>
+  <data name="FulfillmentUnknown" xml:space="preserve"><value>Unbekannt</value></data>
+  <data name="FulfillmentMet" xml:space="preserve"><value>Erfüllt</value></data>
+  <data name="FulfillmentUnmet" xml:space="preserve"><value>Nicht erfüllt</value></data>
+  <data name="FulfillmentRated" xml:space="preserve"><value>Persönliche Einschätzung</value></data>
+  <data name="SaveAssessment" xml:space="preserve"><value>{0} für {1} speichern</value></data>
+  <data name="AssessmentNote" xml:space="preserve"><value>Notiz ergänzen</value></data>
+  <data name="NotePresent" xml:space="preserve"><value>vorhanden</value></data>
+  <data name="AssessmentNoteHelp" xml:space="preserve"><value>Was hast du festgestellt? Was ist noch zu klären?</value></data>
+  <data name="ClearAssessment" xml:space="preserve"><value>Zurücksetzen</value></data>
+  <data name="ClearAssessmentFor" xml:space="preserve"><value>Bewertung für {0} zurücksetzen</value></data>
+  <data name="ClearAssessmentConfirm" xml:space="preserve"><value>Wert, Grundlage und Notiz dieser Bewertung entfernen? Das Kriterium bleibt bestehen und wird wieder als unbekannt angezeigt.</value></data>
+  <data name="AllCandidates" xml:space="preserve"><value>Alle Autos</value></data>
+  <data name="CompareCandidate" xml:space="preserve"><value>Im Vergleich ansehen</value></data>
+  <data name="NoAutomaticExclusion" xml:space="preserve"><value>Ein verfehltes Muss führt nicht automatisch zum Ausschluss. Du entscheidest, welche Abstriche für dich in Frage kommen.</value></data>
+  <data name="AssessCandidateTitle" xml:space="preserve"><value>Was weisst du über dieses Auto?</value></data>
+  <data name="AssessCandidateHelp" xml:space="preserve"><value>Trage bestätigte Angaben und deine Erfahrungen ein. Ein leeres Feld bedeutet unbekannt, nicht nein oder null.</value></data>
+  <data name="NoVehicleCriteria" xml:space="preserve"><value>Zuerst festhalten, worauf es ankommt.</value></data>
+  <data name="NoVehicleCriteriaHelp" xml:space="preserve"><value>Lege unter Kriterien Anforderungen mit dem Bezug Fahrzeug an, um die Ausstattung zu bewerten.</value></data>
+  <data name="EditCriteria" xml:space="preserve"><value>Kriterien bearbeiten</value></data>
+  <data name="OfferCriteriaSeparate" xml:space="preserve"><value>Kriterien mit dem Bezug Offerte gehören nicht zur Fahrzeugausstattung und werden hier nicht bewertet.</value></data>
+  <data name="RatingIsSubjective" xml:space="preserve"><value>Bewertungen von 1–5 sind persönliche Einschätzungen – auch bei Muss-Kriterien. Daraus wird keine Erfüllung, Verletzung oder Gesamtnote berechnet.</value></data>
+  <data name="CandidateClassification" xml:space="preserve"><value>Deine Einordnung</value></data>
+  <data name="CandidateStatus" xml:space="preserve"><value>Einstufung</value></data>
+  <data name="CandidateReason" xml:space="preserve"><value>Begründung</value></data>
+  <data name="CandidateReasonHelp" xml:space="preserve"><value>Für Zurückstellen und Ausscheiden ist eine Begründung erforderlich.</value></data>
+  <data name="SaveClassification" xml:space="preserve"><value>Einordnung speichern</value></data>
+  <data name="NoCandidateReason" xml:space="preserve"><value>Noch keine Begründung erfasst.</value></data>
+  <data name="NoCandidateNotes" xml:space="preserve"><value>Noch keine Notizen erfasst.</value></data>
+  <data name="EditCandidate" xml:space="preserve"><value>Stammdaten bearbeiten</value></data>
+  <data name="SaveCandidate" xml:space="preserve"><value>Stammdaten speichern</value></data>
+  <data name="ComparisonTitle" xml:space="preserve"><value>Was spricht für welches Auto?</value></data>
+  <data name="ComparisonHelp" xml:space="preserve"><value>Vergleiche zwei Kandidaten anhand deiner Anforderungen. Unbekanntes bleibt sichtbar, und deine Einschätzung lässt sich direkt bearbeiten.</value></data>
+  <data name="NoComparisonCandidates" xml:space="preserve"><value>Noch keine Autos zum Vergleichen.</value></data>
+  <data name="NoComparisonCandidatesHelp" xml:space="preserve"><value>Erfasse zuerst Kandidaten und prüfe ihre Ausstattung.</value></data>
+  <data name="FirstCandidate" xml:space="preserve"><value>Erstes Auto</value></data>
+  <data name="SecondCandidate" xml:space="preserve"><value>Zweites Auto</value></data>
+  <data name="SelectCandidate" xml:space="preserve"><value>Auto auswählen</value></data>
+  <data name="ShowComparison" xml:space="preserve"><value>Vergleich anzeigen</value></data>
+  <data name="OneCandidateComparison" xml:space="preserve"><value>Für einen direkten Vergleich ein weiteres Auto hinzufügen oder ein anderes zweites Auto auswählen.</value></data>
+  <data name="CriterionForCandidate" xml:space="preserve"><value>{0} bei {1}</value></data>
+  <data name="EditAssessment" xml:space="preserve"><value>Bewertung bearbeiten</value></data>
+  <data name="SelectDifferentCandidates" xml:space="preserve"><value>Wähle zwei unterschiedliche Autos für den Vergleich.</value></data>
+  <data name="InvalidCandidateLinks" xml:space="preserve"><value>Bitte nur vollständige http- oder https-Adressen ohne Zugangsdaten angeben (höchstens zehn Links).</value></data>
+  <data name="CandidateReasonRequired" xml:space="preserve"><value>Bitte begründe, warum du dieses Auto zurückstellst oder ausscheiden lässt.</value></data>
+  <data name="VehicleCriteriaOnly" xml:space="preserve"><value>Hier können nur Kriterien mit dem Bezug Fahrzeug bewertet werden.</value></data>
+  <data name="CriterionHasAssessments" xml:space="preserve"><value>Für dieses Kriterium bestehen bereits Bewertungen. Setze sie zuerst zurück, bevor du Typ, Bezug oder Einheit änderst. Bezeichnung, Priorität, Schwelle und Gruppe bleiben bearbeitbar.</value></data>
+  <data name="CandidateCountSingle" xml:space="preserve"><value>1 Auto</value></data>
+  <data name="VehicleSpecifications" xml:space="preserve"><value>Technische Daten</value></data>
+  <data name="SpecificationsHelp" xml:space="preserve"><value>Alle Angaben sind optional. Diese Daten erscheinen im Vergleich und werden nicht bewertet.</value></data>
+  <data name="NoSpecifications" xml:space="preserve"><value>Noch keine technischen Daten erfasst.</value></data>
+  <data name="NotSpecified" xml:space="preserve"><value>Nicht angegeben</value></data>
+  <data name="Calculated" xml:space="preserve"><value>Berechnet</value></data>
+  <data name="CalculatedValue" xml:space="preserve"><value>Berechnet: {0}</value></data>
+  <data name="SpecificationsWeightHelp" xml:space="preserve"><value>Zwei Angaben reichen: Gesamtgewicht = Leergewicht + Zuladung. Lass das zu berechnende Feld leer.</value></data>
+  <data name="SpecificationsPowerHelp" xml:space="preserve"><value>Gib kW oder PS ein. Der andere Wert wird umgerechnet; lass dieses Feld leer. Bei Hybridfahrzeugen die Systemleistung angeben.</value></data>
+  <data name="SpecificationsElectricHelp" xml:space="preserve"><value>AC: Wechselstromladen · DC: Schnellladen. Verbrauch in kWh/100 km; Ladezeit ausdrücklich von 20 auf 80 %.</value></data>
+  <data name="SpecificationsHybridHelp" xml:space="preserve"><value>Bei Hybridfahrzeugen können beide Bereiche ausgefüllt werden.</value></data>
+  <data name="SpecGroupDimensions" xml:space="preserve"><value>Abmessungen</value></data>
+  <data name="SpecGroupSpace" xml:space="preserve"><value>Platz &amp; Stauraum</value></data>
+  <data name="SpecGroupWeight" xml:space="preserve"><value>Gewicht</value></data>
+  <data name="SpecGroupPerformance" xml:space="preserve"><value>Antrieb &amp; Leistung</value></data>
+  <data name="SpecGroupElectric" xml:space="preserve"><value>Elektroantrieb &amp; Laden</value></data>
+  <data name="SpecGroupCombustion" xml:space="preserve"><value>Verbrennungsmotor &amp; Tank</value></data>
+  <data name="SpecPropulsion" xml:space="preserve"><value>Motorisierung</value></data>
+  <data name="SpecDrive" xml:space="preserve"><value>Antrieb</value></data>
+  <data name="PropulsionElectric" xml:space="preserve"><value>Elektroauto</value></data>
+  <data name="PropulsionCombustion" xml:space="preserve"><value>Verbrenner</value></data>
+  <data name="PropulsionHybrid" xml:space="preserve"><value>Hybrid / Plug-in-Hybrid</value></data>
+  <data name="DriveAll" xml:space="preserve"><value>AWD · Allrad</value></data>
+  <data name="DriveRear" xml:space="preserve"><value>RWD · Hinterrad</value></data>
+  <data name="DriveFront" xml:space="preserve"><value>FWD · Vorderrad</value></data>
+  <data name="InvalidSpecifications" xml:space="preserve"><value>Bitte prüfe die technischen Daten: nur gültige, positive Zahlen; Stauraum, Zuladung und Ladeleistung dürfen auch 0 sein.</value></data>
+  <data name="InconsistentWeights" xml:space="preserve"><value>Die Gewichte passen nicht zusammen. Gesamtgewicht = Leergewicht + Zuladung. Lass einen Wert leer, um ihn berechnen zu lassen.</value></data>
+  <data name="InconsistentPower" xml:space="preserve"><value>kW und PS passen nicht zusammen. Gib nur einen der beiden Werte an, um den anderen berechnen zu lassen.</value></data>
+  <data name="InconsistentBatteryCapacity" xml:space="preserve"><value>Die nutzbare Batteriekapazität darf nicht grösser als die gesamte Kapazität sein.</value></data>
+  <data name="InconsistentBootVolume" xml:space="preserve"><value>Das Kofferraumvolumen mit umgeklappter Hinterbank darf nicht kleiner als das reguläre Volumen sein.</value></data>
+  <data name="InconsistentWidth" xml:space="preserve"><value>Die Breite mit Spiegeln darf nicht kleiner als die Breite ohne Spiegel sein.</value></data>
+  <data name="SpecLengthMm" xml:space="preserve"><value>Länge</value></data>
+  <data name="SpecWidthMm" xml:space="preserve"><value>Breite ohne Spiegel</value></data>
+  <data name="SpecWidthWithMirrorsMm" xml:space="preserve"><value>Breite mit Spiegeln</value></data>
+  <data name="SpecHeightMm" xml:space="preserve"><value>Höhe</value></data>
+  <data name="SpecWheelbaseMm" xml:space="preserve"><value>Radstand</value></data>
+  <data name="SpecSeats" xml:space="preserve"><value>Sitzplätze</value></data>
+  <data name="SpecBootVolumeLitres" xml:space="preserve"><value>Kofferraum</value></data>
+  <data name="SpecBootVolumeFoldedLitres" xml:space="preserve"><value>Kofferraum · Hinterbank umgeklappt</value></data>
+  <data name="SpecFrunkVolumeLitres" xml:space="preserve"><value>Frunk</value></data>
+  <data name="SpecKerbWeightKg" xml:space="preserve"><value>Leergewicht</value></data>
+  <data name="SpecGrossWeightKg" xml:space="preserve"><value>Zulässiges Gesamtgewicht</value></data>
+  <data name="SpecPayloadKg" xml:space="preserve"><value>Zuladung</value></data>
+  <data name="SpecPowerKw" xml:space="preserve"><value>Leistung</value></data>
+  <data name="SpecPowerPs" xml:space="preserve"><value>Leistung</value></data>
+  <data name="SpecAccelerationSeconds" xml:space="preserve"><value>0–100 km/h</value></data>
+  <data name="SpecTopSpeedKmh" xml:space="preserve"><value>Höchstgeschwindigkeit</value></data>
+  <data name="SpecSummerConsumptionKwhPer100Km" xml:space="preserve"><value>Verbrauch Sommer</value></data>
+  <data name="SpecWinterConsumptionKwhPer100Km" xml:space="preserve"><value>Verbrauch Winter</value></data>
+  <data name="SpecBatteryUsableKwh" xml:space="preserve"><value>Batteriekapazität · nutzbar (netto)</value></data>
+  <data name="SpecBatteryGrossKwh" xml:space="preserve"><value>Batteriekapazität · gesamt (brutto)</value></data>
+  <data name="SpecAcChargingPowerKw" xml:space="preserve"><value>Max. Ladeleistung AC</value></data>
+  <data name="SpecDcChargingPowerKw" xml:space="preserve"><value>Max. Ladeleistung DC</value></data>
+  <data name="SpecCharging20To80Minutes" xml:space="preserve"><value>Ladezeit 20–80 %</value></data>
+  <data name="SpecTankCapacityLitres" xml:space="preserve"><value>Tankgrösse</value></data>
+  <data name="SpecRangeKm" xml:space="preserve"><value>Reichweite mit einer Tankfüllung</value></data>
+  <data name="SpecFuelConsumptionLitresPer100Km" xml:space="preserve"><value>Kraftstoffverbrauch</value></data>
+  <data name="ComparisonAssessmentsTitle" xml:space="preserve"><value>Kriterienbewertungen</value></data>
+  <data name="Offers" xml:space="preserve"><value>Offerten</value></data>
+
+  <data name="OfferHeading" xml:space="preserve"><value>Angebote einholen und nachverfolgen</value></data>
+  <data name="OffersHelp" xml:space="preserve"><value>Sammle die Angebote deiner Anbieter. Ergänzungen und Nachverhandlungen bleiben als eigene Versionen erhalten.</value></data>
+  <data name="NewOffer" xml:space="preserve"><value>Offerte erfassen</value></data>
+  <data name="NoOffers" xml:space="preserve"><value>Noch keine Offerten</value></data>
+  <data name="NoOffersHelp" xml:space="preserve"><value>Wähle ein Auto und erfasse eine erste Anfrage oder ein vorhandenes Angebot. Unbekannte Werte können offen bleiben.</value></data>
+  <data name="OffersNeedCandidate" xml:space="preserve"><value>Erfasse zuerst ein Auto, damit du ihm Offerten zuordnen kannst.</value></data>
+  <data name="AllOffers" xml:space="preserve"><value>Alle Offerten</value></data>
+  <data name="OfferForCandidate" xml:space="preserve"><value>Offerten für dieses Auto</value></data>
+  <data name="OfferCandidate" xml:space="preserve"><value>Auto</value></data>
+  <data name="OfferCurrency" xml:space="preserve"><value>Währung der Evaluation</value></data>
+  <data name="OfferCurrencyHelp" xml:space="preserve"><value>Drei Buchstaben, z. B. CHF oder EUR. Diese Währung gilt für alle Offerten der Evaluation und bleibt nach der ersten Erfassung fest.</value></data>
+  <data name="CurrencyRequired" xml:space="preserve"><value>Bitte gib ein Währungskürzel mit drei Buchstaben an.</value></data>
+  <data name="CurrencyFixed" xml:space="preserve"><value>Die Währung dieser Evaluation ist bereits festgelegt. Vorhandene Beträge werden nicht in eine andere Währung umgedeutet.</value></data>
+  <data name="OfferKind" xml:space="preserve"><value>Beschaffungsform</value></data>
+  <data name="OfferCommitment" xml:space="preserve"><value>Verbindlichkeit</value></data>
+  <data name="OfferKindUnknown" xml:space="preserve"><value>Noch offen</value></data>
+  <data name="OfferKindPurchase" xml:space="preserve"><value>Kauf</value></data>
+  <data name="OfferKindLeasing" xml:space="preserve"><value>Leasing</value></data>
+  <data name="OfferKindFinancing" xml:space="preserve"><value>Finanzierung</value></data>
+  <data name="OfferCommitmentRequested" xml:space="preserve"><value>Angefragt</value></data>
+  <data name="OfferCommitmentNonBinding" xml:space="preserve"><value>Unverbindlich</value></data>
+  <data name="OfferCommitmentBinding" xml:space="preserve"><value>Verbindlich</value></data>
+  <data name="OfferGroupHeader" xml:space="preserve"><value>Anbieter &amp; Fahrzeug</value></data>
+  <data name="OfferGroupDelivery" xml:space="preserve"><value>Termine &amp; Lieferung</value></data>
+  <data name="OfferGroupPrice" xml:space="preserve"><value>Preis</value></data>
+  <data name="OfferGroupContract" xml:space="preserve"><value>Leasing / Finanzierung</value></data>
+  <data name="OfferGroupMileage" xml:space="preserve"><value>Leasingkilometer</value></data>
+  <data name="OfferGroupNotes" xml:space="preserve"><value>Notizen</value></data>
+  <data name="OfferUnknownHelp" xml:space="preserve"><value>Lass unbekannte Angaben leer. 0 bedeutet ausdrücklich keine Kosten; es ersetzt keine fehlende Angabe.</value></data>
+  <data name="OfferContractHelp" xml:space="preserve"><value>Übernimm die Angaben des Anbieters. Rate, Zins und Restpreis werden hier erfasst, nicht auseinander berechnet.</value></data>
+  <data name="OfferMileageHelp" xml:space="preserve"><value>Kilometer pro Jahr und Preise pro Kilometer. Fehlende Preise bleiben offen.</value></data>
+  <data name="OfferLines" xml:space="preserve"><value>Zubehör, Gebühren &amp; Sonderkonditionen</value></data>
+  <data name="OfferLinesHelp" xml:space="preserve"><value>Übernimm die Positionen so, wie sie in der Offerte stehen. Bezahlte Beträge, inklusive Leistungen und offene Preise bleiben getrennt.</value></data>
+  <data name="AddOfferLine" xml:space="preserve"><value>Position hinzufügen</value></data>
+  <data name="RemoveOfferLine" xml:space="preserve"><value>Position entfernen</value></data>
+  <data name="MoveOfferLineUp" xml:space="preserve"><value>Position nach oben</value></data>
+  <data name="MoveOfferLineDown" xml:space="preserve"><value>Position nach unten</value></data>
+  <data name="OfferLineName" xml:space="preserve"><value>Bezeichnung der Position</value></data>
+  <data name="OfferLineKind" xml:space="preserve"><value>Art</value></data>
+  <data name="OfferLinePriceKind" xml:space="preserve"><value>Preisangabe</value></data>
+  <data name="OfferLineAmount" xml:space="preserve"><value>Betrag</value></data>
+  <data name="OfferLineEffect" xml:space="preserve"><value>Wirkung</value></data>
+  <data name="OfferLineCostCategory" xml:space="preserve"><value>Kostenbereich</value></data>
+  <data name="OfferLineDurationMonths" xml:space="preserve"><value>Dauer in Monaten</value></data>
+  <data name="OfferLineNotes" xml:space="preserve"><value>Hinweise zur Position</value></data>
+  <data name="OfferLineKindAccessory" xml:space="preserve"><value>Zubehör</value></data>
+  <data name="OfferLineKindFee" xml:space="preserve"><value>Gebühr</value></data>
+  <data name="OfferLineKindBenefit" xml:space="preserve"><value>Sonderkondition</value></data>
+  <data name="OfferLineKindEquipment" xml:space="preserve"><value>Ausstattung</value></data>
+  <data name="OfferPriceKindUnknown" xml:space="preserve"><value>Preis offen</value></data>
+  <data name="OfferPriceKindAmount" xml:space="preserve"><value>Betrag bekannt</value></data>
+  <data name="OfferPriceKindIncluded" xml:space="preserve"><value>Inklusive</value></data>
+  <data name="OfferBenefitEffectCostSaving" xml:space="preserve"><value>Kostenersparnis / Gratisleistung</value></data>
+  <data name="OfferBenefitEffectRight" xml:space="preserve"><value>Recht / Option</value></data>
+  <data name="CostCategoryService" xml:space="preserve"><value>Service</value></data>
+  <data name="CostCategoryTires" xml:space="preserve"><value>Reifen</value></data>
+  <data name="CostCategoryPublicCharging" xml:space="preserve"><value>Öffentliches Laden</value></data>
+  <data name="CostCategoryHomeCharging" xml:space="preserve"><value>Heimladen</value></data>
+  <data name="CostCategoryFuel" xml:space="preserve"><value>Kraftstoff</value></data>
+  <data name="CostCategoryInsurance" xml:space="preserve"><value>Versicherung</value></data>
+  <data name="CostCategoryTax" xml:space="preserve"><value>Steuern / Abgaben</value></data>
+  <data name="CostCategoryParking" xml:space="preserve"><value>Parkplatz</value></data>
+  <data name="CostCategoryOther" xml:space="preserve"><value>Sonstiges</value></data>
+  <data name="OfferChangeNote" xml:space="preserve"><value>Was wurde ergänzt oder nachverhandelt?</value></data>
+  <data name="OfferSaveNew" xml:space="preserve"><value>Offerte anlegen</value></data>
+  <data name="OfferSaveRevision" xml:space="preserve"><value>Als neue Version speichern</value></data>
+  <data name="OfferEdit" xml:space="preserve"><value>Neue Version erfassen</value></data>
+  <data name="OfferVersion" xml:space="preserve"><value>Version {0}</value></data>
+  <data name="OfferHistory" xml:space="preserve"><value>Versionshistorie</value></data>
+  <data name="OfferHistoryHelp" xml:space="preserve"><value>Jede gespeicherte Änderung ist ein eigener Stand. Frühere Versionen können gelesen, aber nicht überschrieben werden.</value></data>
+  <data name="OfferCurrent" xml:space="preserve"><value>Aktuelle Version</value></data>
+  <data name="OfferHistorical" xml:space="preserve"><value>Du siehst einen früheren Stand dieser Offerte.</value></data>
+  <data name="OfferBackToCurrent" xml:space="preserve"><value>Zur aktuellen Version</value></data>
+  <data name="OfferChanges" xml:space="preserve"><value>Änderungen zur Vorversion</value></data>
+  <data name="OfferUnchanged" xml:space="preserve"><value>Keine Änderung an diesem Feld</value></data>
+  <data name="OfferLinesChanged" xml:space="preserve"><value>Die Positionen haben sich geändert. Beide Stände sind in der Historie vollständig einsehbar.</value></data>
+  <data name="NoOfferChanges" xml:space="preserve"><value>Es wurden keine Änderungen erfasst. Ergänze Angaben oder eine Änderungsnotiz.</value></data>
+  <data name="OfferArchive" xml:space="preserve"><value>Offerte archivieren</value></data>
+  <data name="OfferRestore" xml:space="preserve"><value>Offerte wieder aktivieren</value></data>
+  <data name="OfferArchived" xml:space="preserve"><value>Diese Offerte ist archiviert. Aktiviere sie, um sie weiterzubearbeiten.</value></data>
+  <data name="OfferArchivedLabel" xml:space="preserve"><value>Archiviert</value></data>
+  <data name="ShowArchivedOffers" xml:space="preserve"><value>Archivierte Offerten anzeigen</value></data>
+  <data name="OfferOpenFields" xml:space="preserve"><value>Noch offene Angaben</value></data>
+  <data name="OfferNoOpenFields" xml:space="preserve"><value>Die wichtigsten Angaben sind erfasst.</value></data>
+  <data name="OfferNoLines" xml:space="preserve"><value>Keine einzelnen Positionen erfasst.</value></data>
+  <data name="OfferNoChangeNote" xml:space="preserve"><value>Ohne Änderungsnotiz</value></data>
+  <data name="OfferCompare" xml:space="preserve"><value>Offerten vergleichen</value></data>
+  <data name="OfferCompareHelp" xml:space="preserve"><value>Wähle zwei Offerten desselben Autos. Vergleiche die Angaben und offenen Punkte; Beträge sind keine Gesamtkostenrechnung.</value></data>
+  <data name="FirstOffer" xml:space="preserve"><value>Erste Offerte</value></data>
+  <data name="SecondOffer" xml:space="preserve"><value>Zweite Offerte</value></data>
+  <data name="SelectOffer" xml:space="preserve"><value>Offerte auswählen</value></data>
+  <data name="OfferCompareNeedTwo" xml:space="preserve"><value>Für einen direkten Vergleich brauchst du zwei Offerten desselben Autos.</value></data>
+  <data name="OfferSameCandidateRequired" xml:space="preserve"><value>Vergleiche hier zwei unterschiedliche Offerten desselben Autos.</value></data>
+  <data name="InvalidOfferTerms" xml:space="preserve"><value>Bitte prüfe die Offerte: Beträge dürfen nicht negativ sein; Laufzeit, Kilometer und Datumsangaben müssen gültig sein.</value></data>
+  <data name="InvalidOfferLine" xml:space="preserve"><value>Bitte prüfe die Position: Ein bekannter Preis benötigt einen Betrag. Inklusive und offene Preise enthalten keinen Betrag. Wirkung und Dauer gehören zu Sonderkonditionen.</value></data>
+  <data name="TooManyOfferLines" xml:space="preserve"><value>Eine Version kann höchstens 500 Positionen enthalten.</value></data>
+  <data name="InvalidOfferDate" xml:space="preserve"><value>Der Zeitpunkt der Offertversion ist ungültig oder liegt vor der vorherigen Version.</value></data>
+  <data name="OfferCriteriaOnly" xml:space="preserve"><value>Hier können nur Kriterien mit dem Bezug Offerte bewertet werden.</value></data>
+  <data name="OfferAssessmentTitle" xml:space="preserve"><value>Anforderungen an diese Offerte</value></data>
+  <data name="OfferAssessmentHelp" xml:space="preserve"><value>Diese Einschätzungen beziehen sich auf die aktuelle Offertversion. Eine neue Version kennzeichnet frühere Einschätzungen zur erneuten Prüfung.</value></data>
+  <data name="OfferAssessmentStale" xml:space="preserve"><value>Aus Version {0} – bitte erneut prüfen</value></data>
+  <data name="OfferAssessmentReview" xml:space="preserve"><value>Für aktuelle Version bestätigen</value></data>
+  <data name="OfferNoCriteria" xml:space="preserve"><value>Noch keine Kriterien mit dem Bezug Offerte vorhanden.</value></data>
+  <data name="OfferCriteriaSeparateLink" xml:space="preserve"><value>Offertkriterien prüfst du bei der jeweiligen Offerte.</value></data>
+  <data name="OfferAssessmentSave" xml:space="preserve"><value>Einschätzung speichern</value></data>
+  <data name="OfferAssessmentReset" xml:space="preserve"><value>Einschätzung zurücksetzen</value></data>
+  <data name="OfferMonthlyUnit" xml:space="preserve"><value>/ Monat</value></data>
+  <data name="OfferKilometreUnit" xml:space="preserve"><value>/ km</value></data>
+  <data name="OfferOpen" xml:space="preserve"><value>Offen</value></data>
+  <data name="OfferDurationOpen" xml:space="preserve"><value>Dauer offen</value></data>
+  <data name="OfferDuration" xml:space="preserve"><value>{0} Monate</value></data>
+  <data name="OfferRevisionSaved" xml:space="preserve"><value>Neue Offertversion gespeichert.</value></data>
+  <data name="OfferAssessmentFor" xml:space="preserve"><value>{0} – {1}</value></data>
+  <data name="OfferDuplicateRevision" xml:space="preserve"><value>Versionen müssen lückenlos bei 1 beginnen.</value></data>
+  <data name="OfferName" xml:space="preserve"><value>Bezeichnung</value></data>
+  <data name="OfferProvider" xml:space="preserve"><value>Anbieter / Händler</value></data>
+  <data name="OfferLender" xml:space="preserve"><value>Leasinggeber / Kreditgeber</value></data>
+  <data name="OfferVehicleDescription" xml:space="preserve"><value>Angebotenes Fahrzeug / Ausführung</value></data>
+  <data name="OfferIssuedOn" xml:space="preserve"><value>Offertdatum</value></data>
+  <data name="OfferValidUntil" xml:space="preserve"><value>Gültig bis</value></data>
+  <data name="OfferDeliveryOn" xml:space="preserve"><value>Lieferdatum</value></data>
+  <data name="OfferDeliveryNotes" xml:space="preserve"><value>Lieferfrist / Hinweise</value></data>
+  <data name="OfferBasePrice" xml:space="preserve"><value>Basispreis</value></data>
+  <data name="OfferTermMonths" xml:space="preserve"><value>Laufzeit in Monaten</value></data>
+  <data name="OfferAnnualInterestPercent" xml:space="preserve"><value>Zins pro Jahr (%)</value></data>
+  <data name="OfferMonthlyPayment" xml:space="preserve"><value>Monatliche Rate</value></data>
+  <data name="OfferDownPayment" xml:space="preserve"><value>Anzahlung / Sonderzahlung</value></data>
+  <data name="OfferResidualPayment" xml:space="preserve"><value>Restpreis / Schlussrate</value></data>
+  <data name="OfferIncludedKilometresPerYear" xml:space="preserve"><value>Inkludierte Kilometer pro Jahr</value></data>
+  <data name="OfferExcessKilometrePrice" xml:space="preserve"><value>Preis pro Mehrkilometer</value></data>
+  <data name="OfferUnusedKilometreCredit" xml:space="preserve"><value>Vergütung pro Minderkilometer</value></data>
+  <data name="OfferNotes" xml:space="preserve"><value>Notizen zur Offerte</value></data>
+  <data name="Documents" xml:space="preserve"><value>Dokumente</value></data>
+  <data name="DocumentsHelp" xml:space="preserve"><value>Die Dateien gehören zu dieser Offerte. Jede Dateiversion zeigt, zu welchem Offertstand sie hinzugefügt wurde.</value></data>
+  <data name="DocumentsEmpty" xml:space="preserve"><value>Zu diesem Offertstand sind noch keine Dokumente abgelegt.</value></data>
+  <data name="DocumentAdd" xml:space="preserve"><value>Dokument hinzufügen</value></data>
+  <data name="DocumentReplace" xml:space="preserve"><value>Neue Dateiversion</value></data>
+  <data name="DocumentName" xml:space="preserve"><value>Name des Dokuments</value></data>
+  <data name="DocumentFile" xml:space="preserve"><value>Datei</value></data>
+  <data name="DocumentNote" xml:space="preserve"><value>Notiz zur Dateiversion</value></data>
+  <data name="DocumentUpload" xml:space="preserve"><value>Datei hochladen</value></data>
+  <data name="DocumentUploadHelp" xml:space="preserve"><value>Die Datei wird mit dem aktuellen Offertstand verbunden. Vorherige Dateiversionen bleiben erhalten. Zugriff haben die Personen mit einer Freigabe für diese Evaluation.</value></data>
+  <data name="DocumentLimits" xml:space="preserve"><value>Maximal 25 MiB pro Datei, insgesamt 200 MiB je Evaluation inklusive früherer Versionen. Dateien werden als Download bereitgestellt.</value></data>
+  <data name="DocumentVersion" xml:space="preserve"><value>Dateiversion {0}</value></data>
+  <data name="DocumentHistory" xml:space="preserve"><value>Dateihistorie ({0})</value></data>
+  <data name="DocumentDownload" xml:space="preserve"><value>Herunterladen</value></data>
+  <data name="DocumentDelete" xml:space="preserve"><value>Dokument löschen</value></data>
+  <data name="DocumentDeleteConfirm" xml:space="preserve"><value>Dokument und alle Dateiversionen endgültig löschen?</value></data>
+  <data name="DocumentReselect" xml:space="preserve"><value>Bitte wähle die Datei vor dem erneuten Hochladen nochmals aus. Bei einem Versionskonflikt lade zuerst diese Seite neu.</value></data>
+  <data name="InvalidDocument" xml:space="preserve"><value>Die Datei oder ihre Versionsangaben sind ungültig. Leere Dateien können nicht hochgeladen werden.</value></data>
+  <data name="DocumentTooLarge" xml:space="preserve"><value>Die Datei ist zu gross. Ein Dokument darf höchstens 25 MiB, ein Importarchiv höchstens 250 MiB gross sein.</value></data>
+  <data name="DocumentStorageUnavailable" xml:space="preserve"><value>Der Dateispeicher ist momentan nicht verfügbar oder die Datei konnte nicht vollständig geprüft werden. Bitte versuche es später erneut.</value></data>
+  <data name="DocumentUploadExpired" xml:space="preserve"><value>Der Upload ist abgelaufen. Bitte lade die Datei erneut hoch.</value></data>
+  <data name="DocumentCapacityReached" xml:space="preserve"><value>Die Evaluation erreicht die Grenze von 200 MiB oder 1’000 Dateiversionen. Lösche ein nicht mehr benötigtes Dokument, bevor du weitere Dateien hinzufügst.</value></data>
+  <data name="DocumentsRequireArchive" xml:space="preserve"><value>Diese Evaluation enthält Dokumente. Verwende den vollständigen ZIP-Export.</value></data>
+  <data name="ExportTooLarge" xml:space="preserve"><value>Die Evaluation überschreitet die Grössengrenze für den Export.</value></data>
+  <data name="Costs" xml:space="preserve"><value>Kosten</value></data>
+  <data name="CostPlanningEyebrow" xml:space="preserve"><value>Deine laufenden und einmaligen Zahlungen</value></data>
+  <data name="CostPlanningTitle" xml:space="preserve"><value>Zusätzliche Kosten planen</value></data>
+  <data name="CostPlanningHelp" xml:space="preserve"><value>Versicherung, Energie, Parkplatz und weitere Kosten: gemeinsam für alle Autos oder nur für ein bestimmtes Auto.</value></data>
+  <data name="CostPlanSetup" xml:space="preserve"><value>Zeitraum festlegen</value></data>
+  <data name="CostPlanChange" xml:space="preserve"><value>Zeitraum ändern</value></data>
+  <data name="CostPlanHelp" xml:space="preserve"><value>Wähle den ersten Monat und die Dauer deiner Planung. Eine Änderung verschiebt den Zeitbezug der Positionen; bereits erfasste Positionen bleiben erhalten.</value></data>
+  <data name="CostStart" xml:space="preserve"><value>Beginn der Planung</value></data>
+  <data name="CostDuration" xml:space="preserve"><value>Dauer in Monaten</value></data>
+  <data name="CostSavePlan" xml:space="preserve"><value>Zeitraum speichern</value></data>
+  <data name="CostMonthCount" xml:space="preserve"><value>{0} Monate</value></data>
+  <data name="CostAdd" xml:space="preserve"><value>Kostenposition hinzufügen</value></data>
+  <data name="CostEdit" xml:space="preserve"><value>Kostenposition bearbeiten</value></data>
+  <data name="CostName" xml:space="preserve"><value>Bezeichnung der Kostenposition</value></data>
+  <data name="CostScope" xml:space="preserve"><value>Gilt für</value></data>
+  <data name="CostCommon" xml:space="preserve"><value>Für alle Autos</value></data>
+  <data name="CostCommonHelp" xml:space="preserve"><value>Diese Positionen werden bei jedem Auto einmal mitgerechnet.</value></data>
+  <data name="CostVehicleOnly" xml:space="preserve"><value>Nur dieses Auto</value></data>
+  <data name="CostCandidateHelp" xml:space="preserve"><value>Gemeinsame Positionen und zusätzliche Positionen dieses Autos. Die Beträge verschiedener Autos werden nicht zusammengezählt.</value></data>
+  <data name="CostRecorded" xml:space="preserve"><value>erfasst</value></data>
+  <data name="CostKnownPart" xml:space="preserve"><value>bekannter Teil</value></data>
+  <data name="CostSummary" xml:space="preserve"><value>Erfasste Zahlungen im Zeitraum</value></data>
+  <data name="CostKnownNet" xml:space="preserve"><value>Bekannte Ausgaben abzüglich Einnahmen</value></data>
+  <data name="CostExpenses" xml:space="preserve"><value>Ausgaben</value></data>
+  <data name="CostIncome" xml:space="preserve"><value>Einnahmen</value></data>
+  <data name="CostNet" xml:space="preserve"><value>Saldo</value></data>
+  <data name="CostAverage" xml:space="preserve"><value>Durchschnitt pro Monat</value></data>
+  <data name="CostSummaryHelp" xml:space="preserve"><value>Summe ausschliesslich der hier erfassten Positionen. Kaufpreis, Leasing- und Kreditraten, Restwert und entgangene Rendite sind darin nicht enthalten.</value></data>
+  <data name="CostMissing" xml:space="preserve"><value>{0} Position(en) mit fälligen Zahlungen haben noch keinen Betrag. Die angezeigte Summe ist unvollständig.</value></data>
+  <data name="CostItems" xml:space="preserve"><value>Kostenpositionen</value></data>
+  <data name="CostEmpty" xml:space="preserve"><value>Noch keine Positionen für diese Auswahl erfasst. Füge die bekannten Kosten hinzu; Beträge dürfen offen bleiben.</value></data>
+  <data name="CostFrequency" xml:space="preserve"><value>Zahlungsrhythmus</value></data>
+  <data name="CostFrequencyOnce" xml:space="preserve"><value>Einmalig</value></data>
+  <data name="CostFrequencyMonthly" xml:space="preserve"><value>Monatlich</value></data>
+  <data name="CostFrequencyYearly" xml:space="preserve"><value>Jährlich</value></data>
+  <data name="CostFrequencyIncluded" xml:space="preserve"><value>Inklusive</value></data>
+  <data name="CostDirection" xml:space="preserve"><value>Art der Zahlung</value></data>
+  <data name="CostDirectionExpense" xml:space="preserve"><value>Ausgabe</value></data>
+  <data name="CostDirectionIncome" xml:space="preserve"><value>Einnahme / Gutschrift</value></data>
+  <data name="CostAmount" xml:space="preserve"><value>Betrag je Zahlung</value></data>
+  <data name="CostAmountHelp" xml:space="preserve"><value>Leer bedeutet unbekannt. 0 bedeutet einen bekannten Betrag von null. Jährliche Beträge werden im Fälligkeitsmonat vollständig berücksichtigt.</value></data>
+  <data name="CostFirstMonth" xml:space="preserve"><value>Erster Monat</value></data>
+  <data name="CostLastMonth" xml:space="preserve"><value>Letzter Monat (einschliesslich)</value></data>
+  <data name="CostFromMonth" xml:space="preserve"><value>Ab Monat {0}</value></data>
+  <data name="CostThroughMonth" xml:space="preserve"><value>Monat {0}</value></data>
+  <data name="CostTimingHelp" xml:space="preserve"><value>Monat 1 entspricht {0}; der aktuelle Zeitraum umfasst {1} Monate. Ohne letzten Monat läuft die Position bis zum Ende der Planung. Jahrespositionen wiederholen sich alle 12 Monate ab dem ersten Monat.</value></data>
+  <data name="CostOutsidePeriod" xml:space="preserve"><value>Ausserhalb des gewählten Zeitraums</value></data>
+  <data name="CostPeriodTotal" xml:space="preserve"><value>Im Zeitraum</value></data>
+  <data name="CostPaymentCount" xml:space="preserve"><value>{0} Zahlung(en)</value></data>
+  <data name="CostNotes" xml:space="preserve"><value>Notiz / Grundlage</value></data>
+  <data name="CostEditHelp" xml:space="preserve"><value>Erfasse Betrag und Fälligkeit so, wie die Zahlung anfällt. Eine gemeinsame Position wirkt auf alle Autos; fahrzeugspezifische Positionen kommen zusätzlich dazu.</value></data>
+  <data name="CostDeleteConfirm" xml:space="preserve"><value>Diese Kostenposition endgültig löschen? Gemeinsame Positionen entfallen dadurch bei allen Autos.</value></data>
+  <data name="CostTimeline" xml:space="preserve"><value>Wann fällt was an?</value></data>
+  <data name="CostTimelineHelp" xml:space="preserve"><value>Monats- und Jahresansicht zeigen dieselben Zahlungen. Der monatliche Durchschnitt ist keine gleichmässige Zahlungsrate.</value></data>
+  <data name="CostDisplay" xml:space="preserve"><value>Darstellung</value></data>
+  <data name="CostMonthlyView" xml:space="preserve"><value>Monate</value></data>
+  <data name="CostYearlyView" xml:space="preserve"><value>Jahre</value></data>
+  <data name="CostPeriod" xml:space="preserve"><value>Zeitraum</value></data>
+  <data name="CostDetails" xml:space="preserve"><value>Zusammensetzung</value></data>
+  <data name="CostMonthRange" xml:space="preserve"><value>Monat {0}–{1}</value></data>
+  <data name="CostOpenCount" xml:space="preserve"><value>{0} offen</value></data>
+  <data name="CostPositionCount" xml:space="preserve"><value>{0} Position(en)</value></data>
+  <data name="CostPages" xml:space="preserve"><value>Seiten der Zahlungsübersicht</value></data>
+  <data name="CostPrevious" xml:space="preserve"><value>Zurück</value></data>
+  <data name="CostNext" xml:space="preserve"><value>Weiter</value></data>
+  <data name="CostPage" xml:space="preserve"><value>Seite {0} von {1}</value></data>
+  <data name="InvalidCost" xml:space="preserve"><value>Bitte prüfe Betrag, Zahlungsrhythmus und Zeitraum. Beträge haben höchstens zwei Nachkommastellen; der letzte Monat darf nicht vor dem ersten liegen.</value></data>
+  <data name="InvalidCostPlanning" xml:space="preserve"><value>Wähle einen gültigen Startmonat und eine Dauer zwischen 1 und 1’200 Monaten.</value></data>
+  <data name="CostPlanningRequired" xml:space="preserve"><value>Für diese Evaluation ist noch kein Planungszeitraum festgelegt.</value></data>
+  <data name="CostCurrencyRequired" xml:space="preserve"><value>Die gemeinsame Währung wird bei der ersten Offerte festgelegt. Erfasse zuerst eine Offerte, bevor du Kostenpositionen hinzufügst.</value></data>
+  <data name="TooManyCosts" xml:space="preserve"><value>Eine Evaluation kann höchstens 1’000 Kostenpositionen enthalten.</value></data>
+  <data name="CostRemove" xml:space="preserve"><value>Kostenposition löschen</value></data>
+  <data name="Calculations" xml:space="preserve"><value>Rechnen</value></data>
+  <data name="Choose" xml:space="preserve"><value>Bitte wählen</value></data>
+  <data name="ScenarioEyebrow" xml:space="preserve"><value>Deine Annahmen. Dein Vergleich.</value></data>
+  <data name="ScenarioTitle" xml:space="preserve"><value>Was kostet dich welcher Weg?</value></data>
+  <data name="ScenarioIntro" xml:space="preserve"><value>Kauf, Leasing oder Kredit: Vergleiche Zahlungen, Restwert und entgangene Rendite zum selben Stichtag.</value></data>
+  <data name="ScenarioAdd" xml:space="preserve"><value>Szenario anlegen</value></data>
+  <data name="ScenarioEdit" xml:space="preserve"><value>Szenario bearbeiten</value></data>
+  <data name="ScenarioName" xml:space="preserve"><value>Name des Szenarios</value></data>
+  <data name="ScenarioMode" xml:space="preserve"><value>Beschaffungsweg</value></data>
+  <data name="ScenarioChooseOffer" xml:space="preserve"><value>Mit welcher Offerte möchtest du rechnen?</value></data>
+  <data name="ScenarioChooseOfferHelp" xml:space="preserve"><value>Ein Szenario bezieht sich auf eine feste Offertversion. Seine Annahmen kannst du unabhängig von der Offerte verändern.</value></data>
+  <data name="ScenarioVersion" xml:space="preserve"><value>Version {0}</value></data>
+  <data name="ScenarioSourceVersion" xml:space="preserve"><value>Verwendete Offertversion</value></data>
+  <data name="ScenarioOpenSource" xml:space="preserve"><value>Offertstand ansehen</value></data>
+  <data name="ScenarioSourceHelp" xml:space="preserve"><value>Ein Versionswechsel ersetzt keine Rechenannahmen. Prüfe und übertrage geänderte Konditionen bewusst; der Offertstand bleibt unverändert.</value></data>
+  <data name="ScenarioEditHelp" xml:space="preserve"><value>Bestätige den Gesamtpreis und prüfe die übernommenen Konditionen. Leere Angaben bleiben offen; trage 0 ein, wenn sicher kein Betrag anfällt.</value></data>
+  <data name="AcquisitionPurchase" xml:space="preserve"><value>Barkauf</value></data>
+  <data name="AcquisitionLeaseReturn" xml:space="preserve"><value>Leasing mit Rückgabe</value></data>
+  <data name="AcquisitionLeaseBuyout" xml:space="preserve"><value>Leasing mit Übernahme</value></data>
+  <data name="AcquisitionFinancing" xml:space="preserve"><value>Kreditfinanzierung</value></data>
+  <data name="ScenarioPurchasePrice" xml:space="preserve"><value>Bestätigter Gesamtpreis</value></data>
+  <data name="ScenarioPurchasePriceHelp" xml:space="preserve"><value>Kaufpreis einschliesslich enthaltener Ausstattung und Gebühren. Offertpositionen werden nicht automatisch addiert. Bei Leasing dient er nur als Referenzbetrag.</value></data>
+  <data name="ScenarioInitialFees" xml:space="preserve"><value>Zusätzliche Einmalgebühren</value></data>
+  <data name="ScenarioInitialFeesHelp" xml:space="preserve"><value>Nur separat zu zahlende Gebühren, die weder im Gesamtpreis noch in Anzahlung oder Raten enthalten sind. 0, wenn keine anfallen.</value></data>
+  <data name="ScenarioDownPayment" xml:space="preserve"><value>Leasing-Anzahlung</value></data>
+  <data name="ScenarioDownPaymentHelp" xml:space="preserve"><value>Zahlung zu Beginn, zusätzlich zu den Monatsraten.</value></data>
+  <data name="ScenarioMonthlyPayment" xml:space="preserve"><value>Monatsrate</value></data>
+  <data name="ScenarioMonthlyPaymentHelp" xml:space="preserve"><value>Die vereinbarte Rate wird übernommen und nicht aus einem Zinssatz geschätzt.</value></data>
+  <data name="ScenarioTermMonths" xml:space="preserve"><value>Vertragslaufzeit in Monaten</value></data>
+  <data name="ScenarioTermMonthsHelp" xml:space="preserve"><value>Die Vertragslaufzeit ist unabhängig vom gewählten Vergleichsstichtag.</value></data>
+  <data name="ScenarioFinalPayment" xml:space="preserve"><value>Übernahmepreis / Schlussrate</value></data>
+  <data name="ScenarioFinalPaymentHelp" xml:space="preserve"><value>Leasing: Übernahmepreis am Vertragsende. Kredit: zusätzliche Schlussrate nach der letzten regulären Rate; 0 ohne Schlussrate.</value></data>
+  <data name="ScenarioLoanAmount" xml:space="preserve"><value>Kreditbetrag</value></data>
+  <data name="ScenarioLoanAmountHelp" xml:space="preserve"><value>Der finanzierte Teil des bestätigten Gesamtpreises. Die Differenz ist der eigene Einsatz zu Beginn.</value></data>
+  <data name="ScenarioLoanInterestPercent" xml:space="preserve"><value>Nominaler Kreditzins pro Jahr (%)</value></data>
+  <data name="ScenarioLoanInterestPercentHelp" xml:space="preserve"><value>Monatszins = nominaler Jahreszins / 12. Verwende hier keinen effektiven Jahreszins.</value></data>
+  <data name="ScenarioAnnualKilometres" xml:space="preserve"><value>Angenommene Kilometer pro Jahr</value></data>
+  <data name="ScenarioAnnualKilometresHelp" xml:space="preserve"><value>Grundlage für die Kilometerabrechnung und die Einordnung deiner Restwertannahmen.</value></data>
+  <data name="ScenarioIncludedKilometresPerYear" xml:space="preserve"><value>Inklusive Kilometer pro Jahr</value></data>
+  <data name="ScenarioIncludedKilometresPerYearHelp" xml:space="preserve"><value>Das vertragliche Jahreskontingent; über die Laufzeit zeitanteilig gerechnet.</value></data>
+  <data name="ScenarioExcessKilometrePrice" xml:space="preserve"><value>Preis je Mehrkilometer</value></data>
+  <data name="ScenarioExcessKilometrePriceHelp" xml:space="preserve"><value>Wird nur benötigt, wenn die angenommene Fahrleistung über dem Kontingent liegt.</value></data>
+  <data name="ScenarioUnusedKilometreCredit" xml:space="preserve"><value>Vergütung je Minderkilometer</value></data>
+  <data name="ScenarioUnusedKilometreCreditHelp" xml:space="preserve"><value>Wird nur benötigt, wenn Kilometer übrig bleiben. 0 bedeutet keine Vergütung.</value></data>
+  <data name="ScenarioCreditConvention" xml:space="preserve"><value>Kreditzinsen werden monatlich auf Rappen/Cent gerundet; die Rate folgt am Monatsende. Eine Schlussrate kommt nach der letzten regulären Rate hinzu. Stimmen Kreditbetrag, Zins, Raten und Schlussrate nicht überein, bleibt das Ergebnis offen.</value></data>
+  <data name="ScenarioLeaseConvention" xml:space="preserve"><value>Leasingraten werden am Monatsanfang gezahlt. Rückgabe wird genau am Vertragsende verglichen; Übernahme am Vertragsende mit anschliessendem Weiterhalten ist möglich. Für eine vorzeitige Beendigung werden keine Konditionen angenommen.</value></data>
+  <data name="ScenarioNotes" xml:space="preserve"><value>Annahmen und Begründung</value></data>
+  <data name="ScenarioCostsReviewed" xml:space="preserve"><value>Ich habe Zusatzkosten und Vergünstigungen für dieses Szenario geprüft.</value></data>
+  <data name="ScenarioCostsReviewedHelp" xml:space="preserve"><value>Gemeinsame und fahrzeugspezifische Kosten werden eingerechnet. Gratisleistungen kannst du anschliessend über zeitlich begrenzte Kostenanpassungen abbilden. Offertzugaben werden nicht automatisch verrechnet.</value></data>
+  <data name="ScenarioPlanningRequired" xml:space="preserve"><value>Lege zuerst den Planungszeitraum unter Kosten und die gemeinsame Währung mit einer Offerte fest.</value></data>
+  <data name="ScenarioSharedAssumption" xml:space="preserve"><value>Gemeinsame Renditeannahme</value></data>
+  <data name="ScenarioAnnualReturn" xml:space="preserve"><value>Angenommene Anlagerendite pro Jahr (%)</value></data>
+  <data name="ScenarioReturnHelp" xml:space="preserve"><value>Gilt für alle Szenarien dieser Evaluation. Effektiver Jahreszins mit monatlich gleichwertigem Zinseszins; 0 bedeutet keine Rendite. Steuern auf Kapitalerträge und Inflation sind nicht eingerechnet.</value></data>
+  <data name="ScenarioEmpty" xml:space="preserve"><value>Ein Szenario macht deine Annahmen greifbar.</value></data>
+  <data name="ScenarioEmptyHelp" xml:space="preserve"><value>Beginne mit einer Offerte, prüfe die Beträge und ergänze einen Restwert-Stichtag. Du kannst anschliessend eine Kopie erstellen und eine andere Variante durchspielen.</value></data>
+  <data name="ScenarioCompare" xml:space="preserve"><value>Szenarien vergleichen</value></data>
+  <data name="ScenarioAll" xml:space="preserve"><value>Alle Szenarien</value></data>
+  <data name="ScenarioOpen" xml:space="preserve"><value>Rechnung ansehen</value></data>
+  <data name="ScenarioDelete" xml:space="preserve"><value>Szenario löschen</value></data>
+  <data name="ScenarioDeleteConfirm" xml:space="preserve"><value>Dieses Szenario mit Restwerten und Kostenanpassungen löschen? Offerte und gemeinsame Kosten bleiben erhalten.</value></data>
+  <data name="ScenarioLiveCosts" xml:space="preserve"><value>Zeitraum, Rendite und gemeinsame Kosten gelten aktuell für alle Szenarien. Änderungen daran werden neu berechnet; dies ist kein eingefrorener Entscheidungsstand.</value></data>
+  <data name="ScenarioNewOfferVersion" xml:space="preserve"><value>Offertversion {0} ist verfügbar. Dieses Szenario verwendet weiterhin seinen gewählten Stand.</value></data>
+  <data name="ScenarioCheckpoint" xml:space="preserve"><value>Stichtag nach Monat</value></data>
+  <data name="ScenarioCalculate" xml:space="preserve"><value>Berechnen</value></data>
+  <data name="ScenarioAtMonth" xml:space="preserve"><value>Ende Monat {0} · {1}</value></data>
+  <data name="ScenarioHorizonHelp" xml:space="preserve"><value>Monat 1 beginnt im {0}. Die Planung umfasst {1} Monate; der Vergleich erfolgt jeweils am Monatsende.</value></data>
+  <data name="CalculationEffectiveCost" xml:space="preserve"><value>Effektive Kosten am Stichtag</value></data>
+  <data name="CalculationPerMonth" xml:space="preserve"><value>im Monatsdurchschnitt</value></data>
+  <data name="CalculationNetPayments" xml:space="preserve"><value>Bekannte Zahlungen abzüglich Einnahmen</value></data>
+  <data name="CalculationOpportunity" xml:space="preserve"><value>Entgangene Rendite auf Zahlungen</value></data>
+  <data name="CalculationRemainingDebt" xml:space="preserve"><value>Restschuld</value></data>
+  <data name="CalculationResidualDeduction" xml:space="preserve"><value>Abzüglich erwarteter Fahrzeugwert</value></data>
+  <data name="ScenarioIncomplete" xml:space="preserve"><value>Für ein belastbares Ergebnis fehlt noch:</value></data>
+  <data name="ScenarioResidualMissing" xml:space="preserve"><value>Erwarteter Fahrzeugwert genau für Monat {0}.</value></data>
+  <data name="ResidualLow" xml:space="preserve"><value>Pessimistisch</value></data>
+  <data name="ResidualExpected" xml:space="preserve"><value>Erwartet</value></data>
+  <data name="ResidualHigh" xml:space="preserve"><value>Optimistisch</value></data>
+  <data name="ScenarioBandHelp" xml:space="preserve"><value>Effektive Kosten mit deinem jeweiligen Restwert. Zwischen Stichtagen wird nicht interpoliert.</value></data>
+  <data name="CalculationWealth" xml:space="preserve"><value>Vermögen und Rechenweg</value></data>
+  <data name="CalculationReferenceCapital" xml:space="preserve"><value>Gemeinsames Referenzkapital</value></data>
+  <data name="CalculationAccount" xml:space="preserve"><value>Rechnerischer Kontostand</value></data>
+  <data name="CalculationFinalWealth" xml:space="preserve"><value>Vermögen inkl. Auto abzüglich Restschuld</value></data>
+  <data name="CalculationReferenceHelp" xml:space="preserve"><value>Alle Szenarien starten rechnerisch mit dem höchsten eingetragenen Gesamtpreis dieser Evaluation, sonst mit 0. Dieser gemeinsame Betrag verändert die Kostendifferenz nicht und ist kein Budget. Negative Kontostände sind Teil der Vergleichsrechnung, keine zugesagte Finanzierung.</value></data>
+  <data name="CalculationComposition" xml:space="preserve"><value>Wie setzt sich der Betrag zusammen?</value></data>
+  <data name="CalculationCompositionHelp" xml:space="preserve"><value>Zahlungen mit ihrem jeweiligen Zeitwert am Stichtag. Bei offenen Angaben sind nur die bekannten Teile aufgeführt.</value></data>
+  <data name="CalculationOpportunityShort" xml:space="preserve"><value>davon zusätzlich entgangene Rendite</value></data>
+  <data name="CalculationInitialFees" xml:space="preserve"><value>Zusätzliche Einmalgebühren</value></data>
+  <data name="CalculationPurchase" xml:space="preserve"><value>Gesamtpreis</value></data>
+  <data name="CalculationDownPayment" xml:space="preserve"><value>Leasing-Anzahlung</value></data>
+  <data name="CalculationLeasePayments" xml:space="preserve"><value>Leasingraten</value></data>
+  <data name="CalculationBuyout" xml:space="preserve"><value>Übernahmepreis</value></data>
+  <data name="CalculationMileage" xml:space="preserve"><value>Mehr-/Minderkilometer</value></data>
+  <data name="CalculationEquity" xml:space="preserve"><value>Eigener Einsatz beim Kauf</value></data>
+  <data name="CalculationCreditPayments" xml:space="preserve"><value>Kreditraten</value></data>
+  <data name="CalculationBalloon" xml:space="preserve"><value>Schlussrate</value></data>
+  <data name="CalculationAdditionalCost" xml:space="preserve"><value>Zusatzkosten</value></data>
+  <data name="ScenarioResiduals" xml:space="preserve"><value>Deine Restwert-Stichtage</value></data>
+  <data name="ScenarioResidualHelp" xml:space="preserve"><value>Erfasse den Marktwert an den Zeitpunkten, die du vergleichen willst. Auch nach einer Leasingübernahme ist der Marktwert unabhängig vom vertraglichen Übernahmepreis.</value></data>
+  <data name="ScenarioResidualMileage" xml:space="preserve"><value>Das Szenario nimmt {0} km pro Jahr an.</value></data>
+  <data name="ScenarioResidualMileageHelp" xml:space="preserve"><value>Das Restwertband muss zu dieser Fahrleistung passen. Bei mehr Kilometern wird der Fahrzeugwert nicht automatisch gesenkt; passe ihn selbst an, damit die Eigentumsvariante nicht zu günstig erscheint.</value></data>
+  <data name="ResidualNotes" xml:space="preserve"><value>Grundlage des Restwerts</value></data>
+  <data name="ResidualSave" xml:space="preserve"><value>Restwert-Stichtag speichern</value></data>
+  <data name="ResidualSaveHelp" xml:space="preserve"><value>Ein vorhandener Stichtag für denselben Monat wird aktualisiert. Nicht ausgefüllte Werte bleiben offen.</value></data>
+  <data name="ResidualDelete" xml:space="preserve"><value>Stichtag löschen</value></data>
+  <data name="ResidualDeleteConfirm" xml:space="preserve"><value>Diesen Restwert-Stichtag löschen?</value></data>
+  <data name="ScenarioAdjustments" xml:space="preserve"><value>Kosten für dieses Szenario anpassen</value></data>
+  <data name="ScenarioAdjustmentsHelp" xml:space="preserve"><value>Ersetze den Betrag einer vorhandenen Kostenposition für einen Zeitraum. 0 bildet eine Gratisleistung ab, leer bedeutet unbekannt. Zahlungsrhythmus und Ausgaben-/Einnahmenart bleiben gleich; ausserhalb des Zeitraums gilt der ursprüngliche Betrag.</value></data>
+  <data name="AdjustmentCost" xml:space="preserve"><value>Kostenposition</value></data>
+  <data name="AdjustmentAmount" xml:space="preserve"><value>Abweichender Betrag je Zahlung</value></data>
+  <data name="AdjustmentNotes" xml:space="preserve"><value>Grundlage / Vergünstigung</value></data>
+  <data name="AdjustmentSave" xml:space="preserve"><value>Kostenanpassung speichern</value></data>
+  <data name="AdjustmentDelete" xml:space="preserve"><value>Anpassung entfernen</value></data>
+  <data name="AdjustmentDeleteConfirm" xml:space="preserve"><value>Diese Anpassung entfernen und wieder den ursprünglichen Betrag verwenden?</value></data>
+  <data name="ScenarioPaymentSchedule" xml:space="preserve"><value>Zahlungen im Zeitverlauf</value></data>
+  <data name="ScenarioScheduleHelp" xml:space="preserve"><value>Zusatzkosten fallen am Monatsanfang an. Kreditraten, Übernahme und Kilometerabrechnung am Monatsende. Jahreszeilen summieren die tatsächlichen Monatsbewegungen; Kontostand und Restschuld zeigen den letzten Monat.</value></data>
+  <data name="ScenarioStartPayments" xml:space="preserve"><value>Zahlungen Monatsanfang</value></data>
+  <data name="ScenarioEndPayments" xml:space="preserve"><value>Zahlungen Monatsende</value></data>
+  <data name="ScenarioAccountInterest" xml:space="preserve"><value>Rechnerische Kontoverzinsung</value></data>
+  <data name="ScenarioCopy" xml:space="preserve"><value>Szenario kopieren</value></data>
+  <data name="ScenarioCopyName" xml:space="preserve"><value>Name der unabhängigen Kopie</value></data>
+  <data name="ScenarioCompareHelp" xml:space="preserve"><value>Wähle zwei Szenarien und einen gemeinsamen Stichtag. Die Kosten werden mit derselben Rendite und denselben zeitlichen Konventionen berechnet.</value></data>
+  <data name="ScenarioLeft" xml:space="preserve"><value>Linkes Szenario</value></data>
+  <data name="ScenarioRight" xml:space="preserve"><value>Rechtes Szenario</value></data>
+  <data name="ScenarioEqualCost" xml:space="preserve"><value>Beide Szenarien haben dieselben erwarteten Kosten.</value></data>
+  <data name="ScenarioDifference" xml:space="preserve"><value>{0} kostet dich {1} {2} weniger.</value></data>
+  <data name="ScenarioMonthlyDifference" xml:space="preserve"><value>Das entspricht {0} {1} pro Monat über {2} Monate.</value></data>
+  <data name="ScenarioCompareBandHelp" xml:space="preserve"><value>Diese Differenz verwendet jeweils den erwarteten Restwert. Die Bandbreiten darunter zeigen die Auswirkungen deiner anderen Restwerte; sie sind keine Prognose.</value></data>
+  <data name="ScenarioCompareIncomplete" xml:space="preserve"><value>Solange relevante Angaben fehlen, wird keine Kostendifferenz als vollständiges Ergebnis ausgewiesen.</value></data>
+  <data name="ScenarioResidualThreshold" xml:space="preserve"><value>Wenn allein der Restwert von „{0}“ verändert wird, liegt die Kostengleichheit bei {1} {2}. Oberhalb davon kostet „{0}“ weniger als „{3}“. Alle übrigen Annahmen bleiben gleich.</value></data>
+  <data name="ScenarioResidualThresholdBelowZero" xml:space="preserve"><value>„{0}“ kostet bei unveränderten übrigen Annahmen bereits mit einem Restwert von 0 weniger als „{3}“.</value></data>
+  <data name="InvalidScenario" xml:space="preserve"><value>Prüfe die Szenarioangaben. Beträge müssen zwischen 0 und 1 Billion liegen und dürfen höchstens zwei Nachkommastellen haben. Der Kreditbetrag darf den Gesamtpreis nicht überschreiten.</value></data>
+  <data name="InvalidResidual" xml:space="preserve"><value>Prüfe den Stichtag und die Restwerte: pessimistisch ≤ erwartet ≤ optimistisch.</value></data>
+  <data name="InvalidCostAdjustment" xml:space="preserve"><value>Prüfe Kostenposition, Betrag und Zeitraum der Anpassung.</value></data>
+  <data name="InvalidReturn" xml:space="preserve"><value>Gib eine jährliche Rendite zwischen −99 und 100 Prozent an; auch 0 ist möglich.</value></data>
+  <data name="TooManyScenarios" xml:space="preserve"><value>Eine Evaluation kann höchstens 200 Szenarien enthalten.</value></data>
+  <data name="TooManyResiduals" xml:space="preserve"><value>Ein Szenario kann höchstens 100 Restwert-Stichtage enthalten.</value></data>
+  <data name="ScenarioOfferFixed" xml:space="preserve"><value>Die Offerte eines bestehenden Szenarios kann nicht gewechselt werden. Lege dafür ein neues Szenario an.</value></data>
+  <data name="CostUsedByScenario" xml:space="preserve"><value>Für diese Kostenposition bestehen Szenarioanpassungen. Entferne sie zuerst, bevor du die Zuordnung oder den Rhythmus auf inklusive änderst.</value></data>
+  <data name="CalculationOverflow" xml:space="preserve"><value>Die Kombination aus Zeitraum, Rendite und Beträgen übersteigt den darstellbaren Zahlenbereich.</value></data>
+  <data name="CalculationReturnMissing" xml:space="preserve"><value>Gemeinsame Renditeannahme festlegen.</value></data>
+  <data name="ScenarioCostsUnreviewed" xml:space="preserve"><value>Zusatzkosten und Vergünstigungen prüfen und im Szenario bestätigen.</value></data>
+  <data name="ScenarioLeaseHorizon" xml:space="preserve"><value>Rückgabe ist genau am Vertragsende berechenbar; Übernahme ab Vertragsende. Wähle einen passenden Stichtag.</value></data>
+  <data name="ScenarioCreditInconsistent" xml:space="preserve"><value>Kreditbetrag, Zins, Raten und Schlussrate ergeben keinen vollständigen Tilgungsplan. Prüfe die Konditionen.</value></data>
+  <data name="ScenarioMissingCost" xml:space="preserve"><value>Betrag einer fälligen Kostenposition:</value></data>
+  <data name="ScenarioMissingInitialFees" xml:space="preserve"><value>Zusätzliche Einmalgebühren ergänzen.</value></data>
+  <data name="ScenarioMissingPurchasePrice" xml:space="preserve"><value>Bestätigter Gesamtpreis ergänzen.</value></data>
+  <data name="ScenarioMissingTermMonths" xml:space="preserve"><value>Vertragslaufzeit in Monaten ergänzen.</value></data>
+  <data name="ScenarioMissingMonthlyPayment" xml:space="preserve"><value>Monatsrate ergänzen.</value></data>
+  <data name="ScenarioMissingDownPayment" xml:space="preserve"><value>Leasing-Anzahlung ergänzen.</value></data>
+  <data name="ScenarioMissingFinalPayment" xml:space="preserve"><value>Übernahmepreis / Schlussrate ergänzen.</value></data>
+  <data name="ScenarioMissingAnnualKilometres" xml:space="preserve"><value>Angenommene Kilometer pro Jahr ergänzen.</value></data>
+  <data name="ScenarioMissingIncludedKilometresPerYear" xml:space="preserve"><value>Inklusive Kilometer pro Jahr ergänzen.</value></data>
+  <data name="ScenarioMissingExcessKilometrePrice" xml:space="preserve"><value>Preis je Mehrkilometer ergänzen.</value></data>
+  <data name="ScenarioMissingUnusedKilometreCredit" xml:space="preserve"><value>Vergütung je Minderkilometer ergänzen.</value></data>
+  <data name="ScenarioMissingLoanAmount" xml:space="preserve"><value>Kreditbetrag ergänzen.</value></data>
+  <data name="ScenarioMissingLoanInterestPercent" xml:space="preserve"><value>Nominaler Kreditzins pro Jahr (%) ergänzen.</value></data>
 </root>

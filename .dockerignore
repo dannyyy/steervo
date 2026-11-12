@@ -6,3 +6,5 @@
 !deploy/container
 !deploy/container/keys
 !deploy/container/keys/.keep
+!deploy/container/documents
+!deploy/container/documents/.keep

@@ -19,9 +19,14 @@ public static class Rules
     }
     public static T Defined<T>(T value) where T : struct, Enum =>
         Enum.IsDefined(value) ? value : throw new RuleException("InvalidValue");
+    public static string OptionalText(string? value, int max)
+    {
+        var result = value?.Trim() ?? "";
+        return result.Length <= max ? result : throw new RuleException("InvalidText");
+    }
 }
 
-public sealed class Evaluation
+public sealed partial class Evaluation
 {
     public Guid Id { get; private set; } = Guid.NewGuid();
     public string OwnerId { get; private set; } = "";
@@ -76,6 +81,12 @@ public sealed class Evaluation
     {
         var criterion = FindCriterion(id);
         ValidateGroup(input.GroupId);
+        if ((criterion.Scope != input.Scope && (Assessments.Any(x => x.CriterionId == id) || OfferAssessments.Any(x => x.CriterionId == id)))
+            || ((Assessments.Any(x => x.CriterionId == id && x.HasValue) || OfferAssessments.Any(x => x.CriterionId == id && x.HasValue))
+                && (criterion.Type != input.Type || criterion.Unit != (input.Type == CriterionType.Measurement ? input.Unit?.Trim() : null))))
+            throw new RuleException("CriterionHasAssessments");
+        // Validate before changing the group so a rejected edit cannot partially reassign it.
+        _ = new Criterion(Id, input, criterion.Position);
         Reassign(id, input.GroupId);
         criterion.Update(input);
     }
@@ -109,6 +120,8 @@ public sealed class Evaluation
     public void RemoveCriterion(Guid id)
     {
         var criterion = FindCriterion(id);
+        Assessments.RemoveAll(x => x.CriterionId == id);
+        OfferAssessments.RemoveAll(x => x.CriterionId == id);
         Criteria.Remove(criterion);
         NormalizeCriteria(criterion.GroupId);
     }

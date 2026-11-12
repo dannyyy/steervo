@@ -1,0 +1,26 @@
+@model VehicleSpecifications
+@using Steervo.Web.Pages.Evaluations.Candidates
+<details class="specification-sheet" id="candidate-specifications" open="@Model.HasValues()">
+    <summary>@T["VehicleSpecifications"]</summary>
+    <p class="micro">@T["SpecificationsHelp"]</p>
+    @if (!Model.HasValues()) { <p class="muted">@T["NoSpecifications"]</p> }
+    <div class="specification-overview">
+    @foreach (var group in SpecificationFields.All.GroupBy(field => field.Group))
+    {
+        var fields = group.Where(field => field.Value(Model).HasValue).ToList();
+        var hasDrive = group.Key == "Performance" && (Model.Propulsion.HasValue || Model.Drive.HasValue);
+        if (fields.Count == 0 && !hasDrive) { continue; }
+        <section><h4>@T["SpecGroup" + group.Key]</h4><dl>
+        @if (hasDrive)
+        {
+            @if (Model.Propulsion.HasValue) { <div><dt>@T["SpecPropulsion"]</dt><dd>@T["Propulsion" + Model.Propulsion]</dd></div> }
+            @if (Model.Drive.HasValue) { <div><dt>@T["SpecDrive"]</dt><dd>@T["Drive" + Model.Drive]</dd></div> }
+        }
+        @foreach (var field in fields)
+        {
+            <div data-specification="@field.Name"><dt>@T[field.Label]</dt><dd>@field.Value(Model)?.ToString("0.###") @field.Unit @if (field.IsCalculated(Model)) { <span class="calculated-badge">@T["Calculated"]</span> }</dd></div>
+        }
+        </dl></section>
+    }
+    </div>
+</details>

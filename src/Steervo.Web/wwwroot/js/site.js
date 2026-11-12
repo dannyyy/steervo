@@ -31,8 +31,8 @@ document.addEventListener('htmx:afterSwap', event => {
   const submittedDraft = drafts.get(event.detail.xhr);
   if (event.detail.xhr?.status === 422 && submittedDraft) {
     const draft = new Map(submittedDraft);
-    const form = [...document.querySelectorAll('#evaluation-workspace form')].find(candidate =>
-      candidate.querySelector('[name=action]')?.value === draft.get('action') && (candidate.querySelector('[name=itemId]')?.value || '') === (draft.get('itemId') || ''));
+    const form = [...document.querySelectorAll('#evaluation-workspace form, #candidate-workspace form, #offer-workspace form')].find(candidate =>
+      ['action', 'itemId', 'candidateId', 'offerId', 'criterionId'].every(name => (candidate.elements.namedItem(name)?.value || '') === (draft.get(name) || '')));
     if (form) {
       for (const [name, value] of submittedDraft) {
         const field = form.elements.namedItem(name);

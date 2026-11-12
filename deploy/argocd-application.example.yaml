@@ -17,6 +17,10 @@ spec:
         publicUrl: https://steervo.example.org
         existingSecret: steervo-runtime
         trustedProxies: []
+        documentStorage:
+          endpoint: http://garage.storage.svc:3900
+          region: garage
+          bucket: steervo
         ingress:
           host: steervo.example.org
           entryPoint: websecure

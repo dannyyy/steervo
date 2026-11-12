@@ -1,11 +1,8 @@
 @model Steervo.Web.Pages.Evaluations.DetailsModel
 @{ var e = Model.Evaluation; var edit = Model.Access >= AccessLevel.Editor; var owner = Model.Access == AccessLevel.Owner; }
 <div id="evaluation-workspace" data-version="@e.Version" hx-target="#evaluation-workspace" hx-swap="outerHTML show:none focus-scroll:false" hx-sync="this:drop">
-<a asp-page="/Index" class="back-link">← @T["AllEvaluations"]</a>
-<a asp-page="/Evaluations/Details" asp-page-handler="Export" asp-route-id="@e.Id" class="export-link">@T["ExportEvaluation"] ↓</a>
-<div class="page-heading"><div><p class="eyebrow">@T["Evaluation"] · @T[Model.Access.ToString()]</p><h1>@e.Name</h1><p class="muted">@e.Purpose</p></div><span class="badge">@T["CriterionCount", e.Criteria.Count]</span></div>
+<partial name="_EvaluationHeader" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "criteria")' />
 @if (Model.Notice is not null) { <div class="notice @(Model.Failed ? "failure" : "success")" role="status" tabindex="-1">@Model.Notice</div> }
-<div class="section-nav"><span class="active">01 <strong>@T["Criteria"]</strong></span><a href="#sharing">@T["Access"]</a>@if (edit) { <a href="#case-settings">@T["CaseSettings"]</a> }</div>
 @if (!edit) { <p class="notice">@T["ReadOnlyNotice"]</p> }
 <div class="criteria-layout">
 <section class="criteria-main"><div class="section-heading"><div><h2>@T["WhatMatters"]</h2><p class="muted">@T["WhatMattersHelp"]</p></div></div>

@@ -1,0 +1,39 @@
+@page "/evaluations/{id:guid}/offers/compare"
+@model Steervo.Web.Pages.Evaluations.Offers.CompareModel
+@using Steervo.Web.Pages.Evaluations.Offers
+@{ ViewData["Title"] = T["OfferCompare"]; var e = Model.Evaluation; var selected = Model.Selected; }
+<partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "offers")' />
+<a asp-page="Index" asp-route-id="@e.Id" class="back-link">← @T["AllOffers"]</a><h2>@T["OfferCompare"]</h2><p class="muted">@T["OfferCompareHelp"]</p>
+@if (Model.Notice is not null) { <p class="notice failure">@Model.Notice</p> }
+@if (e.Offers.Count > 0)
+{
+<form method="get" class="comparison-picker"><div><label for="offer-compare-first">@T["FirstOffer"]</label><select id="offer-compare-first" name="first">@foreach (var offer in e.Offers) { <option value="@offer.Id" selected="@(offer.Id == Model.First?.Id)">@e.FindCandidate(offer.CandidateId).DisplayName · @offer.Latest.Terms.Name @(offer.Archived ? "· " + T["OfferArchivedLabel"] : "")</option> }</select></div><div><label for="offer-compare-second">@T["SecondOffer"]</label><select id="offer-compare-second" name="second"><option value="">@T["SelectOffer"]</option>@foreach (var offer in e.Offers) { <option value="@offer.Id" selected="@(offer.Id == Model.Second?.Id)">@e.FindCandidate(offer.CandidateId).DisplayName · @offer.Latest.Terms.Name @(offer.Archived ? "· " + T["OfferArchivedLabel"] : "")</option> }</select></div><button class="button secondary">@T["ShowComparison"]</button></form>
+}
+@if (selected.Count < 2) { <p class="notice">@T["OfferCompareNeedTwo"]</p> }
+@if (selected.Count > 0)
+{
+<div class="comparison offer-comparison @(selected.Count == 1 ? "comparison-single" : null)"><div class="comparison-header"><span>@e.Currency · @e.FindCandidate(selected[0].CandidateId).DisplayName</span>@foreach (var offer in selected) { <div><a asp-page="Details" asp-route-id="@e.Id" asp-route-offerId="@offer.Id">@offer.Latest.Terms.Name ↗</a><span class="badge">@T["OfferVersion", offer.Latest.Number]</span>@if (offer.Archived) { <span class="badge">@T["OfferArchivedLabel"]</span> }<p class="micro">@T["OfferKind" + offer.Latest.Terms.Kind] · @T["OfferCommitment" + offer.Latest.Terms.Commitment]</p>@if (Model.Access >= AccessLevel.Editor && !offer.Archived) { <a class="offer-compare-edit" asp-page="Edit" asp-route-id="@e.Id" asp-route-offerId="@offer.Id">@T["OfferEdit"] →</a> }</div> }</div>
+@foreach (var group in OfferFields.All.Where(field => field.Name != "Name").GroupBy(field => field.Group))
+{
+    var fields = group.ToList();
+    if (group.Key == "Contract" && !selected.Any(offer => offer.Latest.Terms.Kind is OfferKind.Leasing or OfferKind.Financing || fields.Any(field => field.Raw(offer.Latest.Terms) is not null))) { continue; }
+    if (group.Key == "Mileage" && !selected.Any(offer => offer.Latest.Terms.Kind == OfferKind.Leasing || fields.Any(field => field.Raw(offer.Latest.Terms) is not null))) { continue; }
+    <section class="comparison-group"><h3>@T["OfferGroup" + group.Key]</h3>@foreach (var field in fields)
+    {
+        <div class="comparison-row specification-row" data-offer-comparison-field="@field.Name"><div class="comparison-criterion">@T[field.Label] @if (field.Type is "money" or "unitprice") { <span class="field-unit">@e.Currency</span> }</div>@foreach (var offer in selected) { var value = field.Display(offer.Latest.Terms); <div class="comparison-cell offer-note" data-offer-cell="@offer.Id">@(string.IsNullOrEmpty(value) ? T["OfferOpen"].Value : value)</div> }</div>
+    }</section>
+}
+<section class="comparison-group"><h3>@T["OfferLines"]</h3><div class="comparison-row"><div class="comparison-criterion">@T["OfferLinesHelp"]</div>@foreach (var offer in selected) { <div class="comparison-cell"><partial name="_OfferLines" model="new OfferSnapshot(offer.Latest, e.Currency)" /></div> }</div></section>
+@if (e.Criteria.Any(criterion => criterion.Scope == CriterionScope.Offer))
+{
+<section class="comparison-group"><h3>@T["OfferAssessmentTitle"]</h3>@foreach (var criterion in e.Criteria.Where(criterion => criterion.Scope == CriterionScope.Offer).OrderBy(criterion => criterion.Position))
+{
+<div class="comparison-row"><div class="comparison-criterion"><strong>@criterion.Name</strong><p class="priority @criterion.Priority.ToString().ToLowerInvariant()">@T[criterion.Priority.ToString()]</p></div>@foreach (var offer in selected)
+{
+    var row = new OfferAssessmentRow(e, offer, criterion, Model.Access); var value = row.Assessment;
+    <div class="comparison-cell"><span class="fulfillment @row.Result.ToString().ToLowerInvariant()">@T["Fulfillment" + row.Result]</span><p>@(criterion.Type == CriterionType.Boolean ? T[value?.BooleanValue is { } boolean ? boolean ? "Yes" : "No" : "FulfillmentUnknown"].Value : criterion.Type == CriterionType.Rating ? value?.RatingValue?.ToString() ?? T["FulfillmentUnknown"].Value : value?.MeasurementValue?.ToString() ?? T["FulfillmentUnknown"].Value) @if (criterion.Type == CriterionType.Measurement) { <span>@criterion.Unit</span> }</p>@if (row.Stale) { <p class="micro">@T["OfferAssessmentStale", value!.RevisionNumber]</p> }@if (value?.Notes.Length > 0) { <p class="offer-note">@value.Notes</p> }<a asp-page="Details" asp-route-id="@e.Id" asp-route-offerId="@offer.Id" asp-fragment="@row.FieldId">@T["OfferAssessmentTitle"] →</a></div>
+}</div>
+}</section>
+}
+</div>
+}

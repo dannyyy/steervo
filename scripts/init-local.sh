@@ -22,5 +22,7 @@ Smtp__HourlyLimit=50
 Smtp__DailyLimit=200
 ASPNETCORE_ENVIRONMENT=Development
 DataProtection__Path=.data/keys
+DocumentStorage__Provider=FileSystem
+DocumentStorage__Path=.data/documents
 EOF
 echo 'Created .env. The single-use installation key is stored in Setup__Token.'

@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Steervo.Application.Accounts;
 using Steervo.Application.Evaluations;
+using Steervo.Application.Documents;
+using Steervo.Infrastructure.Documents;
 using Steervo.Infrastructure.Data;
 using Steervo.Infrastructure.Identity;
 using Steervo.Infrastructure.Mail;
@@ -58,7 +60,20 @@ builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddScoped<IAccountDirectory, AccountDirectory>();
 builder.Services.AddScoped<IEvaluationStore, EvaluationStore>();
 builder.Services.AddScoped<EvaluationWorkspace>();
+builder.Services.AddScoped<CandidateWorkspace>();
+builder.Services.AddScoped<Steervo.Application.Costs.CostWorkspace>();
+builder.Services.AddScoped<Steervo.Application.Scenarios.ScenarioWorkspace>();
+builder.Services.AddScoped<Steervo.Application.Offers.OfferWorkspace>();
 builder.Services.AddScoped<EvaluationTransfer>();
+builder.Services.AddScoped<EvaluationArchive>();
+builder.Services.AddScoped<DocumentWorkspace>();
+builder.Services.AddScoped<IDocumentStorage, DocumentStorage>();
+builder.Services.AddScoped<DocumentCleanup>();
+builder.Services.Configure<DocumentStorageOptions>(builder.Configuration.GetSection("DocumentStorage"));
+var documentProvider = builder.Configuration["DocumentStorage:Provider"] ?? (builder.Environment.IsDevelopment() ? "FileSystem" : "S3");
+if (documentProvider == "FileSystem") builder.Services.AddSingleton<IDocumentObjects, FileSystemDocumentObjects>();
+else if (documentProvider == "S3") builder.Services.AddSingleton<IDocumentObjects, S3DocumentObjects>();
+else throw new InvalidOperationException("DocumentStorage:Provider must be FileSystem or S3.");
 builder.Services.AddRateLimiter(options => {
     options.RejectionStatusCode = 429;
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context => RateLimitPartition.GetFixedWindowLimiter(
@@ -74,6 +89,19 @@ if (args.Contains("--migrate"))
     await scope.ServiceProvider.GetRequiredService<AppDbContext>().Database.MigrateAsync();
     return;
 }
+await using (var scope = app.Services.CreateAsyncScope())
+{
+    var cleanup = scope.ServiceProvider.GetRequiredService<DocumentCleanup>();
+    var removed = await cleanup.RunAsync(args.Contains("--cleanup-documents") ? int.MaxValue : 20);
+    if (args.Contains("--cleanup-documents"))
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var remaining = await db.Set<PendingDocumentDeletion>().CountAsync(p => p.AvailableAt <= DateTimeOffset.UtcNow);
+        app.Logger.LogInformation("Document cleanup processed {Removed} objects; {Remaining} due deletions remain.", removed, remaining);
+        if (remaining > 0) Environment.ExitCode = 1;
+    }
+}
+if (args.Contains("--cleanup-documents")) return;
 app.UseForwardedHeaders();
 if (!app.Environment.IsDevelopment()) { app.UseExceptionHandler("/Error"); app.UseHsts(); app.UseWhen(context => !context.Request.Path.StartsWithSegments("/health"), branch => branch.UseHttpsRedirection()); }
 app.Use(async (context, next) => {

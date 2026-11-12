@@ -1,0 +1,29 @@
+@model Steervo.Web.Pages.Evaluations.Candidates.SpecificationsForm
+@using Steervo.Web.Pages.Evaluations.Candidates
+<div class="specifications-form" data-specifications data-calculated-label="@T["CalculatedValue"]">
+    <h4>@T["VehicleSpecifications"] <span class="optional">@T["OptionalField"]</span></h4>
+    <p class="micro">@T["SpecificationsHelp"]</p>
+    @foreach (var group in SpecificationFields.All.GroupBy(field => field.Group))
+    {
+        <details class="specification-section" id="spec-section-@group.Key">
+            <summary>@T["SpecGroup" + group.Key]</summary>
+            @if (group.Key == "Weight") { <p class="micro">@T["SpecificationsWeightHelp"]</p> }
+            @if (group.Key == "Performance") { <p class="micro">@T["SpecificationsPowerHelp"]</p> }
+            @if (group.Key == "Electric") { <p class="micro">@T["SpecificationsElectricHelp"]</p> }
+            @if (group.Key == "Combustion") { <p class="micro">@T["SpecificationsHybridHelp"]</p> }
+            <div class="specification-grid">
+                @if (group.Key == "Performance")
+                {
+                    <div><label for="spec-Propulsion">@T["SpecPropulsion"]</label><select id="spec-Propulsion" name="Input.Specifications.Propulsion"><option value="">@T["NotSpecified"]</option>@foreach (var value in Enum.GetValues<PropulsionType>()) { <option value="@value" selected="@(Model.Propulsion == value)">@T["Propulsion" + value]</option> }</select></div>
+                    <div><label for="spec-Drive">@T["SpecDrive"]</label><select id="spec-Drive" name="Input.Specifications.Drive"><option value="">@T["NotSpecified"]</option>@foreach (var value in Enum.GetValues<DrivenWheels>()) { <option value="@value" selected="@(Model.Drive == value)">@T["Drive" + value]</option> }</select></div>
+                }
+                @foreach (var field in group)
+                {
+                    <div class="specification-field"><label for="spec-@field.Name">@T[field.Label] @if (field.Unit.Length > 0) { <span class="field-unit">(@field.Unit)</span> }</label><input id="spec-@field.Name" name="Input.Specifications.@field.Name" value="@Model.Value(field.Name)" type="number" min="@(field.AllowZero ? "0" : field.Step == "1" ? "1" : "0.001")" max="1000000" step="@field.Step" inputmode="decimal" data-spec-field="@field.Name" data-unit="@field.Unit" aria-describedby="@(field.Calculate is not null ? "calculated-" + field.Name : null)" />
+                    @if (field.Calculate is not null) { <output id="calculated-@field.Name" for="spec-@field.Name" class="specification-calculated" data-calculated="@field.Name" aria-live="polite"></output> }
+                    </div>
+                }
+            </div>
+        </details>
+    }
+</div>

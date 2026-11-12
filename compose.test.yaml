@@ -26,3 +26,13 @@ services:
       interval: 2s
       timeout: 2s
       retries: 30
+  storage:
+    image: adobe/s3mock:5.2.2@sha256:e7c36014dcf4c7f0f6bec9de888477d1d9b8f55eceb7d9c1186f70d7aadf81ca
+    environment: { COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS: steervo-tests }
+    mem_limit: 512m
+    ports: ["127.0.0.1:55439:9090"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:9090/steervo-tests/"]
+      interval: 2s
+      timeout: 2s
+      retries: 60
