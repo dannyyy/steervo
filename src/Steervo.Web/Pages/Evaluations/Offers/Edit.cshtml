@@ -3,15 +3,16 @@
 @using Steervo.Web.Pages.Evaluations.Offers
 @{ ViewData["Title"] = T[Model.Offer is null ? "NewOffer" : "OfferEdit"]; var e = Model.Evaluation; }
 <partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "offers")' />
-<a class="back-link" asp-page="Index" asp-route-id="@e.Id" asp-route-candidateId="@(Model.Input.CandidateId == Guid.Empty ? (Guid?)null : Model.Input.CandidateId)">← @T["AllOffers"]</a>
-<h2>@T[Model.Offer is null ? "NewOffer" : "OfferEdit"]</h2><p class="muted">@T["OfferUnknownHelp"]</p>
-@if (Model.Notice is not null) { <div class="notice failure" role="alert">@Model.Notice</div> }
-@if (Model.Offer is not null) { <p class="micro">@T["OfferVersion", Model.Offer.Latest.Number] · @T["OfferHistoryHelp"]</p> }
-<form method="post" class="offer-form" data-offer-form><input type="hidden" asp-for="Version" />
-<section class="panel"><div class="field-pair"><div><label for="offer-candidate">@T["OfferCandidate"]</label>@if (Model.Offer is null) { <select id="offer-candidate" name="Input.CandidateId" required data-offer-candidate><option value="">@T["SelectCandidate"]</option>@foreach (var candidate in e.Candidates.OrderBy(candidate => candidate.Position)) { <option value="@candidate.Id" selected="@(candidate.Id == Model.Input.CandidateId)" data-description="@candidate.DisplayName">@candidate.DisplayName</option> }</select> } else { <p>@e.FindCandidate(Model.Offer.CandidateId).DisplayName</p> }</div><div><label for="offer-currency">@T["OfferCurrency"]</label><input id="offer-currency" name="Input.Currency" value="@(e.Currency ?? Model.Input.Currency)" readonly="@(e.Currency is not null)" required minlength="3" maxlength="3" pattern="[A-Za-z]{3}" autocomplete="off" aria-describedby="offer-currency-help" /><p class="micro" id="offer-currency-help">@T["OfferCurrencyHelp"]</p></div></div></section>
+<a class="back-link" href="@Model.ReturnUrl"><partial name="/Pages/Shared/_Icon.cshtml" model='"back"' />@T[Model.Offer is null ? "AllOffers" : "Offer"]</a>
+<section id="offer-page-editor" class="workspace-surface page-editor" data-editor data-page-editor data-return-url="@Model.ReturnUrl" aria-labelledby="offer-editor-title">
+<div class="surface-heading"><div><p class="editor-context">@(Model.Offer is null ? e.Name : Model.Offer.Latest.Terms.Name)</p><h2 id="offer-editor-title">@T[Model.Offer is null ? "NewOffer" : "OfferEdit"]</h2><p class="muted">@T["OfferUnknownHelp"]</p></div></div>
+@if (Model.Offer is not null) { <p class="notice">@T["OfferVersion", Model.Offer.Latest.Number] · @T["OfferHistoryHelp"]</p> }
+<div class="editor-error notice failure" role="alert" tabindex="-1" hidden="@(Model.Notice is null)">@Model.Notice</div>
+<form method="post" class="offer-form" data-offer-form data-guard-draft data-retain-on-error hx-post="@Request.Path@Request.QueryString" hx-swap="none" hx-sync="this:drop" hx-disabled-elt="find button[type=submit]"><input type="hidden" asp-for="Version" />
+<section class="form-section"><div class="field-pair"><div><label for="offer-candidate">@T["OfferCandidate"]</label>@if (Model.Offer is null) { <select id="offer-candidate" name="Input.CandidateId" required data-offer-candidate><option value="">@T["SelectCandidate"]</option>@foreach (var candidate in e.Candidates.OrderBy(candidate => candidate.Position)) { <option value="@candidate.Id" selected="@(candidate.Id == Model.Input.CandidateId)" data-description="@candidate.DisplayName">@candidate.DisplayName</option> }</select> } else { <p>@e.FindCandidate(Model.Offer.CandidateId).DisplayName</p> }</div><div><label for="offer-currency">@T["OfferCurrency"]</label><input id="offer-currency" name="Input.Currency" value="@(e.Currency ?? Model.Input.Currency)" readonly="@(e.Currency is not null)" required minlength="3" maxlength="3" pattern="[A-Za-z]{3}" autocomplete="off" aria-describedby="offer-currency-help" /><p class="micro" id="offer-currency-help">@T["OfferCurrencyHelp"]</p></div></div></section>
 @foreach (var group in OfferFields.All.GroupBy(field => field.Group))
 {
-<section class="panel"><h3>@T["OfferGroup" + group.Key]</h3>
+<section class="form-section"><h3>@T["OfferGroup" + group.Key]</h3>
 @if (group.Key == "Contract") { <p class="micro">@T["OfferContractHelp"]</p> }
 @if (group.Key == "Mileage") { <p class="micro">@T["OfferMileageHelp"]</p> }
 <div class="offer-fields">
@@ -29,6 +30,7 @@ else { <input id="offer-@field.Name" name="Input.@field.Name" value="@Model.Inpu
 }
 </div></section>
 }
-<section class="panel"><h3>@T["OfferLines"]</h3><p class="micro">@T["OfferLinesHelp"]</p><div data-offer-lines>@for (var index = 0; index < Model.Input.Lines.Count; index++) { <partial name="_OfferLineEditor" model="new OfferLineEditor(Model.Input.Lines[index], index.ToString())" /> }</div><template data-offer-line-template><partial name="_OfferLineEditor" model='new OfferLineEditor(new(), "__index__")' /></template><button type="button" class="button secondary" data-offer-line-add>+ @T["AddOfferLine"]</button></section>
-<section class="panel"><label for="offer-change-note">@T["OfferChangeNote"] <span class="optional">@T["OptionalField"]</span></label><textarea id="offer-change-note" name="Input.ChangeNote" maxlength="2000" rows="2">@Model.Input.ChangeNote</textarea><button class="button" id="save-offer">@T[Model.Offer is null ? "OfferSaveNew" : "OfferSaveRevision"] →</button></section>
-</form>
+<section class="form-section"><h3>@T["OfferLines"]</h3><p class="micro">@T["OfferLinesHelp"]</p><div data-offer-lines>@for (var index = 0; index < Model.Input.Lines.Count; index++) { <partial name="_OfferLineEditor" model="new OfferLineEditor(Model.Input.Lines[index], index.ToString())" /> }</div><template data-offer-line-template><partial name="_OfferLineEditor" model='new OfferLineEditor(new(), "__index__")' /></template><button type="button" class="button secondary" data-offer-line-add><partial name="/Pages/Shared/_Icon.cshtml" model='"plus"' />@T["AddOfferLine"]</button></section>
+<section class="form-section"><label for="offer-change-note">@T["OfferChangeNote"] <span class="optional">@T["OptionalField"]</span></label><textarea id="offer-change-note" name="Input.ChangeNote" maxlength="2000" rows="2">@Model.Input.ChangeNote</textarea></section>
+<partial name="/Pages/Shared/_PageEditorActions.cshtml" model='new Steervo.Web.Pages.Shared.PageEditorActions(Model.ReturnUrl, "save-offer", T[Model.Offer is null ? "OfferSaveNew" : "OfferSaveRevision"].Value)' />
+</form></section>

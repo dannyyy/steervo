@@ -1,14 +1,14 @@
 @model Steervo.Web.Pages.Evaluations.Offers.OfferSnapshot
 @using Steervo.Web.Pages.Evaluations.Offers
 @{ var terms = Model.Revision.Terms; }
-<div class="offer-value-groups">
+<div class="offer-value-groups" id="offer-facts">
 @foreach (var group in OfferFields.All.Where(field => field.Name != "Name").GroupBy(field => field.Group))
 {
     var fields = group.ToList();
     if (group.Key == "Contract" && terms.Kind is not (OfferKind.Leasing or OfferKind.Financing) && !fields.Any(field => field.Raw(terms) is not null)) { continue; }
     if (group.Key == "Mileage" && terms.Kind != OfferKind.Leasing && !fields.Any(field => field.Raw(terms) is not null)) { continue; }
     if (group.Key == "Notes" && string.IsNullOrEmpty(terms.Notes)) { continue; }
-    <section class="panel"><h3>@T["OfferGroup" + group.Key]</h3><dl class="offer-values">
+    <section><h3>@T["OfferGroup" + group.Key]</h3><dl class="offer-values">
     @foreach (var field in fields)
     {
         var value = field.Display(terms);

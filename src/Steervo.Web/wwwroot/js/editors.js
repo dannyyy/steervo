@@ -8,7 +8,7 @@
   let leaving = false;
   let noticeTimer;
 
-  const fields = form => [...new FormData(form)].filter(([key]) => !['__RequestVerificationToken', 'version'].includes(key));
+  const fields = form => [...new FormData(form)].filter(([key]) => key !== '__RequestVerificationToken' && key.toLowerCase() !== 'version');
   function restoreField(field, value) {
     if (!field || !('value' in field)) return;
     if (field.type === 'file') return;
@@ -55,6 +55,10 @@
     }
   }
   function closeEditor(editor, restore = true) {
+    if (editor.hasAttribute('data-page-editor')) {
+      guardedForms(editor).forEach(form => { forcedDirty.delete(form); initial.set(form, signature(form)); });
+      return;
+    }
     guardedForms(editor).forEach(form => {
       form.reset();
       if (form.hasAttribute('data-new-object')) {
@@ -82,7 +86,10 @@
       confirmation.dataset.discardAction, confirmation.dataset.continueAction);
   }
   async function requestClose(editor) {
-    if (editor && await canClose([editor])) closeEditor(editor);
+    if (editor && await canClose([editor])) {
+      closeEditor(editor);
+      if (editor.hasAttribute('data-page-editor')) { leaving = true; location.assign(editor.dataset.returnUrl); }
+    }
   }
   function showEditor(editor, opener, focusId, focus = true) {
     if (opener?.id) editor.dataset.opener = opener.id;
@@ -135,7 +142,7 @@
         editor.addEventListener('cancel', event => { event.preventDefault(); requestClose(editor); });
         if (editor.dataset.openOnLoad === 'true') showEditor(editor, currentOpener(editor), null, false);
       }
-      const error = editor.querySelector('.editor-error:not([hidden]), .notice.failure');
+      const error = editor.querySelector('.editor-error:not([hidden]), .notice.failure:not([hidden])');
       if (error) guardedForms(editor).forEach(form => forcedDirty.add(form));
     });
     clearTimeout(noticeTimer);
@@ -247,9 +254,26 @@
   });
   document.addEventListener('htmx:beforeSwap', event => {
     const state = requests.get(event.detail.xhr);
-    if (state?.retain && event.detail.xhr.status === 422) {
+    if (state?.retain && [409, 422].includes(event.detail.xhr.status)) {
       event.detail.shouldSwap = false; event.detail.isError = false;
-      editorError(state.oldEditor, event.detail.xhr.responseText);
+      const json = event.detail.xhr.getResponseHeader('Content-Type')?.includes('application/json')
+        ? JSON.parse(event.detail.xhr.responseText) : null;
+      editorError(state.oldEditor, json?.error || event.detail.xhr.responseText);
+      if (event.detail.xhr.status === 409 && json?.reviewUrl && json.version) {
+        const error = state.oldEditor.querySelector('.editor-error');
+        const context = document.createElement('p'); context.textContent = json.context; error.append(context);
+        const help = document.createElement('p'); help.textContent = document.body.dataset.editorPageConflict; error.append(help);
+        const review = document.createElement('a'); review.href = json.reviewUrl; review.target = '_blank'; review.rel = 'noopener';
+        review.textContent = document.body.dataset.editorReview; error.append(review);
+        const retry = document.createElement('button'); retry.type = 'button'; retry.textContent = document.body.dataset.editorRetry;
+        retry.addEventListener('click', () => {
+          if (busy.has(state.oldEditor)) return;
+          const form = state.oldEditor.querySelector('form[data-guard-draft]');
+          form.elements.namedItem('Version').value = json.version;
+          form.requestSubmit(form.querySelector('button[type=submit]'));
+        });
+        error.append(retry);
+      }
     }
     const responseUrl = event.detail.xhr.responseURL;
     if (state && responseUrl && new URL(responseUrl).pathname.startsWith('/Auth/')) {
@@ -338,7 +362,8 @@
       requests.delete(event.detail.xhr);
     }
   });
-  initialize();
+  // Page forms finish configuring dependent fields before recording their baseline.
+  document.addEventListener('DOMContentLoaded', initialize, { once: true });
   if (location.hash === '#specifications') selectTab('record-specifications');
   if (document.getElementById('evaluation-workspace') && ['#sharing', '#case-settings'].includes(location.hash)) {
     const url = new URL(location.href);

@@ -14,7 +14,7 @@
     <script src="~/lib/htmx.min.js" defer></script><script src="~/js/site.js" asp-append-version="true" defer></script><script src="~/js/sorting.js" asp-append-version="true" defer></script><script src="~/js/workspace.js" asp-append-version="true" defer></script><script src="~/js/editors.js" asp-append-version="true" defer></script><script src="~/js/specifications.js" asp-append-version="true" defer></script><script src="~/js/offers.js" asp-append-version="true" defer></script>
     @await RenderSectionAsync("Scripts", required: false)
 </head>
-<body data-editor-network-error="@T["EditorNetworkError"]" data-editor-permission-error="@T["EditorPermissionError"]" data-editor-conflict="@T["EditorConflict"]" data-editor-review="@T["EditorReviewCurrent"]">
+<body data-editor-page-conflict="@T["EditorPageConflict"]" data-editor-retry="@T["EditorRetryCurrent"]" data-editor-network-error="@T["EditorNetworkError"]" data-editor-permission-error="@T["EditorPermissionError"]" data-editor-conflict="@T["EditorConflict"]" data-editor-review="@T["EditorReviewCurrent"]">
 <a class="skip" href="#main">@T["Skip"]</a>
 <div class="shell">
     <header class="app-header">

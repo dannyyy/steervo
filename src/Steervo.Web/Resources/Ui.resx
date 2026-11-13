@@ -778,4 +778,13 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
 <data name="EvaluationSettingsHelp" xml:space="preserve"><value>Name und Zweck deiner Entscheidung. Daten und Freigaben bleiben beim Bearbeiten erhalten.</value></data>
 <data name="ExportHelp" xml:space="preserve"><value>Lade die Evaluation mit allen vorhandenen Versionen und Anhängen herunter. Ein Import erstellt daraus eine neue private Evaluation.</value></data>
 <data name="DeleteEvaluationNamed" xml:space="preserve"><value>Evaluation „{0}“ löschen?</value></data>
+<data name="EditorPageConflict" xml:space="preserve"><value>Dein Entwurf ist unverändert. Öffne den aktuellen Stand zum Vergleich. Erst mit «Stand geprüft – erneut speichern» wird dein Entwurf erneut gesendet.</value></data>
+<data name="EditorRetryCurrent" xml:space="preserve"><value>Stand geprüft – erneut speichern</value></data>
+<data name="DocumentDeleteNamed" xml:space="preserve"><value>Dokument „{0}“ löschen?</value></data>
+<data name="OfferContents" xml:space="preserve"><value>In dieser Offerte</value></data>
+<data name="OfferOverview" xml:space="preserve"><value>Angebot</value></data>
+<data name="OfferComparisonRegion" xml:space="preserve"><value>Offertenvergleich – horizontal scrollbar</value></data>
+<data name="OfferArchiveHelp" xml:space="preserve"><value>Archivierte Offerten bleiben mit ihren Versionen und Dokumenten erhalten. Du kannst sie jederzeit wieder aktivieren.</value></data>
+<data name="OfferAllFilters" xml:space="preserve"><value>Alle Offerten anzeigen</value></data>
+  <data name="ApplyOfferFilter" xml:space="preserve"><value>Filter anwenden</value></data>
 </root>

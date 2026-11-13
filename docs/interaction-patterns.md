@@ -4,7 +4,7 @@ Diese Regeln sind das Ziel der Canvas/Tinte-Migration der vorhandenen Anwendung.
 
 ## Navigation und Kontext
 
-Evaluation, ausgewähltes Fahrzeug und Vergleichspartner bleiben beim Wechsel zwischen Erfassen und Vergleichen erhalten. Zurück führt zum sinnvollen Ausgangspunkt; direkt aufrufbare Seiten und Browsernavigation bleiben nutzbar. Der aktive Bereich ist visuell und über `aria-current` erkennbar.
+Evaluation, ausgewähltes Fahrzeug beziehungsweise Offerte und Vergleichspartner bleiben beim Wechsel zwischen Erfassen und Vergleichen erhalten. Zurück führt zum sinnvollen Ausgangspunkt; direkt aufrufbare Seiten und Browsernavigation bleiben nutzbar. Der aktive Bereich ist visuell und über `aria-current` erkennbar.
 
 Die globale Navigation führt zu Evaluationen und Konto; der Evaluationskontext führt zu den vorhandenen Fachbereichen. Freigaben, Einstellungen, Kosten und Rechnen dürfen durch die verkürzte Mockup-Navigation nicht verschwinden. Lange Navigation auf kleinen Bildschirmen wird strukturell angepasst, nicht durch unleserlich kleine Schrift eingepasst.
 
@@ -13,7 +13,9 @@ Die globale Navigation führt zu Evaluationen und Konto; der Evaluationskontext 
 | Aufgabe | Gemeinsames Zielmuster | Grund |
 | --- | --- | --- |
 | Fahrzeug-/Offertbewertung mit Wert, Grundlage, Notiz | Editor am betroffenen Kriterium | Der bewertete Inhalt bleibt der Bezugspunkt |
-| Bewertung im mobilen Vergleich | Editor außerhalb der horizontal scrollenden Tabelle mit Fahrzeug- und Kriteriumsname | Ein vollständiges Formular bleibt innerhalb der Bildschirmbreite |
+| Fahrzeugbewertung im mobilen Vergleich | Editor außerhalb der horizontal scrollenden Tabelle mit Fahrzeug- und Kriteriumsname | Ein vollständiges Formular bleibt innerhalb der Bildschirmbreite |
+| Offertbewertung aus dem Vergleich | Link zum Kriterium in der Offertakte; gewähltes Paar und Rückweg zur Spalte bleiben erhalten | Die Bewertung nennt den aktuellen Offertstand und dessen Prüfbedarf |
+| Dokument hinzufügen / neue Dateiversion | Dedizierte Formularseite mit demselben Entwurfsschutz | Datei, Versionsbezug und Uploadfehler bleiben zusammen |
 | Kurzer Objektname, Gruppe oder kleine Kriterienänderung | Kompakter Editor am Inhalt | Keine Unterbrechung für eine lokale Änderung |
 | Neues Fahrzeug / kompakte Stammdaten / längere persönliche Notiz | Gemeinsame seitliche Bearbeitungsfläche, auf Mobilgeräten volle Breite | Der zugrunde liegende Fahrzeugkontext bleibt erhalten |
 | Neue Evaluation und andere kompakte Anlageaufgaben | Dasselbe gemeinsame Editorverhalten; Größe passend zum Inhalt | Kein eigener Dialogstil pro Objekt |
@@ -58,6 +60,8 @@ Für destruktive Bestätigungen: Objektname und Folge im Dialog nennen, sichere 
 | Leerer Bereich | Erklären, was fehlt, und eine passende nächste Aktion anbieten, sofern die Rolle sie erlaubt |
 | Keine Treffer im Filter | Filterbezug zeigen und Rückkehr zu allen Einträgen anbieten |
 | Nur Leserecht / alte Version | Lesedarstellung und Grund erkennbar; keine scheinbar bedienbaren Schreibaktionen |
+
+Bei langen Offertformularen und Uploads ersetzen Fehler das Formular nicht. Ein Versionskonflikt zeigt einen Link zum aktuellen Stand in einem zweiten Tab; **Stand geprüft – erneut speichern** sendet den erhaltenen Entwurf ausdrücklich mit dem geprüften Versionsstand. Weitere gleichzeitige Änderungen lösen erneut einen Konflikt aus. Gewählte Dateien bleiben bei HTMX-Fehlern im ursprünglichen Eingabefeld; bei einem nativen POST ohne JavaScript fordert die Seite bei Fehlern die erneute Dateiauswahl an.
 
 `role="status"` beziehungsweise `aria-live` für knappe Rückmeldungen, `role="alert"` für relevante Fehler verwenden. Meldungen nicht mehrfach durch einen Fragmentaustausch ankündigen. Ausreichender Kontrast und Text ergänzen die Farben.
 

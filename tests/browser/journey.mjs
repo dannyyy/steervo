@@ -366,7 +366,7 @@ try {
   const persistedCandidates = JSON.parse(await (await browserRequest(page, `${casePath}?handler=Export`)).text());
   const persistedOffers = JSON.parse(await (await browserRequest(page, `${offerChecks.casePath}?handler=Export`)).text());
   assert.equal(persistedOffers.currency, 'EUR');
-  assert.equal(persistedOffers.offers.find(offer => offer.id === offerChecks.firstId).revisions.length, 3);
+  assert.equal(persistedOffers.offers.find(offer => offer.id === offerChecks.firstId).revisions.length, 4);
   assert.equal(persistedCandidates.candidates.length, 8);
   assert.equal(persistedCandidates.candidates.find(item => item.id === candidateChecks.firstId).specifications.kerbWeightKg, 2100);
   assert.equal(persistedCandidates.assessments.find(item => item.candidateId === candidateChecks.firstId && item.criterionId === candidateChecks.rating).ratingValue, 2);

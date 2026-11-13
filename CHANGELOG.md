@@ -2,6 +2,10 @@
 
 ## Unveröffentlicht
 
+- Dritter Teil der Canvas/Tinte-Migration: gemeinsame Offertenliste, zusammenhängende Offertakte, lesbare Versionshistorie und Offertenvergleich mit fixierter Kriterienspalte auf Mobilgeräten. Vergleichsauswahl bleibt beim Wechsel in Bearbeitung und Upload erhalten.
+- Fahrzeug- und Offertbewertungen verwenden denselben Editor. Neue Offertstände kennzeichnen weiterhin frühere Einschätzungen zur erneuten Prüfung.
+- Gegliederte Offertformulare und Dokumentuploads verwenden den gemeinsamen Entwurfsschutz und lokale Fehler. Versionskonflikte erhalten alle Eingaben und die gewählte Datei; erneutes Senden erfolgt ausdrücklich nach Prüfung. Dokumentlöschung nennt das Objekt im gemeinsamen Bestätigungsdialog.
+
 - Zweiter Teil der Canvas/Tinte-Migration: gemeinsame Evaluationsübersicht, Kriterien und Gruppen auf einer Arbeitsfläche sowie eigene Ansichten für Freigaben und Einstellungen. Einheitliche Anlage-, Bearbeitungs- und Bestätigungsdialoge einschliesslich Import und Löschen.
 - Sortieren erhält offene Kriterienentwürfe auch bei Konflikten. Fehlgeschlagene Importe behalten die gewählte Datei; Rechteentzug verhindert weitere Speicherung, ohne den Entwurf zu verlieren.
 

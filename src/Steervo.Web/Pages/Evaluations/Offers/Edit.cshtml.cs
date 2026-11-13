@@ -14,6 +14,9 @@ public sealed class EditModel(OfferWorkspace workspace, ICurrentUser current, IS
     public AccessLevel Access => Evaluation.AccessFor(current.Id)!.Value;
     [BindProperty] public OfferForm Input { get; set; } = new();
     [BindProperty] public long Version { get; set; }
+    [BindProperty(SupportsGet = true)] public Guid? First { get; set; }
+    [BindProperty(SupportsGet = true)] public Guid? Second { get; set; }
+    public string ReturnUrl => Offer is null ? $"/evaluations/{Evaluation.Id}/offers" : $"/evaluations/{Evaluation.Id}/offers/{Offer.Id}?first={First}&second={Second}";
     public string? Notice { get; private set; }
     public async Task<IActionResult> OnGetAsync(Guid id, Guid? offerId, Guid? candidateId)
     {
@@ -42,12 +45,19 @@ public sealed class EditModel(OfferWorkspace workspace, ICurrentUser current, IS
             if (Offer is null)
                 offerId = await workspace.AddAsync(id, Version, Input.CandidateId, terms, lines, Input.Currency, Input.ChangeNote);
             else await workspace.ReviseAsync(id, Version, Offer.Id, terms, lines, Input.ChangeNote);
-            return RedirectToPage("Details", new { id, offerId });
+            if (Request.Headers.ContainsKey("HX-Request"))
+            {
+                Response.Headers["HX-Redirect"] = Url.Page("Details", new { id, offerId, first = First, second = Second });
+                return new EmptyResult();
+            }
+            return RedirectToPage("Details", new { id, offerId, first = First, second = Second });
         }
         catch (RuleException error)
         {
             if (error.Message is "Forbidden" or "NotFound") return StatusCode(error.Message == "Forbidden" ? 403 : 404);
             Notice = text[error.Message]; Response.StatusCode = error.Message == "Conflict" ? 409 : 422;
+            if (Request.Headers.ContainsKey("HX-Request")) return new JsonResult(new { error = Notice, version = Evaluation.Version,
+                reviewUrl = ReturnUrl, context = Offer is null ? Evaluation.Name : $"{Offer.Latest.Terms.Name} · {text["OfferVersion", Offer.Latest.Number]}" });
             return Page();
         }
     }
@@ -55,5 +65,7 @@ public sealed class EditModel(OfferWorkspace workspace, ICurrentUser current, IS
     {
         Evaluation = await workspace.ReadAsync(id); Evaluation.Require(current.Id, AccessLevel.Editor);
         Offer = offerId.HasValue ? Evaluation.FindOffer(offerId.Value) : null;
+        First = Evaluation.Offers.Any(item => item.Id == First && item.CandidateId == Offer?.CandidateId) ? First : Offer?.Id;
+        Second = Evaluation.Offers.Any(item => item.Id == Second && item.Id != First && item.CandidateId == Offer?.CandidateId) ? Second : null;
     }
 }

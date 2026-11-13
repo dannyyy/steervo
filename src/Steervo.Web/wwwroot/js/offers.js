@@ -1,4 +1,9 @@
 (() => {
+  const comparison = document.getElementById('offer-comparison-scroll');
+  if (comparison?.dataset.focusOffer) {
+    const column = [...comparison.querySelectorAll('[data-offer-column]')].find(item => item.dataset.offerColumn === comparison.dataset.focusOffer);
+    if (column) requestAnimationFrame(() => { comparison.scrollLeft = Math.max(0, column.offsetLeft - comparison.querySelector('th').offsetWidth); });
+  }
   function updateLine(line) {
     const benefit = line.querySelector('[data-line-kind]').value === 'Benefit';
     const amount = line.querySelector('[data-line-price]').value === 'Amount';
@@ -44,8 +49,8 @@
       const line = button.closest('[data-offer-line]');
       if (!line) return;
       if (button.hasAttribute('data-offer-line-remove')) { line.remove(); form.querySelector('[data-offer-line-add]').focus({ preventScroll: true }); }
-      if (button.hasAttribute('data-offer-line-up') && line.previousElementSibling) line.previousElementSibling.before(line);
-      if (button.hasAttribute('data-offer-line-down') && line.nextElementSibling) line.nextElementSibling.after(line);
+      if (button.hasAttribute('data-offer-line-up') && line.previousElementSibling) { line.previousElementSibling.before(line); button.focus({ preventScroll: true }); }
+      if (button.hasAttribute('data-offer-line-down') && line.nextElementSibling) { line.nextElementSibling.after(line); button.focus({ preventScroll: true }); }
     });
   }
 })();

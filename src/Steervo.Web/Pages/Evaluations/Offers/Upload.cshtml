@@ -1,18 +1,19 @@
 @page "/evaluations/{id:guid}/offers/{offerId:guid}/documents/upload/{documentId:guid?}"
 @model Steervo.Web.Pages.Evaluations.Offers.UploadModel
 @{ ViewData["Title"] = T[Model.Document is null ? "DocumentAdd" : "DocumentReplace"].Value; }
-<a class="back-link" asp-page="Details" asp-route-id="@Model.Evaluation.Id" asp-route-offerId="@Model.Offer.Id" asp-fragment="documents">← @Model.Offer.Latest.Terms.Name</a>
-<section class="panel document-upload">
-<p class="eyebrow">@T["OfferVersion", Model.Offer.Latest.Number]</p><h1>@ViewData["Title"]</h1>
+<partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(Model.Evaluation, Model.Access, "offers")' />
+<a class="back-link" href="@Model.ReturnUrl"><partial name="/Pages/Shared/_Icon.cshtml" model='"back"' />@Model.Offer.Latest.Terms.Name</a>
+<section id="document-page-editor" class="workspace-surface document-upload page-editor" data-editor data-page-editor data-return-url="@Model.ReturnUrl" aria-labelledby="document-upload-title">
+<p class="eyebrow">@T["OfferVersion", Model.Offer.Latest.Number]</p><h1 id="document-upload-title">@ViewData["Title"]</h1>
 <p class="muted">@T["DocumentUploadHelp"]</p>
-<div asp-validation-summary="All" class="validation" role="alert"></div>
-<form method="post" enctype="multipart/form-data">
+<div class="editor-error validation" role="alert" tabindex="-1" hidden="@ViewData.ModelState.IsValid"><div asp-validation-summary="All"></div></div>
+<form method="post" enctype="multipart/form-data" data-guard-draft data-retain-on-error hx-post="@Request.Path@Request.QueryString" hx-encoding="multipart/form-data" hx-swap="none" hx-sync="this:drop" hx-disabled-elt="find button[type=submit]">
 <input asp-for="Version" type="hidden" />
 @if (Model.Document is null) { <label asp-for="Name">@T["DocumentName"]</label><input asp-for="Name" maxlength="160" required /> }
 else { <p><strong>@Model.Document.Name</strong> · @T["DocumentVersion", Model.Document.Latest.Number]</p><input asp-for="Name" type="hidden" /> }
 <label for="upload">@T["DocumentFile"]</label><input id="upload" name="upload" type="file" required aria-describedby="document-limits" />
 <p class="micro" id="document-limits">@T["DocumentLimits"]</p>
 <label asp-for="Note">@T["DocumentNote"] <span class="optional">@T["Optional"]</span></label><textarea asp-for="Note" maxlength="2000" rows="3"></textarea>
-<div class="form-actions"><button class="button primary">@T["DocumentUpload"]</button><a class="button secondary" asp-page="Details" asp-route-id="@Model.Evaluation.Id" asp-route-offerId="@Model.Offer.Id" asp-fragment="documents">@T["Cancel"]</a></div>
+<partial name="/Pages/Shared/_PageEditorActions.cshtml" model='new Steervo.Web.Pages.Shared.PageEditorActions(Model.ReturnUrl, "save-document", T["DocumentUpload"].Value)' />
 </form>
 </section>

@@ -355,7 +355,7 @@ Statusplaketten sind nicht interaktiv. Sie verwenden kleine Rundungen, kurze Wö
 
 Die Akte fasst Einleitung und Detailinhalt zusammen. Bewertungszeilen ordnen Kriterium mit Anforderung, Wert mit Quelle, Status und Bearbeitungshinweis. Die gesamte bearbeitbare Zeile ist ein Button mit einem zugänglichen Namen. Die Mindesthöhe in Canvas ist auf dem Desktop (83px), mobil (91px). Der mobile Status wird als Text direkt beim Wert gezeigt.
 
-Technische Daten sind beschriftete Faktenlisten ohne Erfüllungswertung. Notizen sind lesbarer Fliesstext. Offerten verwenden dieselbe Schrift-, Linien- und Aktionssprache; Versionsnummern, Dokumente und bestehende Prüfhinweise werden bei der Migration vollständig erhalten. Leere Zustände erklären den fehlenden Inhalt und bieten eine passende bestehende Handlung.
+Technische Daten sind beschriftete Faktenlisten ohne Erfüllungswertung. Notizen sind lesbarer Fliesstext. Offerten verwenden dieselbe Schrift-, Linien- und Aktionssprache. Ihre Akte verbindet Angebot, Einschätzungen, Dokumente und Versionshistorie über Abschnittslinks auf einer gemeinsamen Fläche. Historische Versionen bleiben lesbar und unveränderlich; frühere Einschätzungen tragen nach einem Versionswechsel weiterhin den Prüfhinweis. Vollständige Offerten und Uploads verwenden gegliederte Formularseiten mit gemeinsamen Abschlussaktionen. Leere Zustände erklären den fehlenden Inhalt und bieten eine passende bestehende Handlung.
 
 ### Fields and inline editor
 

@@ -4,9 +4,9 @@ Steervo schafft einen eigenen Arbeitsbereich für deine Fahrzeugentscheidungen. 
 
 ## Aktueller Entwicklungsschwerpunkt
 
-Die gewählte Designrichtung ist **Canvas mit Tinte**. Auf dem Hauptbranch `main` wird zuerst die bestehende Anwendung auf dieses Layout umgestellt; Abläufe, Formulare und Dialoge werden dabei vereinheitlicht und optimiert. Neue Features folgen nach Abschluss dieser Migration. Der gemeinsame Seitenrahmen, Fahrzeugakte, Bewertungen und Fahrzeugvergleich sowie Evaluationsübersicht, Kriterien, Gruppen, Freigaben und Einstellungen sind bereits umgestellt. Die übrigen Bereiche folgen schrittweise.
+Die gewählte Designrichtung ist **Canvas mit Tinte**. Auf dem Hauptbranch `main` wird zuerst die bestehende Anwendung auf dieses Layout umgestellt; Abläufe, Formulare und Dialoge werden dabei vereinheitlicht und optimiert. Neue Features folgen nach Abschluss dieser Migration. Der gemeinsame Seitenrahmen, Fahrzeugakte, Bewertungen und Fahrzeugvergleich sowie Evaluationsübersicht, Kriterien, Gruppen, Freigaben und Einstellungen sowie Offerten, Versionshistorie und Dokumente sind bereits umgestellt. Die übrigen Bereiche folgen schrittweise.
 
-Verbindliche Grundlagen: [Designsystem](DESIGN.md), [Interaktionsmuster](docs/interaction-patterns.md), [Migrationsplan mit Abnahmekriterien](docs/design-migration.md) und [Produktregeln](PRODUCT.md). Der [interaktive Prototyp](prototypes/design/README.md) dient als Referenz. Als Nächstes folgt Phase 3 des Migrationsplans: Offerten und Dokumente.
+Verbindliche Grundlagen: [Designsystem](DESIGN.md), [Interaktionsmuster](docs/interaction-patterns.md), [Migrationsplan mit Abnahmekriterien](docs/design-migration.md) und [Produktregeln](PRODUCT.md). Der [interaktive Prototyp](prototypes/design/README.md) dient als Referenz. Als Nächstes folgt Phase 4 des Migrationsplans: Kosten und Rechenszenarien.
 
 ## Was bereits funktioniert
 

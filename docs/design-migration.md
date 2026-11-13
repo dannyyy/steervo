@@ -70,11 +70,11 @@ Jedes Paket umfasst Quellcode, notwendige Tests und eine überprüfte echte Ober
 
 ### 3. Offerten und Dokumente
 
-- [ ] Offertenliste, Detail, Bearbeitung, Versionshistorie und Vergleich nach derselben Hierarchie gestalten.
-- [ ] Aktuelle und historische Versionen deutlich unterscheiden. Ein neuer Stand bleibt eine neue Version; alte Stände bleiben unverändert.
-- [ ] Offertbewertungen konsistent mit Fahrzeugbewertungen bearbeiten, aber ihren Angebotsbezug und die notwendige erneute Prüfung nach Versionswechsel sichtbar halten.
-- [ ] Upload, Dateiversionen, Download und Entfernen in die gemeinsame Rückmeldungs- und Dialogstruktur übernehmen.
-- [ ] Archivieren/Wiederherstellen verständlich von dauerhaftem Entfernen unterscheiden.
+- [x] Offertenliste, Detail, Bearbeitung, Versionshistorie und Vergleich nach derselben Hierarchie gestalten.
+- [x] Aktuelle und historische Versionen deutlich unterscheiden. Ein neuer Stand bleibt eine neue Version; alte Stände bleiben unverändert.
+- [x] Offertbewertungen konsistent mit Fahrzeugbewertungen bearbeiten, aber ihren Angebotsbezug und die notwendige erneute Prüfung nach Versionswechsel sichtbar halten.
+- [x] Upload, Dateiversionen, Download und Entfernen in die gemeinsame Rückmeldungs- und Dialogstruktur übernehmen.
+- [x] Archivieren/Wiederherstellen verständlich von dauerhaftem Entfernen unterscheiden.
 
 **Abnahme:** Zwei Offerten desselben Fahrzeugs vergleichen, eine neue Version mit Dokument ergänzen und alte Versionen weiter lesen. Währungssperre, inklusive/offene Preise, Uploadgrenzen und aktuelle Downloadrechte bleiben wirksam.
 
@@ -146,7 +146,31 @@ Freigaben und Einstellungen haben eigene Ansichten im Evaluationskontext mit akt
 - Die bestehende Sortierprüfung deckt lange Listen, Pfeiltasten, Rückkehrfokus, Drag & Drop zwischen Gruppen, leere Gruppen, Touch, Escape und erhaltene Eingaben ab. Der Import prüft ungültige Dateien, Erhalt der Dateiauswahl und anschliessenden erfolgreichen JSON-/ZIP-Import.
 - Echte Oberfläche bei 1440 und 390 px visuell geprüft; Strukturprüfungen zusätzlich bei 320, 768 und 1024 px. Lange Namen, Leser/Bearbeiter/Besitzer, aktive Navigation und alte Abschnittslinks sind berücksichtigt. Lokale Screenshots liegen unter `.artifacts/browser/phase2/` sowie `.artifacts/browser/phase2-*.png`; Logs und Bilder bleiben ausserhalb der Commits.
 
-**Nächste Arbeit:** Phase 3, Offerten und Dokumente. Danach folgen Kosten/Rechnen und Einstieg/Konto in Phase 4–5. Die Gesamtmigration ist weiterhin offen; neue Features bleiben nachgeordnet.
+## Phase 3: Offerten und Dokumente
+
+**Abgeschlossen am 13. November 2026.** Offertenliste und Offertakte verwenden zusammenhängende Canvas-Flächen. Die Akte verbindet Angebotsangaben, Positionen, Änderungen, Einschätzungen, Dokumente und Historie über Abschnittslinks. Aktuelle und historische Versionen bleiben unterscheidbar; alte Stände sind unveränderlich. Archivieren und Wiederherstellen bleiben direkte reversible Aktionen, während dauerhaftes Entfernen eines Dokuments dessen Namen und Folgen im gemeinsamen Bestätigungsdialog zeigt.
+
+Der Vergleich verwendet eine echte Tabelle mit fixierter Kriterienspalte auf Mobilgeräten. Das gewählte Offertenpaar bleibt in Detail, Versionsbearbeitung und Upload erhalten; die Rückkehr zum Vergleich stellt die betroffene Spalte wieder her. Ein Bewertungslink führt zum Kriterium in der Offertakte. Dort teilt die Offertbewertung den Editor mit Fahrzeugbewertungen, einschliesslich Wert, Grundlage, Notiz, Rückkehrfokus und Fehlerverhalten. Nach einem neuen Offertstand bleibt der Hinweis zur erneuten Prüfung sichtbar; die Bestätigung erfolgt ausdrücklich für die aktuelle Version.
+
+Vollständige Offerten und Uploads bleiben eigene Formularseiten mit gemeinsamen Abschlussaktionen, Escape und Entwurfsschutz. Validierung und Verbindungsfehler behalten dynamische Positionen, Reihenfolge, Notizen und ausgewählte Dateien. Bei HTTP 409 bleibt auch der alte Versionswert stehen: Der aktuelle Stand kann in einem zweiten Tab geprüft werden; erst die ausdrücklich beschriftete Wiederholung sendet den Entwurf mit dem geprüften Versionswert. Rechteentzug oder abgelaufene Anmeldung lassen den Entwurf sichtbar und sperren weitere Speicherung.
+
+### Technische Übergabe
+
+- `Shared/AssessmentEditor`, `AssessmentDraft` und `_AssessmentEditor.cshtml` dienen Fahrzeugen und Offerten. Die Fachaktionen, Auswertungen und Berechtigungen bleiben getrennt und unverändert. Offertspezifische Prüfhinweise und Bestätigungsbeschriftungen werden dem gemeinsamen Editor übergeben.
+- `Shared/_PageEditorActions.cshtml` ergänzt gemeinsame Abbrechen-/Abschlussaktionen für die vorhandenen langen Seiten. `Edit` und `Upload` liefern bei erfolgreichen HTMX-POSTs `HX-Redirect`; bei HTTP 409/422 liefern sie lokale Fehlermeldung, aktuellen Versionsstand und Prüfziel. Native POSTs behalten den bisherigen Seiten-/Redirect-Ablauf.
+- `editors.js` erhält vollständige Seitenformulare statt sie bei Fehlern auszutauschen. Versionsfelder werden unabhängig von Gross-/Kleinschreibung vom Entwurfsvergleich ausgenommen; anfänglich deaktivierte Positionsfelder werden vor der Baseline berücksichtigt. Ausgeblendete Fehler markieren einen unveränderten Entwurf nicht als bearbeitet.
+- `First`/`Second` werden auf die bestehende Evaluation und dasselbe Fahrzeug beschränkt. Dateidownloads, historische Versionsbezüge, Uploadlimits, Servervalidierung, Anti-Forgery, Zugriffskontrolle und Speicheroperationen bleiben erhalten.
+- Stabile Dokument- und Abschnitts-IDs erhalten geöffnete Historien und bieten Fokusziele nach Löschung. Positionswechsel erhalten den Fokus am Sortierbutton. Die alten parallelen Entwurfswiederhersteller greifen nicht mehr auf gemeinsam verwaltete Offertformulare zu.
+- Ersetzte Bewertungsformulare und Grid-Vergleichsregeln wurden aus `site.css` entfernt. Die neuen Flächen und Seiteneditoren liegen in `canvas.css`; Fachfelder und Positionslayouts bleiben bestehende Razor-Bausteine. Keine Datenbank- oder Import-/Exportformatänderung.
+
+### Verifikation
+
+- 100 erfolgreiche Fach-/Integrationstests über den bestehenden Testbefehl; Build ohne Warnungen und Fehler. Der Abschlusslauf `PLAYWRIGHT_EXECUTABLE_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npm run test:e2e` gegen eine eigene temporäre Testdatenbank enthält 64 erfolgreiche Browserprüfungen über alle bestehenden Produktbereiche. Protokolle lokal unter `.artifacts/phase3/verification.log` (Fach-/Integrationstests), `build.log` und `browser-final.log`.
+- `tests/browser/offers.mjs` prüft zusätzlich erhaltene Reihenfolge und Notizen bei Netzfehlern, unverändertes Verlassen, Entwurfsschutz, Null/Unbekannt, ungültige Bewertungsgrundlage, Rückkehrfokus, explizite Konfliktwiederholung, unveränderliche Historie, entzogene Bearbeitungsrechte, mobile zweite Vergleichsspalte und Upload-Rückweg. Archivieren und Wiederherstellen erhalten die Historie.
+- `tests/browser/documents.mjs` prüft erhaltene Dateien bei Netzfehlern, Validierung, Konflikten und abgelaufener Anmeldung; die ausdrückliche Wiederholung erzeugt eine getrennte Dateiversion mit denselben Bytes. Löschen prüft Objektname, sicheren Anfangsfokus, Escape, Rückkehrfokus und Erhalt der unabhängigen ZIP-Importkopie.
+- Die echte Anwendung wurde mit synthetischen Daten bei 1440 und 390 px visuell geprüft. Offertenliste, Detail, Vergleich, Bearbeitung und Upload passen zusätzlich bei 320, 768 und 1024 px ohne seitenweite Überbreite. Lange Offert-, Dokument- und Dateinamen sowie ungetrennte Notizen wurden an denselben fünf Breiten geprüft. Screenshots unter `.artifacts/browser/phase3/`; Bilder, Logs und Testdaten bleiben ausserhalb der Commits.
+
+**Nächste Arbeit:** Phase 4, Kosten und Rechenszenarien. Danach folgen Einstieg/Konto und die abschliessende Gesamtprüfung in Phase 5. Die Gesamtmigration bleibt offen; neue Features bleiben nachgeordnet.
 
 ## Inventar der vorhandenen Oberflächen
 

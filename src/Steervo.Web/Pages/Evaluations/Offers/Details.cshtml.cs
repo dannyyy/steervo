@@ -1,3 +1,4 @@
+using Steervo.Web.Pages.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Localization;
@@ -16,6 +17,10 @@ public sealed class DetailsModel(OfferWorkspace workspace, ICurrentUser current,
     public AccessLevel Access => Evaluation.AccessFor(current.Id)!.Value;
     public string? Notice { get; private set; }
     public bool Failed { get; private set; }
+    public AssessmentDraft? Draft { get; private set; }
+    [BindProperty(SupportsGet = true)] public Guid? First { get; set; }
+    [BindProperty(SupportsGet = true)] public Guid? Second { get; set; }
+    public string ReturnContext => $"?first={First}&second={Second}";
     public async Task<IActionResult> OnGetAsync(Guid id, Guid offerId, int? revision)
     {
         try { await LoadAsync(id, offerId, revision); return Page(); }
@@ -42,7 +47,10 @@ public sealed class DetailsModel(OfferWorkspace workspace, ICurrentUser current,
         catch (RuleException error)
         {
             if (error.Message is "Forbidden" or "NotFound") return StatusCode(error.Message == "Forbidden" ? 403 : 404);
-            Failed = true; Notice = text[error.Message]; Response.StatusCode = error.Message == "Conflict" ? 409 : 422;
+            Failed = true; Notice = text[error.Message];
+            if (action is "assess-offer" or "clear-assessment")
+                Draft = new(offerId, criterionId, Request.Form["booleanValue"], measurementValue, Request.Form["ratingValue"], Request.Form["source"], notes, Notice);
+            Response.StatusCode = error.Message == "Conflict" ? 409 : 422;
         }
         await LoadAsync(id, offerId, revision);
         return Request.Headers.ContainsKey("HX-Request") ? Partial("_OfferDetails", this) : Page();
@@ -51,5 +59,8 @@ public sealed class DetailsModel(OfferWorkspace workspace, ICurrentUser current,
     {
         Evaluation = await workspace.ReadAsync(id); Offer = Evaluation.FindOffer(offerId);
         Revision = revision.HasValue ? Offer.Revision(revision.Value) : Offer.Latest;
+        First = Evaluation.Offers.Any(item => item.Id == First && item.CandidateId == Offer.CandidateId) ? First : offerId;
+        Second = Evaluation.Offers.Any(item => item.Id == Second && item.Id != First && item.CandidateId == Offer.CandidateId) ? Second
+            : Request.Query.ContainsKey("second") ? null : Evaluation.Offers.OrderBy(item => item.Archived).FirstOrDefault(item => item.CandidateId == Offer.CandidateId && item.Id != First)?.Id;
     }
 }
