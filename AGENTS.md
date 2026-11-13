@@ -6,7 +6,7 @@ Read [CLAUDE.md](CLAUDE.md) for the public Community repository boundaries and [
 
 The user selected **Canvas / Tinte**. The main development branch is **`main`**; this repository has no `master` branch.
 
-The current work is to migrate the **existing** application's layout and design, and to unify and improve its workflows, forms and dialogs. Complete this migration before starting new features. The prototype is a visual reference, not the production implementation.
+The migration of the **existing** application to Canvas / Tinte is complete (phases 0–5, verified on 13 November 2026). Continue development on `main` using the documented design and shared interactions. New features require their own scope; the prototype remains a visual reference, not the production implementation.
 
 Before UI work, read:
 
@@ -15,7 +15,7 @@ Before UI work, read:
 3. [docs/interaction-patterns.md](docs/interaction-patterns.md) — shared interaction behaviour.
 4. [docs/design-migration.md](docs/design-migration.md) — phased scope, source inventory and acceptance checklist.
 
-Start with the first incomplete migration phase. Record actual completion and verification; do not mark a phase done merely because a mockup exists. Do not reopen the design selection unless the user changes it.
+Preserve the completed migration and record actual verification for subsequent changes. Do not reopen the design selection unless the user changes it.
 
 ## Implementation constraints
 

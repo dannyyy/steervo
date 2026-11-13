@@ -193,7 +193,7 @@ export async function checkScenarioWorkflows(options) {
   await save(page, () => page.getByRole('button', { name: 'Stand geprüft – erneut speichern', exact: true }).click()); await focus(page, 'scenario-settings-title');
   await page.locator('#open-scenario-settings').click(); assert.equal(await page.locator('#AnnualReturn').inputValue(), '2');
   await page.keyboard.press('Escape'); await focus(page, 'open-scenario-settings');
-  const expiredContext = await page.context().browser().newContext({ storageState: await page.context().storageState() });
+  const expiredContext = await page.context().browser().newContext({ storageState: await page.context().storageState(), ignoreHTTPSErrors: origin.startsWith('https:') });
   const expired = await expiredContext.newPage(); expired.setDefaultTimeout(10_000);
   await expired.goto(`${origin}${path}/edit/${cash}`); await expired.locator('#Input_Notes').fill('Erhaltene Rechenannahmen ohne Sitzung');
   await expiredContext.clearCookies(); await expired.locator('#save-scenario').click();

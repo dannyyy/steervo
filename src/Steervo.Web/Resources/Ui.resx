@@ -15,7 +15,7 @@
 <data name="ServerConnected" xml:space="preserve"><value>Mit Server verbunden</value></data>
 <data name="SourceAvailable" xml:space="preserve"><value>Quelloffen</value></data>
 <data name="YourDecision" xml:space="preserve"><value>Deine Kriterien. Deine Entscheidung.</value></data>
-<data name="ConnectionError" xml:space="preserve"><value>Die Verbindung zum Server ist unterbrochen. Deine Eingabe wurde nicht bestätigt. Bitte erneut versuchen.</value></data>
+<data name="ConnectionError" xml:space="preserve"><value>Die Anfrage konnte nicht abgeschlossen werden. Bitte versuche es erneut.</value></data>
 <data name="SignIn" xml:space="preserve"><value>Anmelden</value></data>
 <data name="WelcomeBack" xml:space="preserve"><value>WILLKOMMEN ZURÜCK</value></data>
 <data name="SignInHeading" xml:space="preserve"><value>Deine nächste Entscheidung beginnt hier.</value></data>
@@ -812,4 +812,23 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="EditorOperationConflict" xml:space="preserve"><value>Die Aktion wurde nicht ausgeführt. Prüfe den aktuellen Stand. Erst mit «Stand geprüft – erneut bestätigen» öffnest du die Bestätigung erneut.</value></data>
   <data name="EditorOperationRetry" xml:space="preserve"><value>Stand geprüft – erneut bestätigen</value></data>
   <data name="EditorMissingError" xml:space="preserve"><value>Dieser Eintrag ist nicht mehr verfügbar. Öffne die Übersicht, um den aktuellen Stand zu prüfen.</value></data>
+  <data name="AccessCapture" xml:space="preserve"><value>Festhalten, worauf es dir ankommt.</value></data>
+  <data name="AccessCompare" xml:space="preserve"><value>Fahrzeuge und Offerten gegenüberstellen.</value></data>
+  <data name="AccountReauthenticate" xml:space="preserve"><value>Anmeldung kurz bestätigen</value></data>
+  <data name="SignInAgain" xml:space="preserve"><value>Erneut anmelden</value></data>
+  <data name="RenamePasskey" xml:space="preserve"><value>Passkey umbenennen</value></data>
+  <data name="RemovePasskeyNamed" xml:space="preserve"><value>Passkey «{0}» entfernen?</value></data>
+  <data name="PasskeyAdded" xml:space="preserve"><value>Der Passkey wurde hinzugefügt.</value></data>
+  <data name="AccountChangeConflict" xml:space="preserve"><value>Dein Konto wurde inzwischen geändert. Die Eingabe bleibt erhalten. Prüfe den aktuellen Stand und wiederhole die Änderung.</value></data>
+  <data name="InvitationAccessHelp" xml:space="preserve"><value>Eine Einladung gibt Zugang zu dieser Installation. Evaluationen werden separat freigegeben.</value></data>
+  <data name="ErrorForbiddenTitle" xml:space="preserve"><value>Hier fehlt dir der Zugriff.</value></data>
+  <data name="ErrorForbiddenHelp" xml:space="preserve"><value>Für diese Seite hast du keine Berechtigung. Bei einer Evaluation kann der Besitzer dir den passenden Zugriff freigeben.</value></data>
+  <data name="ErrorNotFoundTitle" xml:space="preserve"><value>Diese Seite ist nicht verfügbar.</value></data>
+  <data name="ErrorNotFoundHelp" xml:space="preserve"><value>Unter dieser Adresse wurde keine Seite gefunden. Prüfe den Link oder kehre zur Übersicht zurück.</value></data>
+  <data name="ErrorRateLimitTitle" xml:space="preserve"><value>Einen Moment, bitte.</value></data>
+  <data name="ErrorRateLimitHelp" xml:space="preserve"><value>Es wurden zu viele Anfragen gesendet. Warte eine Minute und versuche es dann erneut.</value></data>
+  <data name="RequestPending" xml:space="preserve"><value>Wird verarbeitet …</value></data>
+  <data name="RequestRateLimited" xml:space="preserve"><value>Zu viele Anfragen. Deine Eingaben bleiben erhalten. Warte eine Minute und versuche es erneut.</value></data>
+  <data name="OfflineNotice" xml:space="preserve"><value>Du bist offline. Offene Eingaben bleiben auf dieser Seite erhalten. Sobald die Verbindung zurück ist, kannst du sie erneut senden.</value></data>
+  <data name="Passkey" xml:space="preserve"><value>Passkey</value></data>
 </root>

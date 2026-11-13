@@ -89,6 +89,10 @@ export async function checkCanvas({ page, origin, casePath, firstId, secondId, b
   assert.equal(await opener(boolean).evaluate(button => button === document.activeElement), true);
   assert.ok(Math.abs(await scroll.evaluate(element => element.scrollLeft) - horizontal) <= 1);
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  for (const heading of await page.locator('.comparison-group-label').all()) {
+    const bounds = await heading.boundingBox();
+    assert.ok(bounds.x >= 0 && bounds.x + bounds.width <= 390, 'Group labels remain visible in the second comparison column');
+  }
   await page.screenshot({ path: join(output, 'canvas-comparison-mobile.png'), fullPage: true });
   record('Mobile second-column editing preserves pinned criteria, viewport, horizontal position and return focus');
 
@@ -159,7 +163,7 @@ export async function checkCanvas({ page, origin, casePath, firstId, secondId, b
   record('Canvas record, tabs and comparison fit at 320/768/1024/1440px without document overflow');
 
   // A real expired session redirects to login; that response must never replace the editor.
-  const expired = await page.context().browser().newContext({ storageState: await page.context().storageState() });
+  const expired = await page.context().browser().newContext({ storageState: await page.context().storageState(), ignoreHTTPSErrors: origin.startsWith('https:') });
   try {
     const stalePage = await expired.newPage();
     stalePage.setDefaultTimeout(10000);

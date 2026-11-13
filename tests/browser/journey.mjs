@@ -5,6 +5,7 @@ import { checkCandidates } from './candidates.mjs';
 import { checkOffers } from './offers.mjs';
 import { checkDocuments } from './documents.mjs';
 import { checkCosts } from './costs.mjs';
+import { checkSetup, checkVerify, checkAccess, checkEnrollment, checkRename, checkRateLimit } from './accounts.mjs';
 import { checkScenarios } from './scenarios.mjs';
 import assert from 'node:assert/strict';
 import { spawn, execFileSync } from 'node:child_process';
@@ -97,6 +98,7 @@ async function latestCode(email) {
   throw new Error('Email code was not delivered.');
 }
 async function verify(page, email) {
+  await page.waitForURL(/\/Auth\/Verify/);
   await page.getByLabel('Einmalcode').fill(await latestCode(email));
   await page.getByRole('button', { name: 'Anmelden', exact: true }).click();
   await page.waitForURL(origin + '/');
@@ -151,8 +153,10 @@ try {
   await page.getByLabel('Einrichtungsschlüssel').fill(token);
   await page.getByLabel('Name', { exact: true }).fill('Test Owner');
   await page.getByLabel('E-Mail-Adresse', { exact: true }).fill(ownerEmail);
+  await checkSetup({ page, token, output, record });
   const setupAt = Date.now();
   await page.getByRole('button', { name: 'E-Mail-Adresse bestätigen' }).click();
+  await checkVerify({ page, code: await latestCode(ownerEmail), output, record });
   await verify(page, ownerEmail);
   assert.equal(await page.locator('.case-card').count(), 0);
   assert.equal((await browserRequest(page, '/Auth/Setup')).status(), 404);
@@ -261,6 +265,7 @@ try {
   await page.screenshot({ path: join(output, '02-criteria-desktop.png'), fullPage: true });
 
   await page.getByRole('link', { name: 'Einladungen', exact: true }).click();
+  await page.locator('#invite-person').click();
   await page.getByLabel('Name', { exact: true }).fill('Test Reader'); await page.getByLabel('E-Mail-Adresse', { exact: true }).fill(readerEmail);
   await page.getByRole('button', { name: 'Einladung senden' }).click();
   const reader = await newUser(); await signIn(reader.page, readerEmail);
@@ -314,6 +319,10 @@ try {
   await checkScenarios({ page, reader, readerEmail, origin, output, post, browserRequest, record, restart: async () => { await stopServer(); await startServer(); } });
   await stopServer(); await startServer();
 
+  await checkAccess({ page, reader, newUser, origin, output, record });
+  await checkRateLimit({ page, origin, record });
+  await stopServer(); await startServer();
+
   if (httpsMode) {
     for (const [address, expected] of [
       ['https://other.steervo-browser.test:5190', 'Passkeys sind für'],
@@ -325,8 +334,9 @@ try {
       let optionsRequests = 0;
       alternate.on('request', request => { if (request.url().includes('handler=Options')) optionsRequests++; });
       await alternate.goto(`${address}/Account`);
+      await alternate.locator('#add-passkey').click();
       await alternate.getByLabel('Name des Passkeys').fill('Wrong origin');
-      await alternate.getByRole('button', { name: 'Passkey hinzufügen', exact: true }).click();
+      await alternate.locator('#save-passkey').click();
       const notice = alternate.locator('[data-passkey-error]');
       await notice.filter({ hasText: expected }).waitFor();
       assert.ok((await notice.innerText()).includes(origin));
@@ -348,9 +358,11 @@ try {
   const cdp = await owner.context.newCDPSession(page);
   await cdp.send('WebAuthn.enable');
   const authenticator = await cdp.send('WebAuthn.addVirtualAuthenticator', { options: { protocol: 'ctap2', transport: 'internal', hasResidentKey: true, hasUserVerification: true, isUserVerified: true, automaticPresenceSimulation: true } });
+  await checkEnrollment({ page, origin, output, record });
   await page.goto(`${origin}/Account`);
+  await page.locator('#add-passkey').click();
   await page.getByLabel('Name des Passkeys').fill('Testgerät');
-  await page.getByRole('button', { name: 'Passkey hinzufügen', exact: true }).click();
+  await page.locator('#save-passkey').click();
   await page.getByRole('heading', { name: 'Testgerät', exact: true }).waitFor();
   await page.getByRole('button', { name: 'Abmelden', exact: true }).click();
   await page.getByRole('button', { name: 'Mit Passkey anmelden', exact: true }).click();
@@ -372,12 +384,14 @@ try {
   assert.equal(persistedCandidates.assessments.find(item => item.candidateId === candidateChecks.firstId && item.criterionId === candidateChecks.rating).ratingValue, 2);
   record(`${process.env.STEERVO_E2E_DATABASE_CONTAINER ? 'Application and database' : 'Application'} restart preserves session keys, cases, criteria, ordering and shares`);
 
-  await page.goto(`${origin}/Account`); await page.locator('.passkey-row summary').click();
+  await page.goto(`${origin}/Account`);
+  await checkRename({ page, owner, browser, origin, output, record });
+  await page.locator('.passkey-row [data-editor-open]').click();
   await page.locator('.passkey-row').getByLabel('Name', { exact: true }).fill('Umbenanntes Testgerät');
-  await page.getByRole('button', { name: 'Umbenennen', exact: true }).click();
+  await page.locator('.passkey-row [id^=save-passkey-]').click();
   await page.getByRole('heading', { name: 'Umbenanntes Testgerät', exact: true }).waitFor();
-  await page.locator('.passkey-row summary').click();
   await page.getByRole('button', { name: 'Passkey entfernen', exact: true }).click();
+  await page.locator('[data-confirm-accept]').click();
   await page.getByRole('heading', { name: 'Noch kein Passkey hinterlegt.', exact: true }).waitFor();
   await cdp.send('WebAuthn.removeVirtualAuthenticator', authenticator);
   await page.getByRole('button', { name: 'Abmelden', exact: true }).click();

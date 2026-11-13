@@ -174,7 +174,7 @@ export async function checkDocuments({ page, reader, readerEmail, origin, output
   assert.equal((await browserRequest(page, downloadPath)).status(), 404);
   assert.equal(await (await browserRequest(page, `${importedPath}/documents/${copiedId}/1`)).text(), firstBytes.toString());
   record('Responsive document screens and ZIP import retain all file versions independently of deleted originals');
-  const expiredContext = await page.context().browser().newContext({ storageState: await page.context().storageState() });
+  const expiredContext = await page.context().browser().newContext({ storageState: await page.context().storageState(), ignoreHTTPSErrors: origin.startsWith('https:') });
   const expiredPage = await expiredContext.newPage();
   expiredPage.setDefaultTimeout(10_000);
   await expiredPage.goto(`${origin}${offerPath}/documents/upload`);

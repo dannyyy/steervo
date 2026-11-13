@@ -43,12 +43,12 @@
     </tbody>
     @if (panels.Any(p => p.Scenario.Terms.Mode != AcquisitionMode.LeaseReturn))
     {
-    <tbody><tr class="vehicle-group-heading"><th colspan="3" scope="colgroup">@T["ScenarioBandTitle"]<span class="micro">@T["ScenarioBandHelp"]</span></th></tr>
+    <tbody><tr class="vehicle-group-heading"><th colspan="3" scope="colgroup"><span class="comparison-group-label">@T["ScenarioBandTitle"]<span class="micro">@T["ScenarioBandHelp"]</span></span></th></tr>
     @foreach (var field in new (string Label, Func<ScenarioPanel, decimal?> Value)[] { ("ResidualLow", p => p.Result.PessimisticCost), ("ResidualExpected", p => p.Result.ExpectedCost), ("ResidualHigh", p => p.Result.OptimisticCost) })
     { <tr><th scope="row" class="vehicle-criterion">@T[field.Label]</th>@foreach (var panel in panels) { <td class="vehicle-value">@(panel.Scenario.Terms.Mode == AcquisitionMode.LeaseReturn ? T["ScenarioNotApplicable"].Value : Money(field.Value(panel)))</td> }</tr> }
     </tbody>
     }
-    <tbody><tr class="vehicle-group-heading"><th colspan="3" scope="colgroup">@T["CalculationWealth"]<span class="micro">@T["CalculationReferenceHelp"]</span></th></tr>
+    <tbody><tr class="vehicle-group-heading"><th colspan="3" scope="colgroup"><span class="comparison-group-label">@T["CalculationWealth"]<span class="micro">@T["CalculationReferenceHelp"]</span></span></th></tr>
     @foreach (var field in new (string Label, Func<ScenarioPanel, decimal?> Value)[] { ("CalculationReferenceCapital", p => p.Result.ReferenceCapital), ("CalculationAccount", p => p.Result.Account), ("CalculationFinalWealth", p => p.Result.ExpectedWealth) })
     { <tr><th scope="row" class="vehicle-criterion">@T[field.Label]</th>@foreach (var panel in panels) { <td class="vehicle-value">@Money(field.Value(panel))</td> }</tr> }
     </tbody></table></div>

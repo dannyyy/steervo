@@ -23,17 +23,17 @@
         var fields = group.ToList();
         if (group.Key == "Contract" && !selected.Any(offer => offer.Latest.Terms.Kind is OfferKind.Leasing or OfferKind.Financing || fields.Any(field => field.Raw(offer.Latest.Terms) is not null))) { continue; }
         if (group.Key == "Mileage" && !selected.Any(offer => offer.Latest.Terms.Kind == OfferKind.Leasing || fields.Any(field => field.Raw(offer.Latest.Terms) is not null))) { continue; }
-        <tbody><tr class="vehicle-group-heading"><th colspan="@(selected.Count + 1)" scope="colgroup">@T["OfferGroup" + group.Key]</th></tr>
+        <tbody><tr class="vehicle-group-heading"><th colspan="@(selected.Count + 1)" scope="colgroup"><span class="comparison-group-label">@T["OfferGroup" + group.Key]</span></th></tr>
         @foreach (var field in fields)
         {
             <tr data-offer-comparison-field="@field.Name"><th scope="row" class="vehicle-criterion">@T[field.Label] @if (field.Type is "money" or "unitprice") { <span class="field-unit">@e.Currency</span> }</th>@foreach (var offer in selected) { var value = field.Display(offer.Latest.Terms); <td class="vehicle-value offer-note" data-offer-cell="@offer.Id">@(string.IsNullOrEmpty(value) ? T["OfferOpen"].Value : value)</td> }</tr>
         }
         </tbody>
     }
-    <tbody><tr class="vehicle-group-heading"><th colspan="@(selected.Count + 1)" scope="colgroup">@T["OfferLines"]</th></tr><tr><th scope="row" class="vehicle-criterion">@T["OfferLinesHelp"]</th>@foreach (var offer in selected) { <td class="vehicle-value"><partial name="_OfferLines" model="new OfferSnapshot(offer.Latest, e.Currency)" /></td> }</tr></tbody>
+    <tbody><tr class="vehicle-group-heading"><th colspan="@(selected.Count + 1)" scope="colgroup"><span class="comparison-group-label">@T["OfferLines"]</span></th></tr><tr><th scope="row" class="vehicle-criterion">@T["OfferLinesHelp"]</th>@foreach (var offer in selected) { <td class="vehicle-value"><partial name="_OfferLines" model="new OfferSnapshot(offer.Latest, e.Currency)" /></td> }</tr></tbody>
     @if (e.Criteria.Any(criterion => criterion.Scope == CriterionScope.Offer))
     {
-        <tbody><tr class="vehicle-group-heading"><th colspan="@(selected.Count + 1)" scope="colgroup">@T["OfferAssessmentTitle"]</th></tr>
+        <tbody><tr class="vehicle-group-heading"><th colspan="@(selected.Count + 1)" scope="colgroup"><span class="comparison-group-label">@T["OfferAssessmentTitle"]</span></th></tr>
         @foreach (var criterion in e.Criteria.Where(criterion => criterion.Scope == CriterionScope.Offer).OrderBy(criterion => criterion.Position))
         {
             <tr><th scope="row" class="vehicle-criterion"><strong>@criterion.Name</strong><span class="assessment-requirement">@T[criterion.Priority.ToString()] · @T[criterion.Type.ToString()] @if (criterion.Type == CriterionType.Measurement) { <span> · @(criterion.Comparison == Comparison.AtLeast ? "≥" : "≤") @criterion.Threshold @criterion.Unit</span> }</span></th>

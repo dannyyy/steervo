@@ -41,4 +41,4 @@ Strategie, Anforderungen und Projektvision liegen ausserhalb dieses Repositories
 
 ## Aktueller Entwicklungsauftrag
 
-Die gewählte Designrichtung ist **Canvas / Tinte**. Zuerst die bestehende Community-Oberfläche auf `main` migrieren und Abläufe, Formulare und Dialoge vereinheitlichen; danach neue Features. [AGENTS.md](AGENTS.md) verlinkt die verbindliche Gestaltung, die Interaktionsregeln und den schrittweisen [Migrationsplan](docs/design-migration.md). Der Prototyp ist eine Referenz, keine bereits migrierte Anwendung.
+Die gewählte Designrichtung ist **Canvas / Tinte**. Die bestehende Community-Oberfläche auf `main` ist vollständig migriert; Abläufe, Formulare und Dialoge verwenden die gemeinsamen Muster. Weitere Entwicklung baut auf diesem Stand auf und wird gesondert beauftragt. [AGENTS.md](AGENTS.md) verlinkt die verbindliche Gestaltung, die Interaktionsregeln und den abgeschlossenen [Migrationsplan](docs/design-migration.md). Der Prototyp ist eine Referenz, keine bereits migrierte Anwendung.

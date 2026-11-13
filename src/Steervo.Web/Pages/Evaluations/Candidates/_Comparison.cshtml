@@ -24,7 +24,7 @@ else
             {
                 var criteria = e.Criteria.Where(x => x.Scope == CriterionScope.Vehicle && x.GroupId == group?.Id).OrderBy(x => x.Position).ToList();
                 if (criteria.Count == 0) { continue; }
-                <tbody><tr class="vehicle-group-heading"><th colspan="@(selected.Count + 1)" scope="colgroup">@(group?.Name ?? T["Ungrouped"].Value)</th></tr>
+                <tbody><tr class="vehicle-group-heading"><th colspan="@(selected.Count + 1)" scope="colgroup"><span class="comparison-group-label">@(group?.Name ?? T["Ungrouped"].Value)</span></th></tr>
                 @foreach (var criterion in criteria)
                 {
                     <tr data-comparison-criterion="@criterion.Id"><th scope="row" class="vehicle-criterion"><strong>@criterion.Name</strong><span class="assessment-requirement">@T[criterion.Priority.ToString()]</span><span class="assessment-requirement">@T[criterion.Type.ToString()] @if (criterion.Type == CriterionType.Measurement) { <span> · @(criterion.Comparison == Comparison.AtLeast ? "≥" : "≤") @criterion.Threshold @criterion.Unit</span> }</span></th>

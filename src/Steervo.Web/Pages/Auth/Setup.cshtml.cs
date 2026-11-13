@@ -17,7 +17,18 @@ public sealed class SetupModel(IAccountAccess accounts, IStringLocalizer<Ui> tex
     public async Task<IActionResult> OnPostAsync()
     {
         if (await accounts.IsInitializedAsync()) return NotFound();
-        try { var id = await accounts.BeginSetupAsync(Token, Email, Name); return RedirectToPage("Verify", new { id }); }
-        catch (RuleException error) { ModelState.AddModelError("", text[error.Message]); return Page(); }
+        try
+        {
+            var id = await accounts.BeginSetupAsync(Token, Email, Name);
+            var url = Url.Page("Verify", new { id })!;
+            if (Request.Headers.ContainsKey("HX-Request")) { Response.Headers["HX-Redirect"] = url; return new EmptyResult(); }
+            return Redirect(url);
+        }
+        catch (RuleException error)
+        {
+            Response.StatusCode = 422;
+            if (Request.Headers.ContainsKey("HX-Request")) return new JsonResult(new { error = text[error.Message].Value });
+            ModelState.AddModelError("", text[error.Message]); return Page();
+        }
     }
 }

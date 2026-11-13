@@ -13,10 +13,16 @@ public sealed class IndexModel(UserManager<AppUser> users, SignInManager<AppUser
 {
     public IList<UserPasskeyInfo> Passkeys { get; private set; } = [];
     public bool Recent { get; private set; }
-    public string? Notice { get; private set; }
+    [TempData] public string? Notice { get; set; }
+    public string AccountName { get; private set; } = "";
+    public string Email { get; private set; } = "";
+    public string? FailedId { get; private set; }
+    public string? DraftName { get; private set; }
     public async Task OnGetAsync()
     {
-        Passkeys = await users.GetPasskeysAsync(await CurrentAsync());
+        var user = await CurrentAsync();
+        AccountName = user.Name; Email = user.Email!;
+        Passkeys = await users.GetPasskeysAsync(user);
         Recent = await IsRecentAsync();
     }
     private async Task<AppUser> CurrentAsync() => await users.GetUserAsync(User) ?? throw new UnauthorizedAccessException();
@@ -59,18 +65,20 @@ public sealed class IndexModel(UserManager<AppUser> users, SignInManager<AppUser
                 logger.LogWarning("Passkey registration could not be stored: {ErrorCodes}. Request {RequestId}", string.Join(", ", saved.Errors.Select(error => error.Code)), HttpContext.TraceIdentifier);
                 throw new RuleException("Conflict");
             }
-            return new JsonResult(new { redirect = "/Account" });
+            Notice = text["PasskeyAdded"];
+            return new JsonResult(new { redirect = "/Account#passkey-" + Convert.ToHexString(result.Passkey.CredentialId) });
         }
         catch (Exception error) when (error is RuleException or System.Text.Json.JsonException or FormatException or InvalidOperationException)
         {
             if (error is not RuleException)
                 logger.LogWarning("Passkey registration stopped with {ErrorType}: {Reason}. Request {RequestId}", error.GetType().Name, error.Message, HttpContext.TraceIdentifier);
-            return new JsonResult(new { error = text[error is RuleException ? error.Message : "PasskeyFailed"].Value }) { StatusCode = 400 };
+            var key = error is RuleException ? error.Message : "PasskeyFailed";
+            return new JsonResult(new { error = text[key == "Conflict" ? "AccountChangeConflict" : key].Value }) { StatusCode = 400 };
         }
     }
     public async Task<IActionResult> OnPostAsync(string action, string id, string? name)
     {
-        if (!await IsRecentAsync()) return StatusCode(403);
+        if (!await IsRecentAsync()) return new JsonResult(new { error = text["RecentSignInRequired"].Value }) { StatusCode = 403 };
         if (string.IsNullOrWhiteSpace(id)) return BadRequest();
         try
         {
@@ -84,8 +92,17 @@ public sealed class IndexModel(UserManager<AppUser> users, SignInManager<AppUser
             if (!result.Succeeded) throw new RuleException("Conflict");
             if (action == "remove") { await users.UpdateSecurityStampAsync(user); await signIn.RefreshSignInAsync(user); }
             Notice = text["Saved"];
+            var url = "/Account#" + (action == "remove" ? "passkeys-title" : "passkey-" + Convert.ToHexString(credentialId));
+            if (Request.Headers.ContainsKey("HX-Request")) { Response.Headers["HX-Redirect"] = url; return new EmptyResult(); }
+            return Redirect(url);
         }
-        catch (RuleException error) { ModelState.AddModelError("", text[error.Message]); }
+        catch (RuleException error)
+        {
+            Response.StatusCode = error.Message == "NotFound" ? 404 : error.Message == "Conflict" ? 409 : 422;
+            var message = text[error.Message == "Conflict" ? "AccountChangeConflict" : error.Message].Value;
+            if (Request.Headers.ContainsKey("HX-Request")) return new JsonResult(new { error = message });
+            ModelState.AddModelError("", message); FailedId = id; DraftName = name;
+        }
         catch (FormatException) { return BadRequest(); }
         await OnGetAsync(); return Page();
     }

@@ -1,10 +1,10 @@
 @page
 @model Steervo.Web.Pages.Auth.SetupModel
 @{ ViewData["Title"] = T["Setup"]; }
-<div class="auth-layout"><div class="auth-intro"><p class="eyebrow">@T["FreshStart"]</p><h1>@T["SetupHeading"]</h1><p class="lead">@T["SetupIntro"]</p><img class="auth-speedometer" src="~/images/speedometer.svg" asp-append-version="true" width="480" height="276" alt="" aria-hidden="true" /></div>
-<section class="panel auth-card"><h2>@T["Setup"]</h2><p class="muted">@T["SetupHelp"]</p><form method="post">
+<div class="workspace-surface access-workspace"><div class="auth-intro"><p class="eyebrow">@T["FreshStart"]</p><h1>@T["SetupHeading"]</h1><p class="lead">@T["SetupIntro"]</p><partial name="_AccessContext" /></div>
+<section class="auth-card"><h2>@T["Setup"]</h2><p class="muted">@T["SetupHelp"]</p><form id="setup-form" method="post" hx-post="@Request.Path" hx-swap="none" hx-sync="this:drop" hx-disabled-elt="find button[type=submit]" data-request-form data-retain-on-error><div class="editor-error" role="alert" tabindex="-1" hidden></div>
 <div asp-validation-summary="All" class="validation" role="alert"></div>
 <label asp-for="Token">@T["SetupToken"]</label><input asp-for="Token" type="password" required autocomplete="off" />
 <label asp-for="Name">@T["Name"]</label><input asp-for="Name" required maxlength="160" autocomplete="name" />
 <label asp-for="Email">@T["Email"]</label><input asp-for="Email" type="email" required maxlength="254" autocomplete="email" />
-<button class="button primary full">@T["ConfirmEmail"] →</button></form></section></div>
+<button type="submit" class="button primary full">@T["ConfirmEmail"] <partial name="/Pages/Shared/_Icon.cshtml" model='"arrow"' /></button></form></section></div>

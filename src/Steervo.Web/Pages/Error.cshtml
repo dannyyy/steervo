@@ -1,4 +1,4 @@
 @page
 @model Steervo.Web.Pages.ErrorModel
-@{ ViewData["Title"] = T["ErrorTitle"]; }
-<section class="panel centered"><h1>@T["ErrorTitle"]</h1><p>@T["ErrorHelp"]</p><a asp-page="/Index" class="button primary">@T["BackOverview"]</a></section>
+@{ ViewData["Title"] = T[Model.TitleKey]; }
+<section class="workspace-surface system-state"><div class="system-state-heading"><span class="access-symbol"><partial name="/Pages/Shared/_Icon.cshtml" model='"notice"' /></span><span class="system-code">@Model.ErrorCode</span></div><h1>@T[Model.TitleKey]</h1><p class="muted">@T[Model.HelpKey]</p><a asp-page="@(User.Identity?.IsAuthenticated == true ? "/Index" : "/Auth/Login")" class="button primary">@T[User.Identity?.IsAuthenticated == true ? "BackOverview" : "BackSignIn"]<partial name="/Pages/Shared/_Icon.cshtml" model='"arrow"' /></a></section>

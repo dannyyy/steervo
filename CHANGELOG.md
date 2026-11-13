@@ -2,6 +2,10 @@
 
 ## Unveröffentlicht
 
+- Canvas/Tinte-Migration abgeschlossen: auch Anmeldung, Ersteinrichtung, Verifikation, Konto, Passkeys, Einladungen und Systemzustände verwenden die gemeinsame Gestaltung und Bedienung.
+- Konto- und Authentifizierungsformulare behalten Eingaben bei Fehlern; Passkeys verwenden gezielte Editoren und benannte Löschbestätigungen. Erneute Anmeldung führt sicher zum Konto zurück, erfolgreiche Änderungen zur aktualisierten Liste mit Rückkehrfokus.
+- Einheitliche lokale Verbindungs- und Ladehinweise sowie vollständige Fehlerseiten mit erhaltenem HTTP-Status. Mobile Vergleichsüberschriften bleiben beim horizontalen Scrollen sichtbar; alte Layoutregeln und Dialogskripte sind bereinigt.
+
 - Vierter Teil der Canvas/Tinte-Migration: zusammenhängende Kostenplanung und Szenarioakten, gegliederte Formularseiten und zeilenweiser Szenarienvergleich mit fixierter erster Spalte. Fahrzeugbezug, Stichtag, Vergleichspaar und Zahlungsansicht bleiben bei der Bearbeitung erhalten.
 - Planungszeitraum, Rendite, Restwerte, Kostenanpassungen und Szenariokopien verwenden gemeinsame Inline-Editoren mit Entwurfsschutz, lokalen Fehlern und ausdrücklicher Konfliktwiederholung. Offertversionen bleiben fest gebunden; ein Quellenwechsel ersetzt keine Rechenannahmen.
 - Benannte Löschbestätigungen schützen auch benachbarte Entwürfe. Wiederholtes Speichern auf derselben Seite lädt aktuelle Werte und stellt den Fokus wieder her; inzwischen entfernte Einträge beenden weitere Schreibversuche. Berechnungen und Austauschformat bleiben unverändert.
@@ -15,7 +19,7 @@
 
 - Erster Teil der Canvas/Tinte-Migration: horizontaler Seitenrahmen, Fahrzeugliste, zusammenhängende Fahrzeugakte und Fahrzeugvergleich mit lokal ausgelieferter Geist-Schrift.
 - Gemeinsame Bewertung im Kontext, seitliche Formulare für Anlage, Kopie, Stammdaten und Einordnung sowie einheitliche Bestätigungen für Zurücksetzen und Entfernen.
-- Erhaltene Fahrzeugauswahl, mobile Vergleichsspalten und Tastaturfokus; geschützte Entwürfe bei Abbruch, Validierungs- und Verbindungsfehlern, gleichzeitigen Änderungen und abgelaufener Anmeldung. Die übrigen Bereiche folgen dem Migrationsplan.
+- Erhaltene Fahrzeugauswahl, mobile Vergleichsspalten und Tastaturfokus; geschützte Entwürfe bei Abbruch, Validierungs- und Verbindungsfehlern, gleichzeitigen Änderungen und abgelaufener Anmeldung. Die übrigen Bereiche wurden in den folgenden Paketen umgestellt.
 
 ## 0.2.0 — 2026-11-12
 

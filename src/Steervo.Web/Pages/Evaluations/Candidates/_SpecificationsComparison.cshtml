@@ -2,13 +2,13 @@
 @using Steervo.Web.Pages.Evaluations.Candidates
 @if (Model.Any(candidate => candidate.Specifications.HasValues()))
 {
-    <tbody class="specification-comparison"><tr class="vehicle-group-heading"><th scope="colgroup" colspan="@(Model.Count + 1)">@T["VehicleSpecifications"]<span class="micro">@T["SpecificationsHelp"]</span></th></tr></tbody>
+    <tbody class="specification-comparison"><tr class="vehicle-group-heading"><th scope="colgroup" colspan="@(Model.Count + 1)"><span class="comparison-group-label">@T["VehicleSpecifications"]<span class="micro">@T["SpecificationsHelp"]</span></span></th></tr></tbody>
     @foreach (var group in SpecificationFields.All.GroupBy(field => field.Group))
     {
         var fields = group.Where(field => Model.Any(candidate => field.Value(candidate.Specifications).HasValue)).ToList();
         var hasDrive = group.Key == "Performance" && Model.Any(candidate => candidate.Specifications.Propulsion.HasValue || candidate.Specifications.Drive.HasValue);
         if (fields.Count == 0 && !hasDrive) { continue; }
-        <tbody class="specification-comparison"><tr class="specification-group-heading"><th scope="colgroup" colspan="@(Model.Count + 1)">@T["SpecGroup" + group.Key]</th></tr>
+        <tbody class="specification-comparison"><tr class="specification-group-heading"><th scope="colgroup" colspan="@(Model.Count + 1)"><span class="comparison-group-label">@T["SpecGroup" + group.Key]</span></th></tr>
         @if (hasDrive)
         {
             @foreach (var name in new[] { "Propulsion", "Drive" })

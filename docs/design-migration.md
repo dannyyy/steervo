@@ -4,7 +4,7 @@
 
 **Verbindlich gewählt: Canvas mit Tinte.** Die Hauptentwicklung findet auf `main` statt; das Repository hat keinen `master`-Branch. Der Nutzerauftrag ist: zuerst das bestehende Design und Layout umstellen sowie Abläufe und Dialoge vereinheitlichen und optimieren, danach weitere Features entwickeln.
 
-Diese Datei ist der Umsetzungsplan für den vorhandenen Community-Funktionsumfang. Sie beschreibt keine bereits abgeschlossene Migration. Die Auswahl sowie Phase 0 bis Phase 4 sind abgeschlossen. Die vollständige Migration bleibt offen; als Nächstes folgt Phase 5.
+Diese Datei dokumentiert die abgeschlossene Migration des vorhandenen Community-Funktionsumfangs. **Alle Phasen 0–5 sind seit dem 13. November 2026 umgesetzt und verifiziert.** Weitere Entwicklung findet auf `main` mit Canvas/Tinte und den gemeinsamen Interaktionsmustern statt. Neue Features werden gesondert priorisiert.
 
 | Grundlage | Zweck |
 | --- | --- |
@@ -89,16 +89,16 @@ Jedes Paket umfasst Quellcode, notwendige Tests und eine überprüfte echte Ober
 
 ### 5. Konto, Einstieg, Systemzustände und Abschluss
 
-- [ ] Login, Verifikation, Ersteinrichtung, Konto, Passkeys und Einladungen in die gemeinsame Gestaltung überführen.
-- [ ] Fehlerseite, Verbindungsfehler, Ladezustände, leere Bereiche, gesperrte Aktionen und Leserechte vollständig gestalten.
-- [ ] Alte, nicht mehr verwendete Styles und ersetzte Dialogskripte entfernen; Ressourcen, direkte URLs, Zurücknavigation und Fokusziele überprüfen.
-- [ ] Vollständige Regression und visuelle Prüfung aller Bereiche durchführen und verbleibende Unterschiede bewusst auflösen.
+- [x] Login, Verifikation, Ersteinrichtung, Konto, Passkeys und Einladungen in die gemeinsame Gestaltung überführen.
+- [x] Fehlerseite, Verbindungsfehler, Ladezustände, leere Bereiche, gesperrte Aktionen und Leserechte vollständig gestalten.
+- [x] Alte, nicht mehr verwendete Styles und ersetzte Dialogskripte entfernen; Ressourcen, direkte URLs, Zurücknavigation und Fokusziele überprüfen.
+- [x] Vollständige Regression und visuelle Prüfung aller Bereiche durchführen und verbleibende Unterschiede bewusst auflösen.
 
 **Abnahme:** Die gesamte bestehende Anwendung folgt Canvas/Tinte und den gemeinsamen Interaktionsmustern. Erst nach diesem Abschluss werden neue Features priorisiert.
 
-## Umsetzungsstand vom 13. November 2026
+## Nachweis Phase 0 und 1 vom 13. November 2026
 
-**Abgeschlossen: Ausgangsprüfung und erstes Umsetzungspaket.** Die echte Razor-Anwendung verwendet den horizontalen Canvas-Rahmen und lokal ausgeliefertes Geist. Fahrzeugliste, Anlage, unabhängige Kopie, Akte, Einordnung, Stammdaten, Bewertungen und Fahrzeugvergleich sind migriert. Der Rahmen erhält alle bisherigen Bereiche und rollenabhängigen Zugänge. Andere Fachbereiche erhalten damit die gemeinsame Basis, sind aber noch nicht vollständig nach den neuen Interaktionsregeln überarbeitet.
+**Stand des ersten Umsetzungspakets:** Ausgangsprüfung und Kernablauf abgeschlossen. Die echte Razor-Anwendung verwendet den horizontalen Canvas-Rahmen und lokal ausgeliefertes Geist. Fahrzeugliste, Anlage, unabhängige Kopie, Akte, Einordnung, Stammdaten, Bewertungen und Fahrzeugvergleich sind migriert. Der Rahmen erhält alle bisherigen Bereiche und rollenabhängigen Zugänge. Andere Fachbereiche erhalten damit die gemeinsame Basis, sind aber noch nicht vollständig nach den neuen Interaktionsregeln überarbeitet.
 
 Die Akte zeigt Anforderungen als lesbare Zeilen und Notizen auf einer zusammenhängenden Fläche. Technische Daten sind über einen eigenen Tab erreichbar. Dieselbe Teilansicht `_AssessmentEditor.cshtml` bearbeitet Bewertungen in Akte und Vergleich. Im Vergleich folgt der Editor auf die echte HTML-Tabelle, außerhalb des horizontalen Scrollbereichs. Die ausgewählte Fahrzeugkombination bleibt in den Links zwischen beiden Ansichten erhalten. Die Akte funktioniert ohne Fotos.
 
@@ -194,7 +194,28 @@ Planungszeitraum, Rendite, Restwerte, Kostenanpassungen und Szenariokopien verwe
 - `tests/browser/financial-workflows.mjs` prüft erhaltene Fahrzeug-/Tabellen-/Vergleichskontexte, mobilen Spaltenwechsel, Fokus, bewusstes Verwerfen, 422, Netzfehler, 409 mit ausdrücklicher Wiederholung, wiederholtes Speichern auf derselben Seite, entzogene Rechte, abgelaufene Anmeldung, Kostenanpassungen, Kopien und benannte Löschungen einschliesslich zwischenzeitlich entfernter Einträge.
 - Echte Oberfläche mit synthetischen Daten bei 1440 und 390 px visuell geprüft. Struktur- und Langtextprüfungen zusätzlich bei 320, 768 und 1024 px; Vergleich und Zahlungspläne scrollen nur in ihren bezeichneten Bereichen. Vollständige und offene Ergebnisse, Formularseiten, Inline-Editoren, Auswahlzustände und Validierungsfehler sind berücksichtigt. Artefakte unter `.artifacts/browser/phase4/` bleiben ausserhalb der Commits.
 
-**Nächste Arbeit:** Phase 5, Konto, Einstieg, Systemzustände und abschliessende Gesamtprüfung. Die Gesamtmigration bleibt offen; neue Features bleiben nachgeordnet.
+## Phase 5: Konto, Einstieg und Abschluss
+
+**Abgeschlossen am 13. November 2026.** Ersteinrichtung und Anmeldung verwenden eine zusammenhängende Arbeitsfläche; Verifikation, Konto, Passkeys, Einladungen und Fehlerseiten folgen derselben Typografie, Farbgebung und Hierarchie. Passkeys werden in gezielt geöffneten Inline-Editoren verwaltet, Einladungen in der gemeinsamen seitlichen Bearbeitungsfläche. Leere, gesperrte, ausstehende und fehlgeschlagene Zustände sind ausdrücklich dargestellt.
+
+### Technische Übergabe
+
+- Authentifizierungsformulare erhalten ihre Eingaben bei lokalen Fehlern und Netzproblemen. HTMX und native Antworten bleiben verfügbar; lokale Rücksprungziele führen nach erneuter Anmeldung zurück zum Konto.
+- `passkeys.js` wird nur auf Anmeldung und Konto geladen. Geräteabbruch und fehlgeschlagene Requests behalten den Namen; laufende Anfragen verhindern doppeltes Absenden und Schliessen. Eine erfolgreiche Anlage lädt die aktuelle Liste auch bei gleichem Seitenpfad mit neuem Fragment und stellt den Fokus auf den neuen Eintrag.
+- Benannte Passkey-Löschung, Umbenennung und Einladungen verwenden dieselben Editoraktionen, Entwurfsschutz- und Fokusregeln wie die Fachbereiche. Bestehende Autorisierung, WebAuthn-Prüfung, zeitliche Grenzen und Identity-Konfliktprüfung bleiben erhalten.
+- Vollständige Browser-Fehlerseiten zeigen 403, 404, 429 und allgemeine Fehler mit einem sinnvollen Rückweg. Der ursprüngliche HTTP-Status bleibt bestehen; die interne Fehlerdarstellung wird nicht erneut vom globalen Anfragelimit blockiert. Schreibantworten, HTMX-Fragmente und Health-Checks behalten ihr bisheriges Format.
+- Überflüssige Auth-/Karten-/Kontolayouts, die alte Tacho-Illustration, Farb-Aliase und der letzte Browser-`confirm()`-Handler wurden entfernt. `site.js` trägt Felder, Verbindungs- und Ladehinweise; `editors.js` trägt weiterhin die gemeinsamen Interaktionen.
+- Die abschliessende Sichtprüfung hat auch die Gruppenüberschriften in Fahrzeug-, Offert- und Szenarienvergleichen vereinheitlicht: Sie bleiben beim horizontalen Scrollen auf Mobilgeräten sichtbar.
+
+### Verifikation und Abschluss
+
+- **100 Fach-/Integrationstests erfolgreich**, Web-Build ohne Warnungen und Fehler. Vorhandener Prüfablauf aus dem README; lokales Protokoll `.artifacts/phase5/verification.log`.
+- **84 Browserprüfungen erfolgreich** im vollständigen HTTPS-Lauf mit eigener Testdatenbank und isolierten Playwright-Kontexten. Einschliesslich Einrichtung, E-Mail-/Passkey-Anmeldung, aller Fachabläufe, Rollen, konkurrierender Änderungen, Entwurfsschutz, Dateiinhalt/Versionen, JSON-/ZIP-Austausch sowie Anwendungs- und Datenbankneustart. Der letzte Browserlauf ist in `.artifacts/phase5/https-browser.log` und `.artifacts/browser/results.json` festgehalten.
+- `tests/browser/accounts.mjs` ergänzt ungültige Einrichtung und Codes, Offline-/Anfragelimitfehler, doppeltes Absenden, Einladung und Entzug, Passkey-Abbruch, Umbenennen/Entfernen, sichere Bestätigung und tatsächlichen Sitzungsverlust. Ein echtes überschrittenes Serverlimit liefert die gestaltete 429-Seite. Falsche Passkey-Domain und unsicheres HTTP sind zusätzlich im HTTPS-Lauf geprüft.
+- Eine gesonderte lokale Prüfung mit den Schlüsseln der eigenen Testinstanz bestätigt eine tatsächliche 16 Minuten alte Sitzung: Passkey-Anlage serverseitig gesperrt, erneute E-Mail-Anmeldung mit Rückkehr ins Konto. Native Login-Validierung ohne JavaScript behält die E-Mail-Adresse. Dafür wurde kein Anwendungscode und kein produktiver Zugang verändert.
+- **105 Seiten-/Breitenprüfungen** über 21 Ansichten bei 320, 390, 768, 1024 und 1440 px erfolgreich. Desktop-/Mobilaufnahmen aller Bereiche geprüft; keine seitenweite horizontale Überbreite oder JavaScript-Fehler. Gruppenbezeichnungen bleiben auch in der zweiten Vergleichsspalte sichtbar. Screenshots und Prüfergebnisse liegen lokal unter `.artifacts/browser/phase5/`; die zusätzlichen Kontozustände unter `.artifacts/browser/account-*.png`.
+- Alle Migrationseinträge und Abschlusskriterien sind erfüllt. Bewusst beibehalten: lange Formulare als eigene Seiten, horizontal scrollende Vergleichs-/Zahlungstabellen innerhalb ihrer Bereiche sowie native Datei- und Geräteauswahl. Die Designauswahl wird nicht erneut geöffnet; neue Funktionen sind nicht Bestandteil dieses Abschlusses.
+
 
 ## Inventar der vorhandenen Oberflächen
 
@@ -212,7 +233,7 @@ Planungszeitraum, Rendite, Restwerte, Kostenanpassungen und Szenariokopien verwe
 | Rechnen | `Pages/Evaluations/Scenarios/` | Annahmen, Ergebnis, Vergleich, Offertbindung |
 | Einstieg / Konto | `Pages/Auth/`, `Pages/Account/` | Einheitliche Felder, Verifikation, Passkeys, Rollen |
 | Fehler / Status | `Pages/Error.cshtml`, Layout, HTMX-Hinweise | Verständliche Wiederherstellung und zugängliche Meldungen |
-| Interaktionsskripte | `wwwroot/js/site.js`, `workspace.js`, `sorting.js`, `specifications.js`, `offers.js` | HTMX-Lebenszyklus, Fokus, Entwürfe, Sortierung, Bestätigungen |
+| Interaktionsskripte | `wwwroot/js/site.js`, `editors.js`, `passkeys.js`, `workspace.js`, `sorting.js`, `specifications.js`, `offers.js` | HTMX-Lebenszyklus, Fokus, Entwürfe, Sortierung, Bestätigungen |
 
 Dateipfade ohne Präfix beziehen sich auf `src/Steervo.Web/`. Sie beschreiben interne Implementierung, keine öffentliche API.
 
@@ -243,13 +264,13 @@ Für jedes Paket: tatsächliche Razor-Oberfläche mit Playwright bei Desktop- un
 
 Am Ende müssen alle folgenden Punkte nachgewiesen sein:
 
-- [ ] Alle vorhandenen Bereiche sind umgestellt und erreichbar; keine fachliche Regression.
-- [ ] Einheitliche Navigation, Formulare, Status, Aktionen und Dialoge auf Desktop und Mobilgeräten.
-- [ ] Keine seitenweite horizontale Überbreite; Vergleichstabellen dürfen innerhalb eines klar bezeichneten Bereichs scrollen, wobei die Kriterien erkennbar bleiben.
-- [ ] Lesbarer Kontrast, sichtbarer Fokus, passende Labels, erreichbare Aktionen und reduzierte Bewegung.
-- [ ] Bestehende Tests erfolgreich und relevante neue UI-Risiken sinnvoll geprüft.
-- [ ] Dokumentation entspricht der tatsächlichen Umsetzung; offene Punkte und bewusste Abweichungen sind benannt.
-- [ ] Abschluss der Design-/UX-Migration festgehalten, bevor weitere Features begonnen werden.
+- [x] Alle vorhandenen Bereiche sind umgestellt und erreichbar; keine fachliche Regression.
+- [x] Einheitliche Navigation, Formulare, Status, Aktionen und Dialoge auf Desktop und Mobilgeräten.
+- [x] Keine seitenweite horizontale Überbreite; Vergleichstabellen dürfen innerhalb eines klar bezeichneten Bereichs scrollen, wobei die Kriterien erkennbar bleiben.
+- [x] Lesbarer Kontrast, sichtbarer Fokus, passende Labels, erreichbare Aktionen und reduzierte Bewegung.
+- [x] Bestehende Tests erfolgreich und relevante neue UI-Risiken sinnvoll geprüft.
+- [x] Dokumentation entspricht der tatsächlichen Umsetzung; offene Punkte und bewusste Abweichungen sind benannt.
+- [x] Abschluss der Design-/UX-Migration festgehalten, bevor weitere Features begonnen werden.
 
 ## Git-Übergabe
 

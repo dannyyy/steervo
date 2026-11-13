@@ -13,84 +13,38 @@ function initializeFields(root = document) {
   });
 }
 initializeFields();
-const drafts = new WeakMap();
-document.addEventListener('htmx:beforeRequest', event => {
-  const form = event.detail.elt.closest('form');
-  if (form && event.detail.xhr) drafts.set(event.detail.xhr, [...new FormData(form)].filter(([key]) => !['__RequestVerificationToken', 'version'].includes(key)));
-});
 document.addEventListener('htmx:afterSwap', event => {
-  const submittedDraft = drafts.get(event.detail.xhr);
-  if ([409, 422].includes(event.detail.xhr?.status) && submittedDraft) {
-    const draft = new Map(submittedDraft);
-    const form = [...document.querySelectorAll('#evaluation-workspace form:not([data-guard-draft]), #candidate-workspace form:not([data-guard-draft]), #offer-workspace form:not([data-guard-draft])')].find(candidate =>
-      ['action', 'itemId', 'candidateId', 'offerId', 'criterionId'].every(name => (candidate.elements.namedItem(name)?.value || '') === (draft.get(name) || '')));
-    if (form) {
-      for (const [name, value] of submittedDraft) {
-        const field = form.elements.namedItem(name);
-        if (field instanceof HTMLInputElement || field instanceof HTMLSelectElement || field instanceof HTMLTextAreaElement) field.value = value;
-      }
-      let parent = form.parentElement;
-      while (parent) { if (parent instanceof HTMLDetailsElement) parent.open = true; parent = parent.parentElement; }
-    }
-  }
-  drafts.delete(event.detail.xhr);
   initializeFields();
-  if (!event.detail.requestConfig?.elt?.matches('[data-sort]') && !event.detail.target?.querySelector('[data-editor]')) document.querySelector('.notice[tabindex]')?.focus({ preventScroll: true });
+  if (!event.detail.requestConfig?.elt?.matches('[data-sort]') && !event.detail.target?.querySelector('[data-editor]'))
+    document.querySelector('.notice[tabindex]')?.focus({ preventScroll: true });
 });
 document.addEventListener('htmx:beforeSwap', event => {
   if ([409, 422].includes(event.detail.xhr.status)) { event.detail.shouldSwap = true; event.detail.isError = false; }
 });
-document.addEventListener('htmx:sendError', () => { document.getElementById('connection-error').hidden = false; });
-document.addEventListener('htmx:responseError', () => { document.getElementById('connection-error').hidden = false; });
-window.addEventListener('offline', () => { document.getElementById('connection-error').hidden = false; });
-window.addEventListener('online', () => { document.getElementById('connection-error').hidden = true; });
-document.addEventListener('submit', event => {
-  const form = event.target;
-  if (form.dataset.confirm && !window.confirm(form.dataset.confirm)) {
-    event.preventDefault(); event.stopImmediatePropagation();
-  }
-}, true);
-
-async function readPasskeyResponse(response, form) {
-  if (response.redirected || response.status === 401) throw new Error(form.dataset.sessionError);
-  if (response.status === 429) throw new Error(form.dataset.rateError);
-  const result = response.headers.get('content-type')?.includes('application/json') ? await response.json() : null;
-  if (!response.ok || !result) throw new Error(result?.error || form.dataset.error);
-  return result;
+const connection = document.getElementById('connection-error');
+function showConnection(offline = false) {
+  connection.querySelector('[data-connection-message]').textContent = offline ? connection.dataset.offline : connection.dataset.failure;
+  connection.hidden = false;
 }
-
-document.addEventListener('submit', async event => {
-  const form = event.target;
-  if (!form.dataset.passkey) return;
-  event.preventDefault();
-  const error = form.querySelector('[data-passkey-error]');
-  const button = form.querySelector('button');
-  error.textContent = ''; button.disabled = true;
-  try {
-    if (!window.isSecureContext) throw new Error(form.dataset.secureError);
-    if (location.origin !== form.dataset.origin) throw new Error(form.dataset.originError);
-    if (!window.PublicKeyCredential || !PublicKeyCredential.parseCreationOptionsFromJSON || !PublicKeyCredential.parseRequestOptionsFromJSON || !PublicKeyCredential.prototype.toJSON) throw new Error(form.dataset.browserError);
-    const fields = new FormData(form);
-    const optionsResponse = await fetch(form.dataset.options, { method: 'POST', body: fields, credentials: 'same-origin' });
-    const options = await readPasskeyResponse(optionsResponse, form);
-    const credential = form.dataset.passkey === 'create'
-      ? await navigator.credentials.create({ publicKey: PublicKeyCredential.parseCreationOptionsFromJSON(options) })
-      : await navigator.credentials.get({ publicKey: PublicKeyCredential.parseRequestOptionsFromJSON(options) });
-    if (!credential) throw new Error(form.dataset.cancelledError);
-    const credentialJson = credential.toJSON();
-    // Some providers omit empty extension results; Identity requires the JSON member.
-    const clientExtensionResults = credentialJson.clientExtensionResults ?? credential.getClientExtensionResults?.() ?? {};
-    fields.set('credential', JSON.stringify({ ...credentialJson, clientExtensionResults }));
-    const response = await fetch(form.action, { method: 'POST', body: fields, credentials: 'same-origin' });
-    const result = await readPasskeyResponse(response, form);
-    location.assign(result.redirect);
-  } catch (failure) {
-    const browserErrors = {
-      NotAllowedError: form.dataset.cancelledError,
-      InvalidStateError: form.dataset.duplicateError,
-      SecurityError: form.dataset.securityError,
-      NotSupportedError: form.dataset.browserError
-    };
-    error.textContent = failure.name === 'Error' ? failure.message : browserErrors[failure.name] || form.dataset.error;
-  } finally { button.disabled = false; }
-});
+function requestFailed(event) {
+  if (!event.detail.elt?.closest('[data-editor], [data-request-form], [data-operation]')) showConnection(!navigator.onLine);
+}
+document.addEventListener('htmx:sendError', requestFailed);
+document.addEventListener('htmx:responseError', requestFailed);
+window.addEventListener('offline', () => showConnection(true));
+window.addEventListener('online', () => { connection.hidden = true; });
+connection.querySelector('[data-dismiss-connection]').addEventListener('click', () => { connection.hidden = true; });
+function requestPending(form, pending) {
+  if (!form) return;
+  form.toggleAttribute('data-pending', pending);
+  form.setAttribute('aria-busy', String(pending));
+  if (form.hasAttribute('data-sort')) return;
+  let status = form.querySelector('.request-status');
+  if (!status && pending) {
+    status = document.createElement('p'); status.className = 'request-status'; status.setAttribute('role', 'status'); form.append(status);
+  }
+  if (status) { status.textContent = pending ? document.body.dataset.requestPending : ''; status.hidden = !pending; }
+}
+document.addEventListener('htmx:beforeRequest', event => requestPending(event.detail.elt.closest('form'), true));
+document.addEventListener('htmx:afterRequest', event => requestPending(event.detail.elt.closest('form'), false));
+document.addEventListener('form:pending', event => requestPending(event.target.closest('form'), event.detail));

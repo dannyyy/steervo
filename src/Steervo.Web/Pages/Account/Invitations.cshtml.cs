@@ -11,7 +11,8 @@ public sealed class InvitationsModel(IAccountAccess accounts, ICurrentUser curre
     public IReadOnlyList<InvitationView> Invitations { get; private set; } = [];
     [BindProperty] public string Email { get; set; } = "";
     [BindProperty] public string Name { get; set; } = "";
-    public string? Notice { get; private set; }
+    [TempData] public string? Notice { get; set; }
+    public bool Failed { get; private set; }
     public async Task<IActionResult> OnGetAsync()
     {
         if (!await accounts.IsPrimaryAsync(current.Id)) return StatusCode(403);
@@ -25,8 +26,16 @@ public sealed class InvitationsModel(IAccountAccess accounts, ICurrentUser curre
             if (action == "revoke") await accounts.RevokeInvitationAsync(current.Id, id);
             else await accounts.InviteAsync(current.Id, Email, Name);
             Notice = text[action == "revoke" ? "InvitationRevoked" : "InvitationSent"];
+            var url = "/Account/Invitations#invitations-title";
+            if (Request.Headers.ContainsKey("HX-Request")) { Response.Headers["HX-Redirect"] = url; return new EmptyResult(); }
+            return Redirect(url);
         }
-        catch (RuleException error) { ModelState.AddModelError("", text[error.Message]); }
+        catch (RuleException error)
+        {
+            Response.StatusCode = error.Message == "NotFound" ? 404 : error.Message == "Forbidden" ? 403 : 422;
+            if (Request.Headers.ContainsKey("HX-Request")) return new JsonResult(new { error = text[error.Message].Value });
+            Failed = action != "revoke"; ModelState.AddModelError("", text[error.Message]);
+        }
         return await OnGetAsync();
     }
 }

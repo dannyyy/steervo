@@ -2,24 +2,46 @@
 @model Steervo.Web.Pages.Account.IndexModel
 @inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 @{ ViewData["Title"] = T["Account"]; var passkeyOrigin = new Uri(Configuration["PublicUrl"] ?? "http://localhost:5180").GetLeftPart(UriPartial.Authority); }
-<div class="page-heading"><div><p class="eyebrow">@T["Security"]</p><h1>@T["Account"]</h1><p class="muted">@User.Identity?.Name</p></div></div>
-<div class="overview-grid"><section class="panel"><h2>@T["Passkeys"]</h2><p class="muted">@T["PasskeyHelp"]</p><div asp-validation-summary="All" class="validation" role="alert"></div>
+<div class="surface-heading"><div><p class="eyebrow">@T["Security"]</p><h1>@T["Account"]</h1><p class="muted">@Model.AccountName · @Model.Email.ToLowerInvariant()</p></div></div>
+<section class="workspace-surface account-workspace">
+<div class="surface-heading"><div><h2 id="passkeys-title" tabindex="-1" data-return-focus>@T["Passkeys"]</h2><p class="muted">@T["PasskeyHelp"]</p></div>
+@if (Model.Recent) { <button type="button" id="add-passkey" class="button primary" data-editor-open="passkey-add-editor" aria-controls="passkey-add-editor" aria-expanded="false"><partial name="/Pages/Shared/_Icon.cshtml" model='"plus"' />@T["AddPasskey"]</button> }</div>
 @if (Model.Notice is not null) { <p class="notice success" role="status">@Model.Notice</p> }
-@if (!Model.Recent) { <p class="notice">@T["RecentSignInRequired"]</p> }
-@if (Model.Passkeys.Count == 0) { <div class="empty-state"><h3>@T["NoPasskeys"]</h3><p>@T["EmailStillWorks"]</p></div> }
-@foreach (var passkey in Model.Passkeys)
+@if (!Model.Recent) { <div class="notice account-reauthentication"><div><strong>@T["AccountReauthenticate"]</strong><p>@T["RecentSignInRequired"]</p></div><form method="post" asp-page="Logout"><input name="returnUrl" value="/Account" type="hidden" /><button type="submit" class="button secondary">@T["SignInAgain"]</button></form></div> }
+@if (Model.Recent)
 {
-    <article class="passkey-row"><div><h3>@passkey.Name</h3><p class="micro">@T["AddedOn"] @passkey.CreatedAt.ToString("d")</p></div>
-    @if (Model.Recent) { <details><summary>@T["Manage"]</summary><form method="post"><input type="hidden" name="id" value="@Microsoft.AspNetCore.WebUtilities.WebEncoders.Base64UrlEncode(passkey.CredentialId)" /><input type="hidden" name="action" value="rename" /><label for="key-@Convert.ToHexString(passkey.CredentialId)">@T["Name"]</label><input id="key-@Convert.ToHexString(passkey.CredentialId)" name="name" value="@passkey.Name" required maxlength="80" /><button class="button secondary">@T["Rename"]</button></form><form method="post" data-confirm="@T["RemovePasskeyConfirm"]"><input type="hidden" name="id" value="@Microsoft.AspNetCore.WebUtilities.WebEncoders.Base64UrlEncode(passkey.CredentialId)" /><input type="hidden" name="action" value="remove" /><button class="text-button danger">@T["RemovePasskey"]</button></form></details> }
-    </article>
-}
-</section><aside><section class="panel"><h2>@T["AddPasskey"]</h2><p class="muted">@T["AddPasskeyHelp"]</p>@if (Model.Recent) {
-    <form method="post" data-passkey="create" data-options="/Account?handler=Options" action="/Account?handler=Enroll"
+<section id="passkey-add-editor" class="inline-editor account-editor" data-editor data-opener="add-passkey" aria-labelledby="passkey-add-title" hidden>
+<div class="editor-heading"><div><p class="editor-context">@Model.Email.ToLowerInvariant()</p><h3 id="passkey-add-title">@T["AddPasskey"]</h3></div><button type="button" class="icon-button" data-editor-close aria-label="@T["Close"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"close"' /></button></div>
+<p class="editor-help">@T["AddPasskeyHelp"]</p>
+    <form method="post" id="passkey-add-form" data-passkey="create" data-guard-draft data-options="/Account?handler=Options" action="/Account?handler=Enroll"
           data-origin="@passkeyOrigin" data-error="@T["PasskeyCreateFailed"]"
           data-secure-error="@T["PasskeySecureContextRequired", passkeyOrigin]" data-origin-error="@T["PasskeyOriginMismatch", passkeyOrigin]"
           data-browser-error="@T["PasskeyBrowserUnsupported"]" data-cancelled-error="@T["PasskeyCancelled"]"
           data-duplicate-error="@T["PasskeyAlreadyRegistered"]" data-security-error="@T["PasskeySecurityError", passkeyOrigin]"
           data-session-error="@T["PasskeySessionExpired"]" data-rate-error="@T["PasskeyRateLimited"]">
-        @Html.AntiForgeryToken()<label for="passkey-name">@T["PasskeyName"]</label><input id="passkey-name" name="name" required maxlength="80" /><button class="button primary full">@T["AddPasskey"]</button><p data-passkey-error class="validation" role="alert"></p>
+        @Html.AntiForgeryToken()<label for="passkey-name">@T["PasskeyName"]</label><input id="passkey-name" name="name" required maxlength="80" /><partial name="/Pages/Shared/_EditorActions.cshtml" model='new Steervo.Web.Pages.Shared.EditorActions("save-passkey", T["AddPasskey"].Value)' /><p data-passkey-error class="editor-error" role="alert" tabindex="-1" hidden></p>
     </form>
-}</section><div class="help-card"><h3>@T["Recovery"]</h3><p>@T["RecoveryNote"]</p></div></aside></div>
+</section>
+}
+@if (Model.Passkeys.Count == 0) { <div class="canvas-empty account-empty"><span class="access-symbol"><partial name="/Pages/Shared/_Icon.cshtml" model='"key"' /></span><div><h3>@T["NoPasskeys"]</h3><p>@T["EmailStillWorks"]</p></div></div> }
+<div class="passkey-list">
+@foreach (var passkey in Model.Passkeys)
+{
+    var credential = Microsoft.AspNetCore.WebUtilities.WebEncoders.Base64UrlEncode(passkey.CredentialId);
+    var key = Convert.ToHexString(passkey.CredentialId);
+    var failed = Model.FailedId == credential;
+    var name = passkey.Name ?? T["Passkey"].Value;
+    <article class="passkey-row" id="passkey-@key" tabindex="-1" data-return-focus><div class="account-row-heading"><div class="account-row-identity"><partial name="/Pages/Shared/_Icon.cshtml" model='"key"' /><div><h3>@name</h3><p class="micro">@T["AddedOn"] <time datetime="@passkey.CreatedAt.ToString("O")">@passkey.CreatedAt.ToString("d")</time></p></div></div>
+    @if (Model.Recent) { <div class="account-row-actions"><button type="button" id="rename-passkey-@key" class="button secondary" data-editor-open="passkey-editor-@key" aria-controls="passkey-editor-@key" aria-expanded="@failed.ToString().ToLowerInvariant()">@T["Rename"]</button><form id="remove-passkey-@key" method="post" hx-post="/Account" hx-swap="none" hx-sync="this:drop" hx-disabled-elt="find button[type=submit]" data-operation data-retain-on-error data-confirm-action="@T["RemovePasskeyNamed", name]" data-confirm-description="@T["RemovePasskeyConfirm"]"><input name="id" value="@credential" type="hidden" /><input name="action" value="remove" type="hidden" /><button type="submit" class="text-button danger">@T["RemovePasskey"]</button></form></div> }</div>
+    @if (Model.Recent) {
+    <section id="passkey-editor-@key" class="inline-editor account-editor" data-editor data-opener="rename-passkey-@key" aria-labelledby="passkey-title-@key" hidden="@(!failed)">
+    <div class="editor-heading"><div><p class="editor-context">@name</p><h3 id="passkey-title-@key">@T["RenamePasskey"]</h3></div><button type="button" class="icon-button" data-editor-close aria-label="@T["Close"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"close"' /></button></div>
+    <div class="editor-error" role="alert" tabindex="-1" hidden="@(!failed)"><div asp-validation-summary="All"></div></div>
+    <form method="post" hx-post="/Account" hx-swap="none" hx-sync="this:drop" hx-disabled-elt="find button[type=submit]" data-guard-draft data-retain-on-error><input name="id" value="@credential" type="hidden" /><input name="action" value="rename" type="hidden" /><label for="key-@key">@T["Name"]</label><input id="key-@key" name="name" value="@(failed ? Model.DraftName : name)" required maxlength="80" data-editor-focus />
+    <partial name="/Pages/Shared/_EditorActions.cshtml" model='new Steervo.Web.Pages.Shared.EditorActions("save-passkey-" + key)' /></form></section>
+    }</article>
+}
+</div>
+<div class="record-section account-recovery"><partial name="/Pages/Shared/_Icon.cshtml" model='"mail"' /><div><h3>@T["Recovery"]</h3><p class="muted">@T["RecoveryNote"]</p></div></div>
+</section>
+@section Scripts { <script src="~/js/passkeys.js" asp-append-version="true" defer></script> }

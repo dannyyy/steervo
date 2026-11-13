@@ -80,7 +80,7 @@
     if (restore) restoreFocus(opener, true);
   }
   async function canClose(editors) {
-    if (editors.some(editor => busy.has(editor))) return false;
+    if (editors.some(editor => busy.has(editor) || editor.querySelector('form[data-pending]'))) return false;
     if (!editors.some(dirty)) return true;
     return confirmAction(confirmation.dataset.discardTitle, confirmation.dataset.discardDescription,
       confirmation.dataset.discardAction, confirmation.dataset.continueAction);
@@ -211,8 +211,9 @@
         form.dataset.confirmed = 'true'; form.requestSubmit(event.submitter);
       }
     }
-    if (!form.hasAttribute('hx-post') && !event.defaultPrevented) leaving = true;
+    if (!form.hasAttribute('hx-post') && !form.hasAttribute('data-passkey') && !event.defaultPrevented) leaving = true;
   }, true);
+  document.addEventListener('form:navigate', () => { leaving = true; });
   window.addEventListener('beforeunload', event => {
     if (!leaving && pendingEditors().some(dirty)) { event.preventDefault(); event.returnValue = ''; }
   });
@@ -242,7 +243,7 @@
   });
   document.addEventListener('htmx:beforeRequest', event => {
     const form = event.detail.elt.closest('form');
-    const editor = form?.closest('[data-editor]') || (form?.hasAttribute('data-operation') ? form : null);
+    const editor = form?.closest('[data-editor]') || (form?.matches('[data-operation], [data-request-form]') ? form : null);
     if (form?.hasAttribute('data-sort')) {
       requests.set(event.detail.xhr, { sorting: pendingEditors().map(item => ({
         id: item.id, opener: item.dataset.opener, open: activeEditors().includes(item),
@@ -288,7 +289,7 @@
       }
     }
     const responseUrl = event.detail.xhr.responseURL;
-    if (state && responseUrl && new URL(responseUrl).pathname.startsWith('/Auth/')) {
+    if (state && responseUrl && new URL(responseUrl).pathname.startsWith('/Auth/') && !location.pathname.startsWith('/Auth/')) {
       state.denied = true;
       event.detail.shouldSwap = false;
       event.detail.isError = false;
@@ -371,8 +372,10 @@
     if (state && ![409, 422].includes(status) && (status === 0 || status >= 400 || state.denied)) {
       const permission = [401, 403].includes(status) || state.denied;
       const missing = status === 404;
-      editorError(document.getElementById(state.editorId), permission ? document.body.dataset.editorPermissionError
-        : missing ? document.body.dataset.editorMissingError : document.body.dataset.editorNetworkError, permission || missing);
+      const response = event.detail.xhr.getResponseHeader('Content-Type')?.includes('application/json')
+        ? JSON.parse(event.detail.xhr.responseText) : null;
+      editorError(document.getElementById(state.editorId), response?.error || (permission ? document.body.dataset.editorPermissionError
+        : missing ? document.body.dataset.editorMissingError : status === 429 ? document.body.dataset.requestRateError : document.body.dataset.editorNetworkError), permission || missing);
       requests.delete(event.detail.xhr);
     }
   });

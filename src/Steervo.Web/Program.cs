@@ -4,6 +4,7 @@ using System.Security.Claims;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
@@ -76,8 +77,11 @@ else if (documentProvider == "S3") builder.Services.AddSingleton<IDocumentObject
 else throw new InvalidOperationException("DocumentStorage:Provider must be FileSystem or S3.");
 builder.Services.AddRateLimiter(options => {
     options.RejectionStatusCode = 429;
-    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context => RateLimitPartition.GetFixedWindowLimiter(
-        context.Connection.RemoteIpAddress?.ToString() ?? "unknown", _ => new FixedWindowRateLimiterOptions { PermitLimit = 120, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+        context.Features.Get<IStatusCodeReExecuteFeature>() is not null
+            ? RateLimitPartition.GetNoLimiter("status-page")
+            : RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions { PermitLimit = 120, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
     options.AddPolicy("authentication", context => RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
         _ => new FixedWindowRateLimiterOptions { PermitLimit = 20, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
 });
@@ -116,6 +120,12 @@ app.UseRequestLocalization(new RequestLocalizationOptions {
     DefaultRequestCulture = new RequestCulture("de"), SupportedCultures = [new CultureInfo("de")], SupportedUICultures = [new CultureInfo("de")]
 });
 app.UseStaticFiles();
+// Full browser pages get a useful error view; fragments and form responses keep their status and body.
+app.UseWhen(context => HttpMethods.IsGet(context.Request.Method)
+    && !context.Request.Headers.ContainsKey("HX-Request")
+    && !context.Request.Path.StartsWithSegments("/health")
+    && context.Request.Headers.Accept.Any(value => value?.Contains("text/html", StringComparison.OrdinalIgnoreCase) == true),
+    branch => branch.UseStatusCodePagesWithReExecute("/Error", "?statusCode={0}"));
 app.UseRouting();
 app.UseRateLimiter();
 app.UseAuthentication(); app.UseAuthorization();

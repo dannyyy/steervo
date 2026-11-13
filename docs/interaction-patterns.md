@@ -1,6 +1,6 @@
 # Gemeinsame Interaktionsmuster
 
-Diese Regeln sind das Ziel der Canvas/Tinte-Migration der vorhandenen Anwendung. Sie ergänzen [DESIGN.md](../DESIGN.md) und sind noch nicht überall implementiert. Die Reihenfolge steht im [Migrationsplan](design-migration.md).
+Diese Regeln gelten für die gesamte bestehende Anwendung. Die Canvas/Tinte-Migration ist abgeschlossen; die Regeln ergänzen [DESIGN.md](../DESIGN.md). Umsetzungsstand und Prüfnachweise stehen im [Migrationsplan](design-migration.md).
 
 ## Navigation und Kontext
 
@@ -23,6 +23,8 @@ Kostenbearbeitung erhält Fahrzeugbezug, Monats-/Jahresansicht und Seite der Zah
 | Neue Evaluation und andere kompakte Anlageaufgaben | Dasselbe gemeinsame Editorverhalten; Größe passend zum Inhalt | Kein eigener Dialogstil pro Objekt |
 | Planungszeitraum, gemeinsame Renditeannahme, Restwert-Stichtag, Kostenanpassung, Szenariokopie | Gezielt geöffneter Inline-Editor mit gemeinsamen Aktionen | Kleine Annahmen bleiben am zugehörigen Ergebnis; keine dauerhaft sichtbare Formularsammlung |
 | Vollständige Offerte, neue Offertversion, Kostenposition oder Rechenszenario | Dedizierte, gegliederte Formularseite | Längere zusammenhängende Aufgaben brauchen Raum und stabile Navigation |
+| Passkey anlegen / umbenennen | Gezielt geöffneter Inline-Editor im Konto | Name, Gerätebestätigung und Fehler bleiben zusammen |
+| Person zur Installation einladen | Gemeinsame seitliche Bearbeitungsfläche | Einladung und Evaluationsfreigabe bleiben getrennte Aufgaben |
 | Dauerhaftes Entfernen, Zurücksetzen mit Datenverlust, Entwurf verwerfen | Kompakter Bestätigungsdialog | Objekt und tatsächliche Folgen müssen bewusst bestätigt werden |
 | Archivieren / Wiederherstellen | Aktion am Objekt mit klarer Rückmeldung | Reversibles Verhalten von dauerhaftem Löschen unterscheiden |
 | Nur lesen, Quellen prüfen, historische Version ansehen | Lesedarstellung beziehungsweise aufklappbare Details | Ein Lesevorgang öffnet kein scheinbar bearbeitbares Formular |
@@ -91,3 +93,13 @@ Nach einem Fragmentaustausch werden nur die notwendigen Interaktionen initialisi
 ## Abnahme eines gemeinsamen Musters
 
 Eine einmalige Komponentendemonstration genügt nicht. Das Muster muss mindestens in Fahrzeugakte und Vergleich beziehungsweise bei zwei unterschiedlichen Anlage-/Bearbeitungsaufgaben funktionieren. Mit Playwright die tatsächliche Anwendung prüfen: Maus, Tastatur, Mobilgerät, leere und lange Inhalte, Abbruch, Speichern, Fehler, Konflikt, Rolle und Rückkehrfokus. Bestehende Berechtigungs- und Fachtests bleiben wirksam.
+
+## Einstieg, Konto und Systemzustände
+
+Anmeldung, Ersteinrichtung und Verifikation verwenden dieselben Felder, Fokusregeln und lokalen Fehlerhinweise. Fehler behalten E-Mail-Adresse, Namen und Code auf der aktuellen Seite. Ein laufender Request erhält eine sichtbare Statusmeldung und verhindert doppeltes Absenden. Native Formularantworten bleiben als Rückfall möglich.
+
+Passkey-Anlage und Umbenennung öffnen einen lokalen Editor. Abbruch durch das Gerät und Netzfehler erhalten den Namen. Während der Gerätebestätigung lässt sich der Editor nicht schliessen. Nach Speichern wird die aktuelle Kontoseite geladen und der betroffene Eintrag fokussiert; nach Entfernen die Passkey-Überschrift. Die Löschbestätigung benennt den Passkey und beginnt auf Abbrechen. Die vorhandene 15-Minuten-Regel bleibt serverseitig; eine erneute Anmeldung führt zurück zum Konto. Rücksprungziele müssen lokal sein.
+
+Einladungen zeigen ausstehend, angenommen und abgelaufen/entzogen ausdrücklich. Sie gewähren Zugang zur Installation; eine Evaluation braucht weiterhin eine eigene Freigabe. Nach Senden oder Entziehen führt der Fokus zur Liste zurück.
+
+Vollständige Fehlerseiten unterscheiden fehlende Berechtigung, nicht verfügbare Seiten, zu viele Anfragen und allgemeine Fehler. HTTP-Statuscodes bleiben erhalten. Schreibantworten und HTMX-Fragmente behalten lokale Fehler; eine Loginseite ersetzt keinen offenen Entwurf. Offline-Hinweise lassen sich schliessen und verschwinden bei wiederhergestellter Verbindung. Datei- und Passkey-Gerätedialoge bleiben native Browser-/Betriebssystemoberflächen.

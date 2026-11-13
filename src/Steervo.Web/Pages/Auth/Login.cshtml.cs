@@ -13,15 +13,28 @@ namespace Steervo.Web.Pages.Auth;
 public sealed class LoginModel(IAccountAccess accounts, SignInManager<AppUser> signIn, IStringLocalizer<Ui> text) : PageModel
 {
     [BindProperty] public string Email { get; set; } = "";
+    [BindProperty(SupportsGet = true)] public string? ReturnUrl { get; set; }
+    private string Destination => Url.IsLocalUrl(ReturnUrl) ? ReturnUrl! : "/";
     public async Task<IActionResult> OnGetAsync()
     {
         if (!await accounts.IsInitializedAsync()) return RedirectToPage("Setup");
-        return User.Identity?.IsAuthenticated == true ? RedirectToPage("/Index") : Page();
+        return User.Identity?.IsAuthenticated == true ? LocalRedirect(Destination) : Page();
     }
     public async Task<IActionResult> OnPostAsync()
     {
-        try { var id = await accounts.RequestCodeAsync(Email); return RedirectToPage("Verify", new { id }); }
-        catch (RuleException error) { ModelState.AddModelError("", text[error.Message]); return Page(); }
+        try
+        {
+            var id = await accounts.RequestCodeAsync(Email);
+            var url = Url.Page("Verify", new { id, returnUrl = Destination })!;
+            if (Request.Headers.ContainsKey("HX-Request")) { Response.Headers["HX-Redirect"] = url; return new EmptyResult(); }
+            return Redirect(url);
+        }
+        catch (RuleException error)
+        {
+            Response.StatusCode = 422;
+            if (Request.Headers.ContainsKey("HX-Request")) return new JsonResult(new { error = text[error.Message].Value });
+            ModelState.AddModelError("", text[error.Message]); return Page();
+        }
     }
     public async Task<IActionResult> OnPostOptionsAsync() => Content(await signIn.MakePasskeyRequestOptionsAsync(null), "application/json");
     public async Task<IActionResult> OnPostPasskeyAsync(string credential)
@@ -30,7 +43,7 @@ public sealed class LoginModel(IAccountAccess accounts, SignInManager<AppUser> s
         try
         {
             var result = await signIn.PasskeySignInAsync(credential);
-            return result.Succeeded ? new JsonResult(new { redirect = "/" }) : new JsonResult(new { error = text["PasskeyFailed"].Value }) { StatusCode = 400 };
+            return result.Succeeded ? new JsonResult(new { redirect = Destination }) : new JsonResult(new { error = text["PasskeyFailed"].Value }) { StatusCode = 400 };
         }
         catch (Exception error) when (error is System.Text.Json.JsonException or FormatException or InvalidOperationException)
         { return new JsonResult(new { error = text["PasskeyFailed"].Value }) { StatusCode = 400 }; }

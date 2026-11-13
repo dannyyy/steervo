@@ -1,6 +1,6 @@
 ---
 name: "Steervo — Canvas / Tinte"
-description: "Bestätigtes visuelles Zielsystem für die Migration der bestehenden Community-Anwendung."
+description: "Verbindliches visuelles System der bestehenden Community-Anwendung."
 colors:
   accent: "#3e5878"
   accent-hover: "#304862"
@@ -208,9 +208,9 @@ Canvas und Tinte bilden das bestätigte Zielsystem von Steervo. Eine ruhige, war
 
 Die Gestaltung ist offen, übersichtlich und zurückhaltend. Horizontale Navigation, klare Schriftgrössen, schmale Trennlinien und weiche Flächenschatten schaffen Hierarchie. Wiederkehrende Aufgaben verwenden dieselben Steuerelemente und Rückmeldungen; Farbe unterstützt die Bedeutung, ersetzt aber weder Statuswörter noch Quellen und Einheiten.
 
-**Status und Autorität.** Dieses Dokument beschreibt das bestätigte **Zielsystem**. Seit dem 13. November 2026 sind der gemeinsame Rahmen, Fahrzeugliste, Fahrzeugakte, Bewertung, Fahrzeugvergleich, Evaluationsübersicht, Kriterien, Gruppen, Freigaben, Einstellungen, Offerten, Dokumente, Kostenplanung und Rechenszenarien umgesetzt; die übrigen Bereiche folgen dem Migrationsplan. Massgeblich sind die [Auswahl](prototypes/design/selection.json), die Canvas-Regeln und gemeinsam genutzten Komponenten in [round-three.css](prototypes/design/round-three.css) sowie deren Verhalten in [design.js](prototypes/design/design.js). Die Produktionsgrundlage liegt in [tokens.css](src/Steervo.Web/wwwroot/css/tokens.css) und [canvas.css](src/Steervo.Web/wwwroot/css/canvas.css). [site.css](src/Steervo.Web/wwwroot/css/site.css) trägt die weiterhin vorhandenen Fachlayouts. Der gemeinsame [Bewertungseditor](src/Steervo.Web/Pages/Shared/_AssessmentEditor.cshtml) und [Editoraktionen](src/Steervo.Web/Pages/Shared/_EditorActions.cshtml) setzen die Regeln in Akte und Vergleich um. Auswahl: `dossier` / `ink`; bestätigt am 12. November 2026.
+**Status und Autorität.** Canvas/Tinte ist seit dem 13. November 2026 in der gesamten bestehenden Community-Anwendung umgesetzt, einschliesslich Einstieg, Konto, Passkeys, Einladungen und Systemzuständen. Dieses Dokument und die [Interaktionsmuster](docs/interaction-patterns.md) bleiben die verbindliche Grundlage für weitere UI-Arbeit. Die [Auswahl](prototypes/design/selection.json), [round-three.css](prototypes/design/round-three.css) und [design.js](prototypes/design/design.js) dokumentieren die visuelle Referenz; sie ersetzen keine Produktionslogik. Die Produktionsgrundlage liegt in [tokens.css](src/Steervo.Web/wwwroot/css/tokens.css) und [canvas.css](src/Steervo.Web/wwwroot/css/canvas.css). [site.css](src/Steervo.Web/wwwroot/css/site.css) trägt gemeinsame Grundregeln und die vorhandenen Fachlayouts. [Bewertungseditor](src/Steervo.Web/Pages/Shared/_AssessmentEditor.cshtml), [Editoraktionen](src/Steervo.Web/Pages/Shared/_EditorActions.cshtml) und [Editorverhalten](src/Steervo.Web/wwwroot/js/editors.js) setzen die gemeinsamen Regeln um. Auswahl: `dossier` / `ink`; bestätigt am 12. November 2026.
 
-[PRODUCT.md](PRODUCT.md) hält die Produktgrenzen fest. [Designmigration](docs/design-migration.md) ordnet die vollständige Übertragung des vorhandenen Produkts, [Interaktionsmuster](docs/interaction-patterns.md) die verbindlichen Abläufe und Zustände. Neue Funktionen folgen nach der Migration der bestehenden Oberflächen, Layouts, Workflows und Dialoge. Die Dokumentation bleibt innerhalb der öffentlichen Community-Ausgabe und ihrer *source-available*-Einordnung.
+[PRODUCT.md](PRODUCT.md) hält die Produktgrenzen fest. [Designmigration](docs/design-migration.md) ordnet die vollständige Übertragung des vorhandenen Produkts, [Interaktionsmuster](docs/interaction-patterns.md) die verbindlichen Abläufe und Zustände. Die Migration der bestehenden Oberflächen, Layouts, Workflows und Dialoge ist abgeschlossen; neue Funktionen werden gesondert priorisiert. Die Dokumentation bleibt innerhalb der öffentlichen Community-Ausgabe und ihrer *source-available*-Einordnung.
 
 **Key Characteristics:**
 
@@ -386,7 +386,7 @@ Die sichtbare Fokusregel gilt für Buttons, Links, Formularelemente und den Verg
 | Offerten, Dokumente, Versionen | `offers()` als unvollständige Layoutreferenz | [Offertdetails](src/Steervo.Web/Pages/Evaluations/Offers/_OfferDetails.cshtml), [Dokumente](src/Steervo.Web/Pages/Evaluations/Offers/_OfferDocuments.cshtml) |
 | Gemeinsame Gestaltung und Verhalten | gemeinsame Regeln in `round-three.css`; Editor- und Fokusverhalten in `design.js` | [Produktions-CSS](src/Steervo.Web/wwwroot/css/site.css), bestehende Razor-Formulare und HTMX-Verhalten; vollständige Zuordnung in der [Designmigration](docs/design-migration.md) |
 
-Diese Tabelle ist eine Einstiegshilfe, keine vollständige Migrationsliste. Die Studie enthält unter anderem Anmeldung, Freigaben, Kosten, Szenarien und Bestätigungsdialoge nicht vollständig. Alle vorhandenen Funktionen werden in denselben visuellen Rahmen übertragen. Die in der Studie enthaltenen Galerie-, Layoutwechsel- und Palettenbedienungen gehören nicht zur Anwendung.
+Diese Tabelle ist eine Einstiegshilfe, keine vollständige Migrationsliste. Die Studie enthält unter anderem Anmeldung, Freigaben, Kosten, Szenarien und Bestätigungsdialoge nicht vollständig. Alle vorhandenen Funktionen verwenden denselben visuellen Rahmen. Die in der Studie enthaltenen Galerie-, Layoutwechsel- und Palettenbedienungen gehören nicht zur Anwendung.
 
 ## Do's and Don'ts
 
