@@ -4,7 +4,7 @@
 
 **Verbindlich gewählt: Canvas mit Tinte.** Die Hauptentwicklung findet auf `main` statt; das Repository hat keinen `master`-Branch. Der Nutzerauftrag ist: zuerst das bestehende Design und Layout umstellen sowie Abläufe und Dialoge vereinheitlichen und optimieren, danach weitere Features entwickeln.
 
-Diese Datei ist der Umsetzungsplan für den vorhandenen Community-Funktionsumfang. Sie beschreibt keine bereits abgeschlossene Migration. Die Auswahl sowie Phase 0 und Phase 1 sind abgeschlossen. Die vollständige Migration bleibt offen; als Nächstes folgt Phase 2.
+Diese Datei ist der Umsetzungsplan für den vorhandenen Community-Funktionsumfang. Sie beschreibt keine bereits abgeschlossene Migration. Die Auswahl sowie Phase 0 bis Phase 2 sind abgeschlossen. Die vollständige Migration bleibt offen; als Nächstes folgt Phase 3.
 
 | Grundlage | Zweck |
 | --- | --- |
@@ -60,11 +60,11 @@ Jedes Paket umfasst Quellcode, notwendige Tests und eine überprüfte echte Ober
 
 ### 2. Evaluationen, Kriterien und gemeinsame Interaktionen
 
-- [ ] Evaluationsübersicht, Anlegen, Umbenennen, Import/Export, Freigaben und Einstellungen konsistent gestalten.
-- [ ] Kriterien und Gruppen anlegen, bearbeiten, verschieben und sortieren; Quellen und Bewertungen erhalten. Tastatur-/Touch-Sortierung, offene Entwürfe und Scrollposition prüfen.
+- [x] Evaluationsübersicht, Anlegen, Umbenennen, Import/Export, Freigaben und Einstellungen konsistent gestalten.
+- [x] Kriterien und Gruppen anlegen, bearbeiten, verschieben und sortieren; Quellen und Bewertungen erhalten. Tastatur-/Touch-Sortierung, offene Entwürfe und Scrollposition prüfen.
 - [x] Fahrzeug anlegen, Stammdaten ändern, kopieren, klassifizieren und entfernen in das festgelegte Editor-/Bestätigungsmuster überführen. Begründung für Zurückstellen und Ausscheiden beibehalten.
-- [ ] Das in Phase 1 eingeführte gemeinsame Dialogverhalten auf Evaluationen, Kriterien, Gruppen, Freigaben und Einstellungen übertragen: Titel, Anfangsfokus, Escape, Rückkehrfokus, ungespeicherte Eingaben, Validierung und Fehlerrückmeldung.
-- [ ] Browser-`confirm()` durch das gemeinsame Bestätigungsmuster ersetzen, wo eine irreversible Aktion bestätigt werden muss. Kein Bestätigungsdialog für normales Speichern.
+- [x] Das in Phase 1 eingeführte gemeinsame Dialogverhalten auf Evaluationen, Kriterien, Gruppen, Freigaben und Einstellungen übertragen: Titel, Anfangsfokus, Escape, Rückkehrfokus, ungespeicherte Eingaben, Validierung und Fehlerrückmeldung.
+- [x] Browser-`confirm()` durch das gemeinsame Bestätigungsmuster ersetzen, wo eine irreversible Aktion bestätigt werden muss. Kein Bestätigungsdialog für normales Speichern.
 
 **Abnahme:** Einmal erlernte Interaktionen verhalten sich überall gleich. Abbruch, Validierungsfehler, veraltete Versionsstände, fehlende Berechtigung und Netzfehler verlieren keine bereits eingegebenen Werte.
 
@@ -122,15 +122,39 @@ Anlage, Kopie, Stammdaten und Einordnung verwenden native seitliche Dialoge. Spe
 - Neue gezielte Regressionen in `tests/browser/canvas.mjs`: Fahrzeugpaar bei Hin-/Rückwechsel, Tastaturfokus, Escape und bewusstes Verwerfen, mobile zweite Spalte, Netzfehler, 422, 409 mit erhaltenem Entwurf, Navigation während der Konfliktprüfung und tatsächlich abgelaufene Anmeldung. Dialoganlage und abgebrochene Löschung werden zusätzlich geprüft.
 - Echte Anwendung mit synthetischen Daten bei 1440 und 390 px visuell geprüft, einschließlich Akte, Vergleich, Inline-Editor und Seitenpanel. Strukturprüfungen bei 320, 768 und 1024 px ergeben keinen seitenweiten horizontalen Überlauf. Artefakte bleiben unter `.artifacts/` und werden nicht eingecheckt.
 
-**Nächste Arbeit:** Phase 2. Evaluationsübersicht, Kriterien/Gruppe, Freigaben und Einstellungen auf die gemeinsamen Komponenten und Interaktionsregeln umstellen. Die dort noch vorhandenen Browserbestätigungen und individuellen Editoren werden dabei ersetzt. Offerten/Dokumente, Kosten/Rechnen sowie Einstieg/Konto folgen in Phase 3–5. Die Gesamtmigration ist ausdrücklich noch nicht abgeschlossen; neue Features bleiben nachgeordnet.
+## Phase 2: Evaluationen und gemeinsame Interaktionen
+
+**Abgeschlossen am 13. November 2026.** Die Evaluationsübersicht zeigt die vorhandenen Entscheidungen auf einer gemeinsamen Fläche. Anlage und JSON-/ZIP-Import verwenden dieselbe seitliche Bearbeitungsfläche wie Fahrzeuge. Importfehler lassen die gewählte Datei im ursprünglichen Formular stehen; auch der Dateientwurf wird vor unbeabsichtigtem Verlassen geschützt. Ein erfolgreicher Import erzeugt weiterhin eine unabhängige private Evaluation mit allen bisherigen Daten und Versionen.
+
+Kriterien und Gruppen liegen auf einer zusammenhängenden Arbeitsfläche. Die dauerhaft sichtbare Erfassungsspalte entfällt. Neue Kriterien werden im Seitenpanel erfasst; vorhandene Kriterien und kurze Gruppennamen bearbeiten Inline-Editoren mit denselben Feldern, Fehlern und Speichern-/Abbrechen-Aktionen. Kriterien-IDs, Gruppenzuordnung, Bewertungen und Quellen bleiben erhalten. Gruppenauflösung ordnet ihre Kriterien weiterhin ohne Gruppe ein. Kriterienlöschung und Evaluationslöschung nennen das konkrete Objekt im gemeinsamen Bestätigungsdialog.
+
+Freigaben und Einstellungen haben eigene Ansichten im Evaluationskontext mit aktivem Navigationseintrag. Die Rolle lässt sich am freigegebenen Konto ändern; Lesen, Inhaltsbearbeitung und Besitzeraktionen bleiben serverseitig getrennt. Einstellungen zeigen Name und Zweck zunächst lesbar, danach den lokalen Editor, Export und die klar getrennte Löschaktion. Alte Verweise mit `#sharing` und `#case-settings` führen weiterhin zum richtigen Bereich.
+
+### Technische Übergabe
+
+- `_EvaluationOverview.cshtml` bündelt die Übersicht mit ihren Anlage-/Importdialogen. Erfolgreiche HTMX-Anlage und -Import navigieren per `HX-Redirect`; native POSTs behalten ihre normale Weiterleitung. Ein Importfehler liefert lokalisierten Text mit HTTP 422 und ersetzt den Dateieingabe-Editor nicht.
+- `_Workspace.cshtml` behält sein bestehendes HTMX-Ziel und die Versions-/Anti-Forgery-Felder. `_Sharing.cshtml` und `_EvaluationSettings.cshtml` tragen die neuen Abschnitte; `section` erhält den aktiven Bereich auch nach Speichern.
+- `_CriterionEditor`, `_CriterionEditorFields`, `_GroupEditor` und `_ShareEditor` verwenden die gemeinsamen Editoraktionen. Serverseitig gerenderte Fehlerantworten enthalten den Entwurf getrennt von den gespeicherten Standardwerten; bewusstes Verwerfen kehrt zu diesen zurück.
+- `editors.js` erhält offene Editoren und deren Eingaben beim Sortieren, auch bei HTTP 409. `sorting.js` bleibt für Reihenfolge, Tastatur, Touch und Scrollposition verantwortlich. Die alten parallelen Wiederhersteller greifen nicht mehr auf die gemeinsam verwalteten Formulare zu.
+- Nach fehlgeschlagenem Zurücksetzen/Entfernen bleibt auch ein Entwurf im benachbarten Hauptformular erhalten. Beim tatsächlichen Entfernen eines Eintrags kehrt der Fokus zur Abschnittsüberschrift zurück. Bei Rechteentzug bleibt der Entwurf sichtbar und weitere Schreibaktionen werden gesperrt.
+- Die ersetzten Karten-, Sidebar-Erfassungs-, Popover- und Dialogregeln wurden aus `site.css` entfernt; ebenso der nicht mehr verwendete alte Dialoghandler aus `site.js`. Noch bestehende Browserbestätigungen in späteren Fachbereichen werden in deren Migrationspaketen ersetzt.
+
+### Verifikation
+
+- Abschlusslauf: `PLAYWRIGHT_EXECUTABLE_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' ./scripts/test.sh --browser` mit 100 erfolgreichen Fach-/Integrationstests und 56 erfolgreichen Browserprüfungen. Build ohne Warnungen und Fehler. Protokoll lokal unter `.artifacts/phase2/verification.log`.
+- Playwright prüft weiterhin den gesamten bestehenden Funktionsumfang. `tests/browser/evaluations.mjs` ergänzt Netzfehler mit Wiederholung, veraltete Sortierung bei offenem Entwurf, Gruppenkonflikte, fehlgeschlagene Gruppenauflösung, Validierung in Einstellungen/Freigaben, Rollenänderung, tatsächlichen Rechteentzug, bestätigte Löschung und Erhalt der Kriterien beim Auflösen einer Gruppe.
+- Die bestehende Sortierprüfung deckt lange Listen, Pfeiltasten, Rückkehrfokus, Drag & Drop zwischen Gruppen, leere Gruppen, Touch, Escape und erhaltene Eingaben ab. Der Import prüft ungültige Dateien, Erhalt der Dateiauswahl und anschliessenden erfolgreichen JSON-/ZIP-Import.
+- Echte Oberfläche bei 1440 und 390 px visuell geprüft; Strukturprüfungen zusätzlich bei 320, 768 und 1024 px. Lange Namen, Leser/Bearbeiter/Besitzer, aktive Navigation und alte Abschnittslinks sind berücksichtigt. Lokale Screenshots liegen unter `.artifacts/browser/phase2/` sowie `.artifacts/browser/phase2-*.png`; Logs und Bilder bleiben ausserhalb der Commits.
+
+**Nächste Arbeit:** Phase 3, Offerten und Dokumente. Danach folgen Kosten/Rechnen und Einstieg/Konto in Phase 4–5. Die Gesamtmigration ist weiterhin offen; neue Features bleiben nachgeordnet.
 
 ## Inventar der vorhandenen Oberflächen
 
 | Bereich | Bestehende Einstiegspunkte / Dateien | Migrationsschwerpunkt |
 | --- | --- | --- |
 | App-Rahmen | `Pages/Shared/_Layout.cshtml`, `wwwroot/css/site.css` | Navigation, Typografie, Tokens, Footer, globale Hinweise |
-| Evaluation / Navigation | `Pages/Index.cshtml`, `Pages/Evaluations/_EvaluationHeader.cshtml` | Kontext, Übersicht, Anlegen, Import, Export, erreichbare Bereiche |
-| Kriterien / Gruppen / Freigaben | `Pages/Evaluations/Details.cshtml`, `_Workspace.cshtml`, `_CriterionFields.cshtml` | Bearbeitung, Reihenfolge, Rollen, Einstellungen |
+| Evaluation / Navigation | `Pages/Index.cshtml`, `Pages/_EvaluationOverview.cshtml`, `Pages/Evaluations/_EvaluationHeader.cshtml` | Kontext, Übersicht, Anlegen, Import, Export, erreichbare Bereiche |
+| Kriterien / Gruppen / Freigaben | `Pages/Evaluations/Details.cshtml`, `_Workspace.cshtml`, `_CriterionFields.cshtml`, `_Sharing.cshtml`, `_EvaluationSettings.cshtml` | Bearbeitung, Reihenfolge, Rollen, Einstellungen |
 | Kandidaten | `Pages/Evaluations/Candidates/Index.cshtml`, `Details.cshtml`, `_CandidateList.cshtml`, `_CandidateDetails.cshtml` | Auswahl, Akte, Anlage, Klassifikation, Kopie |
 | Bewertungen / Vergleich | `Candidates/_AssessmentRow.cshtml`, `Compare.cshtml`, `_Comparison.cshtml` | Gemeinsamer Editor, Spaltenkontext, Unterschiede |
 | Technische Daten | `Candidates/_Specifications.cshtml`, `_SpecificationsFields.cshtml`, `_SpecificationsComparison.cshtml` | Faktengruppen, Einheiten, Kennzeichnung berechneter Angaben |

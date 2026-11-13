@@ -19,6 +19,7 @@
     state.top = workspace.querySelector('.criteria-main').getBoundingClientRect().top;
     state.open = [...workspace.querySelectorAll('details[open][id]')].map(details => details.id);
     state.fields = [...workspace.querySelectorAll('input[id], select[id], textarea[id]')].filter(field => {
+      if (field.closest('form[data-guard-draft]')) return false;
       const original = field instanceof HTMLSelectElement
         ? [...field.options].find(option => option.defaultSelected)?.value ?? field.options[0]?.value
         : field.defaultValue;

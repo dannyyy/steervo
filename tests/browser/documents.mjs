@@ -122,7 +122,7 @@ export async function checkDocuments({ page, reader, readerEmail, origin, output
   assert.match(zip.suggestedFilename(), /\.zip$/);
   const zipPath = join(output, 'document-export.zip'); await zip.saveAs(zipPath);
   await page.goto(origin);
-  await page.locator('details').filter({ has: page.getByText('Evaluation importieren', { exact: true }) }).locator('summary').click();
+  await page.getByRole('button', { name: 'Evaluation importieren', exact: true }).click();
   await page.getByLabel('Exportdatei (JSON oder ZIP)').setInputFiles(zipPath);
   await page.getByRole('button', { name: 'Als neue Evaluation importieren', exact: true }).click();
   await page.waitForURL(/\/evaluations\//);

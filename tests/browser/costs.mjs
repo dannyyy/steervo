@@ -136,7 +136,7 @@ export async function checkCosts({ page, reader, readerEmail, origin, output, po
   const withCopy = await exportCase(); const copyId = withCopy.candidates.find(c => c.model === 'Kostenkopie').id;
   assert.equal(withCopy.costs.filter(c => c.input.candidateId === copyId).length, 6); assert.equal(withCopy.costs.length, 14);
   await page.goto(origin);
-  await page.locator('details').filter({ has: page.getByText('Evaluation importieren', { exact: true }) }).locator('summary').click();
+  await page.getByRole('button', { name: 'Evaluation importieren', exact: true }).click();
   await page.getByLabel('Exportdatei (JSON oder ZIP)').setInputFiles({ name: 'costs.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(withCopy)) });
   await page.getByRole('button', { name: 'Als neue Evaluation importieren', exact: true }).click(); await page.waitForURL(/\/evaluations\//);
   const importedPath = new URL(page.url()).pathname;

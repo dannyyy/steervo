@@ -5,8 +5,8 @@ export async function checkSorting({ page, owner, origin, output, post, mutate, 
   const returnUrl = page.url();
   await page.goto(origin);
   await page.getByRole('button', { name: /Neue Evaluation/ }).click();
-  await page.getByRole('dialog').getByLabel('Name der Evaluation').fill('Anforderungen übersichtlich ordnen');
-  await page.getByRole('dialog').getByRole('button', { name: 'Evaluation anlegen' }).click();
+  await page.getByRole('dialog', { name: 'Neue Evaluation', exact: true }).getByLabel('Name der Evaluation').fill('Anforderungen übersichtlich ordnen');
+  await page.getByRole('dialog', { name: 'Neue Evaluation', exact: true }).getByRole('button', { name: 'Evaluation anlegen' }).click();
   await page.waitForURL(/\/evaluations\//);
   const path = new URL(page.url()).pathname;
   let version = await page.locator('#evaluation-workspace').getAttribute('data-version');
@@ -70,12 +70,13 @@ export async function checkSorting({ page, owner, origin, output, post, mutate, 
   assert.equal((await order(groupIds[0])).at(-1), 'NFC Karte');
   await drag(row('NFC Karte').locator('[data-drag-handle]'), row('Standardschlüssel'));
   assert.equal((await order(groupIds[0]))[0], 'NFC Karte');
-  await row('UWB Smart Key').locator('summary').click();
+  await row('UWB Smart Key').locator('[data-editor-open]').click();
   await row('UWB Smart Key').getByLabel('Bezeichnung').fill('Noch nicht gespeichert');
   await mutate(page, () => page.getByRole('button', { name: 'Kriterium NFC Karte nach unten', exact: true }).click());
-  assert.equal(await row('UWB Smart Key').locator('details').getAttribute('open'), '');
+  assert.equal(await row('UWB Smart Key').locator('[data-editor]').isVisible(), true);
   assert.equal(await row('UWB Smart Key').getByLabel('Bezeichnung').inputValue(), 'Noch nicht gespeichert');
-  await row('UWB Smart Key').locator('summary').click();
+  await row('UWB Smart Key').getByRole('button', { name: 'Abbrechen', exact: true }).click();
+  await page.getByRole('button', { name: 'Änderungen verwerfen', exact: true }).click();
 
   // Escape and dropping outside the list must not send a mutation.
   const oldVersion = await page.locator('#evaluation-workspace').getAttribute('data-version');

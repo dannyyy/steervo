@@ -767,4 +767,15 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="EditorNetworkError" xml:space="preserve"><value>Die Änderung konnte nicht gespeichert werden. Deine Eingaben bleiben erhalten. Bitte versuche es erneut.</value></data>
   <data name="EditorConflict" xml:space="preserve"><value>Der aktuelle Stand wurde geladen. Dein Entwurf ist weiterhin im Editor. Prüfe die Angaben in der Übersicht, bevor du erneut speicherst.</value></data>
   <data name="EditorReviewCurrent" xml:space="preserve"><value>Aktuellen Stand ansehen</value></data>
+<data name="EditGroup" xml:space="preserve"><value>Gruppe bearbeiten</value></data>
+<data name="EditGroupNamed" xml:space="preserve"><value>Gruppe {0} bearbeiten</value></data>
+<data name="EditCriterionNamed" xml:space="preserve"><value>Kriterium {0} bearbeiten</value></data>
+<data name="RemoveCriterionNamed" xml:space="preserve"><value>„{0}“ löschen?</value></data>
+<data name="RemoveGroupNamed" xml:space="preserve"><value>Gruppe „{0}“ auflösen?</value></data>
+<data name="EditShareNamed" xml:space="preserve"><value>Berechtigung für {0} ändern</value></data>
+<data name="EditPermission" xml:space="preserve"><value>Berechtigung ändern</value></data>
+<data name="PermissionHelp" xml:space="preserve"><value>Leser können die Evaluation ansehen und exportieren. Bearbeiter können zusätzlich Inhalte ändern. Freigaben und das Löschen der Evaluation bleiben beim Besitzer.</value></data>
+<data name="EvaluationSettingsHelp" xml:space="preserve"><value>Name und Zweck deiner Entscheidung. Daten und Freigaben bleiben beim Bearbeiten erhalten.</value></data>
+<data name="ExportHelp" xml:space="preserve"><value>Lade die Evaluation mit allen vorhandenen Versionen und Anhängen herunter. Ein Import erstellt daraus eine neue private Evaluation.</value></data>
+<data name="DeleteEvaluationNamed" xml:space="preserve"><value>Evaluation „{0}“ löschen?</value></data>
 </root>

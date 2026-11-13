@@ -1,0 +1,34 @@
+@model Steervo.Web.Pages.IndexModel
+@inject Steervo.Application.Evaluations.ICurrentUser Current
+@using Steervo.Web.Pages.Shared
+<div id="evaluation-overview" hx-target="#evaluation-overview" hx-swap="outerHTML show:none focus-scroll:false" hx-sync="this:drop" hx-disabled-elt="find button[type=submit]">
+    <div class="page-heading overview-heading"><div><p class="eyebrow">@T["PersonalWorkspace"]</p><h1>@T["Evaluations"]</h1><p class="muted">@T["EvaluationsIntro"]</p></div><div class="surface-actions"><button type="button" id="import-evaluation" class="button secondary" data-dialog-open="import-evaluation-editor" aria-haspopup="dialog">@T["ImportEvaluation"]</button>@if (Model.Evaluations.Count > 0) { <button type="button" id="add-evaluation" data-dialog-open="new-evaluation" aria-haspopup="dialog" class="button primary"><partial name="/Pages/Shared/_Icon.cshtml" model='"plus"' />@T["NewEvaluation"]</button> }</div></div>
+    @if (Model.Evaluations.Count == 0)
+    {
+        <section class="workspace-surface overview-empty"><p class="eyebrow">@T["NewBeginning"]</p><h2>@T["EmptyTitle"]</h2><p>@T["EmptyEvaluations"]</p><button type="button" id="add-evaluation" data-dialog-open="new-evaluation" aria-haspopup="dialog" class="button primary">@T["FirstEvaluation"]<partial name="/Pages/Shared/_Icon.cshtml" model='"arrow"' /></button><div class="overview-guide"><h3>@T["StartWithCriteria"]</h3><p>@T["CriteriaGuide"]</p></div></section>
+    }
+    else
+    {
+        <section class="workspace-surface evaluation-collection" aria-label="@T["Evaluations"]">
+        @foreach (var evaluation in Model.Evaluations)
+        {
+            <a class="case-card" asp-page="/Evaluations/Details" asp-route-id="@evaluation.Id"><div class="case-copy"><span class="badge">@T[evaluation.AccessFor(Current.Id).ToString()!]</span><h2>@evaluation.Name</h2>@if (!string.IsNullOrEmpty(evaluation.Purpose)) { <p>@evaluation.Purpose</p> }</div><div class="case-progress"><span>@T["CriterionCount", evaluation.Criteria.Count]</span><span>@T[evaluation.Candidates.Count == 1 ? "CandidateCountSingle" : "CandidateCount", evaluation.Candidates.Count]</span></div><span class="case-open">@T["OpenEvaluation"]<partial name="/Pages/Shared/_Icon.cshtml" model='"arrow"' /></span></a>
+        }
+        </section>
+    }
+    <dialog id="new-evaluation" class="side-sheet" data-editor data-opener="add-evaluation" aria-labelledby="new-evaluation-title" aria-describedby="new-evaluation-help" data-open-on-load="@(Model.CreationFailed ? "true" : "false")">
+        <div class="editor-heading"><div><p class="editor-context">@T["Evaluations"]</p><h2 id="new-evaluation-title">@T["NewEvaluation"]</h2></div><button type="button" class="icon-button" data-editor-close aria-label="@T["Close"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"close"' /></button></div>
+        <p class="muted" id="new-evaluation-help">@T["NewEvaluationHelp"]</p>
+        <div class="editor-error" role="alert" tabindex="-1" hidden="@(!Model.CreationFailed)">@if (Model.CreationFailed) { <div asp-validation-summary="All"></div> }</div>
+        <form method="post" hx-post="/" data-guard-draft data-submitted-values="@(Model.CreationFailed ? System.Text.Json.JsonSerializer.Serialize(new { Name = Model.Name, Purpose = Model.Purpose }) : null)">
+            <label for="Name">@T["EvaluationName"]</label><input id="Name" name="Name" required maxlength="160" />
+            <label for="Purpose">@T["Purpose"] <span class="optional">@T["OptionalField"]</span></label><textarea id="Purpose" name="Purpose" maxlength="2000" rows="3"></textarea>
+            <p class="micro">@T["PrivateByDefault"]</p><partial name="/Pages/Shared/_EditorActions.cshtml" model='new EditorActions("save-new-evaluation", T["CreateEvaluation"].Value)' />
+        </form>
+    </dialog>
+    <dialog id="import-evaluation-editor" class="side-sheet" data-editor data-opener="import-evaluation" aria-labelledby="import-title" data-open-on-load="@(Model.ImportFailed ? "true" : "false")">
+        <div class="editor-heading"><h2 id="import-title">@T["ImportEvaluation"]</h2><button type="button" class="icon-button" data-editor-close aria-label="@T["Close"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"close"' /></button></div><p class="muted">@T["ImportHelp"]</p>
+        <div class="editor-error" role="alert" tabindex="-1" hidden="@(!Model.ImportFailed)">@if (Model.ImportFailed) { <div asp-validation-summary="All"></div> }</div>
+        <form method="post" asp-page-handler="Import" hx-post="/?handler=Import" enctype="multipart/form-data" hx-encoding="multipart/form-data" data-guard-draft data-retain-on-error><label for="upload">@T["ExportFile"]</label><input id="upload" name="upload" type="file" accept="application/json,application/zip,.json,.zip" required /><p class="micro">@T["PrivateByDefault"]</p><partial name="/Pages/Shared/_EditorActions.cshtml" model='new EditorActions("save-import", T["ImportAsNew"].Value)' /></form>
+    </dialog>
+</div>

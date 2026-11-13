@@ -1,0 +1,17 @@
+@model Steervo.Web.Pages.Evaluations.DetailsModel
+@using Steervo.Web.Pages.Shared
+@{ var e = Model.Evaluation; var failed = Model.FailedAction == "rename"; }
+<section id="case-settings" class="workspace-surface" data-evaluation-section="settings" hidden="@(Model.Section != "settings")" aria-labelledby="settings-title">
+    <div class="surface-heading"><div><h2 id="settings-title">@T["CaseSettings"]</h2><p class="muted">@T["EvaluationSettingsHelp"]</p></div><button type="button" id="edit-evaluation" class="button secondary" data-editor-open="evaluation-editor" aria-expanded="false"><partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' />@T["Edit"]</button></div>
+    <dl class="evaluation-facts"><div><dt>@T["EvaluationName"]</dt><dd>@e.Name</dd></div><div><dt>@T["Purpose"]</dt><dd>@(string.IsNullOrEmpty(e.Purpose) ? T["NotSpecified"].Value : e.Purpose)</dd></div></dl>
+    <div id="evaluation-editor" class="inline-editor" data-editor data-opener="edit-evaluation" hidden="@(!failed)" aria-labelledby="evaluation-editor-title">
+        <div class="editor-heading"><h3 id="evaluation-editor-title">@T["CaseSettings"]</h3><button type="button" class="icon-button" data-editor-close aria-label="@T["Close"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"close"' /></button></div>
+        <div class="editor-error" role="alert" tabindex="-1" hidden="@(!failed)">@(failed ? Model.Notice : null)</div>
+        <form method="post" hx-post="/evaluations/@e.Id?section=settings" data-guard-draft data-submitted-values="@Model.DraftFor("rename")"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="rename" /><label for="case-name">@T["EvaluationName"]</label><input id="case-name" name="name" value="@e.Name" required maxlength="160" /><label for="case-purpose">@T["Purpose"] <span class="optional">@T["OptionalField"]</span></label><textarea id="case-purpose" name="purpose" maxlength="2000">@e.Purpose</textarea><partial name="/Pages/Shared/_EditorActions.cshtml" model='new EditorActions("save-evaluation")' /></form>
+    </div>
+    <div class="evaluation-transfer"><div><h3>@T["ExportEvaluation"]</h3><p>@T["ExportHelp"]</p></div><a class="button secondary" asp-page="/Evaluations/Details" asp-page-handler="Export" asp-route-id="@e.Id" download>@T["ExportEvaluation"]</a></div>
+    @if (Model.Access == AccessLevel.Owner)
+    {
+        <div class="evaluation-danger"><div><h3>@T["DeleteEvaluation"]</h3><p>@T["DeleteEvaluationConfirm"]</p></div><form method="post" hx-post="/evaluations/@e.Id?section=settings" data-confirm-action="@T["DeleteEvaluationNamed", e.Name]" data-confirm-description="@T["DeleteEvaluationConfirm"]"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="delete" /><button type="submit" class="button secondary danger">@T["DeleteEvaluation"]</button></form></div>
+    }
+</section>

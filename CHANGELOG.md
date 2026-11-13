@@ -2,6 +2,9 @@
 
 ## Unveröffentlicht
 
+- Zweiter Teil der Canvas/Tinte-Migration: gemeinsame Evaluationsübersicht, Kriterien und Gruppen auf einer Arbeitsfläche sowie eigene Ansichten für Freigaben und Einstellungen. Einheitliche Anlage-, Bearbeitungs- und Bestätigungsdialoge einschliesslich Import und Löschen.
+- Sortieren erhält offene Kriterienentwürfe auch bei Konflikten. Fehlgeschlagene Importe behalten die gewählte Datei; Rechteentzug verhindert weitere Speicherung, ohne den Entwurf zu verlieren.
+
 - Erster Teil der Canvas/Tinte-Migration: horizontaler Seitenrahmen, Fahrzeugliste, zusammenhängende Fahrzeugakte und Fahrzeugvergleich mit lokal ausgelieferter Geist-Schrift.
 - Gemeinsame Bewertung im Kontext, seitliche Formulare für Anlage, Kopie, Stammdaten und Einordnung sowie einheitliche Bestätigungen für Zurücksetzen und Entfernen.
 - Erhaltene Fahrzeugauswahl, mobile Vergleichsspalten und Tastaturfokus; geschützte Entwürfe bei Abbruch, Validierungs- und Verbindungsfehlern, gleichzeitigen Änderungen und abgelaufener Anmeldung. Die übrigen Bereiche folgen dem Migrationsplan.

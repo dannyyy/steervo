@@ -1,0 +1,19 @@
+@model Steervo.Web.Pages.Evaluations.DetailsModel
+@{ var e = Model.Evaluation; var owner = Model.Access == AccessLevel.Owner; }
+<section id="sharing" class="workspace-surface" data-evaluation-section="sharing" hidden="@(Model.Section != "sharing")" aria-labelledby="sharing-title">
+    <div class="surface-heading"><div><h2 id="sharing-title" tabindex="-1">@T["Access"]</h2><p class="muted">@T[owner ? "SharingHelp" : "OwnerManagesAccess"]</p></div>
+    @if (owner) { <button type="button" id="add-share" class="button primary" data-editor-open="share-editor-new" aria-expanded="false"><partial name="/Pages/Shared/_Icon.cshtml" model='"plus"' />@T["GrantAccess"]</button> }
+    </div>
+    @if (owner)
+    {
+        <partial name="_ShareEditor" model='new Steervo.Web.Pages.Evaluations.ShareEditor(Model, "new", "", AccessLevel.Reader)' />
+        @if (e.Shares.Count == 0) { <div class="canvas-empty"><partial name="/Pages/Shared/_Icon.cshtml" model='"people"' /><h3>@T["NoShares"]</h3><p>@T["PrivateByDefault"]</p></div> }
+        @foreach (var share in e.Shares)
+        {
+            var email = Model.ShareNames.GetValueOrDefault(share.UserId, "—");
+            <article class="share-entry" id="share-@share.UserId"><div class="share-row"><span>@email</span><span class="badge">@T[share.Access.ToString()]</span><div class="row-actions"><button type="button" class="icon-button" id="edit-share-@share.UserId" data-editor-open="share-editor-@share.UserId" aria-expanded="false" aria-label="@T["EditShareNamed", email]"><partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' /></button><form method="post" hx-post="/evaluations/@e.Id?section=sharing" data-focus-fallback="sharing-title"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="revoke" /><input type="hidden" name="userId" value="@share.UserId" /><button type="submit" class="text-button">@T["Revoke"]</button></form></div></div>
+                <partial name="_ShareEditor" model="new Steervo.Web.Pages.Evaluations.ShareEditor(Model, share.UserId, email, share.Access)" />
+            </article>
+        }
+    }
+</section>

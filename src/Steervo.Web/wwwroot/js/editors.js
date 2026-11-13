@@ -11,12 +11,14 @@
   const fields = form => [...new FormData(form)].filter(([key]) => !['__RequestVerificationToken', 'version'].includes(key));
   function restoreField(field, value) {
     if (!field || !('value' in field)) return;
+    if (field.type === 'file') return;
     value = value ?? '';
     if (field instanceof HTMLSelectElement && value !== '' && ![...field.options].some(option => option.value === value))
       field.add(new Option(value, value));
     field.value = value;
   }
-  const signature = form => JSON.stringify(fields(form));
+  const signature = form => JSON.stringify(fields(form).map(([name, value]) =>
+    [name, value instanceof File ? (value.name ? [value.name, value.size, value.lastModified] : null) : value]));
   const guardedForms = root => [...root.querySelectorAll('form[data-guard-draft]')];
   const dirty = root => guardedForms(root).some(form => forcedDirty.has(form) || (initial.has(form) && initial.get(form) !== signature(form)));
   const activeEditors = () => [...document.querySelectorAll('[data-editor]')].filter(editor => editor instanceof HTMLDialogElement ? editor.open : !editor.hidden);
@@ -62,6 +64,7 @@
         }
       }
       forcedDirty.delete(form);
+      form.querySelectorAll('[data-criterion-type]').forEach(field => field.dispatchEvent(new Event('change')));
       initial.set(form, signature(form));
     });
     const error = editor.querySelector('.editor-error');
@@ -87,7 +90,7 @@
     else editor.hidden = false;
     currentOpener(editor)?.setAttribute('aria-expanded', 'true');
     if (!focus) return;
-    const field = (focusId && document.getElementById(focusId)) || editor.querySelector('[data-editor-focus], input:not([type=hidden]), select, textarea');
+    const field = (focusId && document.getElementById(focusId)) || editor.querySelector('[data-editor-focus]') || editor.querySelector('input:not([type=hidden]):not([readonly]), select, textarea');
     for (let parent = field?.parentElement; parent && parent !== editor; parent = parent.parentElement)
       if (parent instanceof HTMLDetailsElement) parent.open = true;
     field?.focus({ preventScroll: true });
@@ -122,6 +125,7 @@
           restoreField(field, value);
         }
         forcedDirty.add(form);
+        form.querySelectorAll('[data-criterion-type]').forEach(field => field.dispatchEvent(new Event('change')));
       }
     });
     document.querySelectorAll('[data-editor]').forEach(editor => {
@@ -180,6 +184,8 @@
   });
   document.addEventListener('submit', async event => {
     const form = event.target;
+    // Sorting preserves open drafts through the fragment exchange.
+    if (form.hasAttribute('data-sort')) return;
     if (form.dataset.confirmed === 'true') { delete form.dataset.confirmed; return; }
     if (form.dataset.confirmAction) {
       event.preventDefault(); event.stopImmediatePropagation();
@@ -219,16 +225,32 @@
   document.addEventListener('htmx:beforeRequest', event => {
     const form = event.detail.elt.closest('form');
     const editor = form?.closest('[data-editor]');
-    if (!editor) return;
+    if (form?.hasAttribute('data-sort')) {
+      requests.set(event.detail.xhr, { sorting: pendingEditors().map(item => ({
+        id: item.id, opener: item.dataset.opener, open: activeEditors().includes(item),
+        forms: guardedForms(item).map(saved => ({ values: fields(saved), dirty: forcedDirty.has(saved) || initial.get(saved) !== signature(saved) }))
+      })) });
+      return;
+    }
+    if (!editor) {
+      if (form?.dataset.focusFallback) requests.set(event.detail.xhr, { fallbackId: form.dataset.focusFallback });
+      return;
+    }
     busy.add(editor); editor.setAttribute('aria-busy', 'true');
     requests.set(event.detail.xhr, {
       editorId: editor.id, openerId: editor.dataset.opener,
+      fallbackId: editor.dataset.focusFallback, retain: form.hasAttribute('data-retain-on-error'),
       tab: document.querySelector('[data-record-tab][aria-selected=true]')?.dataset.recordTab,
-      draft: fields(form), oldEditor: editor
+      draft: fields(form), oldEditor: editor,
+      relatedDrafts: guardedForms(editor).filter(other => other !== form).map(other => fields(other))
     });
   });
   document.addEventListener('htmx:beforeSwap', event => {
     const state = requests.get(event.detail.xhr);
+    if (state?.retain && event.detail.xhr.status === 422) {
+      event.detail.shouldSwap = false; event.detail.isError = false;
+      editorError(state.oldEditor, event.detail.xhr.responseText);
+    }
     const responseUrl = event.detail.xhr.responseURL;
     if (state && responseUrl && new URL(responseUrl).pathname.startsWith('/Auth/')) {
       state.denied = true;
@@ -240,11 +262,36 @@
     const state = requests.get(event.detail.xhr);
     initialize();
     if (!state) return;
+    if (state.sorting) {
+      for (const saved of state.sorting) {
+        const editor = document.getElementById(saved.id);
+        if (!editor) continue;
+        editor.dataset.opener = saved.opener;
+        guardedForms(editor).forEach((form, index) => {
+          const draft = saved.forms[index];
+          if (!draft) return;
+          for (const [name, value] of draft.values) restoreField(form.elements.namedItem(name), value);
+          if (draft.dirty) forcedDirty.add(form);
+          form.querySelectorAll('[data-criterion-type]').forEach(field => field.dispatchEvent(new Event('change')));
+        });
+        if (saved.open) showEditor(editor, currentOpener(editor), null, false);
+      }
+      return;
+    }
     if (state.tab) selectTab(state.tab);
     const editor = document.getElementById(state.editorId);
     if (!editor) return;
     editor.dataset.opener = state.openerId;
     if ([409, 422].includes(event.detail.xhr.status)) {
+      // A failed reset/removal must also retain edits in the adjacent main form.
+      for (const values of state.relatedDrafts || []) {
+        const action = new Map(values).get('action');
+        const related = guardedForms(editor).find(item => item.elements.namedItem('action')?.value === action);
+        if (!related) continue;
+        for (const [name, value] of values) restoreField(related.elements.namedItem(name), value);
+        forcedDirty.add(related);
+        related.querySelectorAll('[data-criterion-type]').forEach(field => field.dispatchEvent(new Event('change')));
+      }
       const action = new Map(state.draft).get('action');
       const form = [...editor.querySelectorAll('form')].find(item => item.elements.namedItem('action')?.value === action);
       if (form) {
@@ -253,6 +300,7 @@
           restoreField(field, value);
         }
         forcedDirty.add(form);
+        form.querySelectorAll('[data-criterion-type]').forEach(field => field.dispatchEvent(new Event('change')));
       }
       showEditor(editor, currentOpener(editor), null, false);
       if (event.detail.xhr.status === 409) {
@@ -275,7 +323,7 @@
     const state = requests.get(event.detail.xhr);
     if (!state) return;
     if (event.detail.xhr.status < 400 && !state.denied) {
-      requestAnimationFrame(() => restoreFocus(document.getElementById(state.openerId), true));
+      if (!state.sorting) requestAnimationFrame(() => restoreFocus(document.getElementById(state.openerId) || document.getElementById(state.fallbackId), true));
     }
     requests.delete(event.detail.xhr);
   });
@@ -292,4 +340,9 @@
   });
   initialize();
   if (location.hash === '#specifications') selectTab('record-specifications');
+  if (document.getElementById('evaluation-workspace') && ['#sharing', '#case-settings'].includes(location.hash)) {
+    const url = new URL(location.href);
+    url.searchParams.set('section', location.hash === '#sharing' ? 'sharing' : 'settings');
+    url.hash = ''; location.replace(url);
+  }
 })();

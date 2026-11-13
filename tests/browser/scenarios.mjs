@@ -97,7 +97,7 @@ export async function checkScenarios({ page, reader, readerEmail, origin, output
   await page.goto(`${origin}${path}/${copiedScenario}?costId=${cost}`); await page.getByLabel('Abweichender Betrag je Zahlung (EUR)').fill('5'); await page.getByRole('button', { name: 'Kostenanpassung speichern' }).click(); await page.locator('#scenario-detail').waitFor(); assert.equal(Number(await amount()), 850);
   await page.goto(`${origin}${path}/${lease}`); assert.equal(Number(await amount()), 820);
   const json = await exportCase(); assert.equal(json.version, 6); assert.equal(json.scenarios.length, 5);
-  await page.goto(origin); await page.locator('details').filter({ has: page.getByText('Evaluation importieren', { exact: true }) }).locator('summary').click();
+  await page.goto(origin); await page.getByRole('button', { name: 'Evaluation importieren', exact: true }).click();
   await page.getByLabel('Exportdatei (JSON oder ZIP)').setInputFiles({ name: 'scenarios.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(json)) }); await page.getByRole('button', { name: 'Als neue Evaluation importieren', exact: true }).click(); await page.waitForURL(/\/evaluations\//);
   const importedPath = new URL(page.url()).pathname; const imported = JSON.parse(await (await browserRequest(page, `${importedPath}?handler=Export`)).text()); assert.equal(imported.scenarios.length, 5);
   assert.ok(imported.scenarios.every(s => !json.scenarios.some(original => original.id === s.id)));
@@ -110,7 +110,7 @@ export async function checkScenarios({ page, reader, readerEmail, origin, output
   await page.getByLabel('Datei', { exact: true }).setInputFiles({ name: 'basis.txt', mimeType: 'text/plain', buffer: Buffer.from('Independent calculation attachment') }); await page.getByRole('button', { name: 'Datei hochladen' }).click(); await page.locator('[data-document-id]').waitFor();
   const downloadEvent = page.waitForEvent('download'); await page.getByRole('link', { name: 'Exportieren', exact: true }).click(); const downloaded = await downloadEvent;
   const zip = await readFile(await downloaded.path()); assert.equal(zip.subarray(0, 2).toString(), 'PK');
-  await page.goto(origin); await page.locator('details').filter({ has: page.getByText('Evaluation importieren', { exact: true }) }).locator('summary').click();
+  await page.goto(origin); await page.getByRole('button', { name: 'Evaluation importieren', exact: true }).click();
   await page.getByLabel('Exportdatei (JSON oder ZIP)').setInputFiles({ name: 'scenarios.zip', mimeType: 'application/zip', buffer: zip }); await page.getByRole('button', { name: 'Als neue Evaluation importieren', exact: true }).click(); await page.waitForURL(/\/evaluations\//);
   const zippedCase = new URL(page.url()).pathname; await page.goto(`${origin}${zippedCase}/scenarios`); assert.equal(await page.locator('[data-scenario-id]').count(), 4);
   await page.getByRole('link', { name: 'Barkauf', exact: true }).click(); assert.equal(Number(await amount()), 920);

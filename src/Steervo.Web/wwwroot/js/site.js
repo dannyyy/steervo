@@ -1,5 +1,7 @@
 function initializeFields(root = document) {
   root.querySelectorAll('[data-criterion-type]').forEach(select => {
+    if (select.dataset.initialized) return;
+    select.dataset.initialized = 'true';
     const fields = select.closest('form').querySelector('[data-measurement-fields]');
     const update = () => {
       const measurement = select.value === 'Measurement';
@@ -11,17 +13,6 @@ function initializeFields(root = document) {
   });
 }
 initializeFields();
-document.addEventListener('click', event => {
-  const opener = event.target.closest('[data-dialog-open]');
-  if (opener) {
-    const dialog = document.getElementById(opener.dataset.dialogOpen);
-    if (dialog instanceof HTMLDialogElement && !dialog.hasAttribute("data-editor") && !dialog.open) dialog.showModal();
-  }
-  const closer = event.target.closest('[data-dialog-close]');
-  if (closer && !closer.closest('[data-editor]')) closer.closest('dialog')?.close();
-});
-document.querySelectorAll('dialog[data-open-on-load="true"]:not([data-editor])').forEach(dialog => dialog.showModal());
-
 const drafts = new WeakMap();
 document.addEventListener('htmx:beforeRequest', event => {
   const form = event.detail.elt.closest('form');
@@ -31,7 +22,7 @@ document.addEventListener('htmx:afterSwap', event => {
   const submittedDraft = drafts.get(event.detail.xhr);
   if ([409, 422].includes(event.detail.xhr?.status) && submittedDraft) {
     const draft = new Map(submittedDraft);
-    const form = [...document.querySelectorAll('#evaluation-workspace form, #candidate-workspace form, #offer-workspace form')].find(candidate =>
+    const form = [...document.querySelectorAll('#evaluation-workspace form:not([data-guard-draft]), #candidate-workspace form:not([data-guard-draft]), #offer-workspace form')].find(candidate =>
       ['action', 'itemId', 'candidateId', 'offerId', 'criterionId'].every(name => (candidate.elements.namedItem(name)?.value || '') === (draft.get(name) || '')));
     if (form) {
       for (const [name, value] of submittedDraft) {

@@ -1,0 +1,14 @@
+@model Steervo.Web.Pages.Evaluations.CriterionEditor
+@using Steervo.Web.Pages.Shared
+@{
+    var c = Model.Criterion; var workspace = Model.Workspace; var e = workspace.Evaluation;
+    var prefix = c?.Id.ToString() ?? "new"; var action = c is null ? "add-criterion" : "edit-criterion";
+    var failed = workspace.DraftFor(action, c?.Id ?? default) is not null || (c is not null && workspace.FailedAction == "remove-criterion" && workspace.FailedItemId == c.Id);
+}
+    <div class="editor-heading"><div><p class="editor-context">@(c?.Name ?? e.Name)</p><h3 id="@(c is null ? "new-criterion-title" : "criterion-title-" + prefix)">@T[c is null ? "AddCriterion" : "EditCriterion"]</h3></div><button type="button" class="icon-button" data-editor-close aria-label="@T["Close"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"close"' /></button></div>
+    <div class="editor-error" role="alert" tabindex="-1" hidden="@(!failed)">@(failed ? workspace.Notice : null)</div>
+    <form method="post" hx-post="/evaluations/@e.Id" data-guard-draft data-submitted-values="@workspace.DraftFor(action, c?.Id ?? default)" class="edit-fields"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="@action" />@if (c is not null) { <input type="hidden" name="itemId" value="@c.Id" /> }
+        <partial name="_CriterionFields" model="new Steervo.Web.Pages.Evaluations.CriterionFields(e.Groups, c, prefix)" />
+        <partial name="/Pages/Shared/_EditorActions.cshtml" model='new EditorActions("save-criterion-" + prefix, c is null ? T["AddCriterion"].Value : null)' />
+    </form>
+    @if (c is not null) { <form method="post" hx-post="/evaluations/@e.Id" class="editor-reset" data-confirm-action="@T["RemoveCriterionNamed", c.Name]" data-confirm-description="@T["RemoveCriterionConfirm"]"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="remove-criterion" /><input type="hidden" name="itemId" value="@c.Id" /><button type="submit" class="text-button danger">@T["RemoveCriterion"]</button></form> }

@@ -14,6 +14,11 @@ public sealed class DetailsModel(EvaluationWorkspace workspace, EvaluationArchiv
     public IReadOnlyDictionary<string, string> ShareNames { get; private set; } = new Dictionary<string, string>();
     public string? Notice { get; private set; }
     public bool Failed { get; private set; }
+    [BindProperty(SupportsGet = true)] public string Section { get; set; } = "criteria";
+    public string? FailedAction { get; private set; }
+    public Guid FailedItemId { get; private set; }
+    public string? SubmittedValues { get; private set; }
+    public string? DraftFor(string action, Guid itemId = default) => FailedAction == action && FailedItemId == itemId ? SubmittedValues : null;
     public async Task<IActionResult> OnGetAsync(Guid id)
     {
         try { await LoadAsync(id); return Page(); }
@@ -66,7 +71,11 @@ public sealed class DetailsModel(EvaluationWorkspace workspace, EvaluationArchiv
         catch (RuleException error)
         {
             if (error.Message is "Forbidden" or "NotFound") return StatusCode(error.Message == "Forbidden" ? 403 : 404);
-            Failed = true; Notice = text[error.Message]; Response.StatusCode = error.Message == "Conflict" ? 409 : 422;
+            Failed = true; Notice = text[error.Message]; FailedAction = action; FailedItemId = itemId;
+            SubmittedValues = System.Text.Json.JsonSerializer.Serialize(Request.Form
+                .Where(field => field.Key != "__RequestVerificationToken" && field.Key != "version")
+                .ToDictionary(field => field.Key, field => field.Value.ToString()));
+            Response.StatusCode = error.Message == "Conflict" ? 409 : 422;
         }
         await LoadAsync(id);
         return Request.Headers.ContainsKey("HX-Request") ? Partial("_Workspace", this) : Page();
@@ -74,6 +83,7 @@ public sealed class DetailsModel(EvaluationWorkspace workspace, EvaluationArchiv
     private async Task LoadAsync(Guid id)
     {
         Evaluation = await workspace.ReadAsync(id);
+        if (Section is not ("sharing" or "settings") || (Section == "settings" && Access < AccessLevel.Editor)) Section = "criteria";
         ShareNames = Access == AccessLevel.Owner ? await accounts.NamesAsync(Evaluation.Shares.Select(x => x.UserId)) : new Dictionary<string, string>();
     }
 }

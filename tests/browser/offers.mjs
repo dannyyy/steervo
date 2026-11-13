@@ -204,7 +204,7 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   record('Offer access checks cover history and direct writes; concurrency preserves drafts and revocation is immediate');
 
   await page.goto(origin);
-  await page.locator('details').filter({ has: page.getByText('Evaluation importieren', { exact: true }) }).locator('summary').click();
+  await page.getByRole('button', { name: 'Evaluation importieren', exact: true }).click();
   await page.getByLabel('Exportdatei (JSON oder ZIP)').setInputFiles({ name: 'offers.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(exported)) });
   await page.getByRole('button', { name: 'Als neue Evaluation importieren', exact: true }).click();
   await page.waitForURL(/\/evaluations\//);

@@ -2,6 +2,7 @@
   const requests = new WeakMap();
   document.addEventListener('htmx:beforeRequest', event => {
     const form = event.detail.elt.closest('form');
+    if (form?.hasAttribute('data-sort')) return;
     const workspace = form?.closest('[data-preserve-viewport]');
     if (workspace) requests.set(event.detail.xhr, { form, workspace });
   });
@@ -18,6 +19,7 @@
     state.scrollRegions = [...workspace.querySelectorAll('[data-preserve-scroll][id]')].map(element => [element.id, element.scrollLeft, element.scrollTop]);
     state.open = [...workspace.querySelectorAll('details[open][id]')].map(element => element.id);
     state.fields = [...workspace.querySelectorAll('input[id], select[id], textarea[id]')].filter(field => {
+      if (field.closest('form[data-guard-draft]')) return false;
       if (event.detail.xhr.status < 400 && submitted?.contains(field)) return false;
       const original = field instanceof HTMLSelectElement
         ? [...field.options].find(option => option.defaultSelected)?.value ?? field.options[0]?.value

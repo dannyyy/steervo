@@ -4,9 +4,9 @@ Steervo schafft einen eigenen Arbeitsbereich für deine Fahrzeugentscheidungen. 
 
 ## Aktueller Entwicklungsschwerpunkt
 
-Die gewählte Designrichtung ist **Canvas mit Tinte**. Auf dem Hauptbranch `main` wird zuerst die bestehende Anwendung auf dieses Layout umgestellt; Abläufe, Formulare und Dialoge werden dabei vereinheitlicht und optimiert. Neue Features folgen nach Abschluss dieser Migration. Der gemeinsame Seitenrahmen sowie Fahrzeugakte, Bewertungen und Fahrzeugvergleich sind bereits umgestellt. Die übrigen Bereiche folgen schrittweise.
+Die gewählte Designrichtung ist **Canvas mit Tinte**. Auf dem Hauptbranch `main` wird zuerst die bestehende Anwendung auf dieses Layout umgestellt; Abläufe, Formulare und Dialoge werden dabei vereinheitlicht und optimiert. Neue Features folgen nach Abschluss dieser Migration. Der gemeinsame Seitenrahmen, Fahrzeugakte, Bewertungen und Fahrzeugvergleich sowie Evaluationsübersicht, Kriterien, Gruppen, Freigaben und Einstellungen sind bereits umgestellt. Die übrigen Bereiche folgen schrittweise.
 
-Verbindliche Grundlagen: [Designsystem](DESIGN.md), [Interaktionsmuster](docs/interaction-patterns.md), [Migrationsplan mit Abnahmekriterien](docs/design-migration.md) und [Produktregeln](PRODUCT.md). Der [interaktive Prototyp](prototypes/design/README.md) dient als Referenz. Als Nächstes folgt Phase 2 des Migrationsplans: Evaluationen, Kriterien, Freigaben und Einstellungen.
+Verbindliche Grundlagen: [Designsystem](DESIGN.md), [Interaktionsmuster](docs/interaction-patterns.md), [Migrationsplan mit Abnahmekriterien](docs/design-migration.md) und [Produktregeln](PRODUCT.md). Der [interaktive Prototyp](prototypes/design/README.md) dient als Referenz. Als Nächstes folgt Phase 3 des Migrationsplans: Offerten und Dokumente.
 
 ## Was bereits funktioniert
 
@@ -44,7 +44,7 @@ dotnet restore Steervo.sln
 
 Danach über **Erste Evaluation anlegen** beziehungsweise **Neue Evaluation** den Dialog öffnen und Name sowie optional einen Zweck erfassen. In der Evaluation Kriterien und bei Bedarf Gruppen hinzufügen. Änderungen werden nach erfolgreichem Speichern auf dem Server bestätigt.
 
-Zum Sortieren den Punktgriff ziehen oder die Pfeile neben einem Eintrag verwenden. Ein fokussierter Griff unterstützt auch die Pfeiltasten ↑ und ↓; Escape bricht das Ziehen ab. Die Einfügemarkierung zeigt das Ziel, und am Bildschirmrand scrollt die Liste während des Ziehens weiter. Über **Bearbeiten** lassen sich Bezeichnung, Priorität, Typ und Gruppenzuordnung ändern.
+Zum Sortieren den Punktgriff ziehen oder die Pfeile neben einem Eintrag verwenden. Ein fokussierter Griff unterstützt auch die Pfeiltasten ↑ und ↓; Escape bricht das Ziehen ab. Die Einfügemarkierung zeigt das Ziel, und am Bildschirmrand scrollt die Liste während des Ziehens weiter. Die Bearbeitungsaktion am jeweiligen Eintrag öffnet Bezeichnung, Priorität, Typ und Gruppenzuordnung. Offene Eingaben bleiben auch beim Sortieren erhalten. **Freigaben** und **Evaluation bearbeiten** öffnen eigene Ansichten im selben Evaluationskontext.
 
 Unter **Autos** Kandidaten erfassen und über **Ausstattung prüfen** Werte, Quellen und Notizen hinterlegen. Die optionalen **Technischen Daten** erfassen Abmessungen, Sitzplätze, Stauraum, Gewichte, Leistung, Verbrauch und Lade- bzw. Tankangaben. Fehlende Gewichts- und Leistungswerte werden aus den vorhandenen Angaben berechnet und gekennzeichnet. **Vergleichen** stellt zwei wählbare Autos gegenüber und trennt technische Daten von Kriterienbewertungen. Weitere Kandidaten bleiben über die Auswahlfelder erreichbar. Kriterien mit dem Bezug Offerte werden beim jeweiligen Angebot geprüft.
 

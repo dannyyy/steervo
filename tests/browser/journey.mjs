@@ -1,4 +1,5 @@
 import { chromium } from 'playwright';
+import { checkEvaluations } from './evaluations.mjs';
 import { checkSorting } from './sorting.mjs';
 import { checkCandidates } from './candidates.mjs';
 import { checkOffers } from './offers.mjs';
@@ -186,7 +187,7 @@ try {
   }
   await page.screenshot({ path: join(output, '06-create-mobile.png'), fullPage: true });
   await creation.getByRole('button', { name: 'Abbrechen', exact: true }).click();
-  await firstEvaluation.click();
+  await page.getByRole('button', { name: 'Weiterbearbeiten', exact: true }).click();
   assert.equal(await creation.getByLabel('Worum geht es?').inputValue(), 'Ein unabhängiger Browser-Test.');
   await page.setViewportSize({ width: 1440, height: 1050 });
   await page.getByLabel('Name der Evaluation').fill('Meine Testentscheidung');
@@ -201,13 +202,13 @@ try {
   assert.equal(await page.locator('.case-card').count(), 1);
   await page.goto(`${origin}${casePath}`);
   record('Evaluation creation opens a focused modal, preserves invalid drafts and works on desktop/mobile');
-  const groupDetails = page.locator('details.panel').filter({ has: page.locator('input[name="action"][value="add-group"]') });
-  await groupDetails.locator('summary').click();
-  await groupDetails.getByLabel('Gruppenname').fill('Alltag');
-  await mutate(page, () => groupDetails.getByRole('button', { name: 'Gruppe hinzufügen' }).click());
-  await groupDetails.locator('summary').click();
-  await groupDetails.getByLabel('Gruppenname').fill('Komfort');
-  await mutate(page, () => groupDetails.getByRole('button', { name: 'Gruppe hinzufügen' }).click());
+  const groupEditor = page.locator('#new-group-editor');
+  for (const name of ['Alltag', 'Komfort']) {
+    await page.locator('#add-group').click();
+    await groupEditor.getByLabel('Gruppenname').fill(name);
+    await mutate(page, () => groupEditor.getByRole('button', { name: 'Gruppe hinzufügen' }).click());
+  }
+  await page.locator('#add-criterion').click();
   const add = page.locator('form').filter({ has: page.locator('input[name="action"][value="add-criterion"]') });
   await add.getByLabel('Bezeichnung').fill('   ');
   const invalidSubmission = page.waitForResponse(response => new URL(response.url()).pathname === casePath && response.request().method() === 'POST');
@@ -215,16 +216,18 @@ try {
   const invalidResponse = await invalidSubmission;
   assert.equal(invalidResponse.status(), 422);
   assert.equal(invalidResponse.request().headers()['hx-request'], 'true');
-  await page.locator('.notice.failure').waitFor();
+  await page.locator('#new-criterion-editor .editor-error').waitFor();
   await page.waitForFunction(() => document.querySelector('#name-new')?.value === '   ');
   await add.getByLabel('Bezeichnung').fill('Gute Sicht');
   await add.getByLabel('Gruppe', { exact: true }).selectOption({ label: 'Alltag' });
   await mutate(page, () => add.getByRole('button', { name: 'Kriterium hinzufügen' }).click());
+  await page.locator('#add-criterion').click();
   await add.getByLabel('Bezeichnung').fill('Kapazität');
   await add.getByLabel('Art des Kriteriums').selectOption('Measurement');
   await add.getByLabel('Schwellenwert').fill('12.5'); await add.getByLabel('Einheit', { exact: true }).fill('units');
   await add.getByLabel('Gruppe', { exact: true }).selectOption({ label: 'Alltag' });
   await mutate(page, () => add.getByRole('button', { name: 'Kriterium hinzufügen' }).click());
+  await page.locator('#add-criterion').click();
   await add.getByLabel('Bezeichnung').fill('Sitzgefühl');
   await add.getByLabel('Art des Kriteriums').selectOption('Rating');
   await add.getByLabel('Priorität').selectOption('Preferred');
@@ -235,15 +238,15 @@ try {
   const criterionId = await original.getAttribute('data-criterion-id');
   await mutate(page, () => page.getByRole('button', { name: 'Kriterium Kapazität nach oben', exact: true }).click());
   await mutate(page, () => page.getByRole('button', { name: 'Gruppe Komfort nach oben', exact: true }).click());
-  await original.locator('summary').click();
+  await original.locator('[data-editor-open]').click();
   const edit = original.locator('form.edit-fields');
   await edit.getByLabel('Gruppe', { exact: true }).selectOption({ label: 'Komfort' });
   await mutate(page, () => edit.getByRole('button', { name: 'Speichern', exact: true }).click());
   assert.equal(await original.getAttribute('data-criterion-id'), criterionId);
   const group = page.locator('.criterion-group').filter({ has: page.getByRole('heading', { name: 'Komfort', exact: true }) });
-  await group.locator('.group-edit summary').click();
+  await group.locator('.group-heading [data-editor-open]').click();
   await group.getByLabel('Gruppenname').fill('Wohlfühlen');
-  await mutate(page, () => group.getByRole('button', { name: 'Umbenennen', exact: true }).click());
+  await mutate(page, () => group.getByRole('button', { name: 'Speichern', exact: true }).click());
   record('Three criterion types, decimal threshold, group/criterion ordering and identity-preserving reassignment');
 
   await checkSorting({ page, owner, origin, output, post, mutate, record });
@@ -268,6 +271,8 @@ try {
   record('Invitations do not share data; invited accounts cannot invite');
 
   await page.goto(`${origin}${casePath}`);
+  await page.getByRole('link', { name: 'Freigaben', exact: true }).click();
+  await page.locator('#add-share').click();
   const share = page.locator('.share-form'); await share.getByLabel('E-Mail-Adresse').fill(readerEmail);
   await mutate(page, () => share.getByRole('button', { name: 'Zugriff freigeben' }).click());
   await reader.page.goto(`${origin}${casePath}`);
@@ -275,6 +280,7 @@ try {
   assert.equal(await reader.page.locator('[data-drag-handle]').count(), 0);
   let version = await reader.page.locator('#evaluation-workspace').getAttribute('data-version');
   for (const action of ['add-group', 'delete', 'share', 'place-group', 'place-criterion']) assert.equal((await post(reader.page, casePath, { action, name: 'Blocked', email: ownerEmail, access: 'Editor', version })).status(), 403);
+  await page.locator('#add-share').click();
   await share.getByLabel('E-Mail-Adresse').fill(readerEmail); await share.getByLabel('Berechtigung').selectOption('Editor');
   await mutate(page, () => share.getByRole('button', { name: 'Zugriff freigeben' }).click());
   await reader.page.reload(); version = await reader.page.locator('#evaluation-workspace').getAttribute('data-version');
@@ -290,6 +296,9 @@ try {
   await page.screenshot({ path: join(output, '03-criteria-mobile.png'), fullPage: true });
   await page.setViewportSize({ width: 1440, height: 1050 });
   record('Responsive layout at desktop and 390px mobile width');
+
+  await stopServer(); await startServer();
+  await checkEvaluations({ page, reader, readerEmail, origin, output, post, browserRequest, mutate, record });
 
   // Run the candidate journey in a fresh request-rate window while retaining data and sessions.
   await stopServer(); await startServer();
@@ -378,6 +387,7 @@ try {
   record('Passkey rename/removal and email recovery');
 
   await page.goto(`${origin}${casePath}`);
+  await page.getByRole('link', { name: 'Freigaben', exact: true }).click();
   await mutate(page, () => page.locator('.share-row').getByRole('button', { name: 'Entziehen', exact: true }).click());
   assert.equal((await browserRequest(reader.page, casePath)).status(), 403);
   assert.equal((await browserRequest(reader.page, `${casePath}?handler=Export`)).status(), 403);
@@ -388,11 +398,15 @@ try {
   const download = await downloadReady;
   const exportFile = join(output, 'evaluation.json'); await download.saveAs(exportFile);
   await page.goto(origin);
-  await page.locator('details').filter({ has: page.getByText('Evaluation importieren', { exact: true }) }).locator('summary').click();
+  await page.getByRole('button', { name: 'Evaluation importieren', exact: true }).click();
   await page.getByLabel('Exportdatei (JSON oder ZIP)').setInputFiles({ name: 'invalid.json', mimeType: 'application/json', buffer: Buffer.from('{invalid') });
   await page.getByRole('button', { name: 'Als neue Evaluation importieren', exact: true }).click();
-  await page.locator('details[open] .validation-summary-errors').waitFor();
+  await page.locator('#import-evaluation-editor .editor-error:not([hidden])').waitFor();
   assert.equal(await creation.isVisible(), false);
+  assert.equal(await page.locator('#upload').evaluate(input => input.files[0].name), 'invalid.json');
+  await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: 'Weiterbearbeiten', exact: true }).click();
+  assert.equal(await page.locator('#upload').evaluate(input => input.files[0].name), 'invalid.json');
   await page.getByLabel('Exportdatei (JSON oder ZIP)').setInputFiles(exportFile);
   await page.getByRole('button', { name: 'Als neue Evaluation importieren', exact: true }).click();
   await page.waitForURL(/\/evaluations\//);
