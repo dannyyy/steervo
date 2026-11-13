@@ -89,6 +89,7 @@ button.assessment-summary[aria-expanded=true] { color: var(--accent); }
 .fulfillment { padding: 4px 7px; border-radius: 6px; font-size: 11px; font-style: normal; font-weight: 400; line-height: 1.45; color: var(--muted); background: var(--neutral-surface); }
 .fulfillment.met { background: var(--positive-bg); color: var(--positive); }
 .fulfillment.unmet { background: var(--negative-bg); color: var(--negative); }
+.fulfillment.optional { background: var(--soft); color: var(--accent); }
 .fulfillment.unknown { background: var(--warning-bg); color: var(--warning); font-style: normal; }
 .vehicle-record .assessment-notes-text { margin: -4px 0 16px; font-size: 12px; max-width: 65ch; }
 .record-notes > section + section { border-top: 1px solid var(--line); padding-top: 24px; margin-top: 28px; }
@@ -96,6 +97,11 @@ button.assessment-summary[aria-expanded=true] { color: var(--accent); }
 .record-notes h4 { font-size: 12px; margin-top: 24px; }
 .candidate-notes { line-height: 1.85; }
 .candidate-warning { border: 0; border-radius: 8px; font-size: 12px; background: var(--negative-bg); color: var(--negative); }
+.candidate-optional { padding: 13px 16px; margin: 16px 0; border-radius: 8px; font-size: 12px; background: var(--soft); color: var(--accent); }
+.candidate-optional p { margin-top: 5px; overflow-wrap: anywhere; }
+.candidate-optional .micro { color: var(--accent); font-size: 11px; }
+.candidate-assessment-status > * { margin: 0; }
+.candidate-assessment-status > * + * { margin-top: 12px; }
 .candidate-warning .micro { color: var(--negative); font-size: 11px; }
 .vehicle-record .specification-sheet { margin: 0; padding: 0 0 24px; border: 0; }
 .vehicle-record .specification-sheet > summary { font-weight: 560; font-size: 19px; }
@@ -105,7 +111,7 @@ button.assessment-summary[aria-expanded=true] { color: var(--accent); }
 .candidate-collection .card-top { grid-column: 3; grid-row: 1; align-self: start; }
 .candidate-collection h3 { grid-column: 1; grid-row: 1; margin: 0; font-size: 22px; }
 .candidate-collection .candidate-meta { grid-column: 1; grid-row: 2; margin: 0; }
-.candidate-collection .candidate-warning, .candidate-collection .candidate-next { grid-column: 2; grid-row: 1 / 3; align-self: start; margin: 0; }
+.candidate-collection .candidate-assessment-status { grid-column: 2; grid-row: 1 / 3; align-self: start; margin: 0; }
 .candidate-collection .candidate-reason { grid-column: 1 / 3; margin: 8px 0; }
 .candidate-collection .candidate-open { grid-column: 3; grid-row: 2; text-align: right; }
 .candidate-collection .candidate-actions { grid-column: 1 / -1; border: 0; margin-top: 4px; padding-top: 4px; }
@@ -199,7 +205,7 @@ body:has(dialog[open]) { overflow: hidden; }
   .evaluation-summary { flex-direction: column; align-items: flex-end; gap: 4px; }
   .candidate-collection .candidate-card { grid-template-columns: minmax(0, 1fr) auto; }
   .candidate-collection .card-top, .candidate-collection .candidate-open { grid-column: 2; }
-  .candidate-collection .candidate-warning, .candidate-collection .candidate-next { grid-column: 1 / -1; grid-row: auto; margin-top: 12px; }
+  .candidate-collection .candidate-assessment-status { grid-column: 1 / -1; grid-row: auto; margin-top: 12px; }
   .candidate-collection .candidate-reason { grid-column: 1 / -1; }
 }
 @media (max-width: 700px) {
@@ -333,10 +339,12 @@ body:has(dialog[open]) { overflow: hidden; }
 .overview-guide { border-top: 1px solid var(--line); margin-top: 45px; padding-top: 24px; max-width: 65ch; }
 .overview-guide h3 { font-size: 15px; font-weight: 550; }
 .overview-guide p { font-size: 12px; color: var(--muted); margin-top: 8px; }
-.evaluation-collection { padding-top: 6px; padding-bottom: 6px; }
-.evaluation-collection .case-card { display: grid; grid-template-columns: minmax(0,1fr) 160px auto; gap: 28px; align-items: center; padding: 28px 0; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: none; box-shadow: none; transform: none; }
-.evaluation-collection .case-card:last-child { border-bottom: 0; }
-.evaluation-collection .case-card:hover { background: var(--row-hover); }
+.workspace-surface.evaluation-collection { padding: 0; --evaluation-row-radius: calc(var(--radius-surface) - 1px); }
+.evaluation-collection .case-card { display: grid; grid-template-columns: minmax(0,1fr) 160px auto; gap: 28px; align-items: center; padding: 28px 34px; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; background: none; box-shadow: none; transform: none; }
+.evaluation-collection .case-card:first-child { border-top-left-radius: var(--evaluation-row-radius); border-top-right-radius: var(--evaluation-row-radius); }
+.evaluation-collection .case-card:last-child { border-bottom: 0; border-bottom-left-radius: var(--evaluation-row-radius); border-bottom-right-radius: var(--evaluation-row-radius); }
+.evaluation-collection .case-card:hover, .evaluation-collection .case-card:focus-visible { background: var(--row-hover); }
+.evaluation-collection .case-card:focus-visible { position: relative; z-index: 1; }
 .evaluation-collection .case-card h2 { font-size: 24px; margin: 10px 0 7px; overflow-wrap: anywhere; }
 .evaluation-collection .case-card p { color: var(--muted); font-size: 13px; margin: 0; max-width: 65ch; white-space: pre-wrap; overflow-wrap: anywhere; }
 .case-progress { display: flex; flex-direction: column; gap: 5px; color: var(--muted); font-size: 12px; }
@@ -357,7 +365,7 @@ body:has(dialog[open]) { overflow: hidden; }
 @media (max-width: 980px) {
   .workspace-surface { padding: 26px; }
   .surface-heading { flex-wrap: wrap; }
-  .evaluation-collection .case-card { grid-template-columns: minmax(0, 1fr) auto; gap: 16px; }
+  .evaluation-collection .case-card { grid-template-columns: minmax(0, 1fr) auto; gap: 16px; padding-inline: 26px; }
   .case-progress { grid-column: 1; flex-direction: row; gap: 18px; }
   .case-open { grid-column: 2; grid-row: 1 / 3; }
 }
@@ -378,7 +386,9 @@ body:has(dialog[open]) { overflow: hidden; }
   .overview-empty h2 { font-size: 29px; }
   .overview-empty > p:not(.eyebrow) { font-size: 13px; }
   .overview-guide { margin-top: 32px; }
-  .evaluation-collection .case-card { padding: 22px 0; }
+  .workspace-surface.evaluation-collection { --evaluation-row-radius: calc(var(--radius-surface-mobile) - 1px); }
+  .evaluation-collection .case-card { padding: 22px 19px; }
+  .evaluation-collection .case-copy { grid-column: 1 / -1; }
   .evaluation-collection .case-card h2 { font-size: 22px; }
   .case-open { grid-row: 2; }
   .case-open .icon { display: none; }

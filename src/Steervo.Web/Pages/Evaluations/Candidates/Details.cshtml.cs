@@ -1,5 +1,4 @@
 using Steervo.Web.Pages.Shared;
-using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Localization;
@@ -25,7 +24,7 @@ public sealed class DetailsModel(CandidateWorkspace workspace, ICurrentUser curr
         catch (RuleException error) { return StatusCode(error.Message == "Forbidden" ? 403 : 404); }
     }
     public async Task<IActionResult> OnPostAsync(Guid id, Guid candidateId, long version, string action, Guid criterionId,
-        CandidateForm input, CandidateStatus status, string? reason, bool? booleanValue, string? measurementValue, int? ratingValue,
+        CandidateForm input, CandidateStatus status, string? reason, string? booleanValue, string? measurementValue, int? ratingValue,
         AssessmentSource source, string? notes, Guid? first, Guid? second)
     {
         try
@@ -37,7 +36,7 @@ public sealed class DetailsModel(CandidateWorkspace workspace, ICurrentUser curr
                 case "edit-candidate": await workspace.EditAsync(id, version, candidateId, input.ToInput()); break;
                 case "classify-candidate": await workspace.ClassifyAsync(id, version, candidateId, status, reason); break;
                 case "assess-candidate":
-                    await workspace.AssessAsync(id, version, candidateId, criterionId, new(booleanValue, ParseMeasurement(measurementValue), ratingValue, source, notes)); break;
+                    await workspace.AssessAsync(id, version, candidateId, criterionId, AssessmentForm.ToInput(booleanValue, measurementValue, ratingValue, source, notes)); break;
                 case "clear-assessment": await workspace.ClearAssessmentAsync(id, version, candidateId, criterionId); break;
                 default: throw new RuleException("InvalidValue");
             }
@@ -54,12 +53,6 @@ public sealed class DetailsModel(CandidateWorkspace workspace, ICurrentUser curr
         }
         await LoadAsync(id, candidateId, first, second);
         return Request.Headers.ContainsKey("HX-Request") ? Partial("_CandidateDetails", this) : Page();
-    }
-    internal static decimal? ParseMeasurement(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value)) return null;
-        if (!decimal.TryParse(value, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var parsed)) throw new RuleException("InvalidValue");
-        return parsed;
     }
     private async Task LoadAsync(Guid id, Guid candidateId, Guid? first, Guid? second)
     {

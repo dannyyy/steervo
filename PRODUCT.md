@@ -24,7 +24,7 @@ Der vorhandene Funktionsumfang ist im [README](README.md#was-bereits-funktionier
 
 - Anmeldung mit E-Mail-Einmalcode oder Passkey, kontrollierte Ersteinrichtung, Einladungen und Freigaben.
 - Kriterien mit optionalen Gruppen, Reihenfolge, Prioritäten Muss / stark gewünscht / optional und Bezug auf Fahrzeug oder Offerte.
-- Ja/Nein, Messwerte mit Schwelle und persönliche Bewertungen von 1–5. Unbekannt, Nein und null sind verschiedene Zustände. Persönliche Bewertungen haben keine objektive Erfüllungsschwelle und ergeben keine Gesamtnote. Ein verfehltes Muss schliesst ein Fahrzeug nicht automatisch aus.
+- Ja/Nein mit zusätzlicher Angabe «Optional» für separat erhältliche Ausstattung, Messwerte mit Schwelle und persönliche Bewertungen von 1–5. Unbekannt, Nein und null sind verschiedene Zustände. Persönliche Bewertungen haben keine objektive Erfüllungsschwelle und ergeben keine Gesamtnote. «Optional erhältlich» ist ein eigener Zustand: bekannt, aber noch nicht enthalten; auch bei Muss-Kriterien weder erfüllt noch verfehlt. Die Angabe ist unabhängig von der Kriterienpriorität «optional». Ein verfehltes Muss schliesst ein Fahrzeug nicht automatisch aus.
 - Kandidaten, technische Daten, Quellen und Notizen; unabhängige Kopien; begründetes Zurückstellen und Ausscheiden. Technische Fakten und Kriterienbewertungen bleiben getrennt.
 - Mehrere Offerten pro Fahrzeug; unveränderliche ältere Offert- und Dokumentversionen. Offertbewertungen bleiben nach einer neuen Version erhalten und werden zur erneuten Prüfung markiert. Währung pro Evaluation.
 - Kostenplanung und gespeicherte Rechenszenarien mit expliziten Annahmen, festen Offertbezügen und offen bleibenden Ergebnissen bei fehlenden Angaben. Keine Länder- oder Steuerautomatik.

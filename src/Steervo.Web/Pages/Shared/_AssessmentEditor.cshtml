@@ -5,7 +5,7 @@
     var a = Model;
     var field = Model.FieldId;
     var draft = Model.Draft;
-    var booleanValue = a.BooleanValue?.ToString().ToLowerInvariant();
+    var booleanValue = a.OptionalAvailable ? "optional" : a.BooleanValue?.ToString().ToLowerInvariant();
     var measurementValue = a.MeasurementValue?.ToString(System.Globalization.CultureInfo.InvariantCulture);
     var ratingValue = a.RatingValue?.ToString();
     var sourceValue = a.Source.ToString();
@@ -21,7 +21,8 @@
             @switch (c.Type)
             {
                 case CriterionType.Boolean:
-                    <select id="value-@field" name="booleanValue" data-editor-focus><option value="" selected="@(string.IsNullOrEmpty(booleanValue))">@T["FulfillmentUnknown"]</option><option value="true" selected="@(booleanValue == "true")">@T["Yes"]</option><option value="false" selected="@(booleanValue == "false")">@T["No"]</option></select>
+                    <select id="value-@field" name="booleanValue" aria-describedby="boolean-help-@field" data-editor-focus><option value="" selected="@(string.IsNullOrEmpty(booleanValue))">@T["FulfillmentUnknown"]</option><option value="true" selected="@(booleanValue == "true")">@T["Yes"]</option><option value="false" selected="@(booleanValue == "false")">@T["No"]</option><option value="optional" selected="@(booleanValue == "optional")">@T["BooleanOptional"]</option></select>
+                    <p id="boolean-help-@field" class="editor-help">@T["BooleanOptionalHelp"]</p>
                     break;
                 case CriterionType.Measurement:
                     <div class="measurement-entry"><input id="value-@field" name="measurementValue" type="number" step="any" value="@measurementValue" placeholder="@T["FulfillmentUnknown"]" aria-describedby="unit-@field" data-editor-focus /><span id="unit-@field">@c.Unit</span></div>

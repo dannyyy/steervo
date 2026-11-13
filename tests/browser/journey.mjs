@@ -2,6 +2,7 @@ import { chromium } from 'playwright';
 import { checkEvaluations } from './evaluations.mjs';
 import { checkSorting } from './sorting.mjs';
 import { checkCandidates } from './candidates.mjs';
+import { checkOptionalEquipment } from './optional-equipment.mjs';
 import { checkOffers } from './offers.mjs';
 import { checkDocuments } from './documents.mjs';
 import { checkCosts } from './costs.mjs';
@@ -311,6 +312,8 @@ try {
   const candidateChecks = await checkCandidates({ page, reader, origin, output, post, browserRequest, record });
   await stopServer(); await startServer();
   const offerChecks = await checkOffers({ page, reader, readerEmail, origin, output, post, browserRequest, record });
+  await stopServer(); await startServer();
+  await checkOptionalEquipment({ page, reader, readerEmail, origin, output, post, browserRequest, record, casePath, ...candidateChecks, offerChecks });
   await stopServer(); await startServer();
   await checkDocuments({ page, reader, readerEmail, origin, output, post, browserRequest, record, restart: async () => { await stopServer(); await startServer(); } });
   await stopServer(); await startServer();

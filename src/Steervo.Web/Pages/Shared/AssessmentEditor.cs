@@ -5,6 +5,7 @@ public sealed record AssessmentEditor(Evaluation Evaluation, Criterion Criterion
     string SubjectField, string Action, string FieldId, string PostUrl)
 {
     public bool? BooleanValue { get; init; }
+    public bool OptionalAvailable { get; init; }
     public decimal? MeasurementValue { get; init; }
     public int? RatingValue { get; init; }
     public AssessmentSource Source { get; init; }

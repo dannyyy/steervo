@@ -6,6 +6,7 @@
     var comparisonUrl = $"/evaluations/{e.Id}/compare?first={Model.ComparisonFirst}&second={Model.ComparisonSecond}";
     var vehicleCriteria = e.Criteria.Where(x => x.Scope == CriterionScope.Vehicle).ToList();
     var failures = vehicleCriteria.Where(x => x.Priority == Priority.Required && e.ResultFor(c.Id, x.Id) == Fulfillment.Unmet).ToList();
+    var optional = vehicleCriteria.Where(x => x.Priority == Priority.Required && e.ResultFor(c.Id, x.Id) == Fulfillment.Optional).ToList();
     var open = vehicleCriteria.Count(x => e.ResultFor(c.Id, x.Id) == Fulfillment.Unknown);
 }
 <div id="candidate-workspace" data-version="@e.Version" data-preserve-viewport hx-target="#candidate-workspace" hx-swap="outerHTML show:none focus-scroll:false" hx-sync="this:drop">
@@ -33,6 +34,7 @@
             <section id="record-assessments" role="tabpanel" aria-labelledby="tab-assessments" tabindex="0">
                 <div class="record-section-heading"><h3>@T["VehicleRequirements"]</h3><span>@T["OpenAssessmentCount", open, vehicleCriteria.Count]</span></div>
                 @if (failures.Count > 0) { <div class="candidate-warning"><strong>@T["RequiredNotMet"]</strong><p>@string.Join(" · ", failures.Select(x => x.Name))</p><p class="micro">@T["NoAutomaticExclusion"]</p></div> }
+                @if (optional.Count > 0) { <div class="candidate-optional"><strong>@T["RequiredOptional"]</strong><p>@string.Join(" · ", optional.Select(x => x.Name))</p><p class="micro">@T["RequiredOptionalHelp"]</p></div> }
                 @if (vehicleCriteria.Count == 0) { <div class="empty-state"><h3>@T["NoVehicleCriteria"]</h3><p>@T["NoVehicleCriteriaHelp"]</p><a asp-page="/Evaluations/Details" asp-route-id="@e.Id" class="button secondary">@T["EditCriteria"]</a></div> }
                 @foreach (var group in e.Groups.OrderBy(x => x.Position).Cast<CriterionGroup?>().Append(null))
                 {

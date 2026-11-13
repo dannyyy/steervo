@@ -8,10 +8,10 @@ public sealed record GroupExport(Guid Id, string Name, int Position);
 public sealed record CriterionExport(Guid Id, string Name, CriterionType Type, Priority Priority, CriterionScope Scope, Guid? GroupId, decimal? Threshold, string? Unit, Comparison Comparison, int Position);
 public sealed record CandidateExport(Guid Id, string Model, string Brand, string Variant, CandidateCondition Condition, int? Year, int? Mileage,
     string Notes, string Links, CandidateStatus Status, string StatusReason, int Position, VehicleSpecifications? Specifications = null);
-public sealed record AssessmentExport(Guid CandidateId, Guid CriterionId, bool? BooleanValue, decimal? MeasurementValue, int? RatingValue, AssessmentSource Source, string Notes);
+public sealed record AssessmentExport(Guid CandidateId, Guid CriterionId, bool? BooleanValue, decimal? MeasurementValue, int? RatingValue, AssessmentSource Source, string Notes, bool OptionalAvailable = false);
 public sealed record OfferRevisionExport(int Number, DateTimeOffset CreatedAt, string ChangeNote, OfferTerms Terms, OfferLineInput[] Lines);
 public sealed record OfferExport(Guid Id, Guid CandidateId, bool Archived, OfferRevisionExport[] Revisions);
-public sealed record OfferAssessmentExport(Guid OfferId, Guid CriterionId, int RevisionNumber, bool? BooleanValue, decimal? MeasurementValue, int? RatingValue, AssessmentSource Source, string Notes);
+public sealed record OfferAssessmentExport(Guid OfferId, Guid CriterionId, int RevisionNumber, bool? BooleanValue, decimal? MeasurementValue, int? RatingValue, AssessmentSource Source, string Notes, bool OptionalAvailable = false);
 public sealed record CostPlanningExport(DateOnly Start, int Months);
 public sealed record CostExport(Guid Id, CostInput Input);
 public sealed record ScenarioExport(Guid Id, ScenarioInput Input, ResidualInput[] Residuals, CostAdjustmentInput[] CostAdjustments);
@@ -36,15 +36,15 @@ public sealed class EvaluationTransfer(EvaluationWorkspace workspace, IEvaluatio
     }
     internal static byte[] Serialize(Evaluation evaluation)
     {
-        var content = new EvaluationExport("steervo-evaluation", 6, evaluation.Name, evaluation.Purpose,
+        var content = new EvaluationExport("steervo-evaluation", 7, evaluation.Name, evaluation.Purpose,
             evaluation.Groups.OrderBy(x => x.Position).Select(x => new GroupExport(x.Id, x.Name, x.Position)).ToArray(),
             evaluation.Criteria.OrderBy(x => x.Position).Select(x => new CriterionExport(x.Id, x.Name, x.Type, x.Priority, x.Scope, x.GroupId, x.Threshold, x.Unit, x.Comparison, x.Position)).ToArray(),
             evaluation.Candidates.OrderBy(x => x.Position).Select(x => new CandidateExport(x.Id, x.Model, x.Brand, x.Variant, x.Condition, x.Year, x.Mileage, x.Notes, x.Links, x.Status, x.StatusReason, x.Position, x.Specifications)).ToArray(),
-            evaluation.Assessments.OrderBy(x => x.CandidateId).ThenBy(x => x.CriterionId).Select(x => new AssessmentExport(x.CandidateId, x.CriterionId, x.BooleanValue, x.MeasurementValue, x.RatingValue, x.Source, x.Notes)).ToArray(), evaluation.Currency,
+            evaluation.Assessments.OrderBy(x => x.CandidateId).ThenBy(x => x.CriterionId).Select(x => new AssessmentExport(x.CandidateId, x.CriterionId, x.BooleanValue, x.MeasurementValue, x.RatingValue, x.Source, x.Notes, x.OptionalAvailable)).ToArray(), evaluation.Currency,
             evaluation.Offers.Select(offer => new OfferExport(offer.Id, offer.CandidateId, offer.Archived,
                 offer.Revisions.OrderBy(revision => revision.Number).Select(revision => new OfferRevisionExport(revision.Number, revision.CreatedAt, revision.ChangeNote, revision.Terms,
                     revision.Lines.OrderBy(line => line.Position).Select(line => line.ToInput()).ToArray())).ToArray())).ToArray(),
-            evaluation.OfferAssessments.Select(value => new OfferAssessmentExport(value.OfferId, value.CriterionId, value.RevisionNumber, value.BooleanValue, value.MeasurementValue, value.RatingValue, value.Source, value.Notes)).ToArray(),
+            evaluation.OfferAssessments.Select(value => new OfferAssessmentExport(value.OfferId, value.CriterionId, value.RevisionNumber, value.BooleanValue, value.MeasurementValue, value.RatingValue, value.Source, value.Notes, value.OptionalAvailable)).ToArray(),
             evaluation.CostPlanning is { } plan ? new(plan.Start, plan.Months) : null,
             evaluation.Costs.Select(cost => new CostExport(cost.Id, cost.ToInput())).ToArray(),
             evaluation.CalculationSettings is { } settings ? new(settings.AnnualReturnPercent) : null,
@@ -63,7 +63,7 @@ public sealed class EvaluationTransfer(EvaluationWorkspace workspace, IEvaluatio
         EvaluationExport content;
         try { content = JsonSerializer.Deserialize<EvaluationExport>(data, Json) ?? throw new RuleException("InvalidImport"); }
         catch (JsonException) { throw new RuleException("InvalidImport"); }
-        if (content.Format != "steervo-evaluation" || content.Version is not (1 or 2 or 3 or 4 or 5 or 6) || content.Groups is null || content.Criteria is null || content.Groups.Length > 100 || content.Criteria.Length > 1000
+        if (content.Format != "steervo-evaluation" || content.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7) || content.Groups is null || content.Criteria is null || content.Groups.Length > 100 || content.Criteria.Length > 1000
             || content.Groups.Any(x => x is null || x.Id == Guid.Empty || x.Position < 0) || content.Criteria.Any(x => x is null || x.Id == Guid.Empty || x.Position < 0)
             || content.Groups.DistinctBy(x => x.Id).Count() != content.Groups.Length || content.Criteria.DistinctBy(x => x.Id).Count() != content.Criteria.Length
             || (content.Version == 1 && (content.Candidates is not null || content.Assessments is not null))
@@ -95,6 +95,7 @@ public sealed class EvaluationTransfer(EvaluationWorkspace workspace, IEvaluatio
             || candidates.DistinctBy(x => x.Id).Count() != candidates.Length
             || assessments.Any(x => x is null)
             || assessments.DistinctBy(x => (x.CandidateId, x.CriterionId)).Count() != assessments.Length) throw new RuleException("InvalidImport");
+        if (content.Version < 7 && (assessments.Any(x => x.OptionalAvailable) || offerAssessments.Any(x => x.OptionalAvailable))) throw new RuleException("InvalidImport");
         var evaluation = new Evaluation(current.Id, content.Name, content.Purpose);
         var groups = content.Groups.OrderBy(x => x.Position).ToDictionary(x => x.Id, x => evaluation.AddGroup(x.Name));
         var criteria = new Dictionary<Guid, Guid>();
@@ -118,7 +119,7 @@ public sealed class EvaluationTransfer(EvaluationWorkspace workspace, IEvaluatio
         foreach (var assessment in assessments)
         {
             if (!candidateIds.TryGetValue(assessment.CandidateId, out var candidateId) || !criteria.TryGetValue(assessment.CriterionId, out var criterionId)) throw new RuleException("InvalidImport");
-            evaluation.AssessCandidate(candidateId, criterionId, new(assessment.BooleanValue, assessment.MeasurementValue, assessment.RatingValue, assessment.Source, assessment.Notes));
+            evaluation.AssessCandidate(candidateId, criterionId, new(assessment.BooleanValue, assessment.MeasurementValue, assessment.RatingValue, assessment.Source, assessment.Notes, assessment.OptionalAvailable));
         }
         if (content.Currency is not null) evaluation.SetCurrency(content.Currency);
         var offerIds = new Dictionary<Guid, Guid>();
@@ -135,7 +136,7 @@ public sealed class EvaluationTransfer(EvaluationWorkspace workspace, IEvaluatio
         foreach (var value in offerAssessments)
         {
             if (!offerIds.TryGetValue(value.OfferId, out var offerId) || !criteria.TryGetValue(value.CriterionId, out var criterionId)) throw new RuleException("InvalidImport");
-            evaluation.AssessOffer(offerId, criterionId, new(value.BooleanValue, value.MeasurementValue, value.RatingValue, value.Source, value.Notes));
+            evaluation.AssessOffer(offerId, criterionId, new(value.BooleanValue, value.MeasurementValue, value.RatingValue, value.Source, value.Notes, value.OptionalAvailable));
             evaluation.OfferAssessments.Single(assessment => assessment.OfferId == offerId && assessment.CriterionId == criterionId).RestoreRevision(evaluation.FindOffer(offerId), value.RevisionNumber);
         }
         foreach (var offer in offers.Where(offer => offer.Archived)) evaluation.ArchiveOffer(offerIds[offer.Id], true);

@@ -14,10 +14,10 @@ Verbindliche Grundlagen: [Designsystem](DESIGN.md), [Interaktionsmuster](docs/in
 - Anmeldung per E-Mail-Einmalcode oder Passkey; Passkeys hinzufügen, umbenennen und entfernen.
 - Weitere Konten ausschliesslich durch Einladungen des Hauptbenutzers.
 - Private Evaluationen mit Name, Zweck und dauerhafter Speicherung in PostgreSQL.
-- Kriterien als Ja/Nein, Messwert mit Schwelle oder Bewertung 1–5; Prioritäten Muss, stark gewünscht und optional. Fehlende Bewertungen werden nicht als Nichterfüllung behandelt.
+- Kriterien als Ja/Nein mit zusätzlicher Angabe «Optional» für separat erhältliche Ausstattung, Messwert mit Schwelle oder Bewertung 1–5; Prioritäten Muss, stark gewünscht und optional. Fehlende Bewertungen werden nicht als Nichterfüllung behandelt.
 - Kompakte Kriterienzeilen und eine optionale Gruppenebene. Kriterien und Gruppen per Pfeiltasten oder Drag & Drop sortieren, auch per Touch; Kriterien zwischen Gruppen und nach «Ohne Gruppe» verschieben. Kriterien-IDs, sichtbarer Ausschnitt und offene Bearbeitungsfelder bleiben beim Sortieren erhalten.
 - Autos mit optionalen Stammdaten, Notizen und Quellen erfassen, in eigener Reihenfolge anordnen und unabhängig kopieren. Einstufungen wie Favorit, zurückgestellt oder ausgeschieden halten deine Auswahl fest; Zurückstellen und Ausscheiden verlangen eine Begründung.
-- Die Ausstattung pro Auto anhand der eigenen Fahrzeugkriterien prüfen. Unbekannt, nein und null bleiben unterscheidbar; Grundlage und Notiz dokumentieren eine Einschätzung. Muss-Verletzungen führen nie automatisch zum Ausschluss.
+- Die Ausstattung pro Auto anhand der eigenen Fahrzeugkriterien prüfen. Unbekannt, nein und null bleiben unterscheidbar; Grundlage und Notiz dokumentieren eine Einschätzung. «Optional erhältlich» bedeutet bekannt, aber noch nicht enthalten; dieser eigene Status zählt auch bei Muss-Kriterien weder als erfüllt noch als verfehlt. Bezugsquelle und Details passen in die Notiz. Muss-Verletzungen führen nie automatisch zum Ausschluss.
 - Zwei Autos direkt vergleichen und ihre Bewertungen im Vergleich bearbeiten. Bewertungen von 1–5 bleiben persönliche Einschätzungen, auch bei Muss-Kriterien; sie erzeugen weder Erfüllungsschwellen noch eine Gesamtnote.
 - Mehrere Offerten pro Auto mit frei erfassten Anbietern, Kauf-/Leasing-/Finanzierungsangaben, Zubehör, Gebühren und Sonderkonditionen. Ergänzungen erzeugen neue Versionen; ältere Stände und Änderungen bleiben lesbar.
 - Eine beim ersten Angebot gewählte Währung pro Evaluation. Offertkriterien werden je Angebot bewertet; nach einer neuen Version bleibt die Einschätzung erhalten und wird zur erneuten Prüfung markiert.
@@ -26,7 +26,7 @@ Verbindliche Grundlagen: [Designsystem](DESIGN.md), [Interaktionsmuster](docs/in
 - Zusätzliche Kostenpositionen für alle Autos oder je Auto, mit frei gewähltem Zeitraum, einmaligen, monatlichen, jährlichen und inklusiven Positionen sowie Einnahmen. Monats- und Jahresansicht zeigen dieselben Zahlungen.
 - Besitzer-, Bearbeiter- und Leserechte pro Evaluation. Die Installationsverwaltung verschafft keinen Zugriff auf fremde Fälle.
 - Schutz vor überschriebenen Änderungen bei gleichzeitiger Bearbeitung, serverseitige Validierung und CSRF-Schutz.
-- JSON-Export ohne Anhänge oder ZIP-Export mit sämtlichen Dateiversionen und Import einer Evaluation einschliesslich Kriterien, Gruppen, Kandidaten, Bewertungen, vollständiger Offertversionen, Kostenplanung und Szenarien. Ältere Exporte der Versionen 1 bis 5 können weiterhin importiert werden. Ein Import erzeugt eine neue private Evaluation.
+- JSON-Export ohne Anhänge oder ZIP-Export mit sämtlichen Dateiversionen und Import einer Evaluation einschliesslich Kriterien, Gruppen, Kandidaten, Bewertungen, vollständiger Offertversionen, Kostenplanung und Szenarien. Ältere Exporte der Versionen 1 bis 6 können weiterhin importiert werden. Ein Import erzeugt eine neue private Evaluation.
 - Deutsche Oberfläche auf Desktop und Mobilgeräten. Es werden keine Geschäftsdaten oder Beispielkosten vorbefüllt.
 
 ## Lokal starten

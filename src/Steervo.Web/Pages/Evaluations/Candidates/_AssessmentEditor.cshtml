@@ -1,4 +1,4 @@
 @model Steervo.Web.Pages.Evaluations.Candidates.AssessmentRow
 @using Steervo.Web.Pages.Shared
 @{ var a = Model.Assessment; }
-<partial name="/Pages/Shared/_AssessmentEditor.cshtml" model='new AssessmentEditor(Model.Evaluation, Model.Criterion, Model.Candidate.Id, Model.Candidate.DisplayName, "candidateId", "assess-candidate", Model.FieldId, Model.PostUrl) { BooleanValue = a?.BooleanValue, MeasurementValue = a?.MeasurementValue, RatingValue = a?.RatingValue, Source = a?.Source ?? AssessmentSource.Unknown, Notes = a?.Notes, HasAssessment = a is not null, Draft = Model.HasDraft ? Model.Draft : null }' />
+<partial name="/Pages/Shared/_AssessmentEditor.cshtml" model='new AssessmentEditor(Model.Evaluation, Model.Criterion, Model.Candidate.Id, Model.Candidate.DisplayName, "candidateId", "assess-candidate", Model.FieldId, Model.PostUrl) { BooleanValue = a?.BooleanValue, OptionalAvailable = a?.OptionalAvailable ?? false, MeasurementValue = a?.MeasurementValue, RatingValue = a?.RatingValue, Source = a?.Source ?? AssessmentSource.Unknown, Notes = a?.Notes, HasAssessment = a is not null, Draft = Model.HasDraft ? Model.Draft : null }' />

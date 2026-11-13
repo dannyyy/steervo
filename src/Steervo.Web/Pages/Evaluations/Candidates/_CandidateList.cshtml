@@ -15,14 +15,18 @@ else
     @foreach (var c in e.Candidates.OrderBy(c => c.Position))
     {
         var failures = e.Criteria.Where(x => x.Scope == CriterionScope.Vehicle && x.Priority == Priority.Required && e.ResultFor(c.Id, x.Id) == Fulfillment.Unmet).ToList();
+        var optional = e.Criteria.Where(x => x.Scope == CriterionScope.Vehicle && x.Priority == Priority.Required && e.ResultFor(c.Id, x.Id) == Fulfillment.Optional).ToList();
         var unknown = e.Criteria.Any(x => x.Scope == CriterionScope.Vehicle && e.ResultFor(c.Id, x.Id) == Fulfillment.Unknown);
         <article class="candidate-card" id="candidate-@c.Id" data-candidate-id="@c.Id">
             <div class="card-top"><span class="candidate-status @c.Status.ToString().ToLowerInvariant()">@T["CandidateStatus" + c.Status]</span>
             @if (edit) { <div class="row-actions">@foreach (var direction in new[] { -1, 1 }) { <form method="post" hx-post="/evaluations/@e.Id/candidates"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="move-candidate" /><input type="hidden" name="itemId" value="@c.Id" /><input type="hidden" name="direction" value="@direction" /><button id="move-candidate-@c.Id-@direction" class="icon-button" aria-label="@T[direction == -1 ? "CandidateUp" : "CandidateDown", c.DisplayName]" disabled="@(direction == -1 ? c.Position == 0 : c.Position == e.Candidates.Count - 1)"><partial name="/Pages/Shared/_Icon.cshtml" model='(direction == -1 ? "up" : "down")' /></button></form> }</div> }</div>
             <h3><a asp-page="Details" asp-route-id="@e.Id" asp-route-candidateId="@c.Id">@c.DisplayName</a></h3><p class="muted candidate-meta">@T["Condition" + c.Condition] @if (c.Year.HasValue) { <span> · @c.Year</span> } @if (c.Mileage.HasValue) { <span> · @c.Mileage.Value.ToString("N0") km</span> }</p>
             @if (c.StatusReason.Length > 0) { <p class="candidate-reason">@c.StatusReason</p> }
+            <div class="candidate-assessment-status">
             @if (failures.Count > 0) { <div class="candidate-warning"><strong>@T["RequiredNotMet"]</strong><p>@string.Join(" · ", failures.Select(x => x.Name))</p></div> }
-            else { <p class="candidate-next">@T[unknown ? "CandidateNeedsAssessment" : "CandidateReadyToReview"]</p> }
+            else if (optional.Count == 0) { <p class="candidate-next">@T[unknown ? "CandidateNeedsAssessment" : "CandidateReadyToReview"]</p> }
+            @if (optional.Count > 0) { <div class="candidate-optional"><strong>@T["RequiredOptional"]</strong><p>@string.Join(" · ", optional.Select(x => x.Name))</p></div> }
+            </div>
             <a class="candidate-open" asp-page="Details" asp-route-id="@e.Id" asp-route-candidateId="@c.Id">@T[edit ? "AssessCandidate" : "ViewCandidate"] →</a>
             @if (edit)
             {

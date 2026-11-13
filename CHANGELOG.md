@@ -2,6 +2,13 @@
 
 ## Unveröffentlicht
 
+- Favicon aus dem Steervo-Bildzeichen in Canvas/Tinte: SVG, ICO mit mehreren Grössen und Touch-Icon, auf allen Seiten eingebunden. Build und Auslieferung über Playwright geprüft; Vorschau bei 16, 32 und 48 px auf hellen und dunklen Hintergründen.
+
+- Evaluationsübersicht: Hover über die gesamte Zeilenbreite mit passenden äusseren Rundungen und Innenabstand; sichtbarer Tastaturfokus und mehr Platz für mobile Titel. Am 13. November 2026 mit Playwright für eine und mehrere Evaluationen bei 320–1440 px sowie per Tastatur und Touch geprüft.
+
+- Ja/Nein-Kriterien bieten zusätzlich «Optional» für separat erhältliche Ausstattung. Fahrzeug- und Offertbewertungen zeigen «Optional erhältlich» als eigenen Status, auch bei Muss-Kriterien weder erfüllt noch verfehlt. «Unbekannt» bleibt getrennt; Bezugsquelle und Details können in der Notiz stehen.
+- Der Status bleibt beim Kopieren, Speichern sowie im JSON-/ZIP-Austausch erhalten. Exportformat Version 7; bestehende Dateien der Versionen 1 bis 6 bleiben importierbar. Die Datenbankmigration erhält bestehende Ja-/Nein-Werte und fehlende Angaben. [Fachregeln und Prüfnachweis](docs/optional-equipment.md).
+
 - Canvas/Tinte-Migration abgeschlossen: auch Anmeldung, Ersteinrichtung, Verifikation, Konto, Passkeys, Einladungen und Systemzustände verwenden die gemeinsame Gestaltung und Bedienung.
 - Konto- und Authentifizierungsformulare behalten Eingaben bei Fehlern; Passkeys verwenden gezielte Editoren und benannte Löschbestätigungen. Erneute Anmeldung führt sicher zum Konto zurück, erfolgreiche Änderungen zur aktualisierten Liste mit Rückkehrfokus.
 - Einheitliche lokale Verbindungs- und Ladehinweise sowie vollständige Fehlerseiten mit erhaltenem HTTP-Status. Mobile Vergleichsüberschriften bleiben beim horizontalen Scrollen sichtbar; alte Layoutregeln und Dialogskripte sind bereinigt.

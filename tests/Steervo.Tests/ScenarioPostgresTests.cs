@@ -62,7 +62,7 @@ public sealed class ScenarioPostgresTests
         e.SetCostAdjustment(scenario, new(e.Costs.Single().Id, 0, 1, 4, "Included period"));
         var copyScenario = e.CopyScenario(scenario, "Unknown price"); e.EditScenario(copyScenario, e.FindScenario(copyScenario).ToInput() with { Terms = Terms with { PurchasePrice = null } });
         await f.RunAsync(async p => { await p.GetRequiredService<IEvaluationStore>().CreateAsync(e); return true; });
-        var bytes = await f.TransferAsync(owner, t => t.ExportAsync(e.Id)); Assert.Equal(6, JsonNode.Parse(bytes)!["version"]!.GetValue<int>());
+        var bytes = await f.TransferAsync(owner, t => t.ExportAsync(e.Id)); Assert.Equal(7, JsonNode.Parse(bytes)!["version"]!.GetValue<int>());
         var copied = await f.TransferAsync(owner, t => t.ImportAsync(bytes)); var imported = await f.AsAsync(owner, w => w.ReadAsync(copied));
         Assert.Equal(3.25m, imported.CalculationSettings!.AnnualReturnPercent); Assert.Equal(2, imported.Scenarios.Count); Assert.Empty(imported.Shares);
         foreach (var item in imported.Scenarios)

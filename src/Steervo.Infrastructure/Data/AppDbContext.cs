@@ -112,23 +112,23 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
         });
         model.Entity<OfferAssessment>(b => {
             b.HasKey(x => x.Id); b.Property(x => x.Id).ValueGeneratedNever(); b.HasIndex(x => new { x.OfferId, x.CriterionId }).IsUnique();
-            b.Property(x => x.Source).HasConversion<string>(); b.Property(x => x.Notes).HasMaxLength(4000); b.Ignore(x => x.HasValue);
+            b.Property(x => x.Source).HasConversion<string>(); b.Property(x => x.Notes).HasMaxLength(4000); b.Ignore(x => x.HasValue); b.Property(x => x.OptionalAvailable).HasDefaultValue(false);
             b.HasOne<OfferRevision>().WithMany().HasForeignKey(x => new { x.EvaluationId, x.OfferId, x.RevisionNumber }).HasPrincipalKey(x => new { x.EvaluationId, x.OfferId, x.Number }).OnDelete(DeleteBehavior.Cascade);
             b.HasOne<Criterion>().WithMany().HasForeignKey(x => new { x.EvaluationId, x.CriterionId }).HasPrincipalKey(x => new { x.EvaluationId, x.Id }).OnDelete(DeleteBehavior.Cascade);
             b.ToTable(t => {
                 t.HasCheckConstraint("ValidOfferAssessmentRating", "\"RatingValue\" IS NULL OR \"RatingValue\" BETWEEN 1 AND 5");
-                t.HasCheckConstraint("SingleOfferAssessmentValue", "(CASE WHEN \"BooleanValue\" IS NULL THEN 0 ELSE 1 END + CASE WHEN \"MeasurementValue\" IS NULL THEN 0 ELSE 1 END + CASE WHEN \"RatingValue\" IS NULL THEN 0 ELSE 1 END) <= 1");
+                t.HasCheckConstraint("SingleOfferAssessmentValue", "(CASE WHEN \"BooleanValue\" IS NULL THEN 0 ELSE 1 END + CASE WHEN \"MeasurementValue\" IS NULL THEN 0 ELSE 1 END + CASE WHEN \"RatingValue\" IS NULL THEN 0 ELSE 1 END + CASE WHEN \"OptionalAvailable\" THEN 1 ELSE 0 END) <= 1");
                 t.HasCheckConstraint("ValidOfferAssessmentSource", "\"Source\" IN ('Unknown','Manufacturer','Offer','Inspection','TestDrive','Research')");
             });
         });
         model.Entity<Assessment>(b => {
             b.HasKey(x => x.Id); b.Property(x => x.Id).ValueGeneratedNever(); b.HasIndex(x => new { x.CandidateId, x.CriterionId }).IsUnique();
-            b.Property(x => x.Source).HasConversion<string>(); b.Property(x => x.Notes).HasMaxLength(4000); b.Ignore(x => x.HasValue);
+            b.Property(x => x.Source).HasConversion<string>(); b.Property(x => x.Notes).HasMaxLength(4000); b.Ignore(x => x.HasValue); b.Property(x => x.OptionalAvailable).HasDefaultValue(false);
             b.HasOne<Candidate>().WithMany().HasForeignKey(x => new { x.EvaluationId, x.CandidateId }).HasPrincipalKey(x => new { x.EvaluationId, x.Id }).OnDelete(DeleteBehavior.Cascade);
             b.HasOne<Criterion>().WithMany().HasForeignKey(x => new { x.EvaluationId, x.CriterionId }).HasPrincipalKey(x => new { x.EvaluationId, x.Id }).OnDelete(DeleteBehavior.Cascade);
             b.ToTable(t => {
                 t.HasCheckConstraint("ValidAssessmentRating", "\"RatingValue\" IS NULL OR \"RatingValue\" BETWEEN 1 AND 5");
-                t.HasCheckConstraint("SingleAssessmentValue", "(CASE WHEN \"BooleanValue\" IS NULL THEN 0 ELSE 1 END + CASE WHEN \"MeasurementValue\" IS NULL THEN 0 ELSE 1 END + CASE WHEN \"RatingValue\" IS NULL THEN 0 ELSE 1 END) <= 1");
+                t.HasCheckConstraint("SingleAssessmentValue", "(CASE WHEN \"BooleanValue\" IS NULL THEN 0 ELSE 1 END + CASE WHEN \"MeasurementValue\" IS NULL THEN 0 ELSE 1 END + CASE WHEN \"RatingValue\" IS NULL THEN 0 ELSE 1 END + CASE WHEN \"OptionalAvailable\" THEN 1 ELSE 0 END) <= 1");
                 t.HasCheckConstraint("ValidAssessmentSource", "\"Source\" IN ('Unknown','Manufacturer','Offer','Inspection','TestDrive','Research')");
             });
         });

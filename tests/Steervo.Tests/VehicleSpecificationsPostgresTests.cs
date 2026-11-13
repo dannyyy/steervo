@@ -34,7 +34,7 @@ public sealed class VehicleSpecificationsPostgresTests
         Assert.Equal(specifications, saved.Candidates.Single().Specifications);
         await fixture.AsAsync(owner, async w => { await w.EditAsync(id, saved.Version, e => e.CopyCandidate(saved.Candidates.Single().Id, "Copy")); return true; });
         var bytes = await fixture.TransferAsync(owner, t => t.ExportAsync(id));
-        Assert.Equal(6, JsonNode.Parse(bytes)!["version"]!.GetValue<int>());
+        Assert.Equal(7, JsonNode.Parse(bytes)!["version"]!.GetValue<int>());
         var copyId = await fixture.TransferAsync(owner, t => t.ImportAsync(bytes));
         var imported = await fixture.AsAsync(owner, w => w.ReadAsync(copyId));
         Assert.All(imported.Candidates, candidate => Assert.Equal(specifications, candidate.Specifications));

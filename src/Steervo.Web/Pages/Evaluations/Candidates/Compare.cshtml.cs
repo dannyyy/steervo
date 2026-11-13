@@ -23,7 +23,7 @@ public sealed class CompareModel(CandidateWorkspace workspace, ICurrentUser curr
         catch (RuleException error) { return StatusCode(error.Message == "Forbidden" ? 403 : 404); }
     }
     public async Task<IActionResult> OnPostAsync(Guid id, Guid? first, Guid? second, long version, string action,
-        Guid candidateId, Guid criterionId, bool? booleanValue, string? measurementValue, int? ratingValue, AssessmentSource source, string? notes)
+        Guid candidateId, Guid criterionId, string? booleanValue, string? measurementValue, int? ratingValue, AssessmentSource source, string? notes)
     {
         try
         {
@@ -32,7 +32,7 @@ public sealed class CompareModel(CandidateWorkspace workspace, ICurrentUser curr
             if (!ModelState.IsValid) throw new RuleException("InvalidValue");
             switch (action)
             {
-                case "assess-candidate": await workspace.AssessAsync(id, version, candidateId, criterionId, new(booleanValue, DetailsModel.ParseMeasurement(measurementValue), ratingValue, source, notes)); break;
+                case "assess-candidate": await workspace.AssessAsync(id, version, candidateId, criterionId, AssessmentForm.ToInput(booleanValue, measurementValue, ratingValue, source, notes)); break;
                 case "clear-assessment": await workspace.ClearAssessmentAsync(id, version, candidateId, criterionId); break;
                 default: throw new RuleException("InvalidValue");
             }

@@ -52,7 +52,7 @@ public sealed partial class Evaluation
         var offer = FindOffer(offerId); var criterion = FindCriterion(criterionId);
         var assessment = OfferAssessments.SingleOrDefault(value => value.OfferId == offerId && value.CriterionId == criterionId);
         return assessment?.RevisionNumber == offer.Latest.Number
-            ? criterion.Assess(assessment.BooleanValue, assessment.MeasurementValue, assessment.RatingValue) : Fulfillment.Unknown;
+            ? criterion.Assess(assessment.BooleanValue, assessment.MeasurementValue, assessment.RatingValue, assessment.OptionalAvailable) : Fulfillment.Unknown;
     }
 }
 
@@ -64,11 +64,12 @@ public sealed class OfferAssessment
     public Guid CriterionId { get; private set; }
     public int RevisionNumber { get; private set; }
     public bool? BooleanValue { get; private set; }
+    public bool OptionalAvailable { get; private set; }
     public decimal? MeasurementValue { get; private set; }
     public int? RatingValue { get; private set; }
     public AssessmentSource Source { get; private set; }
     public string Notes { get; private set; } = "";
-    public bool HasValue => BooleanValue.HasValue || MeasurementValue.HasValue || RatingValue.HasValue;
+    public bool HasValue => OptionalAvailable || BooleanValue.HasValue || MeasurementValue.HasValue || RatingValue.HasValue;
     private OfferAssessment() { }
     internal OfferAssessment(Guid evaluationId, Offer offer, Criterion criterion, AssessmentInput input)
     {
@@ -78,12 +79,13 @@ public sealed class OfferAssessment
     internal void Update(Offer offer, Criterion criterion, AssessmentInput input)
     {
         if (criterion.Scope != CriterionScope.Offer) throw new RuleException("OfferCriteriaOnly");
-        if ((criterion.Type != CriterionType.Boolean && input.BooleanValue.HasValue)
+        if ((criterion.Type != CriterionType.Boolean && (input.BooleanValue.HasValue || input.OptionalAvailable))
+            || (input.OptionalAvailable && input.BooleanValue.HasValue)
             || (criterion.Type != CriterionType.Measurement && input.MeasurementValue.HasValue)
             || (criterion.Type != CriterionType.Rating && input.RatingValue.HasValue)
             || input.RatingValue is < 1 or > 5) throw new RuleException("InvalidValue");
         var source = Rules.Defined(input.Source); var notes = Rules.OptionalText(input.Notes, 4000);
-        BooleanValue = input.BooleanValue; MeasurementValue = input.MeasurementValue; RatingValue = input.RatingValue;
+        BooleanValue = input.BooleanValue; OptionalAvailable = input.OptionalAvailable; MeasurementValue = input.MeasurementValue; RatingValue = input.RatingValue;
         Source = source; Notes = notes; RevisionNumber = offer.Latest.Number;
     }
     public void RestoreRevision(Offer offer, int revisionNumber)

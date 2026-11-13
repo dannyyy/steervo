@@ -11,6 +11,6 @@ else { <div class="assessment-summary"><partial name="_OfferAssessmentSummary" m
 @if (!string.IsNullOrEmpty(a?.Notes)) { <p class="assessment-notes-text">@a.Notes</p> }
 @if (edit)
 {
-    <partial name="/Pages/Shared/_AssessmentEditor.cshtml" model='new AssessmentEditor(Model.Evaluation, c, Model.Offer.Id, Model.Offer.Latest.Terms.Name, "offerId", "assess-offer", field, Model.PostUrl) { BooleanValue = a?.BooleanValue, MeasurementValue = a?.MeasurementValue, RatingValue = a?.RatingValue, Source = a?.Source ?? AssessmentSource.Unknown, Notes = a?.Notes, HasAssessment = a is not null, Draft = Model.HasDraft ? Model.Draft : null, ReviewNotice = Model.Stale ? T["OfferAssessmentStale", a!.RevisionNumber].Value : null, SubmitLabel = Model.Stale ? T["OfferAssessmentReview"].Value : null }' />
+    <partial name="/Pages/Shared/_AssessmentEditor.cshtml" model='new AssessmentEditor(Model.Evaluation, c, Model.Offer.Id, Model.Offer.Latest.Terms.Name, "offerId", "assess-offer", field, Model.PostUrl) { BooleanValue = a?.BooleanValue, OptionalAvailable = a?.OptionalAvailable ?? false, MeasurementValue = a?.MeasurementValue, RatingValue = a?.RatingValue, Source = a?.Source ?? AssessmentSource.Unknown, Notes = a?.Notes, HasAssessment = a is not null, Draft = Model.HasDraft ? Model.Draft : null, ReviewNotice = Model.Stale ? T["OfferAssessmentStale", a!.RevisionNumber].Value : null, SubmitLabel = Model.Stale ? T["OfferAssessmentReview"].Value : null }' />
 }
 </article>

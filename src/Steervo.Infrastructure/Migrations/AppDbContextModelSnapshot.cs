@@ -201,6 +201,11 @@ namespace Steervo.Infrastructure.Migrations
                         .HasMaxLength(4000)
                         .HasColumnType("character varying(4000)");
 
+                    b.Property<bool>("OptionalAvailable")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
                     b.Property<int?>("RatingValue")
                         .HasColumnType("integer");
 
@@ -219,7 +224,7 @@ namespace Steervo.Infrastructure.Migrations
 
                     b.ToTable("Assessment", t =>
                         {
-                            t.HasCheckConstraint("SingleAssessmentValue", "(CASE WHEN \"BooleanValue\" IS NULL THEN 0 ELSE 1 END + CASE WHEN \"MeasurementValue\" IS NULL THEN 0 ELSE 1 END + CASE WHEN \"RatingValue\" IS NULL THEN 0 ELSE 1 END) <= 1");
+                            t.HasCheckConstraint("SingleAssessmentValue", "(CASE WHEN \"BooleanValue\" IS NULL THEN 0 ELSE 1 END + CASE WHEN \"MeasurementValue\" IS NULL THEN 0 ELSE 1 END + CASE WHEN \"RatingValue\" IS NULL THEN 0 ELSE 1 END + CASE WHEN \"OptionalAvailable\" THEN 1 ELSE 0 END) <= 1");
 
                             t.HasCheckConstraint("ValidAssessmentRating", "\"RatingValue\" IS NULL OR \"RatingValue\" BETWEEN 1 AND 5");
 
@@ -733,6 +738,11 @@ namespace Steervo.Infrastructure.Migrations
                     b.Property<Guid>("OfferId")
                         .HasColumnType("uuid");
 
+                    b.Property<bool>("OptionalAvailable")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
+
                     b.Property<int?>("RatingValue")
                         .HasColumnType("integer");
 
@@ -754,7 +764,7 @@ namespace Steervo.Infrastructure.Migrations
 
                     b.ToTable("OfferAssessment", t =>
                         {
-                            t.HasCheckConstraint("SingleOfferAssessmentValue", "(CASE WHEN \"BooleanValue\" IS NULL THEN 0 ELSE 1 END + CASE WHEN \"MeasurementValue\" IS NULL THEN 0 ELSE 1 END + CASE WHEN \"RatingValue\" IS NULL THEN 0 ELSE 1 END) <= 1");
+                            t.HasCheckConstraint("SingleOfferAssessmentValue", "(CASE WHEN \"BooleanValue\" IS NULL THEN 0 ELSE 1 END + CASE WHEN \"MeasurementValue\" IS NULL THEN 0 ELSE 1 END + CASE WHEN \"RatingValue\" IS NULL THEN 0 ELSE 1 END + CASE WHEN \"OptionalAvailable\" THEN 1 ELSE 0 END) <= 1");
 
                             t.HasCheckConstraint("ValidOfferAssessmentRating", "\"RatingValue\" IS NULL OR \"RatingValue\" BETWEEN 1 AND 5");
 

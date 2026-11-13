@@ -53,7 +53,7 @@ public sealed class CostPostgresTests
             e.AddCost(new("Included", CostCategory.Service, CostFrequency.Included, null, 1, 12, car));
             e.AddCost(new("Credit", CostCategory.Other, CostFrequency.Once, 80, 3, CandidateId: car, Direction: CostDirection.Income));
         }); return true; });
-        var bytes = await f.TransferAsync(owner, t => t.ExportAsync(id)); Assert.Equal(6, JsonNode.Parse(bytes)!["version"]!.GetValue<int>());
+        var bytes = await f.TransferAsync(owner, t => t.ExportAsync(id)); Assert.Equal(7, JsonNode.Parse(bytes)!["version"]!.GetValue<int>());
         var copyId = await f.TransferAsync(owner, t => t.ImportAsync(bytes)); var copy = await f.AsAsync(owner, w => w.ReadAsync(copyId));
         var original = await f.AsAsync(owner, w => w.ReadAsync(id));
         Assert.Equal(original.CostPlanning!.Start, copy.CostPlanning!.Start); Assert.Equal(18, copy.CostPlanning.Months);

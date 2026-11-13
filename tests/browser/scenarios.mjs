@@ -100,7 +100,7 @@ export async function checkScenarios({ page, reader, readerEmail, origin, output
   const copiedScenario = new URL(page.url()).pathname.split('/').at(-1); assert.equal(Number(await amount()), 820);
   await page.goto(`${origin}${path}/${copiedScenario}?costId=${cost}`); await page.getByLabel('Abweichender Betrag je Zahlung (EUR)').fill('5'); await save(() => page.getByRole('button', { name: 'Kostenanpassung speichern' }).click()); await page.locator('#scenario-detail').waitFor(); assert.equal(Number(await amount()), 850);
   await page.goto(`${origin}${path}/${lease}`); assert.equal(Number(await amount()), 820);
-  const json = await exportCase(); assert.equal(json.version, 6); assert.equal(json.scenarios.length, 5);
+  const json = await exportCase(); assert.equal(json.version, 7); assert.equal(json.scenarios.length, 5);
   await page.goto(origin); await page.getByRole('button', { name: 'Evaluation importieren', exact: true }).click();
   await page.getByLabel('Exportdatei (JSON oder ZIP)').setInputFiles({ name: 'scenarios.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(json)) }); await page.getByRole('button', { name: 'Als neue Evaluation importieren', exact: true }).click(); await page.waitForURL(/\/evaluations\//);
   const importedPath = new URL(page.url()).pathname; const imported = JSON.parse(await (await browserRequest(page, `${importedPath}?handler=Export`)).text()); assert.equal(imported.scenarios.length, 5);

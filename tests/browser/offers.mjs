@@ -272,7 +272,7 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   assert.equal(await reader.page.locator('#save-offer').isDisabled(), true);
   record('Revoked editing permission keeps the long offer draft visible and prevents further saves');
   const exported = JSON.parse(await (await browserRequest(page, `${casePath}?handler=Export`)).text());
-  assert.equal(exported.version, 6);
+  assert.equal(exported.version, 7);
   assert.equal(exported.currency, 'EUR');
   assert.equal(exported.offers.length, 2);
   assert.equal(exported.offers.find(offer => offer.id === firstId).revisions.length, 4);

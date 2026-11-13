@@ -58,6 +58,6 @@ public sealed partial class Evaluation
         _ = FindCandidate(candidateId);
         var criterion = FindCriterion(criterionId);
         var assessment = Assessments.SingleOrDefault(x => x.CandidateId == candidateId && x.CriterionId == criterionId);
-        return criterion.Assess(assessment?.BooleanValue, assessment?.MeasurementValue, assessment?.RatingValue);
+        return criterion.Assess(assessment?.BooleanValue, assessment?.MeasurementValue, assessment?.RatingValue, assessment?.OptionalAvailable ?? false);
     }
 }

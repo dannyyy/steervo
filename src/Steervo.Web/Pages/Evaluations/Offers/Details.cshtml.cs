@@ -27,7 +27,7 @@ public sealed class DetailsModel(OfferWorkspace workspace, ICurrentUser current,
         catch (RuleException error) { return StatusCode(error.Message == "Forbidden" ? 403 : 404); }
     }
     public async Task<IActionResult> OnPostAsync(Guid id, Guid offerId, int? revision, long version, string action,
-        Guid criterionId, bool? booleanValue, string? measurementValue, int? ratingValue, AssessmentSource source, string? notes, Guid documentId)
+        Guid criterionId, string? booleanValue, string? measurementValue, int? ratingValue, AssessmentSource source, string? notes, Guid documentId)
     {
         try
         {
@@ -37,7 +37,7 @@ public sealed class DetailsModel(OfferWorkspace workspace, ICurrentUser current,
             {
                 case "archive-offer": await workspace.ArchiveAsync(id, version, offerId, true); break;
                 case "restore-offer": await workspace.ArchiveAsync(id, version, offerId, false); break;
-                case "assess-offer": await workspace.AssessAsync(id, version, offerId, criterionId, new(booleanValue, Candidates.DetailsModel.ParseMeasurement(measurementValue), ratingValue, source, notes)); break;
+                case "assess-offer": await workspace.AssessAsync(id, version, offerId, criterionId, AssessmentForm.ToInput(booleanValue, measurementValue, ratingValue, source, notes)); break;
                 case "clear-assessment": await workspace.ClearAssessmentAsync(id, version, offerId, criterionId); break;
                 case "remove-document": await workspace.RemoveDocumentAsync(id, version, offerId, documentId); break;
                 default: throw new RuleException("InvalidValue");

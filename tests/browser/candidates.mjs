@@ -212,7 +212,7 @@ export async function checkCandidates({ page, reader, origin, output, post, brow
   assert.equal((await post(page, firstPath, { action: 'assess-candidate', criterionId: rating, ratingValue: '9', version })).status(), 422);
   assert.equal((await post(page, firstPath, { action: 'assess-candidate', criterionId: boolean, booleanValue: 'false', version: '1' })).status(), 409);
   const exported = JSON.parse(await (await browserRequest(page, `${casePath}?handler=Export`)).text());
-  assert.equal(exported.version, 6);
+  assert.equal(exported.version, 7);
   assert.equal(exported.candidates.length, 8);
   const specifications = exported.candidates.find(candidate => candidate.id === firstId).specifications;
   assert.equal(specifications.kerbWeightKg, 2100);

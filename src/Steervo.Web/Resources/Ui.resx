@@ -831,4 +831,9 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="RequestRateLimited" xml:space="preserve"><value>Zu viele Anfragen. Deine Eingaben bleiben erhalten. Warte eine Minute und versuche es erneut.</value></data>
   <data name="OfflineNotice" xml:space="preserve"><value>Du bist offline. Offene Eingaben bleiben auf dieser Seite erhalten. Sobald die Verbindung zurück ist, kannst du sie erneut senden.</value></data>
   <data name="Passkey" xml:space="preserve"><value>Passkey</value></data>
+  <data name="BooleanOptional" xml:space="preserve"><value>Optional</value></data>
+  <data name="BooleanOptionalHelp" xml:space="preserve"><value>Optional bedeutet: separat erhältlich, aber noch nicht enthalten, etwa beim Hersteller oder einem Drittanbieter. Bezugsquelle und Details kannst du in der Notiz festhalten.</value></data>
+  <data name="FulfillmentOptional" xml:space="preserve"><value>Optional erhältlich</value></data>
+  <data name="RequiredOptional" xml:space="preserve"><value>Diese Muss-Anforderungen sind optional erhältlich</value></data>
+  <data name="RequiredOptionalHelp" xml:space="preserve"><value>Separat erhältlich, aber noch nicht enthalten. Diese Anforderungen zählen weder als erfüllt noch als verfehlt.</value></data>
 </root>

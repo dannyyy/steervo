@@ -5,7 +5,7 @@ public enum CriterionType { Boolean, Measurement, Rating }
 public enum Priority { Required, Preferred, Optional }
 public enum CriterionScope { Vehicle, Offer }
 public enum Comparison { AtLeast, AtMost }
-public enum Fulfillment { Unknown, Met, Unmet, Rated }
+public enum Fulfillment { Unknown, Met, Unmet, Rated, Optional }
 
 public sealed class RuleException(string code) : Exception(code);
 
@@ -193,8 +193,9 @@ public sealed class Criterion
         Threshold = Type == CriterionType.Measurement ? input.Threshold : null;
         Unit = Type == CriterionType.Measurement ? Rules.Text(input.Unit, 30) : null;
     }
-    public Fulfillment Assess(bool? boolean = null, decimal? measurement = null, int? rating = null)
+    public Fulfillment Assess(bool? boolean = null, decimal? measurement = null, int? rating = null, bool optionalAvailable = false)
     {
+        if (Type == CriterionType.Boolean && optionalAvailable) return Fulfillment.Optional;
         if (Type == CriterionType.Boolean) return boolean is null ? Fulfillment.Unknown : boolean.Value ? Fulfillment.Met : Fulfillment.Unmet;
         if (Type == CriterionType.Measurement) return measurement is null ? Fulfillment.Unknown : (Comparison == Comparison.AtLeast ? measurement >= Threshold : measurement <= Threshold) ? Fulfillment.Met : Fulfillment.Unmet;
         if (rating is null) return Fulfillment.Unknown;

@@ -248,6 +248,7 @@ Tinte ist ein gedämpfter blau-grauer Interaktionsakzent auf warmen, fast neutra
 | Erfüllt | `positive` / `positive-bg` | Erfasste objektive Anforderung erfüllt. |
 | Noch offen | `warning` / `warning-bg` | Angabe fehlt; keine negative Bewertung. |
 | Nicht erfüllt | `negative` / `negative-bg` | Erfasste objektive Anforderung verfehlt. |
+| Optional erhältlich | `accent` / `soft` | Ausstattung separat erhältlich, aber noch nicht enthalten; unabhängig von der Kriterienpriorität. |
 | Persönlich | `muted` / `neutral-surface` | Subjektive Bewertung, etwa 1–5. |
 | In Auswahl / Favorit | `accent` / `soft` | Einordnung des Fahrzeugs, unabhängig von der Erfüllung. |
 
@@ -281,6 +282,10 @@ Das sind beobachtete Rollen, keine mathematisch abgeleitete Skala. Die effektiv 
 **The Ein Schriftbild Rule.** Geist trägt die gesamte Oberfläche. Zahlen werden über tabellarische Ziffern ausgerichtet, nicht durch eine zusätzliche Monospace-Schrift.
 
 **Assets.** Die vorhandene [Geist-Datei](prototypes/design/assets/geist.woff2) und ihre [SIL Open Font License 1.1](prototypes/design/assets/OFL.txt) bilden die Schriftgrundlage. Herkunft und Lizenz stehen in [provenance.json](prototypes/design/assets/provenance.json). Bei der Übernahme in die Produktionsassets bleibt die Lizenz erhalten.
+
+### Favicon
+
+Das Favicon übernimmt das Bildzeichen aus `Pages/Shared/_Icon.cshtml`: zwei schräge Balken, ohne Wortmarke. Die helle Marke auf einer abgerundeten Tintenfläche bleibt auf hellen und dunklen Browserleisten lesbar. `wwwroot/favicon.svg` ist die Vektorquelle; `favicon.ico` enthält 16, 32 und 48 px. Das deckende `apple-touch-icon.png` hat 180 px und überlässt die äussere Maskierung dem Betriebssystem. Der gemeinsame Seitenrahmen bindet alle Varianten mit Inhaltsversionierung ein.
 
 ## Layout
 

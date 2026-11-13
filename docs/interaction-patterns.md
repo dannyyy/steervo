@@ -6,6 +6,8 @@ Diese Regeln gelten für die gesamte bestehende Anwendung. Die Canvas/Tinte-Migr
 
 Evaluation, ausgewähltes Fahrzeug, Offerte beziehungsweise Rechenszenario und Vergleichspartner bleiben beim Wechsel zwischen Erfassen und Vergleichen erhalten. Zurück führt zum sinnvollen Ausgangspunkt; direkt aufrufbare Seiten und Browsernavigation bleiben nutzbar. Der aktive Bereich ist visuell und über `aria-current` erkennbar.
 
+Anklickbare Evaluationszeilen nutzen die volle Breite ihrer gemeinsamen Fläche. Der Innenabstand liegt im Link, damit auch die Randbereiche anklickbar sind. Hover und Tastaturfokus folgen den äusseren Rundungen; zwischen mehreren Zeilen bleiben gerade Trennkanten. Die Fokusumrandung darf nicht abgeschnitten werden. Auf Mobilgeräten erhält der Titel die volle Zeilenbreite.
+
 Die globale Navigation führt zu Evaluationen und Konto; der Evaluationskontext führt zu den vorhandenen Fachbereichen. Freigaben, Einstellungen, Kosten und Rechnen dürfen durch die verkürzte Mockup-Navigation nicht verschwinden. Lange Navigation auf kleinen Bildschirmen wird strukturell angepasst, nicht durch unleserlich kleine Schrift eingepasst.
 
 Kostenbearbeitung erhält Fahrzeugbezug, Monats-/Jahresansicht und Seite der Zahlungstabelle. Szenariobearbeitung erhält Vergleichspaar, Stichtag und Zahlungsansicht. Nach Speichern führt der Fokus zur betroffenen Position oder zum Szenariotitel; lokale Annahmen führen zu ihrem Abschnitt zurück. Im mobilen Szenarienvergleich bleibt die zuvor bearbeitete Spalte sichtbar.
@@ -76,7 +78,7 @@ Löschkonflikte verwenden **Stand geprüft – erneut bestätigen** und öffnen 
 
 - Pro Vergleichsspalte Identität und Variante erkennbar halten. Ein horizontaler Wechsel darf Kriterienbezeichnungen nicht verschwinden lassen.
 - Beim Bearbeiten der zweiten Spalte bleibt das richtige Fahrzeug ausdrücklich genannt; nach Speichern kehrt die Darstellung zu dieser Spalte zurück.
-- Unbekannt, nicht erfüllt, erfüllt und persönlich sind verschiedene Zustände. Farbe allein reicht nicht zur Unterscheidung.
+- Unbekannt, nicht erfüllt, erfüllt, optional erhältlich und persönlich sind verschiedene Zustände. «Optional» bei einer Ja/Nein-Angabe bedeutet separat erhältlich, aber noch nicht enthalten. Es ist unabhängig von der Kriterienpriorität «optional» und zählt auch bei Muss-Kriterien weder als erfüllt noch als verfehlt. Hersteller, Drittanbieter und weitere Bedingungen können über Grundlage und Notiz festgehalten werden. Farbe allein reicht nicht zur Unterscheidung.
 - Technische Angaben bleiben Fakten, subjektive Bewertungen bleiben subjektiv. Keine unbestellte Gesamtnote oder automatische Ausschlusslogik ergänzen.
 - Original-/abgeleitete Angaben, Offertversion, Währung, Einheit und Zeitraum bleiben dort sichtbar, wo sie die Interpretation beeinflussen.
 - Rechenszenarien binden sich an eine bestimmte Offertversion. Ein Wechsel des Quellenlinks oder Versionsfeldes ersetzt keine bestätigten Annahmen. Gemeinsame Kosten, Rendite und Zeitraum wirken weiterhin aktuell auf alle Rechnungen. Restwerte gelten nur am erfassten Stichtag, ohne Interpolation.
