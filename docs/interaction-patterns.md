@@ -4,9 +4,11 @@ Diese Regeln sind das Ziel der Canvas/Tinte-Migration der vorhandenen Anwendung.
 
 ## Navigation und Kontext
 
-Evaluation, ausgewähltes Fahrzeug beziehungsweise Offerte und Vergleichspartner bleiben beim Wechsel zwischen Erfassen und Vergleichen erhalten. Zurück führt zum sinnvollen Ausgangspunkt; direkt aufrufbare Seiten und Browsernavigation bleiben nutzbar. Der aktive Bereich ist visuell und über `aria-current` erkennbar.
+Evaluation, ausgewähltes Fahrzeug, Offerte beziehungsweise Rechenszenario und Vergleichspartner bleiben beim Wechsel zwischen Erfassen und Vergleichen erhalten. Zurück führt zum sinnvollen Ausgangspunkt; direkt aufrufbare Seiten und Browsernavigation bleiben nutzbar. Der aktive Bereich ist visuell und über `aria-current` erkennbar.
 
 Die globale Navigation führt zu Evaluationen und Konto; der Evaluationskontext führt zu den vorhandenen Fachbereichen. Freigaben, Einstellungen, Kosten und Rechnen dürfen durch die verkürzte Mockup-Navigation nicht verschwinden. Lange Navigation auf kleinen Bildschirmen wird strukturell angepasst, nicht durch unleserlich kleine Schrift eingepasst.
+
+Kostenbearbeitung erhält Fahrzeugbezug, Monats-/Jahresansicht und Seite der Zahlungstabelle. Szenariobearbeitung erhält Vergleichspaar, Stichtag und Zahlungsansicht. Nach Speichern führt der Fokus zur betroffenen Position oder zum Szenariotitel; lokale Annahmen führen zu ihrem Abschnitt zurück. Im mobilen Szenarienvergleich bleibt die zuvor bearbeitete Spalte sichtbar.
 
 ## Welche Bearbeitungsform passt zu welcher Aufgabe?
 
@@ -19,6 +21,7 @@ Die globale Navigation führt zu Evaluationen und Konto; der Evaluationskontext 
 | Kurzer Objektname, Gruppe oder kleine Kriterienänderung | Kompakter Editor am Inhalt | Keine Unterbrechung für eine lokale Änderung |
 | Neues Fahrzeug / kompakte Stammdaten / längere persönliche Notiz | Gemeinsame seitliche Bearbeitungsfläche, auf Mobilgeräten volle Breite | Der zugrunde liegende Fahrzeugkontext bleibt erhalten |
 | Neue Evaluation und andere kompakte Anlageaufgaben | Dasselbe gemeinsame Editorverhalten; Größe passend zum Inhalt | Kein eigener Dialogstil pro Objekt |
+| Planungszeitraum, gemeinsame Renditeannahme, Restwert-Stichtag, Kostenanpassung, Szenariokopie | Gezielt geöffneter Inline-Editor mit gemeinsamen Aktionen | Kleine Annahmen bleiben am zugehörigen Ergebnis; keine dauerhaft sichtbare Formularsammlung |
 | Vollständige Offerte, neue Offertversion, Kostenposition oder Rechenszenario | Dedizierte, gegliederte Formularseite | Längere zusammenhängende Aufgaben brauchen Raum und stabile Navigation |
 | Dauerhaftes Entfernen, Zurücksetzen mit Datenverlust, Entwurf verwerfen | Kompakter Bestätigungsdialog | Objekt und tatsächliche Folgen müssen bewusst bestätigt werden |
 | Archivieren / Wiederherstellen | Aktion am Objekt mit klarer Rückmeldung | Reversibles Verhalten von dauerhaftem Löschen unterscheiden |
@@ -61,7 +64,9 @@ Für destruktive Bestätigungen: Objektname und Folge im Dialog nennen, sichere 
 | Keine Treffer im Filter | Filterbezug zeigen und Rückkehr zu allen Einträgen anbieten |
 | Nur Leserecht / alte Version | Lesedarstellung und Grund erkennbar; keine scheinbar bedienbaren Schreibaktionen |
 
-Bei langen Offertformularen und Uploads ersetzen Fehler das Formular nicht. Ein Versionskonflikt zeigt einen Link zum aktuellen Stand in einem zweiten Tab; **Stand geprüft – erneut speichern** sendet den erhaltenen Entwurf ausdrücklich mit dem geprüften Versionsstand. Weitere gleichzeitige Änderungen lösen erneut einen Konflikt aus. Gewählte Dateien bleiben bei HTMX-Fehlern im ursprünglichen Eingabefeld; bei einem nativen POST ohne JavaScript fordert die Seite bei Fehlern die erneute Dateiauswahl an.
+Bei langen Offert-, Kosten- und Szenarioformularen sowie Uploads ersetzen Fehler das Formular nicht. Ein Versionskonflikt zeigt einen Link zum aktuellen Stand in einem zweiten Tab; **Stand geprüft – erneut speichern** sendet den erhaltenen Entwurf ausdrücklich mit dem geprüften Versionsstand. Weitere gleichzeitige Änderungen lösen erneut einen Konflikt aus. Gewählte Dateien bleiben bei HTMX-Fehlern im ursprünglichen Eingabefeld; bei einem nativen POST ohne JavaScript fordert die Seite bei Fehlern die erneute Dateiauswahl an.
+
+Löschkonflikte verwenden **Stand geprüft – erneut bestätigen** und öffnen danach erneut die konkrete Bestätigung. Auch eine bereits bestätigte Löschung darf einen benachbarten Entwurf nicht still verwerfen. Ist ein Eintrag inzwischen entfernt, bleibt die Seite erhalten, meldet dessen fehlende Verfügbarkeit und sperrt weitere Schreibversuche.
 
 `role="status"` beziehungsweise `aria-live` für knappe Rückmeldungen, `role="alert"` für relevante Fehler verwenden. Meldungen nicht mehrfach durch einen Fragmentaustausch ankündigen. Ausreichender Kontrast und Text ergänzen die Farben.
 
@@ -72,11 +77,14 @@ Bei langen Offertformularen und Uploads ersetzen Fehler das Formular nicht. Ein 
 - Unbekannt, nicht erfüllt, erfüllt und persönlich sind verschiedene Zustände. Farbe allein reicht nicht zur Unterscheidung.
 - Technische Angaben bleiben Fakten, subjektive Bewertungen bleiben subjektiv. Keine unbestellte Gesamtnote oder automatische Ausschlusslogik ergänzen.
 - Original-/abgeleitete Angaben, Offertversion, Währung, Einheit und Zeitraum bleiben dort sichtbar, wo sie die Interpretation beeinflussen.
+- Rechenszenarien binden sich an eine bestimmte Offertversion. Ein Wechsel des Quellenlinks oder Versionsfeldes ersetzt keine bestätigten Annahmen. Gemeinsame Kosten, Rendite und Zeitraum wirken weiterhin aktuell auf alle Rechnungen. Restwerte gelten nur am erfassten Stichtag, ohne Interpolation.
 - Fehlende Informationen werden als offen gezeigt. Der Demo-Prototyp setzt weder echte Kosten voraus noch liefert er Standardwerte für Benutzer.
 
 ## HTMX und Sortierung
 
 Die vorhandene Kombination aus vollständigen Razor-Seiten und Teilansichten bleibt maßgeblich. IDs, Anti-Forgery-Tokens, Versionsfelder und Rollenprüfung dürfen beim Extrahieren gemeinsamer UI-Bausteine nicht verloren gehen.
+
+Erfolgreiche vollständige Formularaktionen dürfen per `HX-Redirect` navigieren. Führt die Antwort auf denselben Pfad mit derselben Query und nur einem anderen Sprungziel, muss der gespeicherte Stand trotzdem neu geladen werden. Stabile, explizite Fokusziele erhalten dabei den Bezug zum bearbeiteten Inhalt.
 
 Nach einem Fragmentaustausch werden nur die notwendigen Interaktionen initialisiert; Handler nicht mehrfach registrieren. Fokus, Scrollposition, offene Editorzustände und ungespeicherte Felder gehören zum Zustand des Arbeitsbereichs. Sortieren ändert die Reihenfolge, nicht IDs oder Bewertungen. Tastatur, Touch, Abbruch und Bewegung zwischen Gruppen bleiben unterstützt.
 

@@ -485,3 +485,194 @@ body:has(dialog[open]) { overflow: hidden; }
 
 .offer-line-actions button { display: inline-flex; align-items: center; justify-content: center; min-width: 40px; }
 .page-editor input[type=file]::file-selector-button { font: inherit; padding: 6px 10px; margin: -3px 12px -3px -5px; border: 1px solid var(--field-border); border-radius: 4px; background: var(--soft); color: var(--accent); cursor: pointer; }
+
+/* Financial workspaces keep assumptions, recorded amounts and results distinct. */
+.cost-scope span { color: var(--muted); font-size: 11px; }
+.cost-total span { font-size: 15px; letter-spacing: 0; }
+.cost-result dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+.cost-result-note { grid-column: 1 / -1; margin: 0; max-width: 850px; }
+.cost-copy { min-width: 0; overflow-wrap: anywhere; }
+.cost-row .micro { margin-top: .25rem; }
+.cost-row-amount { display: grid; gap: .2rem; text-align: right; font-size: 13px; font-variant-numeric: tabular-nums; }
+.cost-row-actions form { margin: 0; }
+.cost-row-actions .text-button { min-height: 44px; }
+.cost-notes { font-size: 12px; margin-top: .5rem; }
+.cost-notes p { white-space: pre-wrap; }
+.cost-timeline-heading { display: flex; justify-content: space-between; align-items: start; gap: 1rem; flex-wrap: wrap; }
+.cost-table-scroll { overflow-x: auto; margin-top: 1rem; }
+.cost-table th:first-child, .cost-table td:last-child, .cost-table th:last-child { text-align: left; }
+.cost-table th .micro { display: block; white-space: nowrap; margin: .25rem 0 0; font-weight: 400; }
+.cost-table td { white-space: nowrap; }
+.cost-table td:last-child { min-width: 150px; max-width: 300px; white-space: normal; }
+.cost-table ul { padding-left: 1rem; margin-bottom: 0; overflow-wrap: anywhere; }
+.scenario-editor h1 { font-size: clamp(25px, 3vw, 34px); }
+.scenario-number-grid .micro { margin-top: .4rem; }
+.scenario-check { display: flex; align-items: start; gap: .75rem; margin-top: 1.5rem; }
+.scenario-check input { width: 18px; height: 18px; min-height: 0; flex-shrink: 0; accent-color: var(--accent); }
+.scenario-convention { margin-block: 1.5rem; }
+.scenario-offer-picker { margin-top: 1.5rem; }
+.scenario-offer-option>span:first-of-type { grid-column: 1; font-size: 12px; color: var(--muted); }
+.scenario-offer-option>span:last-child { grid-column: 2; grid-row: 1 / 3; align-self: center; color: var(--accent); }
+.scenario-horizon>div { width: 180px; flex-shrink: 0; }
+.scenario-horizon>.micro { max-width: 52ch; margin-bottom: .5rem; }
+.scenario-result-label { font-size: 13px; margin-top: 1.5rem; }
+.scenario-gaps ul { padding-left: 1.1rem; margin: .6rem 0 0; }
+.scenario-gaps li { margin-block: .4rem; }
+.scenario-result-values { margin: 1.2rem 0 0; font-size: 12px; }
+.scenario-result-values small { display: block; color: var(--muted); font-size: 10px; margin-top: .35rem; }
+.scenario-band span, .scenario-band strong { display: block; font-size: 12px; }
+.scenario-band span { font-size: 10px; color: var(--muted); margin-bottom: .4rem; }
+.scenario-wealth { margin-top: 1.25rem; font-size: 12px; }
+.scenario-components h4 { margin-top: 1.5rem; }
+.scenario-note { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; margin-top: .5rem; }
+.scenario-section { margin-block: 1.5rem; }
+.scenario-checkpoints article>div:first-child { min-width: 0; overflow-wrap: anywhere; }
+.scenario-inline-actions .text-button { min-height: 44px; }
+.scenario-payment-table td:last-child { text-align: right; min-width: 110px; }
+.scenario-compare-picker { display: grid; grid-template-columns: 1fr 1fr 140px auto; gap: 1rem; align-items: end; margin-block: 1.5rem; }
+.scenario-compare-picker select { min-width: 0; }
+.scenario-comparison-summary>p { margin-top: .6rem; font-size: 13px; }
+.scenario-comparison-summary>.micro { color: var(--editor-muted); font-size: 11px; }
+.scenario-threshold { border-top: 1px solid var(--line); padding-top: 1rem; }
+.financial-warning { color: var(--warning); background: var(--warning-bg); border-color: var(--warning-bg); }
+.cost-record .cost-plan-heading, .scenario-collection .scenario-settings { margin: 0 0 24px; }
+.cost-plan-heading h3, .scenario-settings h3 { font-size: 18px; }
+.cost-plan-heading .muted, .scenario-settings .muted { font-size: 12px; }
+.cost-record .cost-plan { margin: 0 0 28px; }
+.cost-plan-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 22px; align-items: end; max-width: 720px; }
+.cost-plan-form .editor-actions { grid-column: 1 / -1; }
+.cost-scopes { display: flex; gap: 10px; overflow-x: auto; padding: 20px 0; border-top: 1px solid var(--line); margin: 0; scroll-padding: 12px; }
+.cost-scope { display: grid; gap: .35rem; flex: 0 0 220px; border: 1px solid transparent; border-radius: 8px; padding: 14px 16px; background: var(--group-surface); overflow-wrap: anywhere; font-size: 13px; }
+.cost-scope.selected { border-color: var(--accent); background: var(--soft); box-shadow: none; }
+.cost-scope strong { font-weight: 550; }
+.cost-result { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px 48px; border: 0; border-radius: 12px; background: var(--soft); padding: 28px; margin-bottom: 26px; }
+.cost-result h3 { font-size: 13px; font-weight: 500; color: var(--editor-muted); }
+.cost-total { font-size: clamp(30px, 3.5vw, 43px); font-weight: 560; letter-spacing: -.04em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; color: var(--accent); margin-top: 10px; }
+.cost-result .micro, .cost-result dt { color: var(--editor-muted); }
+.cost-result dl > div { display: flex; justify-content: space-between; gap: 16px; font-size: 13px; padding: 7px 0; }
+.cost-result dl { margin: 0; display: grid; gap: 0; align-content: center; }
+.cost-record .cost-items, .cost-record .cost-timeline { margin: 0; }
+.cost-record .cost-items .section-heading { margin-bottom: 18px; }
+.cost-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 24px; align-items: center; padding: 22px 0; border-top: 1px solid var(--line); scroll-margin-top: 1rem; }
+.cost-row h4 { font-size: 16px; font-weight: 550; }
+.cost-row-amount strong { font-size: 17px; font-weight: 550; }
+.cost-row-amount .micro { font-size: 11px; color: var(--muted); }
+.cost-row-actions { display: grid; justify-items: center; gap: .4rem; min-width: 100px; }
+.cost-row-actions .button { font-size: 11px; min-height: 38px; }
+.cost-period-switch { display: flex; border: 0; border-radius: 8px; overflow: hidden; background: var(--neutral-surface); padding: 4px; gap: 3px; }
+.cost-period-switch a { padding: 8px 13px; font-size: 12px; border-radius: 5px; }
+.cost-period-switch a[aria-current=page] { background: var(--surface); color: var(--accent); box-shadow: var(--shadow-candidate); }
+.cost-table-scroll:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.cost-table { width: 100%; border-collapse: separate; font-size: 12px; border-spacing: 0; }
+.cost-table thead th { background: var(--group-surface); font-size: 11px; font-weight: 550; color: var(--muted); }
+.cost-table tbody th { font-weight: 500; }
+.cost-table th, .cost-table td { padding: 15px 12px; text-align: right; border-bottom: 1px solid var(--line); vertical-align: top; font-variant-numeric: tabular-nums; }
+.cost-table th:first-child { position: sticky; left: 0; background: var(--surface); border-right: 1px solid var(--line); z-index: 1; }
+.cost-table thead th:first-child { background: var(--group-surface); }
+.cost-open { display: block; color: var(--warning); font-size: 11px; }
+.cost-pagination { display: flex; align-items: center; justify-content: center; gap: 14px 24px; font-size: 12px; margin-top: 22px; flex-wrap: wrap; }
+.cost-editor, .scenario-editor { margin: 0; max-width: 1060px; }
+.page-editor > .muted { max-width: 75ch; margin-bottom: 28px; }
+.scenario-settings { padding: 0; }
+.scenario-collection .scenario-return-form { display: block; max-width: 650px; }
+.scenario-collection .scenario-return-form > div:first-of-type { max-width: 320px; }
+.scenario-list-actions { display: flex; gap: 1.5rem; align-items: center; justify-content: space-between; margin: 26px 0 0; padding-top: 24px; border-top: 1px solid var(--line); }
+.scenario-list-actions .micro { margin: 0; max-width: 65ch; }
+.scenario-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px 28px; padding: 28px 0; border-bottom: 1px solid var(--line); }
+.scenario-card:last-child { border-bottom: 0; padding-bottom: 0; }
+.scenario-card-copy { grid-row: 1 / 3; min-width: 0; }
+.scenario-card h3 { font-size: 24px; font-weight: 550; overflow-wrap: anywhere; }
+.scenario-card .eyebrow { margin-bottom: 10px; }
+.scenario-card .muted, .scenario-card .micro { margin-top: 6px; overflow-wrap: anywhere; }
+.scenario-card .candidate-warning { margin-top: 12px; color: var(--warning); font-size: 12px; }
+.scenario-card .candidate-open { align-self: end; color: var(--accent); font-size: 13px; padding: 0; margin: 0; }
+.scenario-card-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 18px; justify-content: flex-end; font-size: 12px; margin: 0; padding: 0; border: 0; align-self: start; }
+.scenario-card-actions a { font-size: 12px; }
+.scenario-introduction { align-items: flex-start; }
+.scenario-introduction h2 { font-size: clamp(26px, 3vw, 36px); overflow-wrap: anywhere; }
+.scenario-introduction .muted { max-width: 70ch; overflow-wrap: anywhere; }
+.scenario-horizon { display: flex; gap: 16px; align-items: end; margin-block: 1.5rem; padding: 18px 22px; background: var(--group-surface); border-radius: 10px; margin: 0 0 28px; }
+.scenario-horizon label { margin-top: 0; }
+.scenario-horizon .micro { margin: 0; }
+.scenario-detail-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 30px; align-items: start; margin-bottom: 30px; }
+.scenario-result { background: var(--soft); border: 0; border-radius: 12px; padding: 28px; min-width: 0; overflow-wrap: anywhere; }
+.scenario-result.incomplete { background: var(--group-surface); }
+.scenario-result h3 { font-size: 20px; font-weight: 550; }
+.scenario-result .micro, .scenario-result dt, .scenario-result-label { color: var(--editor-muted); }
+.scenario-result-total { font-size: clamp(29px, 3.2vw, 42px); font-weight: 560; letter-spacing: -.035em; font-variant-numeric: tabular-nums; line-height: 1.3; margin-block: .4rem; color: var(--accent); overflow-wrap: anywhere; }
+.scenario-monthly { font-size: 13px; color: var(--editor-muted); }
+.scenario-result-values > div { display: flex; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--line); padding: 11px 0; }
+.scenario-result-values dt { flex: 1; min-width: 0; overflow-wrap: anywhere; font-size: 12px; }
+.scenario-result-values dd { text-align: right; margin: 0; font-variant-numeric: tabular-nums; max-width: 60%; overflow-wrap: anywhere; font-size: 14px; }
+.scenario-components { min-width: 0; padding: 8px 0; }
+.scenario-components h3 { font-size: 19px; font-weight: 550; }
+.scenario-components .scenario-result-values dd { font-size: 13px; }
+.scenario-components small { font-size: 10px; color: var(--muted); }
+.scenario-record .scenario-section { margin: 0; }
+.scenario-section > .surface-heading { margin-bottom: 8px; }
+.scenario-section > .muted { font-size: 13px; max-width: 80ch; }
+.scenario-checkpoints { margin-top: 20px; }
+.scenario-checkpoints article { display: flex; align-items: start; justify-content: space-between; gap: 1.5rem; border-bottom: 1px solid var(--line); font-size: 13px; padding: 20px 0; }
+.scenario-checkpoints strong { font-size: 14px; font-weight: 550; }
+.scenario-inline-actions { display: flex; align-items: center; flex-wrap: wrap; font-size: 12px; flex: none; gap: 16px; }
+.scenario-inline-editor { margin: 24px 0; max-width: 920px; }
+.scenario-inline-editor .scenario-secondary-form { margin: 0; padding: 0; border: 0; }
+.scenario-inline-editor .editor-actions { margin-top: 22px; }
+.scenario-residual-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.scenario-number-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 26px; }
+.scenario-number-grid label { margin-top: 0; }
+.cost-editor .form-section .micro, .scenario-editor .form-section .micro { margin: 7px 0 0; }
+.scenario-convention, .scenario-gaps { color: var(--warning); background: var(--warning-bg); border-color: var(--warning-bg); }
+.scenario-gaps { margin-block: 1.2rem; padding: 14px; border-radius: 6px; font-size: 12px; }
+.scenario-band { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 1.4rem; border-color: var(--line); }
+.scenario-band strong { font-variant-numeric: tabular-nums; font-weight: 550; overflow-wrap: anywhere; }
+.scenario-offer-option { display: grid; grid-template-columns: 1fr auto; padding: 18px 20px; margin-top: 10px; gap: .4rem 1rem; overflow-wrap: anywhere; border-radius: 8px; background: var(--group-surface); }
+.scenario-offer-option:hover { background: var(--soft); }
+.scenario-offer-option strong { font-weight: 550; }
+.scenario-comparison .scenario-compare-picker { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 130px auto; }
+.scenario-comparison-summary { overflow-wrap: anywhere; background: var(--soft); color: var(--ink); padding: 24px; border-radius: 12px; margin-bottom: 1.5rem; border: 0; }
+.scenario-comparison-summary h3 { font-size: 21px; font-weight: 550; }
+.scenario-comparison-summary p { color: var(--editor-muted); }
+.scenario-table .scenario-result-total { font-size: clamp(24px, 2.6vw, 36px); }
+.scenario-table .scenario-result-row td { background: var(--soft); }
+.scenario-table .scenario-result-row .scenario-gaps { margin-bottom: 0; }
+.scenario-table .scenario-result-row .micro { font-size: 11px; }
+form[data-operation] .editor-error { max-width: 380px; margin-bottom: 12px; text-align: left; }
+form[data-operation]:has(.editor-error:not([hidden])) { grid-column: 1 / -1; }
+.scenario-editor [data-scenario-group] h3 { margin-bottom: 20px; }
+@media (max-width: 980px) {
+  .scenario-detail-grid { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .scenario-comparison .scenario-compare-picker { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .cost-result { gap: 20px; }
+}
+@media (max-width: 700px) {
+  .cost-result { grid-template-columns: minmax(0, 1fr); padding: 22px; }
+  .cost-scopes { margin-right: -5px; }
+  .cost-scope { flex-basis: 200px; }
+  .cost-row { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .cost-row-amount { grid-column: 1; grid-row: 2; text-align: left; }
+  .cost-row-actions { grid-column: 1; grid-row: 3; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+  .cost-plan-form, .scenario-number-grid, .scenario-residual-fields { grid-template-columns: minmax(0, 1fr); }
+  .scenario-list-actions { align-items: flex-start; flex-direction: column; gap: 14px; }
+  .scenario-card { gap: 14px; }
+  .scenario-card-copy { grid-column: 1 / -1; grid-row: 1; }
+  .scenario-card h3 { font-size: 22px; }
+  .scenario-card .candidate-open { grid-column: 1 / -1; }
+  .scenario-card-actions { grid-column: 1 / -1; justify-content: flex-start; gap: 24px; }
+  .scenario-introduction .surface-actions { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .scenario-horizon { display: grid; grid-template-columns: minmax(0, 1fr) auto; padding: 16px; gap: 12px; }
+  .scenario-horizon > div { width: auto; min-width: 0; }
+  .scenario-horizon .micro { grid-column: 1 / -1; }
+  .scenario-result { padding: 22px; }
+  .scenario-result-total { font-size: 32px; }
+  .scenario-band { grid-template-columns: minmax(0, 1fr); }
+  .scenario-band > div { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; }
+  .scenario-checkpoints article { flex-direction: column; align-items: stretch; gap: 10px; }
+  .scenario-inline-actions { justify-content: flex-end; }
+  .scenario-comparison .scenario-compare-picker { grid-template-columns: minmax(0, 1fr); }
+  .scenario-table .scenario-result-total { font-size: 23px; }
+  .scenario-table .vehicle-group-heading .micro { max-width: calc(100vw - 96px); }
+  .scenario-table .scenario-gaps { padding: 10px; font-size: 11px; }
+  .scenario-comparison-summary { padding: 20px; }
+  .scenario-comparison-summary h3 { font-size: 19px; }
+}

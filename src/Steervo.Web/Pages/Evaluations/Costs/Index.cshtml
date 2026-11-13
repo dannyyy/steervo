@@ -4,18 +4,15 @@
 @{ ViewData["Title"] = T["CostPlanningTitle"].Value; var e = Model.Evaluation; var plan = e.CostPlanning; var edit = Model.Access >= AccessLevel.Editor; }
 <div id="cost-workspace" data-version="@e.Version">
 <partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "costs")' />
-<div class="candidate-heading"><div><p class="eyebrow">@T["CostPlanningEyebrow"]</p><h2>@T["CostPlanningTitle"]</h2><p class="muted">@T["CostPlanningHelp"]</p></div>
-@if (edit && plan is not null && e.Currency is not null) { <a class="button primary" asp-page="Edit" asp-route-id="@e.Id" asp-route-candidateId="@Model.CandidateId">+ @T["CostAdd"]</a> }</div>
-@if (Model.Notice is not null) { <div class="notice failure" role="alert">@Model.Notice</div> }
-@if (edit)
-{
-<details class="panel cost-plan" open="@(plan is null || Model.Failed)"><summary>@T[plan is null ? "CostPlanSetup" : "CostPlanChange"] @if (plan is not null) { <span class="micro">@plan.Start.ToString("MM.yyyy") – @plan.DateFor(plan.Months).ToString("MM.yyyy") · @T["CostMonthCount", plan.Months]</span> }</summary>
-<p class="muted">@T["CostPlanHelp"]</p><form method="post" class="cost-plan-form"><input type="hidden" name="action" value="plan" /><input asp-for="Version" type="hidden" />
-<div><label asp-for="Plan.Start">@T["CostStart"]</label><input asp-for="Plan.Start" type="month" min="1900-01" max="9899-12" required /></div>
-<div><label asp-for="Plan.Months">@T["CostDuration"]</label><input asp-for="Plan.Months" type="number" min="1" max="1200" step="1" required /></div>
-<button class="button primary">@T["CostSavePlan"]</button></form></details>
-}
-else if (plan is null) { <p class="notice">@T["CostPlanningRequired"]</p> }
+<div class="surface-heading"><div><p class="eyebrow">@T["CostPlanningEyebrow"]</p><h2>@T["CostPlanningTitle"]</h2><p class="muted">@T["CostPlanningHelp"]</p></div>
+@if (edit && plan is not null && e.Currency is not null) { <a class="button primary" asp-page="Edit" asp-route-id="@e.Id" asp-route-candidateId="@Model.CandidateId" asp-route-period="@Model.Period" asp-route-pageNumber="@Model.PageNumber"><partial name="/Pages/Shared/_Icon.cshtml" model='"plus"' />@T["CostAdd"]</a> }</div>
+@if (Model.Notice is not null && Model.FailedAction != "plan") { <div class="notice failure" role="alert">@Model.Notice</div> }
+<section class="workspace-surface cost-record">
+<div class="surface-heading cost-plan-heading"><div><h3 id="cost-plan-title" tabindex="-1" data-return-focus>@T[plan is null ? "CostPlanSetup" : "CostPlanningPeriod"]</h3>
+@if (plan is not null) { <p class="muted">@plan.Start.ToString("MM.yyyy") – @plan.DateFor(plan.Months).ToString("MM.yyyy") · @T["CostMonthCount", plan.Months]</p> }
+else { <p class="muted">@T["CostPlanningRequired"]</p> }</div>
+@if (edit) { <button type="button" id="open-cost-plan" class="button secondary" data-editor-open="cost-plan-editor" aria-controls="cost-plan-editor" aria-expanded="@((plan is null || Model.FailedAction == "plan").ToString().ToLowerInvariant())">@T[plan is null ? "CostPlanSetup" : "CostPlanChange"]</button> }</div>
+@if (edit) { <partial name="_PlanEditor" model="Model" /> }
 @if (e.Currency is null) { <p class="notice">@T["CostCurrencyRequired"] <a asp-page="/Evaluations/Offers/Index" asp-route-id="@e.Id">@T["Offers"] →</a></p> }
 @if (plan is not null && e.Currency is not null && Model.Projection is { } projection)
 {
@@ -33,13 +30,13 @@ else if (plan is null) { <p class="notice">@T["CostPlanningRequired"]</p> }
 <dl><div><dt>@T["CostExpenses"]</dt><dd>@projection.Totals.Expenses.ToString("N2") @e.Currency</dd></div><div><dt>@T["CostIncome"]</dt><dd>@projection.Totals.Income.ToString("N2") @e.Currency</dd></div><div><dt>@T["CostAverage"]</dt><dd>@((projection.Totals.Net / plan.Months).ToString("N2")) @e.Currency</dd></div></dl>
 <p class="micro cost-result-note">@T["CostSummaryHelp"]</p>
 </section>
-@if (!projection.Totals.Complete) { <p class="notice failure" data-cost-missing="@projection.Totals.MissingItems">@T["CostMissing", projection.Totals.MissingItems]</p> }
-<section id="cost-items" class="panel cost-items"><div class="section-heading"><h3>@T["CostItems"]</h3><p class="micro">@T[Model.CandidateId.HasValue ? "CostCandidateHelp" : "CostCommonHelp"]</p></div>
+@if (!projection.Totals.Complete) { <p class="notice financial-warning" data-cost-missing="@projection.Totals.MissingItems">@T["CostMissing", projection.Totals.MissingItems]</p> }
+<section id="cost-items" class="record-section cost-items" tabindex="-1" data-return-focus><div class="section-heading"><h3>@T["CostItems"]</h3><p class="micro">@T[Model.CandidateId.HasValue ? "CostCandidateHelp" : "CostCommonHelp"]</p></div>
 @if (projection.Items.Count == 0) { <p class="muted">@T["CostEmpty"]</p> }
 @foreach (var row in projection.Items.OrderBy(r => r.Item.CandidateId.HasValue).ThenBy(r => r.Item.StartMonth).ThenBy(r => r.Item.Name))
 {
     var item = row.Item;
-    <article class="cost-row" id="cost-@item.Id" data-cost-id="@item.Id"><div class="cost-copy"><h4>@item.Name</h4>
+    <article class="cost-row" id="cost-@item.Id" data-cost-id="@item.Id" tabindex="-1" data-return-focus><div class="cost-copy"><h4>@item.Name</h4>
     <p class="micro">@T["CostCategory" + item.Category] · @T["CostFrequency" + item.Frequency] · @T[item.CandidateId.HasValue ? "CostVehicleOnly" : "CostCommon"]
     @if (item.Direction == CostDirection.Income) { <span class="badge">@T["CostDirectionIncome"]</span> }</p>
     <p class="micro">@T["CostFromMonth", item.StartMonth] (@plan.DateFor(item.StartMonth).ToString("MM.yyyy"))@if (item.EndMonth is { } end) { <span> – @T["CostThroughMonth", end] (@plan.DateFor(end).ToString("MM.yyyy"))</span> }</p>
@@ -48,12 +45,13 @@ else if (plan is null) { <p class="notice">@T["CostPlanningRequired"]</p> }
     </div><div class="cost-row-amount"><strong>@(item.Frequency == CostFrequency.Included ? T["CostFrequencyIncluded"].Value : item.Amount.HasValue ? $"{item.Amount:N2} {e.Currency}" : T["OfferOpen"].Value)</strong>
     <span class="micro">@T["CostPeriodTotal"]: @(row.Total.HasValue ? $"{row.Total:N2} {e.Currency}" : T["OfferOpen"].Value)</span>
     @if (item.Frequency != CostFrequency.Included) { <span class="micro">@T["CostPaymentCount", row.Occurrences]</span> }</div>
-    @if (edit) { <div class="cost-row-actions"><a class="button secondary" asp-page="Edit" asp-route-id="@e.Id" asp-route-costId="@item.Id">@T["Edit"]</a><form method="post" data-confirm="@T["CostDeleteConfirm"]"><input type="hidden" name="action" value="remove-cost" /><input type="hidden" name="Version" value="@e.Version" /><input type="hidden" name="costId" value="@item.Id" /><button class="text-button danger">@T["CostRemove"]</button></form></div> }
+    @if (edit) { <div class="cost-row-actions"><a class="button secondary" asp-page="Edit" asp-route-id="@e.Id" asp-route-costId="@item.Id" asp-route-scope="@Model.CandidateId" asp-route-period="@Model.Period" asp-route-pageNumber="@Model.PageNumber">@T["Edit"]</a><form id="remove-cost-@item.Id" method="post" hx-post="@Model.ContextUrl" hx-swap="none" hx-sync="this:drop" hx-disabled-elt="find button[type=submit]" data-operation data-retain-on-error data-confirm-action="@T["CostDeleteNamed", item.Name]" data-confirm-description="@T["CostDeleteConfirm"]"><input type="hidden" name="action" value="remove-cost" /><input type="hidden" name="Version" value="@e.Version" /><input type="hidden" name="costId" value="@item.Id" /><button type="submit" class="text-button danger">@T["CostRemove"]</button></form></div> }
     </article>
 }
 </section>
-<section class="panel cost-timeline"><div class="cost-timeline-heading"><div><h3>@T["CostTimeline"]</h3><p class="micro">@T["CostTimelineHelp"]</p></div><nav class="cost-period-switch" aria-label="@T["CostDisplay"]"><a asp-page="Index" asp-route-id="@e.Id" asp-route-candidateId="@Model.CandidateId" asp-route-period="month" asp-fragment="cost-timeline" aria-current="@(Model.Period == "month" ? "page" : null)">@T["CostMonthlyView"]</a><a asp-page="Index" asp-route-id="@e.Id" asp-route-candidateId="@Model.CandidateId" asp-route-period="year" asp-fragment="cost-timeline" aria-current="@(Model.Period == "year" ? "page" : null)">@T["CostYearlyView"]</a></nav></div>
-<div class="cost-table-scroll" id="cost-timeline" tabindex="0" role="region" aria-label="@T["CostTimeline"]"><table class="cost-table"><thead><tr><th scope="col">@T["CostPeriod"]</th><th scope="col">@T["CostExpenses"]</th><th scope="col">@T["CostIncome"]</th><th scope="col">@T["CostNet"]</th><th scope="col">@T["CostDetails"]</th></tr></thead><tbody>
+<section class="record-section cost-timeline"><div class="cost-timeline-heading"><div><h3>@T["CostTimeline"]</h3><p class="micro">@T["CostTimelineHelp"]</p></div><nav class="cost-period-switch" aria-label="@T["CostDisplay"]"><a asp-page="Index" asp-route-id="@e.Id" asp-route-candidateId="@Model.CandidateId" asp-route-period="month" asp-fragment="cost-timeline" aria-current="@(Model.Period == "month" ? "page" : null)">@T["CostMonthlyView"]</a><a asp-page="Index" asp-route-id="@e.Id" asp-route-candidateId="@Model.CandidateId" asp-route-period="year" asp-fragment="cost-timeline" aria-current="@(Model.Period == "year" ? "page" : null)">@T["CostYearlyView"]</a></nav></div>
+<p class="comparison-scroll-hint" id="cost-timeline-hint">@T["FinancialScrollHint"]</p>
+<div class="cost-table-scroll" id="cost-timeline" tabindex="0" role="region" aria-describedby="cost-timeline-hint" aria-label="@T["CostTimeline"]"><table class="cost-table"><thead><tr><th scope="col">@T["CostPeriod"]</th><th scope="col">@T["CostExpenses"]</th><th scope="col">@T["CostIncome"]</th><th scope="col">@T["CostNet"]</th><th scope="col">@T["CostDetails"]</th></tr></thead><tbody>
 @foreach (var period in Model.Periods)
 {
     var total = period.Projection.Totals; var active = period.Projection.Items.Where(r => r.Active).ToArray();
@@ -64,4 +62,5 @@ else if (plan is null) { <p class="notice">@T["CostPlanningRequired"]</p> }
 @if (Model.PageCount > 1) { <nav class="cost-pagination" aria-label="@T["CostPages"]">@if (Model.PageNumber > 1) { <a asp-page="Index" asp-route-id="@e.Id" asp-route-candidateId="@Model.CandidateId" asp-route-period="@Model.Period" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-fragment="cost-timeline">← @T["CostPrevious"]</a> }<span>@T["CostPage", Model.PageNumber, Model.PageCount]</span>@if (Model.PageNumber < Model.PageCount) { <a asp-page="Index" asp-route-id="@e.Id" asp-route-candidateId="@Model.CandidateId" asp-route-period="@Model.Period" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-fragment="cost-timeline">@T["CostNext"] →</a> }</nav> }
 </section>
 }
+</section>
 </div>

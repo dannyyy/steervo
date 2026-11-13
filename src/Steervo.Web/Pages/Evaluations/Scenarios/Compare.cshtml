@@ -1,9 +1,10 @@
 @page "/evaluations/{id:guid}/scenarios/compare"
 @model Steervo.Web.Pages.Evaluations.Scenarios.CompareModel
-@{ var e = Model.Evaluation; ViewData["Title"] = T["ScenarioCompare"].Value; }
+@using Steervo.Web.Pages.Evaluations.Scenarios
+@{ var e = Model.Evaluation; ViewData["Title"] = T["ScenarioCompare"].Value; string Money(decimal? value) => value.HasValue ? $"{value:N2} {e.Currency}" : T["OfferOpen"].Value; }
 <partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "scenarios")' />
-<a class="back-link" asp-page="Index" asp-route-id="@e.Id">← @T["ScenarioAll"]</a><h2>@T["ScenarioCompare"]</h2><p class="muted">@T["ScenarioCompareHelp"]</p>
-<form method="get" class="scenario-compare-picker"><div><label for="scenario-left">@T["ScenarioLeft"]</label><select id="scenario-left" name="leftId" required><option value="">@T["Choose"]</option>@foreach (var s in e.Scenarios.OrderBy(s => s.Name)) { <option value="@s.Id" selected="@(s.Id == Model.LeftId)">@s.Name</option> }</select></div><div><label for="scenario-right">@T["ScenarioRight"]</label><select id="scenario-right" name="rightId" required><option value="">@T["Choose"]</option>@foreach (var s in e.Scenarios.OrderBy(s => s.Name)) { <option value="@s.Id" selected="@(s.Id == Model.RightId)">@s.Name</option> }</select></div><div><label for="compare-month">@T["ScenarioCheckpoint"]</label><input id="compare-month" name="month" value="@Model.Month" type="number" min="1" max="@e.CostPlanning!.Months" required /></div><button class="button primary">@T["ScenarioCalculate"]</button></form>
+<a class="back-link" asp-page="Index" asp-route-id="@e.Id"><partial name="/Pages/Shared/_Icon.cshtml" model='"back"' />@T["ScenarioAll"]</a><section class="comparison-surface scenario-comparison"><div class="comparison-introduction"><h2>@T["ScenarioCompare"]</h2><p class="muted">@T["ScenarioCompareHelp"]</p></div>
+<form method="get" class="comparison-picker scenario-compare-picker"><div><label for="scenario-left">@T["ScenarioLeft"]</label><select id="scenario-left" name="leftId" required><option value="">@T["Choose"]</option>@foreach (var s in e.Scenarios.OrderBy(s => s.Name)) { <option value="@s.Id" selected="@(s.Id == Model.LeftId)">@s.Name</option> }</select></div><div><label for="scenario-right">@T["ScenarioRight"]</label><select id="scenario-right" name="rightId" required><option value="">@T["Choose"]</option>@foreach (var s in e.Scenarios.OrderBy(s => s.Name)) { <option value="@s.Id" selected="@(s.Id == Model.RightId)">@s.Name</option> }</select></div><div><label for="compare-month">@T["ScenarioCheckpoint"]</label><input id="compare-month" name="month" value="@Model.Month" type="number" min="1" max="@e.CostPlanning!.Months" required /></div><button class="button primary">@T["ScenarioCalculate"]</button></form>
 @if (Model.Left is { } left && Model.Right is { } right)
 {
     if (left.Result.ExpectedCost is { } a && right.Result.ExpectedCost is { } b)
@@ -18,5 +19,40 @@
         </div>
     }
     else { <p class="notice scenario-convention">@T["ScenarioCompareIncomplete"]</p> }
-    <div class="scenario-comparison-grid"><div><partial name="_Result" model="left" /><a class="button secondary" asp-page="Details" asp-route-id="@e.Id" asp-route-scenarioId="@left.Scenario.Id" asp-route-month="@Model.Month">@T["ScenarioOpen"] →</a></div><div><partial name="_Result" model="right" /><a class="button secondary" asp-page="Details" asp-route-id="@e.Id" asp-route-scenarioId="@right.Scenario.Id" asp-route-month="@Model.Month">@T["ScenarioOpen"] →</a></div></div>
+    var panels = new[] { left, right };
+    <p class="comparison-scroll-hint" id="scenario-scroll-hint">@T["ComparisonScrollHint"]</p>
+    <div id="scenario-comparison-scroll" class="comparison-scroll" tabindex="0" role="region" aria-label="@T["ScenarioComparisonRegion"]" aria-describedby="scenario-scroll-hint" data-focus-scenario="@Request.Query["focus"]">
+    <table class="vehicle-table scenario-table"><caption class="visually-hidden">@T["ScenarioCompare"] · @T["ScenarioAtMonth", Model.Month, e.CostPlanning!.DateFor(Model.Month).ToString("MM.yyyy")]</caption><colgroup><col class="criterion-column" /><col /><col /></colgroup>
+    <thead><tr><th scope="col">@T["ScenarioAtMonth", Model.Month, e.CostPlanning!.DateFor(Model.Month).ToString("MM.yyyy")]</th>
+    @foreach (var panel in panels)
+    { var offer = e.FindOffer(panel.Scenario.OfferId);
+      <th scope="col" data-scenario-column="@panel.Scenario.Id"><a class="comparison-candidate-link" asp-page="Details" asp-route-id="@e.Id" asp-route-scenarioId="@panel.Scenario.Id" asp-route-month="@Model.Month" asp-route-leftId="@Model.LeftId" asp-route-rightId="@Model.RightId">@panel.Scenario.Name<partial name="/Pages/Shared/_Icon.cshtml" model='"arrow"' /></a><p class="micro">@e.FindCandidate(offer.CandidateId).DisplayName</p><p class="micro">@T["Acquisition" + panel.Scenario.Terms.Mode] · @T["ScenarioVersion", panel.Scenario.RevisionNumber]</p>
+      @if (Model.Access >= AccessLevel.Editor) { <a class="text-link" asp-page="Edit" asp-route-id="@e.Id" asp-route-scenarioId="@panel.Scenario.Id" asp-route-month="@Model.Month" asp-route-leftId="@Model.LeftId" asp-route-rightId="@Model.RightId">@T["ScenarioEdit"]</a> }</th>
+    }
+    </tr></thead>
+    <tbody><tr class="scenario-result-row"><th scope="row" class="vehicle-criterion"><strong>@T["CalculationEffectiveCost"]</strong></th>
+    @foreach (var panel in panels)
+    { <td class="vehicle-value" data-result-scenario="@panel.Scenario.Id" data-result-complete="@panel.Result.Complete.ToString().ToLowerInvariant()"><p class="scenario-result-total" data-effective-cost="@panel.Result.ExpectedCost?.ToString(System.Globalization.CultureInfo.InvariantCulture)">@Money(panel.Result.ExpectedCost)</p>@if (panel.Result.ExpectedCost.HasValue) { <p class="scenario-monthly">@Money(panel.Result.ExpectedCost / Model.Month) @T["CalculationPerMonth"]</p> }<partial name="_ResultGaps" model="panel" /></td> }
+    </tr>
+    @foreach (var field in new (string Label, Func<ScenarioPanel, decimal?> Value)[] {
+        ("CalculationNetPayments", p => p.Result.Months.Count == 0 ? null : p.Result.NetPayments),
+        ("CalculationOpportunity", p => p.Result.Issues.Count == 0 ? p.Result.OpportunityCost : null),
+        ("CalculationRemainingDebt", p => p.Result.Issues.Count == 0 ? p.Result.Debt : null),
+        ("CalculationResidualDeduction", p => p.Result.ExpectedResidual) })
+    { <tr><th scope="row" class="vehicle-criterion">@T[field.Label]</th>@foreach (var panel in panels) { <td class="vehicle-value">@Money(field.Value(panel))</td> }</tr> }
+    </tbody>
+    @if (panels.Any(p => p.Scenario.Terms.Mode != AcquisitionMode.LeaseReturn))
+    {
+    <tbody><tr class="vehicle-group-heading"><th colspan="3" scope="colgroup">@T["ScenarioBandTitle"]<span class="micro">@T["ScenarioBandHelp"]</span></th></tr>
+    @foreach (var field in new (string Label, Func<ScenarioPanel, decimal?> Value)[] { ("ResidualLow", p => p.Result.PessimisticCost), ("ResidualExpected", p => p.Result.ExpectedCost), ("ResidualHigh", p => p.Result.OptimisticCost) })
+    { <tr><th scope="row" class="vehicle-criterion">@T[field.Label]</th>@foreach (var panel in panels) { <td class="vehicle-value">@(panel.Scenario.Terms.Mode == AcquisitionMode.LeaseReturn ? T["ScenarioNotApplicable"].Value : Money(field.Value(panel)))</td> }</tr> }
+    </tbody>
+    }
+    <tbody><tr class="vehicle-group-heading"><th colspan="3" scope="colgroup">@T["CalculationWealth"]<span class="micro">@T["CalculationReferenceHelp"]</span></th></tr>
+    @foreach (var field in new (string Label, Func<ScenarioPanel, decimal?> Value)[] { ("CalculationReferenceCapital", p => p.Result.ReferenceCapital), ("CalculationAccount", p => p.Result.Account), ("CalculationFinalWealth", p => p.Result.ExpectedWealth) })
+    { <tr><th scope="row" class="vehicle-criterion">@T[field.Label]</th>@foreach (var panel in panels) { <td class="vehicle-value">@Money(field.Value(panel))</td> }</tr> }
+    </tbody></table></div>
 }
+else { <div class="canvas-empty"><p>@T["ScenarioCompareSelect"]</p></div> }
+</section>
+@section Scripts { <script src="~/js/scenarios.js" asp-append-version="true" defer></script> }

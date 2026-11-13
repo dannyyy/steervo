@@ -3,7 +3,11 @@ using Steervo.Core;
 
 namespace Steervo.Web.Pages.Evaluations.Scenarios;
 
-public sealed record ScenarioField(string Name, string Modes, string Step = "0.01", string Max = "1000000000000");
+public sealed record ScenarioField(string Name, string Modes, string Step = "0.01", string Max = "1000000000000")
+{
+    public string Group => Name is "PurchasePrice" or "InitialFees" ? "Price" : Name is "AnnualKilometres" or "IncludedKilometresPerYear" or "ExcessKilometrePrice" or "UnusedKilometreCredit" ? "Mileage" : "Contract";
+    public bool Monetary => Name is "PurchasePrice" or "InitialFees" or "DownPayment" or "MonthlyPayment" or "FinalPayment" or "LoanAmount" or "ExcessKilometrePrice" or "UnusedKilometreCredit";
+}
 public sealed class ScenarioForm
 {
     public string? Name { get; set; }

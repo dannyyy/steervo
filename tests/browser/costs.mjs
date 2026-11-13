@@ -1,8 +1,10 @@
+import { checkCostWorkflows } from './financial-workflows.mjs';
 import assert from 'node:assert/strict';
 import { join } from 'node:path';
 
 export async function checkCosts({ page, reader, readerEmail, origin, output, post, browserRequest, record, restart }) {
   const originalPath = new URL(page.url()).pathname;
+  async function save(operation, target = page) { await Promise.all([target.waitForNavigation({ waitUntil: 'load' }), operation()]); }
   await page.goto(origin);
   await page.locator('[data-dialog-open="new-evaluation"]').first().click();
   const creation = page.getByRole('dialog', { name: 'Neue Evaluation', exact: true });
@@ -16,7 +18,7 @@ export async function checkCosts({ page, reader, readerEmail, origin, output, po
   await page.getByRole('link', { name: 'Kosten', exact: true }).click();
   await page.getByLabel('Beginn der Planung', { exact: true }).fill('2027-10');
   await page.getByLabel('Dauer in Monaten', { exact: true }).fill('15');
-  await page.getByRole('button', { name: 'Zeitraum speichern', exact: true }).click();
+  await save(() => page.getByRole('button', { name: 'Zeitraum speichern', exact: true }).click());
   await page.locator('#cost-workspace').waitFor();
   await page.getByText('Die gemeinsame Währung wird bei der ersten Offerte festgelegt.', { exact: false }).waitFor();
   assert.equal(await page.getByRole('link', { name: /Kostenposition hinzufügen/ }).count(), 0);
@@ -40,7 +42,7 @@ export async function checkCosts({ page, reader, readerEmail, origin, output, po
     else { assert.equal(await page.locator('#Input_Amount').isDisabled(), true); assert.equal(await page.locator('#Input_Direction').isDisabled(), true); }
     await page.getByLabel('Erster Monat', { exact: true }).fill(start);
     if (end) await page.getByLabel('Letzter Monat', { exact: false }).fill(end);
-    await page.getByRole('button', { name: 'Speichern', exact: true }).click();
+    await save(() => page.getByRole('button', { name: 'Speichern', exact: true }).click());
     await page.locator('#cost-workspace').waitFor();
     return page.locator('[data-cost-id]').filter({ has: page.getByRole('heading', { name, exact: true }) }).getAttribute('data-cost-id');
   }
@@ -73,15 +75,15 @@ export async function checkCosts({ page, reader, readerEmail, origin, output, po
   record('Cost planning reconciles one-off, monthly and annual payments, income, inclusive items, unknowns and calendar-year totals');
 
   await page.goto(`${origin}${costPath}?candidateId=${candidateId}`);
-  await page.locator('.cost-plan summary').click();
+  await page.locator('#open-cost-plan').click();
   await page.getByLabel('Dauer in Monaten', { exact: true }).fill('12');
-  await page.getByRole('button', { name: 'Zeitraum speichern', exact: true }).click();
+  await save(() => page.getByRole('button', { name: 'Zeitraum speichern', exact: true }).click());
   await page.locator('#cost-workspace').waitFor();
   assert.equal(await page.locator('[data-cost-missing]').count(), 0);
   await page.getByText('Ausserhalb des gewählten Zeitraums', { exact: true }).waitFor();
-  await page.locator('.cost-plan summary').click();
+  await page.locator('#open-cost-plan').click();
   await page.getByLabel('Dauer in Monaten', { exact: true }).fill('15');
-  await page.getByRole('button', { name: 'Zeitraum speichern', exact: true }).click(); await page.locator('#cost-workspace').waitFor();
+  await save(() => page.getByRole('button', { name: 'Zeitraum speichern', exact: true }).click()); await page.locator('#cost-workspace').waitFor();
   assert.equal(await page.locator('[data-cost-id]').count(), 8);
   await page.setViewportSize({ width: 390, height: 844 });
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
@@ -120,7 +122,7 @@ export async function checkCosts({ page, reader, readerEmail, origin, output, po
   await page.getByLabel('Betrag je Zahlung', { exact: false }).fill('111');
   await reader.page.goto(`${origin}${costPath}/edit/${sharedMonthly}`);
   await reader.page.getByLabel('Notiz / Grundlage', { exact: false }).fill('Reviewed by editor');
-  await reader.page.locator('#save-cost').click(); await reader.page.locator('#cost-workspace').waitFor();
+  await save(() => reader.page.locator('#save-cost').click(), reader.page); await reader.page.locator('#cost-workspace').waitFor();
   const conflict = page.waitForResponse(r => r.request().method() === 'POST' && r.url() === page.url());
   await page.locator('#save-cost').click(); assert.equal((await conflict).status(), 409);
   assert.equal(await page.getByLabel('Betrag je Zahlung', { exact: false }).inputValue(), '111');
@@ -151,10 +153,13 @@ export async function checkCosts({ page, reader, readerEmail, origin, output, po
   assert.equal(await page.locator('[data-cost-net]').getAttribute('data-cost-net'), '995');
   const zeroCopyId = remaining.costs.find(c => c.input.name === 'Bekannte Null').id;
   await page.locator(`[data-cost-id="${zeroCopyId}"]`).getByRole('button', { name: 'Kostenposition löschen', exact: true }).click();
+  await save(() => page.locator('[data-confirm-accept]').click());
   await page.waitForURL(url => url.pathname === costPath && url.hash === '#cost-items');
   assert.equal(await page.locator('[data-cost-id]').count(), 7);
   assert.equal(await page.locator('[data-cost-net]').getAttribute('data-cost-net'), '995');
   assert.equal((await exportCase()).costs.some(c => c.id === zeroCopyId), false);
   record('Candidate copies and JSON import retain independent costs, timing and scope; candidate and cost deletion preserve unrelated entries');
+  await restart();
+  await checkCostWorkflows({ page, reader, readerEmail, origin, casePath, candidateId: copyId, costId: sharedMonthly, post, record });
   await page.goto(`${origin}${originalPath}`);
 }

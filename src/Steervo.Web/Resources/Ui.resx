@@ -787,4 +787,29 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
 <data name="OfferArchiveHelp" xml:space="preserve"><value>Archivierte Offerten bleiben mit ihren Versionen und Dokumenten erhalten. Du kannst sie jederzeit wieder aktivieren.</value></data>
 <data name="OfferAllFilters" xml:space="preserve"><value>Alle Offerten anzeigen</value></data>
   <data name="ApplyOfferFilter" xml:space="preserve"><value>Filter anwenden</value></data>
+  <data name="CostPlanningPeriod" xml:space="preserve"><value>Planungszeitraum</value></data>
+  <data name="CostIdentity" xml:space="preserve"><value>Position und Zuordnung</value></data>
+  <data name="CostPayment" xml:space="preserve"><value>Betrag und Zahlungsrhythmus</value></data>
+  <data name="CostPaymentTiming" xml:space="preserve"><value>Zahlungszeitraum</value></data>
+  <data name="CostDeleteNamed" xml:space="preserve"><value>Kostenposition „{0}“ löschen?</value></data>
+  <data name="ScenarioDeleteNamed" xml:space="preserve"><value>Szenario „{0}“ löschen?</value></data>
+  <data name="ResidualDeleteNamed" xml:space="preserve"><value>Restwert für {0} löschen?</value></data>
+  <data name="AdjustmentDeleteNamed" xml:space="preserve"><value>Kostenanpassung für „{0}“ entfernen?</value></data>
+  <data name="ResidualAdd" xml:space="preserve"><value>Restwert-Stichtag erfassen</value></data>
+  <data name="AdjustmentAdd" xml:space="preserve"><value>Kostenanpassung erfassen</value></data>
+  <data name="ScenarioIdentity" xml:space="preserve"><value>Szenario und Offertbezug</value></data>
+  <data name="ScenarioGroupPrice" xml:space="preserve"><value>Bestätigte Preise</value></data>
+  <data name="ScenarioGroupContract" xml:space="preserve"><value>Vertragskonditionen</value></data>
+  <data name="ScenarioGroupMileage" xml:space="preserve"><value>Nutzung und Kilometer</value></data>
+  <data name="ScenarioReview" xml:space="preserve"><value>Annahmen prüfen</value></data>
+  <data name="ScenarioContents" xml:space="preserve"><value>In diesem Szenario</value></data>
+  <data name="ScenarioResultTitle" xml:space="preserve"><value>Ergebnis</value></data>
+  <data name="ScenarioComparisonRegion" xml:space="preserve"><value>Szenarienvergleich – horizontal scrollbar</value></data>
+  <data name="ScenarioBandTitle" xml:space="preserve"><value>Kostenband aus den Restwertannahmen</value></data>
+  <data name="ScenarioNotApplicable" xml:space="preserve"><value>Entfällt bei Rückgabe</value></data>
+  <data name="ScenarioCompareSelect" xml:space="preserve"><value>Wähle zwei Szenarien und einen gemeinsamen Stichtag, um ihre Ergebnisse zu vergleichen.</value></data>
+  <data name="FinancialScrollHint" xml:space="preserve"><value>Weitere Spalten: horizontal scrollen oder mit den Pfeiltasten wechseln.</value></data>
+  <data name="EditorOperationConflict" xml:space="preserve"><value>Die Aktion wurde nicht ausgeführt. Prüfe den aktuellen Stand. Erst mit «Stand geprüft – erneut bestätigen» öffnest du die Bestätigung erneut.</value></data>
+  <data name="EditorOperationRetry" xml:space="preserve"><value>Stand geprüft – erneut bestätigen</value></data>
+  <data name="EditorMissingError" xml:space="preserve"><value>Dieser Eintrag ist nicht mehr verfügbar. Öffne die Übersicht, um den aktuellen Stand zu prüfen.</value></data>
 </root>

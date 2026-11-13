@@ -4,7 +4,7 @@
 
 **Verbindlich gewählt: Canvas mit Tinte.** Die Hauptentwicklung findet auf `main` statt; das Repository hat keinen `master`-Branch. Der Nutzerauftrag ist: zuerst das bestehende Design und Layout umstellen sowie Abläufe und Dialoge vereinheitlichen und optimieren, danach weitere Features entwickeln.
 
-Diese Datei ist der Umsetzungsplan für den vorhandenen Community-Funktionsumfang. Sie beschreibt keine bereits abgeschlossene Migration. Die Auswahl sowie Phase 0 bis Phase 2 sind abgeschlossen. Die vollständige Migration bleibt offen; als Nächstes folgt Phase 3.
+Diese Datei ist der Umsetzungsplan für den vorhandenen Community-Funktionsumfang. Sie beschreibt keine bereits abgeschlossene Migration. Die Auswahl sowie Phase 0 bis Phase 4 sind abgeschlossen. Die vollständige Migration bleibt offen; als Nächstes folgt Phase 5.
 
 | Grundlage | Zweck |
 | --- | --- |
@@ -80,10 +80,10 @@ Jedes Paket umfasst Quellcode, notwendige Tests und eine überprüfte echte Ober
 
 ### 4. Kosten und Rechenszenarien
 
-- [ ] Kostenübersicht, Planungszeitraum, Positionen und Monats-/Jahresansichten vereinheitlichen.
-- [ ] Lange Kosten- und Szenarioformulare als klar gegliederte Seiten gestalten; keine großen Formulare in enge Dialoge pressen.
-- [ ] Szenarioauswahl, Preisbestätigung, Annahmen, Ergebnis und Vergleich konsistent zusammenführen.
-- [ ] Währungen, Einheiten, Zeiträume, Offertversionen und offene Angaben direkt an den betroffenen Werten zeigen.
+- [x] Kostenübersicht, Planungszeitraum, Positionen und Monats-/Jahresansichten vereinheitlichen.
+- [x] Lange Kosten- und Szenarioformulare als klar gegliederte Seiten gestalten; keine großen Formulare in enge Dialoge pressen.
+- [x] Szenarioauswahl, Preisbestätigung, Annahmen, Ergebnis und Vergleich konsistent zusammenführen.
+- [x] Währungen, Einheiten, Zeiträume, Offertversionen und offene Angaben direkt an den betroffenen Werten zeigen.
 
 **Abnahme:** Derselbe Datenbestand liefert unveränderte Berechnungsergebnisse. Fehlende Beträge, Restwerte oder Annahmen bleiben sichtbar offen. Vergleich, Szenariokopien und angepasste Kosten behalten ihre bestehenden Regeln.
 
@@ -170,7 +170,31 @@ Vollständige Offerten und Uploads bleiben eigene Formularseiten mit gemeinsamen
 - `tests/browser/documents.mjs` prüft erhaltene Dateien bei Netzfehlern, Validierung, Konflikten und abgelaufener Anmeldung; die ausdrückliche Wiederholung erzeugt eine getrennte Dateiversion mit denselben Bytes. Löschen prüft Objektname, sicheren Anfangsfokus, Escape, Rückkehrfokus und Erhalt der unabhängigen ZIP-Importkopie.
 - Die echte Anwendung wurde mit synthetischen Daten bei 1440 und 390 px visuell geprüft. Offertenliste, Detail, Vergleich, Bearbeitung und Upload passen zusätzlich bei 320, 768 und 1024 px ohne seitenweite Überbreite. Lange Offert-, Dokument- und Dateinamen sowie ungetrennte Notizen wurden an denselben fünf Breiten geprüft. Screenshots unter `.artifacts/browser/phase3/`; Bilder, Logs und Testdaten bleiben ausserhalb der Commits.
 
-**Nächste Arbeit:** Phase 4, Kosten und Rechenszenarien. Danach folgen Einstieg/Konto und die abschliessende Gesamtprüfung in Phase 5. Die Gesamtmigration bleibt offen; neue Features bleiben nachgeordnet.
+## Phase 4: Kosten und Rechenszenarien
+
+**Abgeschlossen am 13. November 2026.** Die Kostenplanung zeigt Zeitraum, Fahrzeugbezug, bekannte Teilsumme, Positionen und Zahlungszeitpunkte auf einer gemeinsamen Canvas-Fläche. Fehlende Beträge bleiben sichtbar offen; die bekannte Summe wird weiterhin ausdrücklich als unvollständig gekennzeichnet. Monats- und Jahresansicht verwenden dieselben Zahlungen, die erste Tabellenspalte bleibt beim horizontalen Scrollen sichtbar. Die vollständige Kostenbearbeitung gliedert Zuordnung, Zahlung, Zeitraum und Notizen auf einer eigenen Seite.
+
+Szenarioübersicht und Akte verbinden gemeinsame Rendite, feste Offertversion, bestätigte Annahmen, Ergebnis, Zusammensetzung, Restwert-Stichtage, Kostenanpassungen und Zahlungsplan. Der Vergleich ist eine echte Tabelle mit einheitlichen Zeilen für effektive Kosten, Zahlungsbestandteile, Restwertband und Rechenweg. Auf Mobilgeräten bleibt die erste Spalte sichtbar und die zuvor bearbeitete zweite Szenariospalte wird wiederhergestellt. Ein neuer Offertstand überschreibt keine Annahmen; der Quellenlink folgt der bewusst gewählten Version.
+
+Planungszeitraum, Rendite, Restwerte, Kostenanpassungen und Szenariokopien verwenden gezielt geöffnete Inline-Editoren. Lange Kosten- und Szenarioformulare verwenden die gemeinsamen Seitenaktionen und denselben Entwurfsschutz. Validierung, Netzfehler, Konflikte, Rechteentzug und abgelaufene Anmeldung erhalten die Eingaben. Löschaktionen nennen das Objekt, schützen benachbarte Entwürfe und verlangen bei einem Konflikt eine erneute ausdrückliche Bestätigung. Bereits entfernte Einträge zeigen eine lokale Fehlermeldung und sperren weitere Schreibversuche.
+
+### Technische Übergabe
+
+- `Costs/_PlanEditor` sowie `Scenarios/_SettingsEditor`, `_ResidualEditor`, `_AdjustmentEditor` und `_CopyEditor` nutzen `Shared/_EditorActions`. Vollständige Bearbeitungsseiten nutzen `_PageEditorActions`. Native POSTs behalten ihre Seiten-/Redirect-Antwort; HTMX erhält bei Fehlern lokale JSON-Rückmeldungen und bei Erfolg `HX-Redirect`.
+- Kosten behalten Fahrzeugbezug, Zeitraumansicht und Tabellenseite bei; Szenarien behalten Vergleichspaar, Stichtag und Zahlungsansicht. Vergleichspartner werden auf die aktuelle Evaluation beschränkt. Explizite Abschnitts-, Positions- und Titelfokusziele erhalten nach dem Neuladen den Bezug zur Änderung.
+- `editors.js` lädt erfolgreiche Antworten auf denselben Pfad und dieselbe Query auch dann neu, wenn sich nur der Sprungpunkt ändert. Sonst würde HTMX lediglich zum Fragment springen und veraltete Werte stehen lassen. `data-operation` verwendet dieselbe lokale Fehlerbehandlung auch für Löschformulare; das Attribut macht sie nicht zu Bearbeitungsdialogen.
+- Bei HTTP 409 bleibt der ursprüngliche Versionswert bis zur ausdrücklich beschrifteten Wiederholung erhalten. Löschaktionen verwenden dafür «Stand geprüft – erneut bestätigen» und öffnen erneut den konkreten Dialog. Ein bestätigtes Entfernen umgeht den Schutz anderer offener Entwürfe nicht.
+- `ScenarioForm.Fields` ergänzt ausschliesslich Anzeigegruppen und Währungseinheiten. Fachregeln, Rechenalgorithmen, Kostenrhythmen, Restwert-Stichtage ohne Interpolation, Kopien, Autorisierung, Anti-Forgery, Datenbankschema und Import-/Exportformat bleiben unverändert.
+- Ersetzte Kosten- und Szenarioregeln wurden aus `site.css` entfernt und in `canvas.css` zusammengeführt. Neue sichtbare Texte liegen in `Ui.resx`. Lange Namen und Notizen umbrechen auch in Zusammensetzung und Vergleichszusammenfassung.
+
+### Verifikation
+
+- 100 erfolgreiche Fach-/Integrationstests über den bestehenden Testbefehl; Build ohne Warnungen und Fehler. Die gezielte Kosten-/Szenariostrecke umfasst 20 erfolgreiche Browserprüfungen. Der Abschlusslauf `PLAYWRIGHT_EXECUTABLE_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' npm run test:e2e` gegen eine eigene temporäre Datenbank umfasst 74 erfolgreiche Browserprüfungen über alle bestehenden Produktbereiche. Protokolle lokal unter `.artifacts/phase4/verification.log` (Fach-/Integrationstests), `build.log` und `browser-final.log`.
+- `tests/browser/costs.mjs` und `scenarios.mjs` behalten ihre fachlichen Erwartungswerte für Zahlungen, Zinseszins, Restschuld, Restwertschwelle, Null/Unbekannt, Kopien und JSON-/ZIP-Austausch. Erfolgreiche Speicherschritte warten nun auf die tatsächliche Navigation.
+- `tests/browser/financial-workflows.mjs` prüft erhaltene Fahrzeug-/Tabellen-/Vergleichskontexte, mobilen Spaltenwechsel, Fokus, bewusstes Verwerfen, 422, Netzfehler, 409 mit ausdrücklicher Wiederholung, wiederholtes Speichern auf derselben Seite, entzogene Rechte, abgelaufene Anmeldung, Kostenanpassungen, Kopien und benannte Löschungen einschliesslich zwischenzeitlich entfernter Einträge.
+- Echte Oberfläche mit synthetischen Daten bei 1440 und 390 px visuell geprüft. Struktur- und Langtextprüfungen zusätzlich bei 320, 768 und 1024 px; Vergleich und Zahlungspläne scrollen nur in ihren bezeichneten Bereichen. Vollständige und offene Ergebnisse, Formularseiten, Inline-Editoren, Auswahlzustände und Validierungsfehler sind berücksichtigt. Artefakte unter `.artifacts/browser/phase4/` bleiben ausserhalb der Commits.
+
+**Nächste Arbeit:** Phase 5, Konto, Einstieg, Systemzustände und abschliessende Gesamtprüfung. Die Gesamtmigration bleibt offen; neue Features bleiben nachgeordnet.
 
 ## Inventar der vorhandenen Oberflächen
 

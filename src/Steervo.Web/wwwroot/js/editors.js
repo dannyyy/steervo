@@ -142,6 +142,7 @@
         editor.addEventListener('cancel', event => { event.preventDefault(); requestClose(editor); });
         if (editor.dataset.openOnLoad === 'true') showEditor(editor, currentOpener(editor), null, false);
       }
+      if (!(editor instanceof HTMLDialogElement) && editor.dataset.openOnLoad === 'true') showEditor(editor, currentOpener(editor), null);
       const error = editor.querySelector('.editor-error:not([hidden]), .notice.failure:not([hidden])');
       if (error) guardedForms(editor).forEach(form => forcedDirty.add(form));
     });
@@ -193,8 +194,8 @@
     const form = event.target;
     // Sorting preserves open drafts through the fragment exchange.
     if (form.hasAttribute('data-sort')) return;
-    if (form.dataset.confirmed === 'true') { delete form.dataset.confirmed; return; }
-    if (form.dataset.confirmAction) {
+    const confirmed = form.dataset.confirmed === 'true'; delete form.dataset.confirmed;
+    if (!confirmed && form.dataset.confirmAction) {
       event.preventDefault(); event.stopImmediatePropagation();
       if (await confirmAction(form.dataset.confirmAction, form.dataset.confirmDescription,
         event.submitter?.textContent?.trim() || form.dataset.confirmAction, confirmation.dataset.cancelAction)) {
@@ -227,11 +228,21 @@
     document.getElementById('connection-error').hidden = true;
   }
   document.addEventListener('htmx:beforeOnLoad', event => {
-    if (event.detail.xhr.status < 400 && event.detail.xhr.getResponseHeader('HX-Redirect')) leaving = true;
+    const redirect = event.detail.xhr.getResponseHeader('HX-Redirect');
+    if (event.detail.xhr.status < 400 && redirect) {
+      leaving = true;
+      const target = new URL(redirect, location.href);
+      // A fragment-only navigation would leave the old values and disabled form in place.
+      if (target.origin === location.origin && target.pathname === location.pathname && target.search === location.search) {
+        event.preventDefault();
+        history.replaceState(null, '', target.href);
+        location.reload();
+      }
+    }
   });
   document.addEventListener('htmx:beforeRequest', event => {
     const form = event.detail.elt.closest('form');
-    const editor = form?.closest('[data-editor]');
+    const editor = form?.closest('[data-editor]') || (form?.hasAttribute('data-operation') ? form : null);
     if (form?.hasAttribute('data-sort')) {
       requests.set(event.detail.xhr, { sorting: pendingEditors().map(item => ({
         id: item.id, opener: item.dataset.opener, open: activeEditors().includes(item),
@@ -261,14 +272,15 @@
       editorError(state.oldEditor, json?.error || event.detail.xhr.responseText);
       if (event.detail.xhr.status === 409 && json?.reviewUrl && json.version) {
         const error = state.oldEditor.querySelector('.editor-error');
+        const operation = state.oldEditor.hasAttribute('data-operation');
         const context = document.createElement('p'); context.textContent = json.context; error.append(context);
-        const help = document.createElement('p'); help.textContent = document.body.dataset.editorPageConflict; error.append(help);
+        const help = document.createElement('p'); help.textContent = operation ? document.body.dataset.editorOperationConflict : document.body.dataset.editorPageConflict; error.append(help);
         const review = document.createElement('a'); review.href = json.reviewUrl; review.target = '_blank'; review.rel = 'noopener';
         review.textContent = document.body.dataset.editorReview; error.append(review);
-        const retry = document.createElement('button'); retry.type = 'button'; retry.textContent = document.body.dataset.editorRetry;
+        const retry = document.createElement('button'); retry.type = 'button'; retry.textContent = operation ? document.body.dataset.editorOperationRetry : document.body.dataset.editorRetry;
         retry.addEventListener('click', () => {
           if (busy.has(state.oldEditor)) return;
-          const form = state.oldEditor.querySelector('form[data-guard-draft]');
+          const form = state.oldEditor.matches('form') ? state.oldEditor : state.oldEditor.querySelector('form[data-guard-draft]');
           form.elements.namedItem('Version').value = json.version;
           form.requestSubmit(form.querySelector('button[type=submit]'));
         });
@@ -358,12 +370,18 @@
     const status = event.detail.xhr.status;
     if (state && ![409, 422].includes(status) && (status === 0 || status >= 400 || state.denied)) {
       const permission = [401, 403].includes(status) || state.denied;
-      editorError(document.getElementById(state.editorId), permission ? document.body.dataset.editorPermissionError : document.body.dataset.editorNetworkError, permission);
+      const missing = status === 404;
+      editorError(document.getElementById(state.editorId), permission ? document.body.dataset.editorPermissionError
+        : missing ? document.body.dataset.editorMissingError : document.body.dataset.editorNetworkError, permission || missing);
       requests.delete(event.detail.xhr);
     }
   });
   // Page forms finish configuring dependent fields before recording their baseline.
-  document.addEventListener('DOMContentLoaded', initialize, { once: true });
+  document.addEventListener('DOMContentLoaded', () => {
+    initialize();
+    const target = document.getElementById(location.hash.slice(1));
+    if (target?.hasAttribute('data-return-focus')) target.focus({ preventScroll: true });
+  }, { once: true });
   if (location.hash === '#specifications') selectTab('record-specifications');
   if (document.getElementById('evaluation-workspace') && ['#sharing', '#case-settings'].includes(location.hash)) {
     const url = new URL(location.href);

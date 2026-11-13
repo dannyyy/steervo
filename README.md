@@ -4,9 +4,9 @@ Steervo schafft einen eigenen Arbeitsbereich für deine Fahrzeugentscheidungen. 
 
 ## Aktueller Entwicklungsschwerpunkt
 
-Die gewählte Designrichtung ist **Canvas mit Tinte**. Auf dem Hauptbranch `main` wird zuerst die bestehende Anwendung auf dieses Layout umgestellt; Abläufe, Formulare und Dialoge werden dabei vereinheitlicht und optimiert. Neue Features folgen nach Abschluss dieser Migration. Der gemeinsame Seitenrahmen, Fahrzeugakte, Bewertungen und Fahrzeugvergleich sowie Evaluationsübersicht, Kriterien, Gruppen, Freigaben und Einstellungen sowie Offerten, Versionshistorie und Dokumente sind bereits umgestellt. Die übrigen Bereiche folgen schrittweise.
+Die gewählte Designrichtung ist **Canvas mit Tinte**. Auf dem Hauptbranch `main` wird zuerst die bestehende Anwendung auf dieses Layout umgestellt; Abläufe, Formulare und Dialoge werden dabei vereinheitlicht und optimiert. Neue Features folgen nach Abschluss dieser Migration. Der gemeinsame Seitenrahmen, Fahrzeugakte, Bewertungen und Fahrzeugvergleich sowie Evaluationsübersicht, Kriterien, Gruppen, Freigaben und Einstellungen sowie Offerten, Versionshistorie, Dokumente, Kostenplanung und Rechenszenarien sind bereits umgestellt. Einstieg, Konto und abschliessende Systemzustände folgen als letztes Paket.
 
-Verbindliche Grundlagen: [Designsystem](DESIGN.md), [Interaktionsmuster](docs/interaction-patterns.md), [Migrationsplan mit Abnahmekriterien](docs/design-migration.md) und [Produktregeln](PRODUCT.md). Der [interaktive Prototyp](prototypes/design/README.md) dient als Referenz. Als Nächstes folgt Phase 4 des Migrationsplans: Kosten und Rechenszenarien.
+Verbindliche Grundlagen: [Designsystem](DESIGN.md), [Interaktionsmuster](docs/interaction-patterns.md), [Migrationsplan mit Abnahmekriterien](docs/design-migration.md) und [Produktregeln](PRODUCT.md). Der [interaktive Prototyp](prototypes/design/README.md) dient als Referenz. Als Nächstes folgt Phase 5 des Migrationsplans: Konto, Einstieg, Systemzustände und Abschlussprüfung.
 
 ## Was bereits funktioniert
 

@@ -1,0 +1,4 @@
+@model Steervo.Web.Pages.Evaluations.Scenarios.ScenarioPanel
+@{ var r = Model.Result; var s = Model.Scenario; }
+@if (r.Issues.Count > 0 || (r.ExpectedResidual is null && s.Terms.Mode != AcquisitionMode.LeaseReturn))
+{ <div class="scenario-gaps"><strong>@T["ScenarioIncomplete"]</strong><ul>@foreach (var issue in r.Issues) { <li>@T[issue.Code] @issue.Detail</li> } @if (r.ExpectedResidual is null && s.Terms.Mode != AcquisitionMode.LeaseReturn) { <li>@T["ScenarioResidualMissing", r.Month]</li> }</ul></div> }

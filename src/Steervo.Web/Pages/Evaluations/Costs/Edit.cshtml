@@ -1,20 +1,22 @@
 @page "/evaluations/{id:guid}/costs/edit/{costId:guid?}"
 @model Steervo.Web.Pages.Evaluations.Costs.EditModel
 @{ ViewData["Title"] = T[Model.Cost is null ? "CostAdd" : "CostEdit"].Value; var e = Model.Evaluation; }
-<a class="back-link" asp-page="Index" asp-route-id="@e.Id" asp-route-candidateId="@Model.Input.CandidateId">← @T["CostPlanningTitle"]</a>
-<section class="panel cost-editor"><p class="eyebrow">@e.Name · @e.Currency</p><h1>@ViewData["Title"]</h1><p class="muted">@T["CostEditHelp"]</p>
-@if (Model.Notice is not null) { <p class="notice failure" role="alert">@Model.Notice</p> }
-<form method="post" data-cost-form><input asp-for="Version" type="hidden" />
-<label asp-for="Input.Name">@T["CostName"]</label><input asp-for="Input.Name" maxlength="200" required />
+<partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "costs")' />
+<a class="back-link" href="@Model.ReturnUrl"><partial name="/Pages/Shared/_Icon.cshtml" model='"back"' />@T["CostPlanningTitle"]</a>
+<section id="cost-page-editor" class="workspace-surface page-editor cost-editor" data-editor data-page-editor data-return-url="@Model.ReturnUrl" aria-labelledby="cost-editor-title">
+<p class="editor-context">@e.Name · @e.Currency</p><h2 id="cost-editor-title">@ViewData["Title"]</h2><p class="muted">@T["CostEditHelp"]</p>
+<div class="editor-error notice failure" role="alert" tabindex="-1" hidden="@(Model.Notice is null)">@Model.Notice</div>
+<form method="post" data-cost-form data-guard-draft data-retain-on-error hx-post="@Request.Path@Request.QueryString" hx-swap="none" hx-sync="this:drop" hx-disabled-elt="find button[type=submit]"><input asp-for="Version" type="hidden" />
+<section class="form-section"><h3>@T["CostIdentity"]</h3><label asp-for="Input.Name">@T["CostName"]</label><input asp-for="Input.Name" maxlength="200" required />
 <div class="field-pair"><div><label asp-for="Input.CandidateId">@T["CostScope"]</label><select asp-for="Input.CandidateId"><option value="">@T["CostCommon"]</option>@foreach (var candidate in e.Candidates.OrderBy(c => c.Position)) { <option value="@candidate.Id">@candidate.DisplayName</option> }</select></div>
 <div><label asp-for="Input.Category">@T["OfferLineCostCategory"]</label><select asp-for="Input.Category">@foreach (var category in Enum.GetValues<CostCategory>()) { <option value="@category">@T["CostCategory" + category]</option> }</select></div></div>
-<div class="field-pair"><div><label asp-for="Input.Frequency">@T["CostFrequency"]</label><select asp-for="Input.Frequency" data-cost-frequency>@foreach (var frequency in Enum.GetValues<CostFrequency>()) { <option value="@frequency">@T["CostFrequency" + frequency]</option> }</select></div>
+</section><section class="form-section"><h3>@T["CostPayment"]</h3><div class="field-pair"><div><label asp-for="Input.Frequency">@T["CostFrequency"]</label><select asp-for="Input.Frequency" data-cost-frequency>@foreach (var frequency in Enum.GetValues<CostFrequency>()) { <option value="@frequency">@T["CostFrequency" + frequency]</option> }</select></div>
 <div><label asp-for="Input.Direction">@T["CostDirection"]</label><select asp-for="Input.Direction" data-cost-direction>@foreach (var direction in Enum.GetValues<CostDirection>()) { <option value="@direction">@T["CostDirection" + direction]</option> }</select></div></div>
 <div data-cost-amount><label asp-for="Input.Amount">@T["CostAmount"] (@e.Currency) <span class="optional">@T["Optional"]</span></label><input asp-for="Input.Amount" type="number" min="0" max="1000000000000" step="0.01" inputmode="decimal" aria-describedby="cost-amount-help" /><p class="micro" id="cost-amount-help">@T["CostAmountHelp"]</p></div>
-<div class="field-pair"><div><label asp-for="Input.StartMonth">@T["CostFirstMonth"]</label><input asp-for="Input.StartMonth" type="number" min="1" max="1200" step="1" required /></div>
+</section><section class="form-section"><h3>@T["CostPaymentTiming"]</h3><div class="field-pair"><div><label asp-for="Input.StartMonth">@T["CostFirstMonth"]</label><input asp-for="Input.StartMonth" type="number" min="1" max="1200" step="1" required /></div>
 <div data-cost-end><label asp-for="Input.EndMonth">@T["CostLastMonth"] <span class="optional">@T["Optional"]</span></label><input asp-for="Input.EndMonth" type="number" min="1" max="1200" step="1" /></div></div>
 @if (e.CostPlanning is { } plan) { <p class="micro">@T["CostTimingHelp", plan.Start.ToString("MM.yyyy"), plan.Months]</p> }
-<label asp-for="Input.Notes">@T["CostNotes"] <span class="optional">@T["Optional"]</span></label><textarea asp-for="Input.Notes" maxlength="2000" rows="3"></textarea>
-<div class="cost-editor-actions"><button class="button primary" id="save-cost">@T["Save"]</button><a class="button secondary" asp-page="Index" asp-route-id="@e.Id" asp-route-candidateId="@Model.Input.CandidateId">@T["Cancel"]</a></div>
+</section><section class="form-section"><label asp-for="Input.Notes">@T["CostNotes"] <span class="optional">@T["Optional"]</span></label><textarea asp-for="Input.Notes" maxlength="2000" rows="3"></textarea>
+</section><partial name="/Pages/Shared/_PageEditorActions.cshtml" model='new Steervo.Web.Pages.Shared.PageEditorActions(Model.ReturnUrl, "save-cost", T["Save"].Value)' />
 </form></section>
 @section Scripts { <script src="~/js/costs.js" asp-append-version="true" defer></script> }

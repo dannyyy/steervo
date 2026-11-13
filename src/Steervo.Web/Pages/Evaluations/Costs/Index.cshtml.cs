@@ -15,12 +15,13 @@ public sealed class IndexModel(CostWorkspace workspace, ICurrentUser current, IS
     public AccessLevel Access => Evaluation.AccessFor(current.Id)!.Value;
     public Guid? CandidateId { get; private set; }
     public string Period { get; private set; } = "month";
-    public int PageNumber { get; private set; }
+    public int PageNumber { get; private set; } = 1;
     public int PageCount { get; private set; }
     public CostProjection? Projection { get; private set; }
     public IReadOnlyList<CostPeriod> Periods { get; private set; } = [];
     public string? Notice { get; private set; }
-    public bool Failed { get; private set; }
+    public string? FailedAction { get; private set; }
+    public string ContextUrl => $"/evaluations/{Evaluation.Id}/costs?candidateId={CandidateId}&period={Period}&pageNumber={PageNumber}";
     [BindProperty] public CostPlanningForm Plan { get; set; } = new();
     [BindProperty] public long Version { get; set; }
     public async Task<IActionResult> OnGetAsync(Guid id, Guid? candidateId, string? period, int pageNumber = 1)
@@ -31,11 +32,11 @@ public sealed class IndexModel(CostWorkspace workspace, ICurrentUser current, IS
         }
         catch (RuleException error) { return StatusCode(error.Message == "Forbidden" ? 403 : 404); }
     }
-    public async Task<IActionResult> OnPostAsync(Guid id, Guid? candidateId, string? period, string action, Guid costId)
+    public async Task<IActionResult> OnPostAsync(Guid id, Guid? candidateId, string? period, string action, Guid costId, int pageNumber = 1)
     {
         try
         {
-            await LoadAsync(id, candidateId, period, 1); Evaluation.Require(current.Id, AccessLevel.Editor);
+            await LoadAsync(id, candidateId, period, pageNumber); Evaluation.Require(current.Id, AccessLevel.Editor);
             if (!ModelState.IsValid) throw new RuleException("InvalidCostPlanning");
             switch (action)
             {
@@ -43,12 +44,16 @@ public sealed class IndexModel(CostWorkspace workspace, ICurrentUser current, IS
                 case "remove-cost": await workspace.RemoveAsync(id, Version, costId); break;
                 default: throw new RuleException("InvalidValue");
             }
-            return RedirectToPage("Index", null, new { id, candidateId, period }, action == "remove-cost" ? "cost-items" : null);
+            var url = ContextUrl + (action == "remove-cost" ? "#cost-items" : "#cost-plan-title");
+            if (Request.Headers.ContainsKey("HX-Request")) { Response.Headers["HX-Redirect"] = url; return new EmptyResult(); }
+            return Redirect(url);
         }
         catch (RuleException error)
         {
             if (error.Message is "Forbidden" or "NotFound") return StatusCode(error.Message == "Forbidden" ? 403 : 404);
-            Failed = true; Notice = text[error.Message]; Response.StatusCode = error.Message == "Conflict" ? 409 : 422;
+            FailedAction = action; Notice = text[error.Message]; Response.StatusCode = error.Message == "Conflict" ? 409 : 422;
+            if (Request.Headers.ContainsKey("HX-Request")) return new JsonResult(new { error = Notice, version = Evaluation.Version, reviewUrl = ContextUrl,
+                context = action == "remove-cost" ? Evaluation.Costs.FirstOrDefault(c => c.Id == costId)?.Name ?? Evaluation.Name : Evaluation.CostPlanning is { } planning ? $"{planning.Start:MM.yyyy} · {text["CostMonthCount", planning.Months]}" : Evaluation.Name });
             if (action != "plan") Plan = CostPlanningForm.From(Evaluation.CostPlanning);
             return Page();
         }

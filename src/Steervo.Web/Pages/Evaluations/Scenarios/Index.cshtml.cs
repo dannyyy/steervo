@@ -13,6 +13,7 @@ public sealed class IndexModel(ScenarioWorkspace workspace, ICurrentUser current
     public AccessLevel Access => Evaluation.AccessFor(current.Id)!.Value;
     [BindProperty] public string? AnnualReturn { get; set; }
     [BindProperty] public long Version { get; set; }
+    public string? FailedAction { get; private set; }
     public string? Notice { get; private set; }
     public async Task<IActionResult> OnGetAsync(Guid id)
     {
@@ -28,12 +29,17 @@ public sealed class IndexModel(ScenarioWorkspace workspace, ICurrentUser current
             if (action == "settings") await workspace.SettingsAsync(id, Version, ScenarioForm.Number(AnnualReturn) ?? throw new RuleException("InvalidReturn"));
             else if (action == "remove") await workspace.RemoveAsync(id, Version, scenarioId);
             else throw new RuleException("InvalidValue");
-            return RedirectToPage("Index", new { id });
+            var url = $"/evaluations/{id}/scenarios" + (action == "settings" ? "#scenario-settings-title" : "#scenario-list-title");
+            if (Request.Headers.ContainsKey("HX-Request")) { Response.Headers["HX-Redirect"] = url; return new EmptyResult(); }
+            return Redirect(url);
         }
         catch (RuleException error)
         {
             if (error.Message is "Forbidden" or "NotFound") return StatusCode(error.Message == "Forbidden" ? 403 : 404);
-            Notice = text[error.Message]; Response.StatusCode = error.Message == "Conflict" ? 409 : 422; return Page();
+            FailedAction = action; Notice = text[error.Message]; Response.StatusCode = error.Message == "Conflict" ? 409 : 422;
+            if (Request.Headers.ContainsKey("HX-Request")) return new JsonResult(new { error = Notice, version = Evaluation.Version, reviewUrl = $"/evaluations/{id}/scenarios",
+                context = action == "remove" ? Evaluation.Scenarios.FirstOrDefault(s => s.Id == scenarioId)?.Name ?? Evaluation.Name : $"{text["ScenarioAnnualReturn"]}: {ScenarioForm.Format(Evaluation.CalculationSettings?.AnnualReturnPercent) ?? text["OfferOpen"]} %" });
+            return Page();
         }
     }
 }

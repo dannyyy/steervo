@@ -2,6 +2,10 @@
 
 ## Unveröffentlicht
 
+- Vierter Teil der Canvas/Tinte-Migration: zusammenhängende Kostenplanung und Szenarioakten, gegliederte Formularseiten und zeilenweiser Szenarienvergleich mit fixierter erster Spalte. Fahrzeugbezug, Stichtag, Vergleichspaar und Zahlungsansicht bleiben bei der Bearbeitung erhalten.
+- Planungszeitraum, Rendite, Restwerte, Kostenanpassungen und Szenariokopien verwenden gemeinsame Inline-Editoren mit Entwurfsschutz, lokalen Fehlern und ausdrücklicher Konfliktwiederholung. Offertversionen bleiben fest gebunden; ein Quellenwechsel ersetzt keine Rechenannahmen.
+- Benannte Löschbestätigungen schützen auch benachbarte Entwürfe. Wiederholtes Speichern auf derselben Seite lädt aktuelle Werte und stellt den Fokus wieder her; inzwischen entfernte Einträge beenden weitere Schreibversuche. Berechnungen und Austauschformat bleiben unverändert.
+
 - Dritter Teil der Canvas/Tinte-Migration: gemeinsame Offertenliste, zusammenhängende Offertakte, lesbare Versionshistorie und Offertenvergleich mit fixierter Kriterienspalte auf Mobilgeräten. Vergleichsauswahl bleibt beim Wechsel in Bearbeitung und Upload erhalten.
 - Fahrzeug- und Offertbewertungen verwenden denselben Editor. Neue Offertstände kennzeichnen weiterhin frühere Einschätzungen zur erneuten Prüfung.
 - Gegliederte Offertformulare und Dokumentuploads verwenden den gemeinsamen Entwurfsschutz und lokale Fehler. Versionskonflikte erhalten alle Eingaben und die gewählte Datei; erneutes Senden erfolgt ausdrücklich nach Prüfung. Dokumentlöschung nennt das Objekt im gemeinsamen Bestätigungsdialog.
