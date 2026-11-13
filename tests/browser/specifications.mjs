@@ -21,8 +21,8 @@ export async function fillSpecifications(dialog) {
 export async function checkSpecificationValidation(page, details) {
   await details.locator('#spec-section-Weight > summary').click();
   await details.locator('#spec-GrossWeightKg').fill('1900');
-  const response = page.waitForResponse(response => response.request().method() === 'POST' && response.url() === page.url());
-  await details.getByRole('button', { name: 'Stammdaten speichern' }).click();
+  const response = page.waitForResponse(response => response.request().method() === 'POST' && new URL(response.url()).pathname === new URL(page.url()).pathname);
+  await details.getByRole('button', { name: 'Speichern', exact: true }).click();
   assert.equal((await response).status(), 422);
   await page.getByText(/Die Gewichte passen nicht zusammen/).waitFor();
   assert.equal(await details.locator('#spec-GrossWeightKg').inputValue(), '1900');
@@ -34,7 +34,7 @@ export async function checkSpecificationValidation(page, details) {
 
 export async function editCopiedSpecifications(page, change) {
   const details = page.locator('#candidate-edit');
-  await details.locator(':scope > summary').click();
+  await page.locator('#edit-candidate').click();
   for (const group of ['Weight', 'Performance', 'Space', 'Electric', 'Combustion'])
     await details.locator(`#spec-section-${group} > summary`).click();
   await details.locator('#spec-KerbWeightKg').fill('2200');
@@ -45,9 +45,9 @@ export async function editCopiedSpecifications(page, change) {
   await details.locator('#spec-TankCapacityLitres').fill('50');
   await details.locator('#spec-RangeKm').fill('800');
   await details.locator('#spec-FuelConsumptionLitresPer100Km').fill('6.25');
-  await change(page, () => details.getByRole('button', { name: 'Stammdaten speichern' }).click());
+  await change(page, () => details.getByRole('button', { name: 'Speichern', exact: true }).click());
   assert.match(await page.locator('#candidate-specifications [data-specification="PayloadKg"]').textContent(), /300 kg/);
-  await details.locator(':scope > summary').click();
+  assert.equal(await details.isVisible(), false);
 }
 
 export async function checkSpecificationsComparison(page, firstId, secondId) {

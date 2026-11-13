@@ -161,14 +161,14 @@ try {
 
   const creation = page.getByRole('dialog', { name: 'Neue Evaluation', exact: true });
   const firstEvaluation = page.getByRole('button', { name: 'Erste Evaluation anlegen' });
-  assert.equal(await page.locator('dialog').isVisible(), false);
+  assert.equal(await creation.isVisible(), false);
   assert.equal(await page.getByRole('button', { name: 'Neue Evaluation', exact: true }).count(), 0);
   await firstEvaluation.click();
   assert.equal(await creation.isVisible(), true);
   assert.equal(await creation.getByLabel('Name der Evaluation').evaluate(input => input === document.activeElement), true);
   await page.screenshot({ path: join(output, '05-create-desktop.png'), fullPage: true });
   await page.keyboard.press('Escape');
-  assert.equal(await page.locator('dialog').isVisible(), false);
+  assert.equal(await creation.isVisible(), false);
   assert.equal(await firstEvaluation.evaluate(button => button === document.activeElement), true);
   await firstEvaluation.click();
   await creation.getByLabel('Name der Evaluation').fill('   ');
@@ -392,7 +392,7 @@ try {
   await page.getByLabel('Exportdatei (JSON oder ZIP)').setInputFiles({ name: 'invalid.json', mimeType: 'application/json', buffer: Buffer.from('{invalid') });
   await page.getByRole('button', { name: 'Als neue Evaluation importieren', exact: true }).click();
   await page.locator('details[open] .validation-summary-errors').waitFor();
-  assert.equal(await page.locator('dialog').isVisible(), false);
+  assert.equal(await creation.isVisible(), false);
   await page.getByLabel('Exportdatei (JSON oder ZIP)').setInputFiles(exportFile);
   await page.getByRole('button', { name: 'Als neue Evaluation importieren', exact: true }).click();
   await page.waitForURL(/\/evaluations\//);

@@ -1,46 +1,60 @@
 @model Steervo.Web.Pages.Evaluations.Candidates.CompareModel
+@using Steervo.Web.Pages.Evaluations.Candidates
 @{ var e = Model.Evaluation; var edit = Model.Access >= AccessLevel.Editor; var url = $"/evaluations/{e.Id}/compare?first={Model.First?.Id}&second={Model.Second?.Id}"; var selected = Model.Selected; }
 <div id="candidate-workspace" data-version="@e.Version" data-preserve-viewport hx-target="#candidate-workspace" hx-swap="outerHTML show:none focus-scroll:false" hx-sync="this:drop">
-<partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "comparison")' />
-@if (Model.Notice is not null) { <div class="notice workspace-notice @(Model.Failed ? "failure" : "success")" role="status" tabindex="-1">@Model.Notice</div> }
-<div class="section-heading"><h2>@T["ComparisonTitle"]</h2><p class="muted">@T["ComparisonHelp"]</p></div>
+<partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "comparison", Model.First?.Id, Model.First?.Id, Model.Second?.Id)' />
+@if (Model.Notice is not null && Model.Draft is null) { <div class="notice workspace-notice @(Model.Failed ? "failure" : "success")" role="@(Model.Failed ? "alert" : "status")" tabindex="-1">@Model.Notice</div> }
+<section class="comparison-surface">
+<div class="comparison-introduction"><p class="eyebrow">@T["CompareCandidates"]</p><h2>@T["ComparisonTitle"]</h2><p class="muted">@T["ComparisonHelp"]</p></div>
 @if (selected.Count == 0)
 {
-    <div class="candidate-empty"><span class="step-number">03</span><div><h3>@T["NoComparisonCandidates"]</h3><p>@T["NoComparisonCandidatesHelp"]</p><a asp-page="Index" asp-route-id="@e.Id" class="button secondary">@T["Candidates"] →</a></div></div>
+    <div class="candidate-empty"><div><h3>@T["NoComparisonCandidates"]</h3><p>@T["NoComparisonCandidatesHelp"]</p><a asp-page="Index" asp-route-id="@e.Id" class="button secondary">@T["Candidates"]<partial name="/Pages/Shared/_Icon.cshtml" model='"arrow"' /></a></div></div>
 }
 else
 {
     <form method="get" class="comparison-picker"><div><label for="compare-first">@T["FirstCandidate"]</label><select id="compare-first" name="first">@foreach (var candidate in e.Candidates.OrderBy(x => x.Position)) { <option value="@candidate.Id" selected="@(candidate.Id == Model.First?.Id)">@candidate.DisplayName · @T["CandidateStatus" + candidate.Status]</option> }</select></div><div><label for="compare-second">@T["SecondCandidate"]</label><select id="compare-second" name="second"><option value="">@T["SelectCandidate"]</option>@foreach (var candidate in e.Candidates.OrderBy(x => x.Position)) { <option value="@candidate.Id" selected="@(candidate.Id == Model.Second?.Id)">@candidate.DisplayName · @T["CandidateStatus" + candidate.Status]</option> }</select></div><button class="button secondary">@T["ShowComparison"]</button></form>
     @if (selected.Count == 1) { <p class="notice">@T["OneCandidateComparison"]</p> }
-    <div class="comparison @(selected.Count == 1 ? "comparison-single" : null)">
-        <div class="comparison-header"><span>@T["CompareCandidates"]</span>@foreach (var candidate in selected) { <div><a asp-page="Details" asp-route-id="@e.Id" asp-route-candidateId="@candidate.Id">@candidate.DisplayName ↗</a><span class="candidate-status @candidate.Status.ToString().ToLowerInvariant()">@T["CandidateStatus" + candidate.Status]</span>@if (candidate.StatusReason.Length > 0) { <p class="micro">@candidate.StatusReason</p> }</div> }</div>
-        <partial name="_SpecificationsComparison" model="selected" />
-        <div class="specification-comparison-heading"><h3>@T["ComparisonAssessmentsTitle"]</h3></div>
-        @foreach (var group in e.Groups.OrderBy(x => x.Position).Cast<CriterionGroup?>().Append(null))
-        {
-            var criteria = e.Criteria.Where(x => x.Scope == CriterionScope.Vehicle && x.GroupId == group?.Id).OrderBy(x => x.Position).ToList();
-            if (criteria.Count == 0) { continue; }
-            <section class="comparison-group"><h3>@(group?.Name ?? T["Ungrouped"].Value)</h3>
-            @foreach (var criterion in criteria)
+    <p class="comparison-scroll-hint" id="comparison-scroll-hint">@T["ComparisonScrollHint"]</p>
+    <div class="comparison-scroll" id="vehicle-comparison-scroll" data-preserve-scroll tabindex="0" role="region" aria-label="@T["CompareCandidates"]" aria-describedby="comparison-scroll-hint">
+        <table class="vehicle-table @(selected.Count == 1 ? "vehicle-table-single" : null)">
+            <caption class="visually-hidden">@T["ComparisonTitle"]</caption>
+            <colgroup><col class="criterion-column" />@foreach (var candidate in selected) { <col /> }</colgroup>
+            <thead><tr><th scope="col">@T["VehicleRequirements"]</th>@foreach (var candidate in selected) { <th scope="col"><a href="/evaluations/@e.Id/candidates/@candidate.Id?first=@Model.First?.Id&second=@Model.Second?.Id" class="comparison-candidate-link">@candidate.DisplayName<partial name="/Pages/Shared/_Icon.cshtml" model='"arrow"' /></a><span class="candidate-status @candidate.Status.ToString().ToLowerInvariant()">@T["CandidateStatus" + candidate.Status]</span>@if (candidate.StatusReason.Length > 0) { <p class="micro">@candidate.StatusReason</p> }</th> }</tr></thead>
+            @foreach (var group in e.Groups.OrderBy(x => x.Position).Cast<CriterionGroup?>().Append(null))
             {
-                <div class="comparison-row" data-comparison-criterion="@criterion.Id"><div class="comparison-criterion"><h4>@criterion.Name</h4><span class="priority @criterion.Priority.ToString().ToLowerInvariant()">@T[criterion.Priority.ToString()]</span><p class="micro">@T[criterion.Type.ToString()] @if (criterion.Type == CriterionType.Measurement) { <span> · @(criterion.Comparison == Comparison.AtLeast ? "≥" : "≤") @criterion.Threshold @criterion.Unit</span> }</p></div>
-                @foreach (var candidate in selected)
+                var criteria = e.Criteria.Where(x => x.Scope == CriterionScope.Vehicle && x.GroupId == group?.Id).OrderBy(x => x.Position).ToList();
+                if (criteria.Count == 0) { continue; }
+                <tbody><tr class="vehicle-group-heading"><th colspan="@(selected.Count + 1)" scope="colgroup">@(group?.Name ?? T["Ungrouped"].Value)</th></tr>
+                @foreach (var criterion in criteria)
                 {
-                    var row = new Steervo.Web.Pages.Evaluations.Candidates.AssessmentRow(e, candidate, criterion, Model.Access, url);
-                    <div class="comparison-cell @row.Result.ToString().ToLowerInvariant()" role="group" aria-label="@T["CriterionForCandidate", criterion.Name, candidate.DisplayName]" data-comparison-candidate="@candidate.Id">
-                        <strong class="comparison-value">@(criterion.Type == CriterionType.Boolean ? T[row.Assessment?.BooleanValue is { } boolean ? boolean ? "Yes" : "No" : "FulfillmentUnknown"].Value : row.ValueText.Length > 0 ? row.ValueText : T["FulfillmentUnknown"].Value)</strong><span class="fulfillment @row.Result.ToString().ToLowerInvariant()">@T["Fulfillment" + row.Result]</span>
-                        @if (row.Assessment?.Source is { } source && source != AssessmentSource.Unknown) { <p class="micro">@T["AssessmentSource" + source]</p> }
-                        @if (!string.IsNullOrEmpty(row.Assessment?.Notes)) { <p class="comparison-note">@row.Assessment.Notes</p> }
-                        @if (edit) { <details class="comparison-editor" id="compare-edit-@candidate.Id-@criterion.Id"><summary>@T["EditAssessment"]</summary><partial name="_AssessmentRow" model="row" /></details> }
-                    </div>
+                    <tr data-comparison-criterion="@criterion.Id"><th scope="row" class="vehicle-criterion"><strong>@criterion.Name</strong><span class="assessment-requirement">@T[criterion.Priority.ToString()]</span><span class="assessment-requirement">@T[criterion.Type.ToString()] @if (criterion.Type == CriterionType.Measurement) { <span> · @(criterion.Comparison == Comparison.AtLeast ? "≥" : "≤") @criterion.Threshold @criterion.Unit</span> }</span></th>
+                    @foreach (var candidate in selected)
+                    {
+                        var row = new AssessmentRow(e, candidate, criterion, Model.Access, url);
+                        <td class="vehicle-value assessment-cell" data-comparison-candidate="@candidate.Id">
+                            @if (edit) { <button type="button" class="comparison-edit" id="open-@row.FieldId" data-editor-open="editor-@row.FieldId" aria-controls="editor-@row.FieldId" aria-expanded="false" aria-label="@T["EditAssessmentFor", criterion.Name, candidate.DisplayName]"><partial name="_ComparisonValue" model="row" /></button> }
+                            else { <div class="comparison-readonly"><partial name="_ComparisonValue" model="row" /></div> }
+                        </td>
+                    }
+                    </tr>
                 }
-                </div>
+                </tbody>
             }
-            </section>
-        }
-        @if (!e.Criteria.Any(x => x.Scope == CriterionScope.Vehicle)) { <p class="notice">@T["NoVehicleCriteriaHelp"]</p> }
+            <partial name="_SpecificationsComparison" model="selected" />
+        </table>
     </div>
-    <div class="comparison-explanation"><p>@T["NoAutomaticExclusion"]</p><p>@T["RatingIsSubjective"]</p><a asp-page="/Evaluations/Details" asp-route-id="@e.Id">@T["EditCriteria"] →</a></div>
-    @if (e.Criteria.Any(x => x.Scope == CriterionScope.Offer)) { <p class="notice"><a asp-page="/Evaluations/Offers/Index" asp-route-id="@e.Id">@T["OfferCriteriaSeparateLink"] →</a></p> }
+    @if (!e.Criteria.Any(x => x.Scope == CriterionScope.Vehicle)) { <p class="notice">@T["NoVehicleCriteriaHelp"]</p> }
+    @if (edit)
+    {
+        <div class="comparison-editors">
+        @foreach (var candidate in selected)
+        {
+            @foreach (var criterion in e.Criteria.Where(x => x.Scope == CriterionScope.Vehicle)) { <partial name="_AssessmentEditor" model="new AssessmentRow(e, candidate, criterion, Model.Access, url, Model.Draft)" /> }
+        }
+        </div>
+    }
+    <div class="comparison-explanation"><p>@T["NoAutomaticExclusion"]</p><p>@T["RatingIsSubjective"]</p><a asp-page="/Evaluations/Details" asp-route-id="@e.Id">@T["EditCriteria"]</a></div>
+    @if (e.Criteria.Any(x => x.Scope == CriterionScope.Offer)) { <p class="micro"><a asp-page="/Evaluations/Offers/Index" asp-route-id="@e.Id">@T["OfferCriteriaSeparateLink"]</a></p> }
 }
+</section>
 </div>

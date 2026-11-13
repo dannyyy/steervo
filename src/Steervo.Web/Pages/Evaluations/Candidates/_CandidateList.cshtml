@@ -1,23 +1,24 @@
 @model Steervo.Web.Pages.Evaluations.Candidates.IndexModel
+@using Steervo.Web.Pages.Shared
 @{ var e = Model.Evaluation; var edit = Model.Access >= AccessLevel.Editor; }
 <div id="candidate-workspace" data-version="@e.Version" data-preserve-viewport hx-target="#candidate-workspace" hx-swap="outerHTML show:none focus-scroll:false" hx-sync="this:drop">
 <partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "candidates")' />
-@if (Model.Notice is not null) { <div class="notice workspace-notice @(Model.Failed ? "failure" : "success")" role="status" tabindex="-1">@Model.Notice</div> }
-<div class="section-heading candidate-heading"><div><h2>@T["CandidatesTitle"]</h2><p class="muted">@T["CandidatesHelp"]</p></div>@if (edit) { <button type="button" class="button primary" data-dialog-open="new-candidate" aria-haspopup="dialog">＋ @T["AddCandidate"]</button> }</div>
+@if (Model.Notice is not null && !Model.CreationFailed && Model.FailedAction != "copy-candidate") { <div class="notice workspace-notice @(Model.Failed ? "failure" : "success")" role="status" tabindex="-1">@Model.Notice</div> }
+<div class="section-heading candidate-heading"><div><h2>@T["CandidatesTitle"]</h2><p class="muted">@T["CandidatesHelp"]</p></div>@if (edit) { <button type="button" class="button primary" id="add-candidate" data-dialog-open="new-candidate" aria-haspopup="dialog"><partial name="/Pages/Shared/_Icon.cshtml" model='"plus"' />@T["AddCandidate"]</button> }</div>
 @if (e.Candidates.Count == 0)
 {
-    <div class="candidate-empty"><span class="step-number">02</span><div><h3>@T["EmptyCandidatesTitle"]</h3><p>@T["EmptyCandidatesHelp"]</p></div></div>
+    <div class="candidate-empty"><partial name="/Pages/Shared/_Icon.cshtml" model='"car"' /><div><h3>@T["EmptyCandidatesTitle"]</h3><p>@T["EmptyCandidatesHelp"]</p></div></div>
 }
 else
 {
-    <div class="candidate-grid">
+    <div class="candidate-grid candidate-collection">
     @foreach (var c in e.Candidates.OrderBy(c => c.Position))
     {
         var failures = e.Criteria.Where(x => x.Scope == CriterionScope.Vehicle && x.Priority == Priority.Required && e.ResultFor(c.Id, x.Id) == Fulfillment.Unmet).ToList();
         var unknown = e.Criteria.Any(x => x.Scope == CriterionScope.Vehicle && e.ResultFor(c.Id, x.Id) == Fulfillment.Unknown);
         <article class="candidate-card" id="candidate-@c.Id" data-candidate-id="@c.Id">
             <div class="card-top"><span class="candidate-status @c.Status.ToString().ToLowerInvariant()">@T["CandidateStatus" + c.Status]</span>
-            @if (edit) { <div class="row-actions">@foreach (var direction in new[] { -1, 1 }) { <form method="post" hx-post="/evaluations/@e.Id/candidates"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="move-candidate" /><input type="hidden" name="itemId" value="@c.Id" /><input type="hidden" name="direction" value="@direction" /><button id="move-candidate-@c.Id-@direction" class="icon-button" aria-label="@T[direction == -1 ? "CandidateUp" : "CandidateDown", c.DisplayName]" disabled="@(direction == -1 ? c.Position == 0 : c.Position == e.Candidates.Count - 1)">@(direction == -1 ? "↑" : "↓")</button></form> }</div> }</div>
+            @if (edit) { <div class="row-actions">@foreach (var direction in new[] { -1, 1 }) { <form method="post" hx-post="/evaluations/@e.Id/candidates"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="move-candidate" /><input type="hidden" name="itemId" value="@c.Id" /><input type="hidden" name="direction" value="@direction" /><button id="move-candidate-@c.Id-@direction" class="icon-button" aria-label="@T[direction == -1 ? "CandidateUp" : "CandidateDown", c.DisplayName]" disabled="@(direction == -1 ? c.Position == 0 : c.Position == e.Candidates.Count - 1)"><partial name="/Pages/Shared/_Icon.cshtml" model='(direction == -1 ? "up" : "down")' /></button></form> }</div> }</div>
             <h3><a asp-page="Details" asp-route-id="@e.Id" asp-route-candidateId="@c.Id">@c.DisplayName</a></h3><p class="muted candidate-meta">@T["Condition" + c.Condition] @if (c.Year.HasValue) { <span> · @c.Year</span> } @if (c.Mileage.HasValue) { <span> · @c.Mileage.Value.ToString("N0") km</span> }</p>
             @if (c.StatusReason.Length > 0) { <p class="candidate-reason">@c.StatusReason</p> }
             @if (failures.Count > 0) { <div class="candidate-warning"><strong>@T["RequiredNotMet"]</strong><p>@string.Join(" · ", failures.Select(x => x.Name))</p></div> }
@@ -25,7 +26,13 @@ else
             <a class="candidate-open" asp-page="Details" asp-route-id="@e.Id" asp-route-candidateId="@c.Id">@T[edit ? "AssessCandidate" : "ViewCandidate"] →</a>
             @if (edit)
             {
-                <details class="candidate-actions"><summary>@T["CandidateActions"]</summary><form method="post"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="copy-candidate" /><input type="hidden" name="itemId" value="@c.Id" /><label for="copy-@c.Id">@T["CopyCandidateName"]</label><input id="copy-@c.Id" name="copyName" value="@c.Model" required maxlength="160" /><p class="micro">@T["CopyCandidateHelp"]</p><button class="button secondary">@T["CopyCandidate"]</button></form><form method="post" hx-post="/evaluations/@e.Id/candidates" data-confirm="@T["RemoveCandidateConfirm"]"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="remove-candidate" /><input type="hidden" name="itemId" value="@c.Id" /><button class="text-button danger">@T["RemoveCandidate"]</button></form></details>
+                <details class="candidate-actions"><summary>@T["CandidateActions"]</summary><button type="button" id="copy-open-@c.Id" class="text-button" data-dialog-open="copy-dialog-@c.Id" aria-haspopup="dialog">@T["CopyCandidate"]</button><form method="post" hx-post="/evaluations/@e.Id/candidates" data-confirm-action="@T["RemoveCandidateNamed", c.DisplayName]" data-confirm-description="@T["RemoveCandidateConfirm"]"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="remove-candidate" /><input type="hidden" name="itemId" value="@c.Id" /><button class="text-button danger">@T["RemoveCandidate"]</button></form></details>
+                var copyFailed = Model.FailedAction == "copy-candidate" && Model.FailedItemId == c.Id;
+                <dialog id="copy-dialog-@c.Id" class="side-sheet" data-editor data-guard-draft data-opener="copy-open-@c.Id" data-open-on-load="@(copyFailed ? "true" : "false")" aria-labelledby="copy-title-@c.Id">
+                    <div class="editor-heading"><div><p class="editor-context">@c.DisplayName</p><h2 id="copy-title-@c.Id">@T["CopyCandidate"]</h2></div><button type="button" class="icon-button" data-editor-close aria-label="@T["Close"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"close"' /></button></div>
+                    <div class="editor-error" role="alert" tabindex="-1" hidden="@(!copyFailed)">@(copyFailed ? Model.Notice : null)</div>
+                    <form method="post" hx-post="/evaluations/@e.Id/candidates" hx-disabled-elt="find button[type=submit]" data-guard-draft data-submitted-values="@(copyFailed ? System.Text.Json.JsonSerializer.Serialize(new { copyName = Model.CopyName }) : null)"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="copy-candidate" /><input type="hidden" name="itemId" value="@c.Id" /><label for="copy-@c.Id">@T["CopyCandidateName"]</label><input id="copy-@c.Id" name="copyName" value="@c.Model" required maxlength="160" /><p class="micro">@T["CopyCandidateHelp"]</p><partial name="/Pages/Shared/_EditorActions.cshtml" model='new EditorActions("copy-submit-" + c.Id, T["CopyCandidate"].Value)' /></form>
+                </dialog>
             }
         </article>
     }
@@ -34,6 +41,13 @@ else
 }
 @if (edit)
 {
-    <dialog id="new-candidate" class="creation-dialog candidate-dialog" aria-labelledby="new-candidate-title" data-open-on-load="@(Model.CreationFailed ? "true" : "false")"><button type="button" class="dialog-close" data-dialog-close aria-label="@T["Close"]">×</button><p class="eyebrow">@T["Candidates"]</p><h2 id="new-candidate-title">@T["AddCandidate"]</h2><p class="muted">@T["NewCandidateHelp"]</p><form method="post"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="add-candidate" />@if (Model.CreationFailed) { <p class="notice failure" role="alert">@Model.Notice</p> }<partial name="_CandidateFields" model="Model.Input" /><div class="dialog-actions"><button type="button" class="button secondary" data-dialog-close>@T["Cancel"]</button><button class="button primary">@T["CreateCandidate"] →</button></div></form></dialog>
+    <dialog id="new-candidate" class="side-sheet" data-editor data-guard-draft data-opener="add-candidate" aria-labelledby="new-candidate-title" data-open-on-load="@(Model.CreationFailed ? "true" : "false")">
+        <div class="editor-heading"><div><p class="editor-context">@T["Candidates"]</p><h2 id="new-candidate-title">@T["AddCandidate"]</h2></div><button type="button" class="icon-button" data-editor-close aria-label="@T["Close"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"close"' /></button></div>
+        <p class="muted">@T["NewCandidateHelp"]</p>
+        <form method="post" hx-post="/evaluations/@e.Id/candidates" hx-disabled-elt="find button[type=submit]" data-guard-draft data-new-object><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="add-candidate" />
+            @if (Model.CreationFailed) { <p class="editor-error" role="alert" tabindex="-1">@Model.Notice</p> }
+            <partial name="_CandidateFields" model="Model.Input" /><partial name="/Pages/Shared/_EditorActions.cshtml" model='new EditorActions("save-new-candidate", T["CreateCandidate"].Value)' />
+        </form>
+    </dialog>
 }
 </div>

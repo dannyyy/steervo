@@ -15,12 +15,12 @@ document.addEventListener('click', event => {
   const opener = event.target.closest('[data-dialog-open]');
   if (opener) {
     const dialog = document.getElementById(opener.dataset.dialogOpen);
-    if (dialog instanceof HTMLDialogElement && !dialog.open) dialog.showModal();
+    if (dialog instanceof HTMLDialogElement && !dialog.hasAttribute("data-editor") && !dialog.open) dialog.showModal();
   }
   const closer = event.target.closest('[data-dialog-close]');
-  if (closer) closer.closest('dialog')?.close();
+  if (closer && !closer.closest('[data-editor]')) closer.closest('dialog')?.close();
 });
-document.querySelectorAll('dialog[data-open-on-load="true"]').forEach(dialog => dialog.showModal());
+document.querySelectorAll('dialog[data-open-on-load="true"]:not([data-editor])').forEach(dialog => dialog.showModal());
 
 const drafts = new WeakMap();
 document.addEventListener('htmx:beforeRequest', event => {
@@ -29,7 +29,7 @@ document.addEventListener('htmx:beforeRequest', event => {
 });
 document.addEventListener('htmx:afterSwap', event => {
   const submittedDraft = drafts.get(event.detail.xhr);
-  if (event.detail.xhr?.status === 422 && submittedDraft) {
+  if ([409, 422].includes(event.detail.xhr?.status) && submittedDraft) {
     const draft = new Map(submittedDraft);
     const form = [...document.querySelectorAll('#evaluation-workspace form, #candidate-workspace form, #offer-workspace form')].find(candidate =>
       ['action', 'itemId', 'candidateId', 'offerId', 'criterionId'].every(name => (candidate.elements.namedItem(name)?.value || '') === (draft.get(name) || '')));
@@ -44,7 +44,7 @@ document.addEventListener('htmx:afterSwap', event => {
   }
   drafts.delete(event.detail.xhr);
   initializeFields();
-  if (!event.detail.requestConfig?.elt?.matches('[data-sort]')) document.querySelector('.notice[tabindex]')?.focus({ preventScroll: true });
+  if (!event.detail.requestConfig?.elt?.matches('[data-sort]') && !event.detail.target?.querySelector('[data-editor]')) document.querySelector('.notice[tabindex]')?.focus({ preventScroll: true });
 });
 document.addEventListener('htmx:beforeSwap', event => {
   if ([409, 422].includes(event.detail.xhr.status)) { event.detail.shouldSwap = true; event.detail.isError = false; }

@@ -23,7 +23,7 @@ export async function checkScenarios({ page, reader, readerEmail, origin, output
   await page.getByRole('link', { name: /Kostenposition hinzufügen/ }).click(); await page.getByLabel('Bezeichnung der Kostenposition').fill('Parkplatz');
   await page.getByLabel('Betrag je Zahlung', { exact: false }).fill('25'); await page.getByRole('button', { name: 'Speichern', exact: true }).click(); await page.locator('#cost-workspace').waitFor();
   const cost = (await exportCase()).costs[0].id;
-  await page.getByRole('link', { name: '06 Rechnen', exact: true }).click(); await page.getByLabel('Angenommene Anlagerendite pro Jahr (%)').fill('0');
+  await page.getByRole('link', { name: 'Rechnen', exact: true }).click(); await page.getByLabel('Angenommene Anlagerendite pro Jahr (%)').fill('0');
   await page.getByRole('button', { name: 'Speichern', exact: true }).click(); await page.locator('#scenario-workspace').waitFor();
   async function create(name, mode, values) {
     await page.goto(`${origin}${path}`); await page.getByRole('link', { name: '+ Szenario anlegen', exact: true }).click();
@@ -108,7 +108,7 @@ export async function checkScenarios({ page, reader, readerEmail, origin, output
 
   await page.goto(`${origin}${casePath}/offers/${offer}`); await page.getByRole('link', { name: 'Dokument hinzufügen', exact: true }).click(); await page.getByLabel('Name des Dokuments').fill('Rechengrundlage');
   await page.getByLabel('Datei', { exact: true }).setInputFiles({ name: 'basis.txt', mimeType: 'text/plain', buffer: Buffer.from('Independent calculation attachment') }); await page.getByRole('button', { name: 'Datei hochladen' }).click(); await page.locator('[data-document-id]').waitFor();
-  const downloadEvent = page.waitForEvent('download'); await page.locator('.export-link').click(); const downloaded = await downloadEvent;
+  const downloadEvent = page.waitForEvent('download'); await page.getByRole('link', { name: 'Exportieren', exact: true }).click(); const downloaded = await downloadEvent;
   const zip = await readFile(await downloaded.path()); assert.equal(zip.subarray(0, 2).toString(), 'PK');
   await page.goto(origin); await page.locator('details').filter({ has: page.getByText('Evaluation importieren', { exact: true }) }).locator('summary').click();
   await page.getByLabel('Exportdatei (JSON oder ZIP)').setInputFiles({ name: 'scenarios.zip', mimeType: 'application/zip', buffer: zip }); await page.getByRole('button', { name: 'Als neue Evaluation importieren', exact: true }).click(); await page.waitForURL(/\/evaluations\//);

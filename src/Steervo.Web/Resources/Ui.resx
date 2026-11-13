@@ -746,4 +746,25 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="ScenarioMissingUnusedKilometreCredit" xml:space="preserve"><value>Vergütung je Minderkilometer ergänzen.</value></data>
   <data name="ScenarioMissingLoanAmount" xml:space="preserve"><value>Kreditbetrag ergänzen.</value></data>
   <data name="ScenarioMissingLoanInterestPercent" xml:space="preserve"><value>Nominaler Kreditzins pro Jahr (%) ergänzen.</value></data>
+  <data name="SteervoHome" xml:space="preserve"><value>Steervo · Meine Evaluationen</value></data>
+  <data name="EvaluationNavigation" xml:space="preserve"><value>Bereiche der Evaluation</value></data>
+  <data name="VehicleRecord" xml:space="preserve"><value>Fahrzeugakte</value></data>
+  <data name="CandidateSelection" xml:space="preserve"><value>Auto auswählen</value></data>
+  <data name="VehicleRequirements" xml:space="preserve"><value>Anforderungen</value></data>
+  <data name="OpenAssessmentCount" xml:space="preserve"><value>{0} von {1} Angaben offen</value></data>
+  <data name="EditSpecifications" xml:space="preserve"><value>Technische Daten bearbeiten</value></data>
+  <data name="EditCandidateNotes" xml:space="preserve"><value>Notizen bearbeiten</value></data>
+  <data name="EditClassification" xml:space="preserve"><value>Einordnung bearbeiten</value></data>
+  <data name="EditAssessmentFor" xml:space="preserve"><value>{0} für {1} bearbeiten</value></data>
+  <data name="AssessmentUnknownHelp" xml:space="preserve"><value>Ein leeres Feld bleibt offen. Nein und null sind erfasste Angaben.</value></data>
+  <data name="ComparisonScrollHint" xml:space="preserve"><value>Weitere Spalte: horizontal scrollen oder mit den Pfeiltasten wechseln.</value></data>
+  <data name="DiscardDraftTitle" xml:space="preserve"><value>Ungespeicherte Änderungen verwerfen?</value></data>
+  <data name="DiscardDraftDescription" xml:space="preserve"><value>Deine Eingaben sind noch nicht gespeichert. Du kannst weiterarbeiten oder sie verwerfen.</value></data>
+  <data name="DiscardDraft" xml:space="preserve"><value>Änderungen verwerfen</value></data>
+  <data name="ContinueEditing" xml:space="preserve"><value>Weiterbearbeiten</value></data>
+  <data name="RemoveCandidateNamed" xml:space="preserve"><value>{0} entfernen</value></data>
+  <data name="EditorPermissionError" xml:space="preserve"><value>Du kannst hier nicht mehr bearbeiten. Dein Entwurf bleibt sichtbar; lade die Seite neu, um deine aktuellen Zugriffsrechte zu prüfen.</value></data>
+  <data name="EditorNetworkError" xml:space="preserve"><value>Die Änderung konnte nicht gespeichert werden. Deine Eingaben bleiben erhalten. Bitte versuche es erneut.</value></data>
+  <data name="EditorConflict" xml:space="preserve"><value>Der aktuelle Stand wurde geladen. Dein Entwurf ist weiterhin im Editor. Prüfe die Angaben in der Übersicht, bevor du erneut speicherst.</value></data>
+  <data name="EditorReviewCurrent" xml:space="preserve"><value>Aktuellen Stand ansehen</value></data>
 </root>

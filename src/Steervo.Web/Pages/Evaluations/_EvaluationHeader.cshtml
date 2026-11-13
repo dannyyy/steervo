@@ -1,15 +1,20 @@
 @model Steervo.Web.Pages.Evaluations.EvaluationHeader
-@{ var e = Model.Evaluation; }
-<a asp-page="/Index" class="back-link">← @T["AllEvaluations"]</a>
-<a asp-page="/Evaluations/Details" asp-page-handler="Export" asp-route-id="@e.Id" class="export-link">@T["ExportEvaluation"] ↓</a>
-<div class="page-heading"><div><p class="eyebrow">@T["Evaluation"] · @T[Model.Access.ToString()]</p><h1>@e.Name</h1><p class="muted">@e.Purpose</p></div><div class="evaluation-counts"><span class="badge">@T["CriterionCount", e.Criteria.Count]</span><span class="badge">@T[e.Candidates.Count == 1 ? "CandidateCountSingle" : "CandidateCount", e.Candidates.Count]</span></div></div>
-<nav class="section-nav" aria-label="@T["EvaluationSteps"]">
-    <a asp-page="/Evaluations/Details" asp-route-id="@e.Id" class="@(Model.Active == "criteria" ? "active" : null)" aria-current="@(Model.Active == "criteria" ? "page" : null)">01 <strong>@T["Criteria"]</strong></a>
-    <a asp-page="/Evaluations/Candidates/Index" asp-route-id="@e.Id" class="@(Model.Active == "candidates" ? "active" : null)" aria-current="@(Model.Active == "candidates" ? "page" : null)">02 <strong>@T["Candidates"]</strong></a>
-    <a asp-page="/Evaluations/Candidates/Compare" asp-route-id="@e.Id" class="@(Model.Active == "comparison" ? "active" : null)" aria-current="@(Model.Active == "comparison" ? "page" : null)">03 <strong>@T["CompareCandidates"]</strong></a>
-    <a asp-page="/Evaluations/Offers/Index" asp-route-id="@e.Id" class="@(Model.Active == "offers" ? "active" : null)" aria-current="@(Model.Active == "offers" ? "page" : null)">04 <strong>@T["Offers"]</strong></a>
-    <a asp-page="/Evaluations/Costs/Index" asp-route-id="@e.Id" class="@(Model.Active == "costs" ? "active" : null)" aria-current="@(Model.Active == "costs" ? "page" : null)">05 <strong>@T["Costs"]</strong></a>
-    <a asp-page="/Evaluations/Scenarios/Index" asp-route-id="@e.Id" class="@(Model.Active == "scenarios" ? "active" : null)" aria-current="@(Model.Active == "scenarios" ? "page" : null)">06 <strong>@T["Calculations"]</strong></a>
-    <a asp-page="/Evaluations/Details" asp-route-id="@e.Id" asp-fragment="sharing">@T["Access"]</a>
-    @if (Model.Access >= AccessLevel.Editor) { <a asp-page="/Evaluations/Details" asp-route-id="@e.Id" asp-fragment="case-settings">@T["CaseSettings"]</a> }
+@{
+    var e = Model.Evaluation;
+    var candidatesUrl = Model.CandidateId.HasValue ? $"/evaluations/{e.Id}/candidates/{Model.CandidateId}?first={Model.First}&second={Model.Second}" : $"/evaluations/{e.Id}/candidates";
+    var comparisonUrl = Model.First.HasValue ? $"/evaluations/{e.Id}/compare?first={Model.First}&second={Model.Second}" : $"/evaluations/{e.Id}/compare";
+}
+<div class="evaluation-context">
+    <div class="evaluation-breadcrumb"><a asp-page="/Index"><partial name="/Pages/Shared/_Icon.cshtml" model='"back"' />@T["AllEvaluations"]</a><span>@T[Model.Access.ToString()]</span></div>
+    <div class="page-heading"><div><h1>@e.Name</h1>@if (!string.IsNullOrEmpty(e.Purpose)) { <p class="muted">@e.Purpose</p> }</div><div class="evaluation-summary"><span>@T["CriterionCount", e.Criteria.Count] · @T[e.Candidates.Count == 1 ? "CandidateCountSingle" : "CandidateCount", e.Candidates.Count]</span><a asp-page="/Evaluations/Details" asp-page-handler="Export" asp-route-id="@e.Id" class="text-link">@T["ExportEvaluation"]</a></div></div>
+</div>
+<nav class="section-nav" aria-label="@T["EvaluationNavigation"]">
+    <a asp-page="/Evaluations/Details" asp-route-id="@e.Id" class="@(Model.Active == "criteria" ? "active" : null)" aria-current="@(Model.Active == "criteria" ? "page" : null)"><partial name="/Pages/Shared/_Icon.cshtml" model='"list"' />@T["Criteria"]</a>
+    <a href="@candidatesUrl" class="@(Model.Active == "candidates" ? "active" : null)" aria-current="@(Model.Active == "candidates" ? "page" : null)"><partial name="/Pages/Shared/_Icon.cshtml" model='"car"' />@T["Candidates"]</a>
+    <a href="@comparisonUrl" class="@(Model.Active == "comparison" ? "active" : null)" aria-current="@(Model.Active == "comparison" ? "page" : null)"><partial name="/Pages/Shared/_Icon.cshtml" model='"compare"' />@T["CompareCandidates"]</a>
+    <a asp-page="/Evaluations/Offers/Index" asp-route-id="@e.Id" class="@(Model.Active == "offers" ? "active" : null)" aria-current="@(Model.Active == "offers" ? "page" : null)"><partial name="/Pages/Shared/_Icon.cshtml" model='"file"' />@T["Offers"]</a>
+    <a asp-page="/Evaluations/Costs/Index" asp-route-id="@e.Id" class="@(Model.Active == "costs" ? "active" : null)" aria-current="@(Model.Active == "costs" ? "page" : null)"><partial name="/Pages/Shared/_Icon.cshtml" model='"wallet"' />@T["Costs"]</a>
+    <a asp-page="/Evaluations/Scenarios/Index" asp-route-id="@e.Id" class="@(Model.Active == "scenarios" ? "active" : null)" aria-current="@(Model.Active == "scenarios" ? "page" : null)"><partial name="/Pages/Shared/_Icon.cshtml" model='"calculate"' />@T["Calculations"]</a>
+    <a asp-page="/Evaluations/Details" asp-route-id="@e.Id" asp-fragment="sharing"><partial name="/Pages/Shared/_Icon.cshtml" model='"people"' />@T["Access"]</a>
+    @if (Model.Access >= AccessLevel.Editor) { <a asp-page="/Evaluations/Details" asp-route-id="@e.Id" asp-fragment="case-settings"><partial name="/Pages/Shared/_Icon.cshtml" model='"settings"' />@T["CaseSettings"]</a> }
 </nav>

@@ -14,6 +14,7 @@ public sealed class CompareModel(CandidateWorkspace workspace, ICurrentUser curr
     public Candidate? Second { get; private set; }
     public IReadOnlyList<Candidate> Selected => new[] { First, Second }.OfType<Candidate>().ToList();
     public string? Notice { get; private set; }
+    public AssessmentDraft? Draft { get; private set; }
     public bool Failed { get; private set; }
     public async Task<IActionResult> OnGetAsync(Guid id, Guid? first, Guid? second)
     {
@@ -39,7 +40,10 @@ public sealed class CompareModel(CandidateWorkspace workspace, ICurrentUser curr
         catch (RuleException error)
         {
             if (error.Message is "Forbidden" or "NotFound") return StatusCode(error.Message == "Forbidden" ? 403 : 404);
-            Failed = true; Notice = text[error.Message]; Response.StatusCode = error.Message == "Conflict" ? 409 : 422;
+            Failed = true; Notice = text[error.Message];
+            Draft = new(candidateId, criterionId, Request.Form["booleanValue"], measurementValue,
+                Request.Form["ratingValue"], Request.Form["source"], notes, Notice);
+            Response.StatusCode = error.Message == "Conflict" ? 409 : 422;
         }
         await LoadAsync(id, first, second);
         return Request.Headers.ContainsKey("HX-Request") ? Partial("_Comparison", this) : Page();

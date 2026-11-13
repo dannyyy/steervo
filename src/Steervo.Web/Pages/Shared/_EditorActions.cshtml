@@ -1,0 +1,5 @@
+@model Steervo.Web.Pages.Shared.EditorActions
+<div class="editor-actions">
+    <button type="button" class="button secondary" data-editor-close>@T["Cancel"]</button>
+    <button type="submit" id="@Model.SubmitId" class="button primary" aria-label="@Model.AccessibleLabel">@(Model.Label ?? T["Save"].Value)</button>
+</div>

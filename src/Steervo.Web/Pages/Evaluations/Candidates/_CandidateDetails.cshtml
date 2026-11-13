@@ -1,37 +1,69 @@
 @model Steervo.Web.Pages.Evaluations.Candidates.DetailsModel
-@{ var e = Model.Evaluation; var c = Model.Candidate; var edit = Model.Access >= AccessLevel.Editor; var url = $"/evaluations/{e.Id}/candidates/{c.Id}"; var vehicleCriteria = e.Criteria.Where(x => x.Scope == CriterionScope.Vehicle).ToList(); var failures = vehicleCriteria.Where(x => x.Priority == Priority.Required && e.ResultFor(c.Id, x.Id) == Fulfillment.Unmet).ToList(); }
+@using Steervo.Web.Pages.Shared
+@{
+    var e = Model.Evaluation; var c = Model.Candidate; var edit = Model.Access >= AccessLevel.Editor;
+    var url = $"/evaluations/{e.Id}/candidates/{c.Id}?first={Model.ComparisonFirst}&second={Model.ComparisonSecond}";
+    var comparisonUrl = $"/evaluations/{e.Id}/compare?first={Model.ComparisonFirst}&second={Model.ComparisonSecond}";
+    var vehicleCriteria = e.Criteria.Where(x => x.Scope == CriterionScope.Vehicle).ToList();
+    var failures = vehicleCriteria.Where(x => x.Priority == Priority.Required && e.ResultFor(c.Id, x.Id) == Fulfillment.Unmet).ToList();
+    var open = vehicleCriteria.Count(x => e.ResultFor(c.Id, x.Id) == Fulfillment.Unknown);
+}
 <div id="candidate-workspace" data-version="@e.Version" data-preserve-viewport hx-target="#candidate-workspace" hx-swap="outerHTML show:none focus-scroll:false" hx-sync="this:drop">
-<partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "candidates")' />
-@if (Model.Notice is not null) { <div class="notice workspace-notice @(Model.Failed ? "failure" : "success")" role="status" tabindex="-1">@Model.Notice</div> }
-<a asp-page="Index" asp-route-id="@e.Id" class="back-link">← @T["AllCandidates"]</a>
-<div class="candidate-detail-heading"><div><span class="candidate-status @c.Status.ToString().ToLowerInvariant()">@T["CandidateStatus" + c.Status]</span><h2>@c.DisplayName</h2><p class="muted">@T["Condition" + c.Condition] @if (c.Year.HasValue) { <span> · @c.Year</span> } @if (c.Mileage.HasValue) { <span> · @c.Mileage.Value.ToString("N0") km</span> }</p></div><a asp-page="Compare" asp-route-id="@e.Id" asp-route-first="@c.Id" class="button secondary">@T["CompareCandidate"] →</a></div>
-@if (failures.Count > 0) { <div class="candidate-warning"><strong>@T["RequiredNotMet"]</strong><p>@string.Join(" · ", failures.Select(x => x.Name))</p><p class="micro">@T["NoAutomaticExclusion"]</p></div> }
-<p class="candidate-offer-link"><a asp-page="/Evaluations/Offers/Index" asp-route-id="@e.Id" asp-route-candidateId="@c.Id">@T["OfferForCandidate"] →</a></p>
-<partial name="_Specifications" model="c.Specifications" />
-<div class="assessment-layout"><section class="assessment-main"><div class="section-heading"><h3>@T["AssessCandidateTitle"]</h3><p class="muted">@T["AssessCandidateHelp"]</p></div>
-@if (vehicleCriteria.Count == 0) { <div class="empty-state"><h3>@T["NoVehicleCriteria"]</h3><p>@T["NoVehicleCriteriaHelp"]</p><a asp-page="/Evaluations/Details" asp-route-id="@e.Id" class="button secondary">@T["EditCriteria"] →</a></div> }
-@foreach (var group in e.Groups.OrderBy(x => x.Position).Cast<CriterionGroup?>().Append(null))
-{
-    var criteria = vehicleCriteria.Where(x => x.GroupId == group?.Id).OrderBy(x => x.Position).ToList();
-    if (criteria.Count == 0) { continue; }
-    <section class="assessment-group"><h3>@(group?.Name ?? T["Ungrouped"].Value)</h3><div class="assessment-list">@foreach (var criterion in criteria) { <partial name="_AssessmentRow" model="new Steervo.Web.Pages.Evaluations.Candidates.AssessmentRow(e, c, criterion, Model.Access, url)" /> }</div></section>
-}
-@if (e.Criteria.Any(x => x.Scope == CriterionScope.Offer)) { <p class="notice"><a asp-page="/Evaluations/Offers/Index" asp-route-id="@e.Id" asp-route-candidateId="@c.Id">@T["OfferCriteriaSeparateLink"] →</a></p> }
-<p class="micro rating-explanation">@T["RatingIsSubjective"]</p>
-</section><aside class="candidate-aside">
-<section class="panel"><h3>@T["CandidateClassification"]</h3>
+<partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "candidates", c.Id, Model.ComparisonFirst, Model.ComparisonSecond)' />
+@if (Model.Notice is not null && !Model.Failed) { <div class="notice workspace-notice success" role="status" tabindex="-1">@Model.Notice</div> }
+<nav class="candidate-ribbon" aria-label="@T["CandidateSelection"]" id="candidate-ribbon" data-preserve-scroll>
+    <a asp-page="Index" asp-route-id="@e.Id" class="candidate-index-link"><partial name="/Pages/Shared/_Icon.cshtml" model='"list"' /><span>@T["AllCandidates"]</span></a>
+    @foreach (var candidate in e.Candidates.OrderBy(x => x.Position))
+    {
+        var first = candidate.Id == Model.ComparisonFirst || candidate.Id == Model.ComparisonSecond ? Model.ComparisonFirst : candidate.Id;
+        var second = candidate.Id == Model.ComparisonFirst || candidate.Id == Model.ComparisonSecond ? Model.ComparisonSecond : Model.ComparisonFirst;
+        <a href="/evaluations/@e.Id/candidates/@candidate.Id?first=@first&second=@second" aria-current="@(candidate.Id == c.Id ? "page" : null)"><strong>@candidate.DisplayName</strong><span>@T["CandidateStatus" + candidate.Status]</span></a>
+    }
+</nav>
+<article class="vehicle-record">
+    <header class="vehicle-introduction">
+        <div><div class="vehicle-kicker"><span>@T["VehicleRecord"]</span><span class="candidate-status @c.Status.ToString().ToLowerInvariant()">@T["CandidateStatus" + c.Status]</span></div><h2>@c.DisplayName</h2>
+            <div class="vehicle-actions"><a href="@comparisonUrl" class="button primary"><partial name="/Pages/Shared/_Icon.cshtml" model='"compare"' />@T["CompareCandidate"]</a>@if (edit) { <button type="button" id="edit-candidate" class="button secondary" data-dialog-open="candidate-edit" aria-haspopup="dialog"><partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' />@T["EditCandidate"]</button> }</div>
+        </div>
+        <dl class="vehicle-facts"><div><dt>@T["CandidateCondition"]</dt><dd>@T["Condition" + c.Condition]</dd></div><div><dt>@T["CandidateYear"]</dt><dd>@(c.Year?.ToString() ?? T["NotSpecified"].Value)</dd></div><div><dt>@T["CandidateMileage"]</dt><dd>@(c.Mileage is { } mileage ? mileage.ToString("N0") : T["NotSpecified"].Value)</dd></div></dl>
+    </header>
+    <div class="record-navigation"><div role="tablist" aria-label="@T["VehicleRecord"]"><button type="button" id="tab-assessments" role="tab" data-record-tab="record-assessments" aria-controls="record-assessments" aria-selected="true">@T["VehicleRequirements"]</button><button type="button" id="tab-specifications" role="tab" data-record-tab="record-specifications" aria-controls="record-specifications" aria-selected="false" tabindex="-1">@T["VehicleSpecifications"]</button></div><a asp-page="/Evaluations/Offers/Index" asp-route-id="@e.Id" asp-route-candidateId="@c.Id">@T["OfferForCandidate"]<partial name="/Pages/Shared/_Icon.cshtml" model='"arrow"' /></a></div>
+    <div class="record-body">
+        <div class="record-main">
+            <section id="record-assessments" role="tabpanel" aria-labelledby="tab-assessments" tabindex="0">
+                <div class="record-section-heading"><h3>@T["VehicleRequirements"]</h3><span>@T["OpenAssessmentCount", open, vehicleCriteria.Count]</span></div>
+                @if (failures.Count > 0) { <div class="candidate-warning"><strong>@T["RequiredNotMet"]</strong><p>@string.Join(" · ", failures.Select(x => x.Name))</p><p class="micro">@T["NoAutomaticExclusion"]</p></div> }
+                @if (vehicleCriteria.Count == 0) { <div class="empty-state"><h3>@T["NoVehicleCriteria"]</h3><p>@T["NoVehicleCriteriaHelp"]</p><a asp-page="/Evaluations/Details" asp-route-id="@e.Id" class="button secondary">@T["EditCriteria"]</a></div> }
+                @foreach (var group in e.Groups.OrderBy(x => x.Position).Cast<CriterionGroup?>().Append(null))
+                {
+                    var criteria = vehicleCriteria.Where(x => x.GroupId == group?.Id).OrderBy(x => x.Position).ToList();
+                    if (criteria.Count == 0) { continue; }
+                    <section class="record-assessment-group"><h4>@(group?.Name ?? T["Ungrouped"].Value)</h4><div class="assessment-list">@foreach (var criterion in criteria) { <partial name="_AssessmentRow" model="new Steervo.Web.Pages.Evaluations.Candidates.AssessmentRow(e, c, criterion, Model.Access, url, Model.Draft)" /> }</div></section>
+                }
+                @if (e.Criteria.Any(x => x.Scope == CriterionScope.Offer)) { <p class="micro"><a asp-page="/Evaluations/Offers/Index" asp-route-id="@e.Id" asp-route-candidateId="@c.Id">@T["OfferCriteriaSeparateLink"]</a></p> }
+                <p class="micro rating-explanation">@T["RatingIsSubjective"]</p>
+            </section>
+            <section id="record-specifications" role="tabpanel" aria-labelledby="tab-specifications" tabindex="0" hidden><partial name="_Specifications" model="c.Specifications" />@if (edit) { <button type="button" id="edit-specifications" class="button secondary" data-dialog-open="candidate-edit" data-focus-id="spec-Propulsion" aria-haspopup="dialog"><partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' />@T["EditSpecifications"]</button> }</section>
+        </div>
+        <aside class="record-notes" aria-label="@T["CandidateNotes"]">
+            <section><div class="record-section-heading"><h3>@T["CandidateNotes"]</h3>@if (edit) { <button type="button" id="edit-notes" class="icon-button" data-dialog-open="candidate-edit" data-focus-id="candidate-notes" aria-haspopup="dialog" aria-label="@T["EditCandidateNotes"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' /></button> }</div><p class="candidate-notes">@(c.Notes.Length > 0 ? c.Notes : T["NoCandidateNotes"].Value)</p>
+                @if (c.SourceLinks.Any()) { <h4>@T["CandidateLinks"]</h4><ul class="candidate-links">@foreach (var link in c.SourceLinks) { <li><a href="@link" target="_blank" rel="noopener noreferrer">@link</a></li> }</ul> }
+            </section>
+            <section><div class="record-section-heading"><h3>@T["CandidateClassification"]</h3>@if (edit) { <button type="button" id="edit-classification" class="icon-button" data-dialog-open="candidate-classification" aria-haspopup="dialog" aria-label="@T["EditClassification"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' /></button> }</div><span class="candidate-status @c.Status.ToString().ToLowerInvariant()">@T["CandidateStatus" + c.Status]</span><p class="candidate-reason">@(c.StatusReason.Length > 0 ? c.StatusReason : T["NoCandidateReason"].Value)</p></section>
+        </aside>
+    </div>
+</article>
 @if (edit)
 {
-    <form method="post" hx-post="@url"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="classify-candidate" /><label for="candidate-status">@T["CandidateStatus"]</label><select id="candidate-status" name="status">@foreach (var status in Enum.GetValues<CandidateStatus>()) { <option value="@status" selected="@(status == c.Status)">@T["CandidateStatus" + status]</option> }</select><label for="candidate-reason">@T["CandidateReason"]</label><textarea id="candidate-reason" name="reason" maxlength="2000" rows="3" aria-describedby="candidate-reason-help">@c.StatusReason</textarea><p id="candidate-reason-help" class="micro">@T["CandidateReasonHelp"]</p><button id="save-classification" class="button secondary full">@T["SaveClassification"]</button></form>
+    <dialog id="candidate-edit" class="side-sheet" data-editor data-guard-draft data-opener="edit-candidate" data-open-on-load="@(Model.FailedAction == "edit-candidate" ? "true" : "false")" aria-labelledby="candidate-edit-title">
+        <div class="editor-heading"><div><p class="editor-context">@c.DisplayName</p><h2 id="candidate-edit-title">@T["EditCandidate"]</h2></div><button type="button" class="icon-button" data-editor-close aria-label="@T["Close"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"close"' /></button></div>
+        <div class="editor-error" role="alert" tabindex="-1" hidden="@(Model.FailedAction != "edit-candidate")">@(Model.FailedAction == "edit-candidate" ? Model.Notice : null)</div>
+        <form method="post" hx-post="@url" hx-disabled-elt="find button[type='submit']" data-guard-draft data-submitted-values="@(Model.FailedAction == "edit-candidate" ? System.Text.Json.JsonSerializer.Serialize(Context.Request.Form.ToDictionary(x => x.Key, x => x.Value.ToString())) : null)"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="edit-candidate" /><partial name="_CandidateFields" model="Steervo.Web.Pages.Evaluations.Candidates.CandidateForm.From(c)" /><partial name="/Pages/Shared/_EditorActions.cshtml" model='new EditorActions("save-candidate-details")' /></form>
+    </dialog>
+    <dialog id="candidate-classification" class="side-sheet" data-editor data-guard-draft data-opener="edit-classification" data-open-on-load="@(Model.FailedAction == "classify-candidate" ? "true" : "false")" aria-labelledby="candidate-classification-title">
+        <div class="editor-heading"><div><p class="editor-context">@c.DisplayName</p><h2 id="candidate-classification-title">@T["CandidateClassification"]</h2></div><button type="button" class="icon-button" data-editor-close aria-label="@T["Close"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"close"' /></button></div>
+        <div class="editor-error" role="alert" tabindex="-1" hidden="@(Model.FailedAction != "classify-candidate")">@(Model.FailedAction == "classify-candidate" ? Model.Notice : null)</div>
+        <form method="post" hx-post="@url" hx-disabled-elt="find button[type='submit']" data-guard-draft data-submitted-values="@(Model.FailedAction == "classify-candidate" ? System.Text.Json.JsonSerializer.Serialize(Context.Request.Form.ToDictionary(x => x.Key, x => x.Value.ToString())) : null)"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="classify-candidate" /><label for="candidate-status">@T["CandidateStatus"]</label><select id="candidate-status" name="status">@foreach (var status in Enum.GetValues<CandidateStatus>()) { <option value="@status" selected="@(status == c.Status)">@T["CandidateStatus" + status]</option> }</select><label for="candidate-reason">@T["CandidateReason"]</label><textarea id="candidate-reason" name="reason" maxlength="2000" rows="4" aria-describedby="candidate-reason-help">@c.StatusReason</textarea><p id="candidate-reason-help" class="micro">@T["CandidateReasonHelp"]</p><partial name="/Pages/Shared/_EditorActions.cshtml" model='new EditorActions("save-classification")' /></form>
+    </dialog>
 }
-else { <p class="candidate-reason">@(c.StatusReason.Length > 0 ? c.StatusReason : T["NoCandidateReason"].Value)</p> }
-</section>
-<section class="panel"><h3>@T["CandidateNotes"]</h3><p class="candidate-notes">@(c.Notes.Length > 0 ? c.Notes : T["NoCandidateNotes"].Value)</p>
-@if (c.SourceLinks.Any()) { <h4>@T["CandidateLinks"]</h4><ul class="candidate-links">@foreach (var link in c.SourceLinks) { <li><a href="@link" target="_blank" rel="noopener noreferrer">@link ↗</a></li> }</ul> }
-</section>
-@if (edit)
-{
-    <details class="panel" id="candidate-edit" open="@(Model.FailedAction == "edit-candidate")"><summary>@T["EditCandidate"]</summary><form method="post" hx-post="@url"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="edit-candidate" /><partial name="_CandidateFields" model="Model.Input" /><button id="save-candidate-details" class="button secondary full">@T["SaveCandidate"]</button></form></details>
-}
-</aside></div>
 </div>

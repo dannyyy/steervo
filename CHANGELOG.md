@@ -1,5 +1,11 @@
 # Änderungen
 
+## Unveröffentlicht
+
+- Erster Teil der Canvas/Tinte-Migration: horizontaler Seitenrahmen, Fahrzeugliste, zusammenhängende Fahrzeugakte und Fahrzeugvergleich mit lokal ausgelieferter Geist-Schrift.
+- Gemeinsame Bewertung im Kontext, seitliche Formulare für Anlage, Kopie, Stammdaten und Einordnung sowie einheitliche Bestätigungen für Zurücksetzen und Entfernen.
+- Erhaltene Fahrzeugauswahl, mobile Vergleichsspalten und Tastaturfokus; geschützte Entwürfe bei Abbruch, Validierungs- und Verbindungsfehlern, gleichzeitigen Änderungen und abgelaufener Anmeldung. Die übrigen Bereiche folgen dem Migrationsplan.
+
 ## 0.2.0 — 2026-11-12
 
 - Gespeicherte Rechenszenarien für Barkauf, Leasing mit Rückgabe oder Übernahme und Kreditfinanzierung, mit festen Offertversionen und eigenständig bestätigten Gesamtpreisen.

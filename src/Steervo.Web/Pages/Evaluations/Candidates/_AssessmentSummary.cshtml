@@ -1,0 +1,6 @@
+@model Steervo.Web.Pages.Evaluations.Candidates.AssessmentRow
+@{ var c = Model.Criterion; var a = Model.Assessment; }
+<span class="assessment-label"><strong>@c.Name</strong><span class="assessment-requirement">@T[c.Priority.ToString()] @if (c.Type == CriterionType.Measurement) { <span> · @(c.Comparison == Comparison.AtLeast ? "≥" : "≤") @c.Threshold @c.Unit</span> } else { <span> · @T[c.Type.ToString()]</span> }</span></span>
+<span class="assessment-answer"><strong>@(c.Type == CriterionType.Boolean ? T[a?.BooleanValue is { } boolean ? boolean ? "Yes" : "No" : "FulfillmentUnknown"].Value : Model.ValueText.Length > 0 ? Model.ValueText : T["FulfillmentUnknown"].Value)</strong><span>@T["AssessmentSource" + (a?.Source ?? AssessmentSource.Unknown)]</span></span>
+<span class="fulfillment @Model.Result.ToString().ToLowerInvariant()">@T["Fulfillment" + Model.Result]</span>
+@if (Model.Access >= AccessLevel.Editor) { <span class="assessment-edit-icon"><partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' /></span> }

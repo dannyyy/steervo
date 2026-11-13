@@ -1,0 +1,60 @@
+@font-face {
+  font-family: Geist;
+  src: url('/fonts/geist.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light;
+  --ink: #252c32;
+  --muted: #657077;
+  --accent: #3e5878;
+  --accent-hover: #304862;
+  --soft: #e9eef3;
+  --canvas: #f4f4f0;
+  --surface: #fff;
+  --nav-surface: #fafbf8;
+  --line: #e5e7e5;
+  --field-border: #cbd2ce;
+  --editor-muted: #536474;
+  --positive: #39705a;
+  --positive-bg: #edf5f0;
+  --warning: #8b641f;
+  --warning-bg: #fbf4e5;
+  --negative: #a34e44;
+  --negative-bg: #fbefed;
+  --neutral-surface: #f1f3f3;
+  --group-surface: #f8f9f7;
+  --row-hover: #f6f8f6;
+  --radius-control: 8px;
+  --radius-button: 9px;
+  --radius-editor: 12px;
+  --radius-surface: 16px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 48px;
+  --shadow-surface: 0 6px 22px #26352f07, 0 1px 3px #26352f07;
+  --shadow-candidate: 0 2px 6px #26352f0c;
+  --shadow-feedback: 0 8px 28px #15261d25;
+  --shadow-dialog: -12px 0 50px #15261d25;
+  --dialog-scrim: #25332d55;
+  --motion-control: 150ms;
+  --motion-editor: 240ms;
+  /* Existing areas use these names until their component migration. */
+  --forest: var(--accent);
+  --green: var(--accent);
+  --lime: var(--soft);
+  --red: var(--negative);
+  font-family: Geist, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-synthesis: none;
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}

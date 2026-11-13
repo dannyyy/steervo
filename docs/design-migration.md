@@ -4,7 +4,7 @@
 
 **Verbindlich gewählt: Canvas mit Tinte.** Die Hauptentwicklung findet auf `main` statt; das Repository hat keinen `master`-Branch. Der Nutzerauftrag ist: zuerst das bestehende Design und Layout umstellen sowie Abläufe und Dialoge vereinheitlichen und optimieren, danach weitere Features entwickeln.
 
-Diese Datei ist der Umsetzungsplan für den vorhandenen Community-Funktionsumfang. Sie beschreibt keine bereits abgeschlossene Migration. Die Auswahl ist abgeschlossen; die untenstehenden Umsetzungspakete sind offen.
+Diese Datei ist der Umsetzungsplan für den vorhandenen Community-Funktionsumfang. Sie beschreibt keine bereits abgeschlossene Migration. Die Auswahl sowie Phase 0 und Phase 1 sind abgeschlossen. Die vollständige Migration bleibt offen; als Nächstes folgt Phase 2.
 
 | Grundlage | Zweck |
 | --- | --- |
@@ -40,21 +40,21 @@ Jedes Paket umfasst Quellcode, notwendige Tests und eine überprüfte echte Ober
 
 ### 0. Ausgangsstand sichern
 
-- [ ] Anwendung und bestehende Tests auf `main` starten; die Befehle stehen im [README](../README.md#prüfen).
-- [ ] Mit isolierten Testdaten aktuelle Desktop-/Mobilansichten und wichtige Fehler-/Leerzustände aufnehmen. Artefakte lokal unter `.artifacts/browser/` halten.
-- [ ] Vorhandene Browser-Selektoren, HTMX-Ziele und Fokus-/Scroll-Erhaltung vor Markupänderungen erfassen.
-- [ ] Das Inventar unten um konkret gefundene Sonderfälle ergänzen; keine erfolgreiche Mockup-Prüfung als Produktionsprüfung werten.
+- [x] Anwendung und bestehende Tests auf `main` starten; die Befehle stehen im [README](../README.md#prüfen).
+- [x] Mit isolierten Testdaten aktuelle Desktop-/Mobilansichten und wichtige Fehler-/Leerzustände aufnehmen. Artefakte lokal unter `.artifacts/browser/` halten.
+- [x] Vorhandene Browser-Selektoren, HTMX-Ziele und Fokus-/Scroll-Erhaltung vor Markupänderungen erfassen.
+- [x] Das Inventar unten um konkret gefundene Sonderfälle ergänzen; keine erfolgreiche Mockup-Prüfung als Produktionsprüfung werten.
 
 ### 1. Gestaltungsgrundlage und durchgehender Kernablauf
 
 **Erstes Umsetzungspaket:** gemeinsames Canvas-Layout und Tinte-Tokens, anschließend eine reale Fahrzeugakte mit Bewertung und Wechsel in den Vergleich.
 
-- [ ] Geist lokal mit OFL-Lizenz ausliefern; Farben, Größen, Abstände, Fokus, Zustände und Bewegungen zentral definieren.
-- [ ] `_Layout.cshtml` und `_EvaluationHeader.cshtml` auf horizontale, responsive Navigation umstellen. Vorhandene Bereiche und rollenabhängige Zugänge erhalten; die nummerierte Darstellung nicht als erzwungene Reihenfolge übernehmen.
-- [ ] Gemeinsame Razor-Teilansichten beziehungsweise kleine, tatsächlich verwendete UI-Bausteine für Buttons, Felder, Status, Hinweise und Editoraktionen einführen. Keine neue allgemeine Plugin- oder Komponentenplattform bauen.
-- [ ] Kandidatenliste, Fahrzeugakte und Fahrzeugvergleich als zusammenhängenden Ablauf portieren. Bearbeitung einer Bewertung in beiden Ansichten verwendet denselben Editor und dieselben serverseitigen Regeln.
-- [ ] Wechsel zwischen Detail und Vergleich erhält die Fahrzeugauswahl. Nach Speichern bleibt auch die bearbeitete zweite Vergleichsspalte auf Mobilgeräten sichtbar.
-- [ ] Auf allen berührten Seiten das gemeinsame Formular-/Dialogverhalten aus Phase 2 bereits verwenden.
+- [x] Geist lokal mit OFL-Lizenz ausliefern; Farben, Größen, Abstände, Fokus, Zustände und Bewegungen zentral definieren.
+- [x] `_Layout.cshtml` und `_EvaluationHeader.cshtml` auf horizontale, responsive Navigation umstellen. Vorhandene Bereiche und rollenabhängige Zugänge erhalten; die nummerierte Darstellung nicht als erzwungene Reihenfolge übernehmen.
+- [x] Gemeinsame Razor-Teilansichten beziehungsweise kleine, tatsächlich verwendete UI-Bausteine für Buttons, Felder, Status, Hinweise und Editoraktionen einführen. Keine neue allgemeine Plugin- oder Komponentenplattform bauen.
+- [x] Kandidatenliste, Fahrzeugakte und Fahrzeugvergleich als zusammenhängenden Ablauf portieren. Bearbeitung einer Bewertung in beiden Ansichten verwendet denselben Editor und dieselben serverseitigen Regeln.
+- [x] Wechsel zwischen Detail und Vergleich erhält die Fahrzeugauswahl. Nach Speichern bleibt auch die bearbeitete zweite Vergleichsspalte auf Mobilgeräten sichtbar.
+- [x] Auf allen berührten Seiten das gemeinsame Formular-/Dialogverhalten aus Phase 2 bereits verwenden.
 
 **Abnahme:** Ein echtes Fahrzeug erfassen, Messwert und Quelle ergänzen, in den Vergleich wechseln, dort ändern und in der Akte wiederfinden; auf Desktop und Mobilgerät, mit Tastatur sowie als Besitzer/Bearbeiter/Leser. Unbekannt, Nein und null bleiben korrekt unterscheidbar. Keine bestehende Funktion dieses Ablaufs wird entfernt.
 
@@ -62,8 +62,8 @@ Jedes Paket umfasst Quellcode, notwendige Tests und eine überprüfte echte Ober
 
 - [ ] Evaluationsübersicht, Anlegen, Umbenennen, Import/Export, Freigaben und Einstellungen konsistent gestalten.
 - [ ] Kriterien und Gruppen anlegen, bearbeiten, verschieben und sortieren; Quellen und Bewertungen erhalten. Tastatur-/Touch-Sortierung, offene Entwürfe und Scrollposition prüfen.
-- [ ] Fahrzeug anlegen, Stammdaten ändern, kopieren, klassifizieren und entfernen in das festgelegte Editor-/Bestätigungsmuster überführen. Begründung für Zurückstellen und Ausscheiden beibehalten.
-- [ ] Gemeinsames Dialogverhalten implementieren: Titel, Anfangsfokus, Escape, Rückkehrfokus, ungespeicherte Eingaben, Validierung und Fehlerrückmeldung.
+- [x] Fahrzeug anlegen, Stammdaten ändern, kopieren, klassifizieren und entfernen in das festgelegte Editor-/Bestätigungsmuster überführen. Begründung für Zurückstellen und Ausscheiden beibehalten.
+- [ ] Das in Phase 1 eingeführte gemeinsame Dialogverhalten auf Evaluationen, Kriterien, Gruppen, Freigaben und Einstellungen übertragen: Titel, Anfangsfokus, Escape, Rückkehrfokus, ungespeicherte Eingaben, Validierung und Fehlerrückmeldung.
 - [ ] Browser-`confirm()` durch das gemeinsame Bestätigungsmuster ersetzen, wo eine irreversible Aktion bestätigt werden muss. Kein Bestätigungsdialog für normales Speichern.
 
 **Abnahme:** Einmal erlernte Interaktionen verhalten sich überall gleich. Abbruch, Validierungsfehler, veraltete Versionsstände, fehlende Berechtigung und Netzfehler verlieren keine bereits eingegebenen Werte.
@@ -95,6 +95,34 @@ Jedes Paket umfasst Quellcode, notwendige Tests und eine überprüfte echte Ober
 - [ ] Vollständige Regression und visuelle Prüfung aller Bereiche durchführen und verbleibende Unterschiede bewusst auflösen.
 
 **Abnahme:** Die gesamte bestehende Anwendung folgt Canvas/Tinte und den gemeinsamen Interaktionsmustern. Erst nach diesem Abschluss werden neue Features priorisiert.
+
+## Umsetzungsstand vom 13. November 2026
+
+**Abgeschlossen: Ausgangsprüfung und erstes Umsetzungspaket.** Die echte Razor-Anwendung verwendet den horizontalen Canvas-Rahmen und lokal ausgeliefertes Geist. Fahrzeugliste, Anlage, unabhängige Kopie, Akte, Einordnung, Stammdaten, Bewertungen und Fahrzeugvergleich sind migriert. Der Rahmen erhält alle bisherigen Bereiche und rollenabhängigen Zugänge. Andere Fachbereiche erhalten damit die gemeinsame Basis, sind aber noch nicht vollständig nach den neuen Interaktionsregeln überarbeitet.
+
+Die Akte zeigt Anforderungen als lesbare Zeilen und Notizen auf einer zusammenhängenden Fläche. Technische Daten sind über einen eigenen Tab erreichbar. Dieselbe Teilansicht `_AssessmentEditor.cshtml` bearbeitet Bewertungen in Akte und Vergleich. Im Vergleich folgt der Editor auf die echte HTML-Tabelle, außerhalb des horizontalen Scrollbereichs. Die ausgewählte Fahrzeugkombination bleibt in den Links zwischen beiden Ansichten erhalten. Die Akte funktioniert ohne Fotos.
+
+Anlage, Kopie, Stammdaten und Einordnung verwenden native seitliche Dialoge. Speichern/Abbrechen, Schließen, Escape, Entwurfsschutz, Rückkehrfokus und lokale Fehlerdarstellung teilen sich dieselben Regeln. Zurücksetzen einer Bewertung und Entfernen eines Fahrzeugs verwenden den gemeinsamen Bestätigungsdialog mit sicherem Anfangsfokus. Fahrzeuganlage und Kopie senden per HTMX; eine erfolgreiche Serverantwort navigiert zur neuen Akte. Die vorhandenen Fachoperationen bleiben unverändert.
+
+**Fehler und Zustände:** HTTP 422 erhält auch ungültige Werte und Notizen. HTTP 409 zeigt den aktuellen gespeicherten Stand und bewahrt den lokalen Entwurf, einschließlich während der Prüfung dieses Standes. Erst eine erneute bewusste Speicherung sendet ihn mit der aktuellen Version. Verbindungsfehler lassen die Eingabe offen. Ein HTTP-403-Fehler oder eine durch abgelaufene Anmeldung verursachte Weiterleitung zur Loginseite darf den Entwurf nicht ersetzen; weitere Schreibaktionen werden gesperrt. Fachliche Rechteprüfungen bleiben serverseitig.
+
+### Überprüfte Schnittstellen und Sonderfälle
+
+- `#candidate-workspace`, `data-version`, Anti-Forgery-Felder, Objekt-IDs und die vorhandenen POST-Aktionen bleiben erhalten. HTMX tauscht den Workspace weiterhin mit `outerHTML show:none focus-scroll:false`; gleichzeitige Requests werden synchronisiert.
+- Stabile IDs für Bewertung, Öffner und Editor ermöglichen die Fokusrückkehr nach dem Fragmentaustausch. Scrollpositionen von Kandidatenwechsel und Vergleich werden separat vom Seiten-Viewport wiederhergestellt. Auch die zweite Vergleichsspalte bleibt nach Speichern sichtbar.
+- Die früher ständig sichtbaren Bewertungsformulare und verschachtelten Vergleichsformulare sind durch gezielt geöffnete Editoren ersetzt. Browsertests öffnen sie über zugängliche Aktionen; ihre fachlichen Assertions für unbekannt/Nein/null, Kopien, Rechte und Berechnungen bleiben bestehen.
+- Die alten Nummern in der Evaluationsnavigation und der reine CSS-Selektor des Exportlinks entfallen. Browserprüfungen verwenden die weiterhin sichtbaren Namen der Bereiche und des Exports.
+- Die Kriterien-Sortierung und ihre bestehenden IDs bleiben unverändert. Offene Details, Eingaben, Fokus und Scrollposition werden auch nach Konfliktantworten wiederhergestellt.
+- Die Gestaltungsgrundlage liegt in `wwwroot/css/tokens.css`, die Canvas-Komponenten in `canvas.css`; `site.css` trägt die weiter vorhandenen Fachlayouts. Die bisherigen Sidebar-Regeln und ersetzte fahrzeugspezifische Layoutregeln wurden entfernt. Die vollständige Bereinigung der übrigen Bereiche gehört zu deren Migration.
+
+### Nachweise
+
+- Ausgangsstand: 100 erfolgreiche Fach-/Integrationstests und bestehender vollständiger Browserlauf vor dem Umbau. Vergleichsbilder liegen lokal unter `.artifacts/browser/before-canvas/`.
+- Nach Umsetzung: `dotnet build src/Steervo.Web --no-restore` ohne Warnungen/Fehler; `PLAYWRIGHT_EXECUTABLE_PATH='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' ./scripts/test.sh --browser` mit 100 erfolgreichen Tests und 47 erfolgreichen Browserprüfungen. Dieser Lauf umfasst die bestehenden Produktbereiche und die neuen Kernabläufe.
+- Neue gezielte Regressionen in `tests/browser/canvas.mjs`: Fahrzeugpaar bei Hin-/Rückwechsel, Tastaturfokus, Escape und bewusstes Verwerfen, mobile zweite Spalte, Netzfehler, 422, 409 mit erhaltenem Entwurf, Navigation während der Konfliktprüfung und tatsächlich abgelaufene Anmeldung. Dialoganlage und abgebrochene Löschung werden zusätzlich geprüft.
+- Echte Anwendung mit synthetischen Daten bei 1440 und 390 px visuell geprüft, einschließlich Akte, Vergleich, Inline-Editor und Seitenpanel. Strukturprüfungen bei 320, 768 und 1024 px ergeben keinen seitenweiten horizontalen Überlauf. Artefakte bleiben unter `.artifacts/` und werden nicht eingecheckt.
+
+**Nächste Arbeit:** Phase 2. Evaluationsübersicht, Kriterien/Gruppe, Freigaben und Einstellungen auf die gemeinsamen Komponenten und Interaktionsregeln umstellen. Die dort noch vorhandenen Browserbestätigungen und individuellen Editoren werden dabei ersetzt. Offerten/Dokumente, Kosten/Rechnen sowie Einstieg/Konto folgen in Phase 3–5. Die Gesamtmigration ist ausdrücklich noch nicht abgeschlossen; neue Features bleiben nachgeordnet.
 
 ## Inventar der vorhandenen Oberflächen
 

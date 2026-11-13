@@ -1,38 +1,14 @@
 @model Steervo.Web.Pages.Evaluations.Candidates.AssessmentRow
-@{ var c = Model.Criterion; var a = Model.Assessment; var edit = Model.Access >= AccessLevel.Editor; var field = Model.FieldId; }
-<article class="assessment-row" id="@field" data-assessment-criterion="@c.Id" data-assessment-candidate="@Model.Candidate.Id" data-result="@Model.Result">
-    <div class="assessment-heading"><div><div class="criterion-title"><h4>@c.Name</h4><span class="priority @c.Priority.ToString().ToLowerInvariant()">@T[c.Priority.ToString()]</span></div><p class="micro">@T[c.Type.ToString()] @if (c.Type == CriterionType.Measurement) { <span> · @(c.Comparison == Comparison.AtLeast ? "≥" : "≤") @c.Threshold @c.Unit</span> }</p></div>
-    <span class="fulfillment @Model.Result.ToString().ToLowerInvariant()">@T["Fulfillment" + Model.Result]</span></div>
-    @if (edit)
+@{ var field = Model.FieldId; }
+<article class="assessment-row" id="@field" data-assessment-criterion="@Model.Criterion.Id" data-assessment-candidate="@Model.Candidate.Id" data-result="@Model.Result">
+    @if (Model.Access >= AccessLevel.Editor)
     {
-        <form method="post" asp-antiforgery="true" action="@Model.PostUrl" hx-post="@Model.PostUrl" class="assessment-form">
-            <input type="hidden" name="version" value="@Model.Evaluation.Version" /><input type="hidden" name="action" value="assess-candidate" /><input type="hidden" name="candidateId" value="@Model.Candidate.Id" /><input type="hidden" name="criterionId" value="@c.Id" />
-            <div class="assessment-value"><label for="value-@field">@T["AssessmentValue"]</label>
-            @switch (c.Type)
-            {
-                case CriterionType.Boolean:
-                    <select id="value-@field" name="booleanValue"><option value="" selected="@(a?.BooleanValue is null)">@T["FulfillmentUnknown"]</option><option value="true" selected="@(a?.BooleanValue == true)">@T["Yes"]</option><option value="false" selected="@(a?.BooleanValue == false)">@T["No"]</option></select>
-                    break;
-                case CriterionType.Measurement:
-                    <div class="measurement-entry"><input id="value-@field" name="measurementValue" type="number" step="any" value="@a?.MeasurementValue?.ToString(System.Globalization.CultureInfo.InvariantCulture)" placeholder="@T["FulfillmentUnknown"]" /><span>@c.Unit</span></div>
-                    break;
-                case CriterionType.Rating:
-                    <select id="value-@field" name="ratingValue"><option value="" selected="@(a?.RatingValue is null)">@T["FulfillmentUnknown"]</option>@for (var value = 1; value <= 5; value++) { <option value="@value" selected="@(a?.RatingValue == value)">@value / 5</option> }</select>
-                    break;
-            }
-            </div>
-            <div class="assessment-source"><label for="source-@field">@T["AssessmentSource"]</label><select id="source-@field" name="source">@foreach (var source in Enum.GetValues<AssessmentSource>()) { <option value="@source" selected="@(source == (a?.Source ?? AssessmentSource.Unknown))">@T["AssessmentSource" + source]</option> }</select></div>
-            <button id="save-@field" class="button secondary" aria-label="@T["SaveAssessment", c.Name, Model.Candidate.DisplayName]">@T["Save"]</button>
-            <details class="assessment-note" id="note-@field"><summary>@T["AssessmentNote"]@if (!string.IsNullOrEmpty(a?.Notes)) { <span class="note-present"> · @T["NotePresent"]</span> }</summary><label for="notes-@field">@T["AssessmentNoteHelp"]</label><textarea id="notes-@field" name="notes" maxlength="4000" rows="2">@a?.Notes</textarea></details>
-        </form>
-        @if (a is not null)
-        {
-            <form method="post" asp-antiforgery="true" action="@Model.PostUrl" hx-post="@Model.PostUrl" class="assessment-reset" data-confirm="@T["ClearAssessmentConfirm"]"><input type="hidden" name="version" value="@Model.Evaluation.Version" /><input type="hidden" name="action" value="clear-assessment" /><input type="hidden" name="candidateId" value="@Model.Candidate.Id" /><input type="hidden" name="criterionId" value="@c.Id" /><button id="clear-@field" class="text-button" aria-label="@T["ClearAssessmentFor", c.Name]">@T["ClearAssessment"]</button></form>
-        }
+        <button type="button" id="open-@field" class="assessment-summary" data-editor-open="editor-@field" aria-controls="editor-@field" aria-expanded="@(Model.HasDraft ? "true" : "false")" aria-label="@T["EditAssessmentFor", Model.Criterion.Name, Model.Candidate.DisplayName]"><partial name="_AssessmentSummary" model="Model" /></button>
+        <partial name="_AssessmentEditor" model="Model" />
     }
     else
     {
-        <div class="assessment-readonly"><strong>@(c.Type == CriterionType.Boolean ? T[a?.BooleanValue is { } value ? value ? "Yes" : "No" : "FulfillmentUnknown"].Value : Model.ValueText.Length > 0 ? Model.ValueText : T["FulfillmentUnknown"].Value)</strong><span class="micro">@T["AssessmentSource" + (a?.Source ?? AssessmentSource.Unknown)]</span></div>
-        @if (!string.IsNullOrEmpty(a?.Notes)) { <p class="assessment-notes-text">@a.Notes</p> }
+        <div class="assessment-summary"><partial name="_AssessmentSummary" model="Model" /></div>
     }
+    @if (!string.IsNullOrEmpty(Model.Assessment?.Notes)) { <p class="assessment-notes-text">@Model.Assessment.Notes</p> }
 </article>

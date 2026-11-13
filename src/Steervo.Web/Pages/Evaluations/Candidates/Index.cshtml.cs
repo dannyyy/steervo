@@ -12,6 +12,9 @@ public sealed class IndexModel(CandidateWorkspace workspace, ICurrentUser curren
     public AccessLevel Access => Evaluation.AccessFor(current.Id)!.Value;
     public string? Notice { get; private set; }
     public bool Failed { get; private set; }
+    public string? FailedAction { get; private set; }
+    public Guid? FailedItemId { get; private set; }
+    public string? CopyName { get; private set; }
     public bool CreationFailed { get; private set; }
     [BindProperty] public CandidateForm Input { get; set; } = new();
     public async Task<IActionResult> OnGetAsync(Guid id)
@@ -29,11 +32,21 @@ public sealed class IndexModel(CandidateWorkspace workspace, ICurrentUser curren
             {
                 case "add-candidate":
                     var candidateId = await workspace.AddAsync(id, version, Input.ToInput());
+                    if (Request.Headers.ContainsKey("HX-Request"))
+                    {
+                        Response.Headers["HX-Redirect"] = Url.Page("Details", new { id, candidateId });
+                        return new EmptyResult();
+                    }
                     return RedirectToPage("Details", new { id, candidateId });
                 case "move-candidate": await workspace.MoveAsync(id, version, itemId, direction); break;
                 case "remove-candidate": await workspace.RemoveAsync(id, version, itemId); break;
                 case "copy-candidate":
                     var copyId = await workspace.CopyAsync(id, version, itemId, copyName ?? "");
+                    if (Request.Headers.ContainsKey("HX-Request"))
+                    {
+                        Response.Headers["HX-Redirect"] = Url.Page("Details", new { id, candidateId = copyId });
+                        return new EmptyResult();
+                    }
                     return RedirectToPage("Details", new { id, candidateId = copyId });
                 default: throw new RuleException("InvalidValue");
             }
@@ -43,6 +56,7 @@ public sealed class IndexModel(CandidateWorkspace workspace, ICurrentUser curren
         {
             if (error.Message is "Forbidden" or "NotFound") return StatusCode(error.Message == "Forbidden" ? 403 : 404);
             Failed = true; Notice = text[error.Message]; CreationFailed = action == "add-candidate";
+            FailedAction = action; FailedItemId = itemId; CopyName = copyName;
             Response.StatusCode = error.Message == "Conflict" ? 409 : 422;
         }
         Evaluation = await workspace.ReadAsync(id);

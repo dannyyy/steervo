@@ -1,6 +1,6 @@
 # Steervo — Canvas / Tinte
 
-Origin: worktree `steervo-prototype-codex`, branch `prototype-codex`, based on `prototype` (`b610c56`). The user selected **Canvas with Tinte**. This reference is retained on `main`; the ASP.NET application has not been migrated. The authoritative handoff is [DESIGN.md](../../DESIGN.md), [interaction patterns](../../docs/interaction-patterns.md), and the [migration plan](../../docs/design-migration.md).
+Origin: worktree `steervo-prototype-codex`, branch `prototype-codex`, based on `prototype` (`b610c56`). The user selected **Canvas with Tinte**. This reference is retained on `main`; the ASP.NET application now uses this direction for its shell and vehicle workflows; the other areas remain in migration. The authoritative handoff is [DESIGN.md](../../DESIGN.md), [interaction patterns](../../docs/interaction-patterns.md), and the [migration plan](../../docs/design-migration.md).
 
 ## Run
 
@@ -45,7 +45,7 @@ Offert details and criteria management show information architecture; full docum
 
 Playwright/Chrome at 1440×1000 and 390×844 exercised capture-to-comparison updates, zero versus unknown, filters, cancellation, candidate selection, technical data, notes, adding candidates and session persistence. No page errors or page-level horizontal overflow at those sizes. The comparison scrolls horizontally on mobile with criterion labels pinned. Further targeted checks cover the second candidate, palette persistence/contrast, and 320/768/1024/1280 px widths.
 
-The design skill launcher/detector is unavailable in this environment; review uses source, computed browser checks and screenshots. Canvas / Tinte is the approved design direction. The production migration is still outstanding.
+The design skill launcher/detector is unavailable in this environment; review uses source, computed browser checks and screenshots. Canvas / Tinte is the approved design direction. The production migration is partial; the shell and vehicle workflows are implemented, with the remaining areas tracked in the migration plan.
 
 Final independent review: the one material finding (secondary text contrast in editors and the review footer) was corrected and scored resolved, disposition `ship` at that fix scope. Measured editor contrasts: Tinte 5.22:1, Petrol 5.10:1, Pflaume 5.21:1; footer 4.89:1. See `review-report.json`. The user subsequently selected Canvas / Tinte.
 

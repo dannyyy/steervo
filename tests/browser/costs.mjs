@@ -13,7 +13,7 @@ export async function checkCosts({ page, reader, readerEmail, origin, output, po
   const costPath = `${casePath}/costs`;
   async function caseVersion() { await page.goto(`${origin}${casePath}`); return page.locator('#evaluation-workspace').getAttribute('data-version'); }
   async function exportCase() { return JSON.parse(await (await browserRequest(page, `${casePath}?handler=Export`)).text()); }
-  await page.getByRole('link', { name: '05 Kosten', exact: true }).click();
+  await page.getByRole('link', { name: 'Kosten', exact: true }).click();
   await page.getByLabel('Beginn der Planung', { exact: true }).fill('2027-10');
   await page.getByLabel('Dauer in Monaten', { exact: true }).fill('15');
   await page.getByRole('button', { name: 'Zeitraum speichern', exact: true }).click();

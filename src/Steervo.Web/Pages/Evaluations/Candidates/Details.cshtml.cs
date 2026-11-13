@@ -15,15 +15,17 @@ public sealed class DetailsModel(CandidateWorkspace workspace, ICurrentUser curr
     public string? Notice { get; private set; }
     public bool Failed { get; private set; }
     public string? FailedAction { get; private set; }
-    public CandidateForm Input { get; private set; } = new();
-    public async Task<IActionResult> OnGetAsync(Guid id, Guid candidateId)
+    public AssessmentDraft? Draft { get; private set; }
+    public Guid? ComparisonFirst { get; private set; }
+    public Guid? ComparisonSecond { get; private set; }
+    public async Task<IActionResult> OnGetAsync(Guid id, Guid candidateId, Guid? first, Guid? second)
     {
-        try { await LoadAsync(id, candidateId); return Page(); }
+        try { await LoadAsync(id, candidateId, first, second); return Page(); }
         catch (RuleException error) { return StatusCode(error.Message == "Forbidden" ? 403 : 404); }
     }
     public async Task<IActionResult> OnPostAsync(Guid id, Guid candidateId, long version, string action, Guid criterionId,
         CandidateForm input, CandidateStatus status, string? reason, bool? booleanValue, string? measurementValue, int? ratingValue,
-        AssessmentSource source, string? notes)
+        AssessmentSource source, string? notes, Guid? first, Guid? second)
     {
         try
         {
@@ -43,10 +45,13 @@ public sealed class DetailsModel(CandidateWorkspace workspace, ICurrentUser curr
         catch (RuleException error)
         {
             if (error.Message is "Forbidden" or "NotFound") return StatusCode(error.Message == "Forbidden" ? 403 : 404);
-            Failed = true; FailedAction = action; Notice = text[error.Message]; Response.StatusCode = error.Message == "Conflict" ? 409 : 422;
+            Failed = true; FailedAction = action; Notice = text[error.Message];
+            if (action is "assess-candidate" or "clear-assessment")
+                Draft = new(candidateId, criterionId, Request.Form["booleanValue"], measurementValue,
+                    Request.Form["ratingValue"], Request.Form["source"], notes, Notice);
+            Response.StatusCode = error.Message == "Conflict" ? 409 : 422;
         }
-        await LoadAsync(id, candidateId);
-        if (FailedAction == "edit-candidate") Input = input;
+        await LoadAsync(id, candidateId, first, second);
         return Request.Headers.ContainsKey("HX-Request") ? Partial("_CandidateDetails", this) : Page();
     }
     internal static decimal? ParseMeasurement(string? value)
@@ -55,10 +60,12 @@ public sealed class DetailsModel(CandidateWorkspace workspace, ICurrentUser curr
         if (!decimal.TryParse(value, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var parsed)) throw new RuleException("InvalidValue");
         return parsed;
     }
-    private async Task LoadAsync(Guid id, Guid candidateId)
+    private async Task LoadAsync(Guid id, Guid candidateId, Guid? first, Guid? second)
     {
         Evaluation = await workspace.ReadAsync(id);
         Candidate = Evaluation.FindCandidate(candidateId);
-        Input = CandidateForm.From(Candidate);
+        ComparisonFirst = Evaluation.Candidates.Any(x => x.Id == first) ? first : candidateId;
+        ComparisonSecond = Evaluation.Candidates.Any(x => x.Id == second && x.Id != ComparisonFirst) ? second
+            : Request.Query.ContainsKey("second") ? null : Evaluation.Candidates.OrderBy(x => x.Position).FirstOrDefault(x => x.Id != ComparisonFirst)?.Id;
     }
 }
