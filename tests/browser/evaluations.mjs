@@ -114,6 +114,10 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
     for (const section of ['criteria', 'sharing', 'settings']) {
       await page.goto(`${origin}${path}?section=${section}`);
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${section} overflows at ${width}`);
+      await page.locator('.evaluation-tools > summary').click();
+      const menu = await page.locator('.evaluation-tools > div').boundingBox();
+      assert.ok(menu.x >= 0 && menu.x + menu.width <= width, `management menu overflows at ${width}`);
+      await page.locator('.evaluation-tools > summary').click();
       if ([390, 1440].includes(width)) await page.screenshot({ path: join(output, `phase2-${section}-${width}.png`), fullPage: true });
     }
   }

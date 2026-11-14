@@ -799,6 +799,8 @@ form[data-operation]:has(.editor-error:not([hidden])) { grid-column: 1 / -1; }
   .workflow-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .workflow-nav a, .workflow-nav a:last-child { grid-column: auto; justify-content: center; font-size: 12px; text-align: center; }
   .workspace-subnav { gap: 20px; margin-bottom: 20px; }
-  .evaluation-tools > div { right: auto; left: 0; }
+  .evaluation-summary { position: relative; }
+  .evaluation-tools { position: static; }
+  .evaluation-tools > div { right: 0; left: auto; }
   .offer-values > .offer-text-value { grid-template-columns: minmax(0, 1fr); gap: 4px; }
 }
