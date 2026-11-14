@@ -28,7 +28,7 @@ else { <p class="muted">@T["CostPlanningRequired"]</p> }</div>
 <section class="cost-result" aria-label="@T["CostSummary"]">
 <div><p class="eyebrow">@(Model.CandidateId is { } candidateId ? e.FindCandidate(candidateId).DisplayName : T["CostCommon"].Value)</p><h3>@T["CostKnownNet"]</h3><p class="cost-total" data-cost-net="@projection.Totals.Net.ToString(System.Globalization.CultureInfo.InvariantCulture)">@projection.Totals.Net.ToString("N2") <span>@e.Currency</span></p><p class="micro">@plan.Start.ToString("MM.yyyy") – @plan.DateFor(plan.Months).ToString("MM.yyyy") · @T["CostMonthCount", plan.Months]</p></div>
 <dl><div><dt>@T["CostExpenses"]</dt><dd>@projection.Totals.Expenses.ToString("N2") @e.Currency</dd></div><div><dt>@T["CostIncome"]</dt><dd>@projection.Totals.Income.ToString("N2") @e.Currency</dd></div><div><dt>@T["CostAverage"]</dt><dd>@((projection.Totals.Net / plan.Months).ToString("N2")) @e.Currency</dd></div></dl>
-<p class="micro cost-result-note">@T["CostSummaryHelp"]</p>
+<p class="micro cost-result-note">@T["CostSummaryHelp"] <a asp-page="/Evaluations/Scenarios/Index" asp-route-id="@e.Id">@T["CostFullComparison"] →</a></p>
 </section>
 @if (!projection.Totals.Complete) { <p class="notice financial-warning" data-cost-missing="@projection.Totals.MissingItems">@T["CostMissing", projection.Totals.MissingItems]</p> }
 <section id="cost-items" class="record-section cost-items" tabindex="-1" data-return-focus><div class="section-heading"><h3>@T["CostItems"]</h3><p class="micro">@T[Model.CandidateId.HasValue ? "CostCandidateHelp" : "CostCommonHelp"]</p></div>

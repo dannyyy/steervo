@@ -1,5 +1,6 @@
 @page "/evaluations/{id:guid}/scenarios"
 @model Steervo.Web.Pages.Evaluations.Scenarios.IndexModel
+@using Steervo.Calculations
 @{ ViewData["Title"] = T["Calculations"].Value; var e = Model.Evaluation; var edit = Model.Access >= AccessLevel.Editor; }
 <div id="scenario-workspace" data-version="@e.Version">
 <partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "scenarios")' />
@@ -8,9 +9,6 @@
 @if (Model.Notice is not null && Model.FailedAction != "settings") { <p class="notice failure" role="alert">@Model.Notice</p> }
 @if (e.CostPlanning is null || e.Currency is null) { <p class="notice financial-warning">@T["ScenarioPlanningRequired"] <a asp-page="/Evaluations/Costs/Index" asp-route-id="@e.Id">@T["Costs"] →</a></p> }
 <section class="workspace-surface scenario-collection">
-<div class="surface-heading scenario-settings"><div><h3 id="scenario-settings-title" tabindex="-1" data-return-focus>@T["ScenarioSharedAssumption"]</h3><p class="muted">@T["ScenarioAnnualReturn"]: <strong>@(e.CalculationSettings is null ? T["OfferOpen"].Value : e.CalculationSettings.AnnualReturnPercent.ToString("0.####") + " %")</strong></p></div>
-@if (edit) { <button type="button" class="button secondary" id="open-scenario-settings" data-editor-open="scenario-settings-editor" aria-controls="scenario-settings-editor" aria-expanded="@((e.CalculationSettings is null || Model.FailedAction == "settings").ToString().ToLowerInvariant())">@T["Edit"]</button> }</div>
-@if (edit) { <partial name="_SettingsEditor" model="Model" /> }
 @if (e.Scenarios.Count == 0) { <div class="canvas-empty"><div><h3>@T["ScenarioEmpty"]</h3><p>@T["ScenarioEmptyHelp"]</p></div></div> }
 else
 {
@@ -19,11 +17,17 @@ else
 @foreach (var scenario in e.Scenarios.OrderBy(s => s.Name))
 {
     var offer = e.FindOffer(scenario.OfferId);
+    var result = e.CostPlanning is { } plan ? ScenarioCalculation.Calculate(e, scenario.Id, plan.Months) : null;
     <article class="scenario-card" data-scenario-id="@scenario.Id"><div class="scenario-card-copy"><p class="eyebrow">@T["Acquisition" + scenario.Terms.Mode]</p><h3><a asp-page="Details" asp-route-id="@e.Id" asp-route-scenarioId="@scenario.Id">@scenario.Name</a></h3><p class="muted">@e.FindCandidate(offer.CandidateId).DisplayName</p><p class="micro">@offer.Revision(scenario.RevisionNumber).Terms.Name · @T["ScenarioVersion", scenario.RevisionNumber]</p>
     @if (offer.Latest.Number != scenario.RevisionNumber) { <p class="candidate-warning">@T["ScenarioNewOfferVersion", offer.Latest.Number]</p> }
+    @if (result is not null) { <p class="scenario-card-result"><strong>@(result.ExpectedCost is { } amount ? $"{amount:N2} {e.Currency}" : T["ScenarioSummaryOpen"].Value)</strong><span>@T["ScenarioSummaryAt", result.Month]</span></p> }
     </div><a class="candidate-open" asp-page="Details" asp-route-id="@e.Id" asp-route-scenarioId="@scenario.Id">@T["ScenarioOpen"] →</a>
     @if (edit) { <div class="scenario-card-actions"><a asp-page="Edit" asp-route-id="@e.Id" asp-route-scenarioId="@scenario.Id">@T["Edit"]</a><form id="remove-scenario-@scenario.Id" method="post" hx-post="@Request.Path" hx-swap="none" hx-sync="this:drop" hx-disabled-elt="find button[type=submit]" data-operation data-retain-on-error data-confirm-action="@T["ScenarioDeleteNamed", scenario.Name]" data-confirm-description="@T["ScenarioDeleteConfirm"]"><input type="hidden" name="action" value="remove" /><input type="hidden" name="scenarioId" value="@scenario.Id" /><input type="hidden" name="Version" value="@e.Version" /><button type="submit" class="text-button danger">@T["ScenarioDelete"]</button></form></div> }</article>
 }
 </div>
 }
+<div class="scenario-shared-settings"><div class="surface-heading scenario-settings"><div><h3 id="scenario-settings-title" tabindex="-1" data-return-focus>@T["ScenarioSharedAssumption"]</h3><p class="muted">@T["ScenarioAnnualReturn"]: <strong>@(e.CalculationSettings is null ? T["OfferOpen"].Value : e.CalculationSettings.AnnualReturnPercent.ToString("0.####") + " %")</strong></p></div>
+@if (edit) { <button type="button" class="button secondary" id="open-scenario-settings" data-editor-open="scenario-settings-editor" aria-controls="scenario-settings-editor" aria-expanded="@((e.CalculationSettings is null || Model.FailedAction == "settings").ToString().ToLowerInvariant())">@T["Edit"]</button> }</div>
+@if (edit) { <partial name="_SettingsEditor" model="Model" /> }
+<a asp-page="/Evaluations/Costs/Index" asp-route-id="@e.Id">@T["ScenarioSetupLink"] →</a></div>
 </section></div>

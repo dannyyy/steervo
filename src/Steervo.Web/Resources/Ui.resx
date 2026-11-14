@@ -518,10 +518,10 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="DocumentCapacityReached" xml:space="preserve"><value>Die Evaluation erreicht die Grenze von 200 MiB oder 1’000 Dateiversionen. Lösche ein nicht mehr benötigtes Dokument, bevor du weitere Dateien hinzufügst.</value></data>
   <data name="DocumentsRequireArchive" xml:space="preserve"><value>Diese Evaluation enthält Dokumente. Verwende den vollständigen ZIP-Export.</value></data>
   <data name="ExportTooLarge" xml:space="preserve"><value>Die Evaluation überschreitet die Grössengrenze für den Export.</value></data>
-  <data name="Costs" xml:space="preserve"><value>Kosten</value></data>
+  <data name="Costs" xml:space="preserve"><value>Zusatzkosten</value></data>
   <data name="CostPlanningEyebrow" xml:space="preserve"><value>Deine laufenden und einmaligen Zahlungen</value></data>
-  <data name="CostPlanningTitle" xml:space="preserve"><value>Zusätzliche Kosten planen</value></data>
-  <data name="CostPlanningHelp" xml:space="preserve"><value>Versicherung, Energie, Parkplatz und weitere Kosten: gemeinsam für alle Autos oder nur für ein bestimmtes Auto.</value></data>
+  <data name="CostPlanningTitle" xml:space="preserve"><value>Zusatzkosten planen</value></data>
+  <data name="CostPlanningHelp" xml:space="preserve"><value>Erfasse hier Versicherung, Energie, Parkplatz und weitere Ausgaben. Kaufpreis, Anzahlung und Raten gehören zur Offerte und werden im Kostenvergleich berücksichtigt.</value></data>
   <data name="CostPlanSetup" xml:space="preserve"><value>Zeitraum festlegen</value></data>
   <data name="CostPlanChange" xml:space="preserve"><value>Zeitraum ändern</value></data>
   <data name="CostPlanHelp" xml:space="preserve"><value>Wähle den ersten Monat und die Dauer deiner Planung. Eine Änderung verschiebt den Zeitbezug der Positionen; bereits erfasste Positionen bleiben erhalten.</value></data>
@@ -545,7 +545,7 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="CostIncome" xml:space="preserve"><value>Einnahmen</value></data>
   <data name="CostNet" xml:space="preserve"><value>Saldo</value></data>
   <data name="CostAverage" xml:space="preserve"><value>Durchschnitt pro Monat</value></data>
-  <data name="CostSummaryHelp" xml:space="preserve"><value>Summe ausschliesslich der hier erfassten Positionen. Kaufpreis, Leasing- und Kreditraten, Restwert und entgangene Rendite sind darin nicht enthalten.</value></data>
+  <data name="CostSummaryHelp" xml:space="preserve"><value>Nur die hier erfassten Zusatzkosten. Kaufpreis, Leasingraten, Restwert und entgangene Rendite findest du im Kostenvergleich.</value></data>
   <data name="CostMissing" xml:space="preserve"><value>{0} Position(en) mit fälligen Zahlungen haben noch keinen Betrag. Die angezeigte Summe ist unvollständig.</value></data>
   <data name="CostItems" xml:space="preserve"><value>Kostenpositionen</value></data>
   <data name="CostEmpty" xml:space="preserve"><value>Noch keine Positionen für diese Auswahl erfasst. Füge die bekannten Kosten hinzu; Beträge dürfen offen bleiben.</value></data>
@@ -590,11 +590,11 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="CostCurrencyRequired" xml:space="preserve"><value>Die gemeinsame Währung wird bei der ersten Offerte festgelegt. Erfasse zuerst eine Offerte, bevor du Kostenpositionen hinzufügst.</value></data>
   <data name="TooManyCosts" xml:space="preserve"><value>Eine Evaluation kann höchstens 1’000 Kostenpositionen enthalten.</value></data>
   <data name="CostRemove" xml:space="preserve"><value>Kostenposition löschen</value></data>
-  <data name="Calculations" xml:space="preserve"><value>Rechnen</value></data>
+  <data name="Calculations" xml:space="preserve"><value>Kostenvergleich</value></data>
   <data name="Choose" xml:space="preserve"><value>Bitte wählen</value></data>
   <data name="ScenarioEyebrow" xml:space="preserve"><value>Deine Annahmen. Dein Vergleich.</value></data>
-  <data name="ScenarioTitle" xml:space="preserve"><value>Was kostet dich welcher Weg?</value></data>
-  <data name="ScenarioIntro" xml:space="preserve"><value>Kauf, Leasing oder Kredit: Vergleiche Zahlungen, Restwert und entgangene Rendite zum selben Stichtag.</value></data>
+  <data name="ScenarioTitle" xml:space="preserve"><value>Kosten vergleichen</value></data>
+  <data name="ScenarioIntro" xml:space="preserve"><value>Vergleiche Kauf, Leasing und Finanzierung mit deinen bestätigten Annahmen. Kaufpreis und Raten stammen aus der Berechnung; Versicherung, Parkplatz und weitere Zusatzkosten kommen aus den Grundlagen.</value></data>
   <data name="ScenarioAdd" xml:space="preserve"><value>Szenario anlegen</value></data>
   <data name="ScenarioEdit" xml:space="preserve"><value>Szenario bearbeiten</value></data>
   <data name="ScenarioName" xml:space="preserve"><value>Name des Szenarios</value></data>
@@ -836,4 +836,14 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="FulfillmentOptional" xml:space="preserve"><value>Optional erhältlich</value></data>
   <data name="RequiredOptional" xml:space="preserve"><value>Diese Muss-Anforderungen sind optional erhältlich</value></data>
   <data name="RequiredOptionalHelp" xml:space="preserve"><value>Separat erhältlich, aber noch nicht enthalten. Diese Anforderungen zählen weder als erfüllt noch als verfehlt.</value></data>
+  <data name="EvaluationManage" xml:space="preserve"><value>Evaluation verwalten</value></data>
+  <data name="WorkflowSetup" xml:space="preserve"><value>Grundlagen</value></data>
+  <data name="WorkflowWorkspace" xml:space="preserve"><value>Autos &amp; Offerten</value></data>
+  <data name="WorkflowResults" xml:space="preserve"><value>Auswertungen</value></data>
+  <data name="WorkflowSections" xml:space="preserve"><value>Bereiche der Arbeitsphase</value></data>
+  <data name="VehicleComparison" xml:space="preserve"><value>Fahrzeugvergleich</value></data>
+  <data name="ScenarioSummaryAt" xml:space="preserve"><value>Nach {0} Monaten</value></data>
+  <data name="ScenarioSummaryOpen" xml:space="preserve"><value>Ergebnis noch offen</value></data>
+  <data name="CostFullComparison" xml:space="preserve"><value>Gesamtkosten vergleichen</value></data>
+  <data name="ScenarioSetupLink" xml:space="preserve"><value>Zusatzkosten und Zeitraum bearbeiten</value></data>
 </root>
