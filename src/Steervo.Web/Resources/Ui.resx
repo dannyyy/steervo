@@ -842,7 +842,7 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="WorkflowResults" xml:space="preserve"><value>Auswertungen</value></data>
   <data name="WorkflowSections" xml:space="preserve"><value>Bereiche der Arbeitsphase</value></data>
   <data name="VehicleComparison" xml:space="preserve"><value>Fahrzeugvergleich</value></data>
-  <data name="ScenarioSummaryAt" xml:space="preserve"><value>Nach {0} Monaten</value></data>
+  <data name="ScenarioSummaryAt" xml:space="preserve"><value>Effektive Kosten nach {0} Monaten</value></data>
   <data name="ScenarioSummaryOpen" xml:space="preserve"><value>Ergebnis noch offen</value></data>
   <data name="CostFullComparison" xml:space="preserve"><value>Gesamtkosten vergleichen</value></data>
   <data name="ScenarioSetupLink" xml:space="preserve"><value>Zusatzkosten und Zeitraum bearbeiten</value></data>
