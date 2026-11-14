@@ -85,7 +85,7 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   record('A failed group removal preserves the adjacent rename draft and does not remove criteria');
 
   await page.locator('.evaluation-tools > summary').click(); await page.getByRole('link', { name: 'Evaluation bearbeiten', exact: true }).click();
-  assert.equal((await page.locator('.evaluation-tools [aria-current=page]').innerText()).trim(), 'Evaluation bearbeiten');
+  assert.equal((await page.locator('.evaluation-tools [aria-current=page]').textContent()).trim(), 'Evaluation bearbeiten');
   await page.locator('#edit-evaluation').click();
   await page.locator('#case-name').fill('   ');
   await page.locator('#case-purpose').fill('Eine erhaltene Notiz zur Entscheidung.');
@@ -119,7 +119,7 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   }
   await page.goto(`${origin}${path}#sharing`);
   await page.waitForURL(`**?section=sharing`);
-  assert.equal((await page.locator('.evaluation-tools [aria-current=page]').innerText()).trim(), 'Freigaben');
+  assert.equal((await page.locator('.evaluation-tools [aria-current=page]').textContent()).trim(), 'Freigaben');
   await reader.page.goto(`${origin}${path}`);
   await reader.page.locator('#add-group').click();
   await reader.page.locator('#new-group-editor').getByLabel('Gruppenname').fill('Nicht verlieren');
