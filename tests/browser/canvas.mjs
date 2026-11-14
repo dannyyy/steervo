@@ -48,7 +48,7 @@ export async function checkCanvas({ page, origin, casePath, firstId, secondId, b
   await page.locator('.comparison-candidate-link').nth(1).click();
   assert.equal(new URL(page.url()).searchParams.get('first'), firstId);
   assert.equal(new URL(page.url()).searchParams.get('second'), secondId);
-  await page.locator('.section-nav').getByRole('link', { name: 'Vergleichen', exact: true }).click();
+  await page.locator('.section-nav').getByRole('link', { name: 'Auswertungen', exact: true }).click();
   assert.equal(await page.locator('#compare-first').inputValue(), firstId);
   assert.equal(await page.locator('#compare-second').inputValue(), secondId);
 
@@ -134,7 +134,7 @@ export async function checkCanvas({ page, origin, casePath, firstId, secondId, b
   assert.equal(await note(boolean).inputValue(), 'Lokaler Entwurf während einer gleichzeitigen Änderung.');
   assert.equal((await exportData()).assessments.find(value => value.candidateId === secondId && value.criterionId === boolean).booleanValue, false);
   await editor(boolean).getByRole('button', { name: 'Aktuellen Stand ansehen' }).click();
-  await page.locator('.section-nav').getByRole('link', { name: 'Autos', exact: true }).click();
+  await page.locator('.section-nav').getByRole('link', { name: 'Autos & Offerten', exact: true }).click();
   await confirmation.getByRole('button', { name: 'Weiterbearbeiten' }).click();
   assert.equal(new URL(page.url()).pathname, `${casePath}/compare`);
   await opener(boolean).click();

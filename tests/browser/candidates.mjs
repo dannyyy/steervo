@@ -25,7 +25,7 @@ export async function checkCandidates({ page, reader, origin, output, post, brow
   };
   const classify = async target => { if (!await target.locator('#candidate-classification').isVisible()) await target.locator('#edit-classification').click(); };
   const save = (target, id) => assessment(target, id).getByRole('button', { name: /speichern$/ });
-  await page.getByRole('link', { name: 'Autos', exact: true }).click();
+  await page.getByRole('link', { name: 'Autos & Offerten', exact: true }).click();
   assert.equal(await page.locator('.candidate-card').count(), 0);
   await page.getByRole('button', { name: 'Auto hinzufügen', exact: false }).click();
   const dialog = page.getByRole('dialog', { name: 'Auto hinzufügen', exact: true });

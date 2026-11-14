@@ -84,8 +84,8 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   await page.getByRole('button', { name: 'Änderungen verwerfen', exact: true }).click();
   record('A failed group removal preserves the adjacent rename draft and does not remove criteria');
 
-  await page.getByRole('link', { name: 'Evaluation bearbeiten', exact: true }).click();
-  assert.equal((await page.locator('.section-nav [aria-current=page]').innerText()).trim(), 'Evaluation bearbeiten');
+  await page.locator('.evaluation-tools > summary').click(); await page.getByRole('link', { name: 'Evaluation bearbeiten', exact: true }).click();
+  assert.equal((await page.locator('.evaluation-tools [aria-current=page]').innerText()).trim(), 'Evaluation bearbeiten');
   await page.locator('#edit-evaluation').click();
   await page.locator('#case-name').fill('   ');
   await page.locator('#case-purpose').fill('Eine erhaltene Notiz zur Entscheidung.');
@@ -94,7 +94,7 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   await page.locator('#case-name').fill(name);
   await mutate(page, () => page.locator('#save-evaluation').click());
   assert.match(await page.locator('.evaluation-facts').innerText(), /Eine erhaltene Notiz/);
-  await page.getByRole('link', { name: 'Freigaben', exact: true }).click();
+  await page.locator('.evaluation-tools > summary').click(); await page.getByRole('link', { name: 'Freigaben', exact: true }).click();
   await page.locator('#add-share').click();
   const share = page.locator('#share-editor-new');
   await share.getByLabel('E-Mail-Adresse').fill('not-confirmed@example.test');
@@ -119,7 +119,7 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   }
   await page.goto(`${origin}${path}#sharing`);
   await page.waitForURL(`**?section=sharing`);
-  assert.equal((await page.locator('.section-nav [aria-current=page]').innerText()).trim(), 'Freigaben');
+  assert.equal((await page.locator('.evaluation-tools [aria-current=page]').innerText()).trim(), 'Freigaben');
   await reader.page.goto(`${origin}${path}`);
   await reader.page.locator('#add-group').click();
   await reader.page.locator('#new-group-editor').getByLabel('Gruppenname').fill('Nicht verlieren');
@@ -134,7 +134,7 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   await reader.page.goto(origin);
   record('Desktop/mobile sections fit the viewport; old links work and real permission revocation protects the draft');
 
-  await page.getByRole('link', { name: 'Kriterien', exact: true }).click();
+  await page.getByRole('link', { name: 'Grundlagen', exact: true }).click();
   await page.locator(`#edit-criterion-${id}`).click();
   await editor.getByRole('button', { name: 'Kriterium löschen', exact: true }).click();
   assert.match(await page.locator('#confirmation-title').innerText(), /Lokaler Entwurf bleibt erhalten/);
@@ -153,7 +153,7 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   assert.equal(ungrouped.criteria[0].groupId, null);
   record('Criterion deletion targets only the confirmed criterion; dissolving a group retains its remaining criteria');
 
-  await page.getByRole('link', { name: 'Evaluation bearbeiten', exact: true }).click();
+  await page.locator('.evaluation-tools > summary').click(); await page.getByRole('link', { name: 'Evaluation bearbeiten', exact: true }).click();
   await page.getByRole('button', { name: 'Evaluation löschen', exact: true }).click();
   const confirmation = page.locator('#action-confirmation');
   assert.match(await confirmation.innerText(), new RegExp(name));
