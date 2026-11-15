@@ -18,7 +18,7 @@ public sealed record ScenarioExport(Guid Id, ScenarioInput Input, ResidualInput[
 public sealed record CalculationSettingsExport(decimal AnnualReturnPercent);
 public sealed record EvaluationExport(string Format, int Version, string Name, string Purpose, GroupExport[] Groups, CriterionExport[] Criteria,
     CandidateExport[]? Candidates = null, AssessmentExport[]? Assessments = null, string? Currency = null, OfferExport[]? Offers = null, OfferAssessmentExport[]? OfferAssessments = null,
-    CostPlanningExport? CostPlanning = null, CostExport[]? Costs = null, CalculationSettingsExport? CalculationSettings = null, ScenarioExport[]? Scenarios = null);
+    CostPlanningExport? CostPlanning = null, CostExport[]? Costs = null, CalculationSettingsExport? CalculationSettings = null, ScenarioExport[]? Scenarios = null, string? Country = null);
 
 public sealed class EvaluationTransfer(EvaluationWorkspace workspace, IEvaluationStore store, ICurrentUser current)
 {
@@ -36,7 +36,7 @@ public sealed class EvaluationTransfer(EvaluationWorkspace workspace, IEvaluatio
     }
     internal static byte[] Serialize(Evaluation evaluation)
     {
-        var content = new EvaluationExport("steervo-evaluation", 7, evaluation.Name, evaluation.Purpose,
+        var content = new EvaluationExport("steervo-evaluation", 8, evaluation.Name, evaluation.Purpose,
             evaluation.Groups.OrderBy(x => x.Position).Select(x => new GroupExport(x.Id, x.Name, x.Position)).ToArray(),
             evaluation.Criteria.OrderBy(x => x.Position).Select(x => new CriterionExport(x.Id, x.Name, x.Type, x.Priority, x.Scope, x.GroupId, x.Threshold, x.Unit, x.Comparison, x.Position)).ToArray(),
             evaluation.Candidates.OrderBy(x => x.Position).Select(x => new CandidateExport(x.Id, x.Model, x.Brand, x.Variant, x.Condition, x.Year, x.Mileage, x.Notes, x.Links, x.Status, x.StatusReason, x.Position, x.Specifications)).ToArray(),
@@ -48,7 +48,7 @@ public sealed class EvaluationTransfer(EvaluationWorkspace workspace, IEvaluatio
             evaluation.CostPlanning is { } plan ? new(plan.Start, plan.Months) : null,
             evaluation.Costs.Select(cost => new CostExport(cost.Id, cost.ToInput())).ToArray(),
             evaluation.CalculationSettings is { } settings ? new(settings.AnnualReturnPercent) : null,
-            evaluation.Scenarios.Select(s => new ScenarioExport(s.Id, s.ToInput(), s.Residuals.Select(r => r.ToInput()).ToArray(), s.CostAdjustments.Select(a => a.ToInput()).ToArray())).ToArray());
+            evaluation.Scenarios.Select(s => new ScenarioExport(s.Id, s.ToInput(), s.Residuals.Select(r => r.ToInput()).ToArray(), s.CostAdjustments.Select(a => a.ToInput()).ToArray())).ToArray(), evaluation.Country);
         return JsonSerializer.SerializeToUtf8Bytes(content, Json);
     }
     public async Task<Guid> ImportAsync(byte[] data)
@@ -63,7 +63,7 @@ public sealed class EvaluationTransfer(EvaluationWorkspace workspace, IEvaluatio
         EvaluationExport content;
         try { content = JsonSerializer.Deserialize<EvaluationExport>(data, Json) ?? throw new RuleException("InvalidImport"); }
         catch (JsonException) { throw new RuleException("InvalidImport"); }
-        if (content.Format != "steervo-evaluation" || content.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7) || content.Groups is null || content.Criteria is null || content.Groups.Length > 100 || content.Criteria.Length > 1000
+        if (content.Format != "steervo-evaluation" || content.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8) || content.Groups is null || content.Criteria is null || content.Groups.Length > 100 || content.Criteria.Length > 1000
             || content.Groups.Any(x => x is null || x.Id == Guid.Empty || x.Position < 0) || content.Criteria.Any(x => x is null || x.Id == Guid.Empty || x.Position < 0)
             || content.Groups.DistinctBy(x => x.Id).Count() != content.Groups.Length || content.Criteria.DistinctBy(x => x.Id).Count() != content.Criteria.Length
             || (content.Version == 1 && (content.Candidates is not null || content.Assessments is not null))
@@ -96,7 +96,9 @@ public sealed class EvaluationTransfer(EvaluationWorkspace workspace, IEvaluatio
             || assessments.Any(x => x is null)
             || assessments.DistinctBy(x => (x.CandidateId, x.CriterionId)).Count() != assessments.Length) throw new RuleException("InvalidImport");
         if (content.Version < 7 && (assessments.Any(x => x.OptionalAvailable) || offerAssessments.Any(x => x.OptionalAvailable))) throw new RuleException("InvalidImport");
+        if (content.Version < 8 && content.Country is not null) throw new RuleException("InvalidImport");
         var evaluation = new Evaluation(current.Id, content.Name, content.Purpose);
+        if (content.Country is not null) evaluation.SetCountry(content.Country);
         var groups = content.Groups.OrderBy(x => x.Position).ToDictionary(x => x.Id, x => evaluation.AddGroup(x.Name));
         var criteria = new Dictionary<Guid, Guid>();
         foreach (var criterion in content.Criteria.OrderBy(x => x.Position))

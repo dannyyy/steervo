@@ -23,6 +23,7 @@ public sealed class EditModel(OfferWorkspace workspace, ICurrentUser current, IS
         try
         {
             await LoadAsync(id, offerId);
+            if (Evaluation.Currency is null) return RedirectToPage("/Evaluations/Details", new { id, section = "settings" });
             if (Offer?.Archived == true) return RedirectToPage("Details", new { id, offerId });
             Version = Evaluation.Version;
             if (Offer is not null) Input = OfferForm.From(Offer, Evaluation.Currency);

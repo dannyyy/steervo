@@ -33,7 +33,7 @@ public sealed class DetailsModel(EvaluationWorkspace workspace, EvaluationArchiv
             await LoadAsync(id); Failed = true; Notice = text[error.Message]; Response.StatusCode = 422; return Page();
         }
     }
-    public async Task<IActionResult> OnPostAsync(Guid id, long version, string action, Guid itemId, string name, string? purpose,
+    public async Task<IActionResult> OnPostAsync(Guid id, long version, string action, Guid itemId, string name, string? purpose, string? country, string? currency,
         Guid? groupId, int direction, int position, CriterionType type, Priority priority, CriterionScope scope, string? threshold, string? unit, Comparison comparison, string email, AccessLevel access, string userId)
     {
         try
@@ -47,7 +47,7 @@ public sealed class DetailsModel(EvaluationWorkspace workspace, EvaluationArchiv
             }
             switch (action)
             {
-                case "rename": await workspace.EditAsync(id, version, e => e.Rename(name, purpose)); break;
+                case "rename": await workspace.EditAsync(id, version, e => e.SetProperties(name, purpose, country, currency)); break;
                 case "add-group": await workspace.EditAsync(id, version, e => e.AddGroup(name)); break;
                 case "rename-group": await workspace.EditAsync(id, version, e => e.RenameGroup(itemId, name)); break;
                 case "move-group": await workspace.EditAsync(id, version, e => e.MoveGroup(itemId, direction)); break;

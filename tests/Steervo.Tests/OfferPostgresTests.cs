@@ -20,7 +20,7 @@ public sealed class OfferPostgresTests
     {
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync(); var reader = await fixture.InviteAsync(owner, "reader@example.test"); var editor = await fixture.InviteAsync(owner, "editor@example.test");
-        var id = await fixture.AsAsync(owner, workspace => workspace.CreateAsync("Decision", null));
+        var id = await fixture.AsAsync(owner, workspace => workspace.CreateAsync("Decision", null, "CH", "EUR"));
         Guid candidate = default, offerId = default;
         await fixture.AsAsync(owner, async workspace => { await workspace.EditAsync(id, 1, evaluation => candidate = evaluation.AddCandidate(new("Vehicle"))); return true; });
         await fixture.AsAsync(owner, async workspace => { await workspace.ShareAsync(id, 2, "reader@example.test", AccessLevel.Reader); return true; });
@@ -53,7 +53,7 @@ public sealed class OfferPostgresTests
     {
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync();
-        var id = await fixture.AsAsync(owner, workspace => workspace.CreateAsync("Decision", null));
+        var id = await fixture.AsAsync(owner, workspace => workspace.CreateAsync("Decision", null, "CH", "EUR"));
         await fixture.AsAsync(owner, async workspace => { await workspace.EditAsync(id, 1, evaluation => {
             var candidate = evaluation.AddCandidate(new("Vehicle"));
             var criterion = evaluation.AddCriterion(new("Service", CriterionType.Boolean, Priority.Required, CriterionScope.Offer));
@@ -83,7 +83,7 @@ public sealed class OfferPostgresTests
         }
         var malformed = JsonNode.Parse(bytes)!; malformed["offers"]![0]!["revisions"]![1]!["number"] = 4;
         await Assert.ThrowsAsync<RuleException>(() => fixture.TransferAsync(owner, transfer => transfer.ImportAsync(Encoding.UTF8.GetBytes(malformed.ToJsonString()))));
-        var legacy = JsonNode.Parse(bytes)!; legacy.AsObject().Remove("calculationSettings"); legacy.AsObject().Remove("scenarios"); legacy["version"] = 3;
+        var legacy = JsonNode.Parse(bytes)!; legacy.AsObject().Remove("calculationSettings"); legacy.AsObject().Remove("scenarios"); legacy["version"] = 3; legacy.AsObject().Remove("country");
         foreach (var property in new[] { "currency", "offers", "offerAssessments", "costPlanning", "costs" }) legacy.AsObject().Remove(property);
         var legacyId = await fixture.TransferAsync(owner, transfer => transfer.ImportAsync(Encoding.UTF8.GetBytes(legacy.ToJsonString())));
         var old = await fixture.AsAsync(owner, workspace => workspace.ReadAsync(legacyId));
@@ -121,7 +121,7 @@ public sealed class OfferPostgresTests
     {
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync();
-        var id = await fixture.AsAsync(owner, workspace => workspace.CreateAsync("Existing", null));
+        var id = await fixture.AsAsync(owner, workspace => workspace.CreateAsync("Existing", null, "CH", "EUR"));
         await fixture.AsAsync(owner, async workspace => { await workspace.EditAsync(id, 1, evaluation => evaluation.AddCandidate(new("Vehicle", Specifications: new() { PowerKw = 125, KerbWeightKg = 1800, GrossWeightKg = 2250 }))); return true; });
         await fixture.RunAsync(async provider => {
             var migrator = provider.GetRequiredService<AppDbContext>().GetService<IMigrator>();

@@ -1,0 +1,16 @@
+@model Steervo.Web.Pages.Shared.EvaluationRegionFields
+<div class="field-pair">
+    <div><label for="@(Model.Prefix)-country">@T["EvaluationCountry"]</label>
+        <select id="@(Model.Prefix)-country" name="Country" required aria-describedby="@(Model.Prefix)-country-help">
+            <option value="">@T["SelectCountry"]</option>
+            @foreach (var code in EvaluationCountries.Codes.OrderBy(EvaluationCountries.DisplayName))
+            { <option value="@code" selected="@(code == Model.Country)">@EvaluationCountries.DisplayName(code) (@code)</option> }
+        </select>
+        <p class="micro" id="@(Model.Prefix)-country-help">@T["EvaluationCountryHelp"]</p>
+    </div>
+    <div><label for="@(Model.Prefix)-currency">@T["EvaluationCurrency"]</label>
+        <input id="@(Model.Prefix)-currency" name="Currency" value="@Model.Currency" required minlength="3" maxlength="3" pattern="[A-Za-z]{3}" readonly="@Model.CurrencyFixed" autocomplete="off" list="@(Model.Prefix)-currencies" aria-describedby="@(Model.Prefix)-currency-help" />
+        <datalist id="@(Model.Prefix)-currencies"><option value="CHF"></option><option value="EUR"></option><option value="USD"></option><option value="GBP"></option></datalist>
+        <p class="micro" id="@(Model.Prefix)-currency-help">@T[Model.CurrencyFixed ? "EvaluationCurrencyLocked" : "EvaluationCurrencyHelp"]</p>
+    </div>
+</div>

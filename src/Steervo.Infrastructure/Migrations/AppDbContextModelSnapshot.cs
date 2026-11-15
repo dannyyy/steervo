@@ -657,6 +657,10 @@ namespace Steervo.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Country")
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -688,6 +692,8 @@ namespace Steervo.Infrastructure.Migrations
 
                     b.ToTable("Evaluations", t =>
                         {
+                            t.HasCheckConstraint("ValidEvaluationCountry", "\"Country\" IS NULL OR \"Country\" ~ '^[A-Z]{2}$'");
+
                             t.HasCheckConstraint("ValidEvaluationCurrency", "\"Currency\" IS NULL OR \"Currency\" ~ '^[A-Z]{3}$'");
                         });
                 });

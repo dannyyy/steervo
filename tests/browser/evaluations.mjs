@@ -6,8 +6,15 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   await page.goto(origin);
   await page.locator('#add-evaluation').click();
   const creation = page.locator('#new-evaluation');
+  assert.equal(await page.locator('#new-region-country').inputValue(), '');
+  assert.equal(await page.locator('#new-region-currency').inputValue(), '');
+  for (const fields of [{ Currency: 'EUR' }, { Country: 'CH' }, { Country: 'ZZ', Currency: 'CHF' }])
+    assert.equal((await post(page, '/', { Name: 'Must not create', ...fields })).status(), 422);
+  record('Creation requires an explicit valid country and currency on the server without defaults');
   const name = 'Eine gemeinsame Entscheidung mit Platz für längere Namen und eigene Anforderungen';
   await creation.getByLabel('Name der Evaluation').fill(name);
+  await page.locator('#new-region-country').selectOption('CH');
+  await page.locator('#new-region-currency').fill('EUR');
   await creation.getByRole('button', { name: 'Evaluation anlegen', exact: true }).click();
   await page.waitForURL(/\/evaluations\//);
   const path = new URL(page.url()).pathname;
@@ -89,11 +96,17 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   await page.locator('#edit-evaluation').click();
   await page.locator('#case-name').fill('   ');
   await page.locator('#case-purpose').fill('Eine erhaltene Notiz zur Entscheidung.');
+  await page.locator('#case-region-country').selectOption('DE');
+  await page.locator('#case-region-currency').fill('CHF');
   await submit(page.locator('#save-evaluation'), 422);
   assert.equal(await page.locator('#case-purpose').inputValue(), 'Eine erhaltene Notiz zur Entscheidung.');
+  assert.equal(await page.locator('#case-region-country').inputValue(), 'DE');
+  assert.equal(await page.locator('#case-region-currency').inputValue(), 'CHF');
   await page.locator('#case-name').fill(name);
   await mutate(page, () => page.locator('#save-evaluation').click());
   assert.match(await page.locator('.evaluation-facts').innerText(), /Eine erhaltene Notiz/);
+  assert.equal((await exportCase()).country, 'DE');
+  assert.equal((await exportCase()).currency, 'CHF');
   await page.locator('.evaluation-tools > summary').click(); await page.getByRole('link', { name: 'Freigaben', exact: true }).click();
   await page.locator('#add-share').click();
   const share = page.locator('#share-editor-new');
@@ -169,5 +182,22 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   await page.waitForURL(origin + '/');
   assert.equal((await browserRequest(page, path)).status(), 404);
   record('Evaluation deletion names its subject, safely cancels, and redirects only after confirmed removal');
+
+  const legacy = { ...ungrouped, name: 'Imported legacy evaluation', version: 7 }; delete legacy.country;
+  await page.locator('#import-evaluation').click();
+  await page.locator('#upload').setInputFiles({ name: 'legacy.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(legacy)) });
+  await page.locator('#save-import').click();
+  await page.waitForURL(/\/evaluations\//);
+  const importedPath = new URL(page.url()).pathname;
+  await page.locator('[data-regional-settings-notice]').getByRole('link').click();
+  assert.equal(await page.locator('#evaluation-editor').isVisible(), true);
+  assert.equal(await page.locator('#case-region-country').inputValue(), '');
+  assert.equal(await page.locator('#case-region-currency').inputValue(), 'CHF');
+  await page.locator('#case-region-country').selectOption('LI');
+  await mutate(page, () => page.locator('#save-evaluation').click());
+  assert.equal(await page.locator('[data-regional-settings-notice]').count(), 0);
+  const completed = JSON.parse(await (await browserRequest(page, `${importedPath}?handler=Export`)).text());
+  assert.equal(completed.country, 'LI'); assert.equal(completed.currency, 'CHF'); assert.equal(completed.version, 8);
+  record('Legacy imports keep their currency and unknown country, then allow explicit completion in properties');
   await page.goto(returnUrl);
 }

@@ -27,9 +27,10 @@ public sealed class EvaluationWorkspace(IEvaluationStore store, ICurrentUser cur
         evaluation.Require(current.Id, AccessLevel.Reader);
         return evaluation;
     }
-    public async Task<Guid> CreateAsync(string name, string? purpose)
+    public async Task<Guid> CreateAsync(string name, string? purpose, string? country, string? currency)
     {
         var evaluation = new Evaluation(current.Id, name, purpose);
+        evaluation.SetProperties(name, purpose, country, currency);
         await store.CreateAsync(evaluation);
         return evaluation.Id;
     }

@@ -10,7 +10,10 @@ public sealed class OfferWorkspace(EvaluationWorkspace evaluations)
         IEnumerable<OfferLineInput> lines, string? currency, string? changeNote)
     {
         var id = Guid.Empty;
-        await evaluations.EditAsync(evaluationId, version, evaluation => id = evaluation.AddOffer(candidateId, terms, lines, currency, changeNote));
+        await evaluations.EditAsync(evaluationId, version, evaluation => {
+            if (evaluation.Currency is null) throw new RuleException("CostCurrencyRequired");
+            id = evaluation.AddOffer(candidateId, terms, lines, currency, changeNote);
+        });
         return id;
     }
     public Task ReviseAsync(Guid evaluationId, long version, Guid offerId, OfferTerms terms, IEnumerable<OfferLineInput> lines, string? changeNote) =>

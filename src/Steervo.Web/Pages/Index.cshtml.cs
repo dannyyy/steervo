@@ -15,10 +15,12 @@ public sealed class IndexModel(EvaluationWorkspace workspace, EvaluationArchive 
     public bool ImportFailed { get; private set; }
     [BindProperty] public string Name { get; set; } = "";
     [BindProperty] public string? Purpose { get; set; }
+    [BindProperty] public string? Country { get; set; }
+    [BindProperty] public string? Currency { get; set; }
     public async Task OnGetAsync() => Evaluations = await workspace.ListAsync();
     public async Task<IActionResult> OnPostAsync()
     {
-        try { var id = await workspace.CreateAsync(Name, Purpose); return Created(id); }
+        try { var id = await workspace.CreateAsync(Name, Purpose, Country, Currency); return Created(id); }
         catch (RuleException error)
         {
             CreationFailed = true; ModelState.AddModelError("", text[error.Message]); await OnGetAsync(); Response.StatusCode = 422;

@@ -7,6 +7,8 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   await page.locator('[data-dialog-open="new-evaluation"]').first().click();
   const creation = page.getByRole('dialog', { name: 'Neue Evaluation', exact: true });
   await creation.getByLabel('Name der Evaluation').fill('Offertenprüfung');
+  await page.locator('#new-region-country').selectOption('CH');
+  await page.locator('#new-region-currency').fill('EUR');
   await creation.getByRole('button', { name: 'Evaluation anlegen', exact: false }).click();
   await page.waitForURL(/\/evaluations\//);
   const casePath = new URL(page.url()).pathname;
@@ -44,7 +46,7 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   await page.getByRole('link', { name: /Offerte erfassen/ }).click();
   assert.equal(await page.locator('#offer-candidate').inputValue(), candidateId);
   assert.equal(await page.locator('#offer-VehicleDescription').inputValue(), 'Angebotsauto');
-  await page.locator('#offer-currency').fill('eur');
+  assert.equal(await page.locator('#offer-currency').inputValue(), 'EUR');
   await page.locator('#offer-Name').fill('Anbieter Nord');
   await page.getByRole('button', { name: /Offerte anlegen/ }).click();
   await page.locator('#offer-workspace').waitFor();
@@ -52,11 +54,21 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   const firstId = firstPath.split('/').at(-1);
   assert.equal(await page.locator('#offer-workspace').getAttribute('data-revision'), '1');
   assert.match(await page.locator('.offer-missing').textContent(), /Basispreis/);
-  record('Offers can start incomplete, inherit their candidate and establish the evaluation currency');
+  record('Offers can start incomplete, inherit their candidate and use the evaluation currency');
+  await page.goto(`${origin}${casePath}?section=settings`);
+  await page.locator('#edit-evaluation').click();
+  assert.equal(await page.locator('#case-region-currency').isEditable(), false);
+  const settingsVersion = await page.locator('#evaluation-workspace').getAttribute('data-version');
+  assert.equal((await post(page, casePath, { action: 'rename', name: 'Must not change', Country: 'DE', Currency: 'USD', version: settingsVersion })).status(), 422);
+  const retained = JSON.parse(await (await browserRequest(page, `${casePath}?handler=Export`)).text());
+  assert.equal(retained.country, 'CH'); assert.equal(retained.currency, 'EUR'); assert.equal(retained.name, 'Offertenprüfung');
+  await page.goto(`${origin}${firstPath}`);
+  record('Evaluation properties lock the currency after the first offer and reject forged changes atomically');
+
 
   await page.getByRole('link', { name: 'Neue Version erfassen', exact: true }).click();
   assert.equal(await page.locator('#offer-currency').inputValue(), 'EUR');
-  assert.equal(await page.locator('#offer-currency').getAttribute('readonly'), 'readonly');
+  assert.equal(await page.locator('#offer-currency').isEditable(), false);
   await page.locator('#offer-Provider').fill('Anbieter Nord');
   await page.locator('#offer-Lender').fill('Finanzierungspartner');
   await page.locator('#offer-kind').selectOption('Leasing');
@@ -272,7 +284,7 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   assert.equal(await reader.page.locator('#save-offer').isDisabled(), true);
   record('Revoked editing permission keeps the long offer draft visible and prevents further saves');
   const exported = JSON.parse(await (await browserRequest(page, `${casePath}?handler=Export`)).text());
-  assert.equal(exported.version, 7);
+  assert.equal(exported.version, 8);
   assert.equal(exported.currency, 'EUR');
   assert.equal(exported.offers.length, 2);
   assert.equal(exported.offers.find(offer => offer.id === firstId).revisions.length, 4);

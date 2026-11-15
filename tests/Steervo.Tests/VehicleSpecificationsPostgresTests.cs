@@ -18,7 +18,7 @@ public sealed class VehicleSpecificationsPostgresTests
     {
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync();
-        var id = await fixture.AsAsync(owner, w => w.CreateAsync("Decision", null));
+        var id = await fixture.AsAsync(owner, w => w.CreateAsync("Decision", null, "CH", "EUR"));
         var specifications = new VehicleSpecifications
         {
             Propulsion = PropulsionType.Hybrid, Drive = DrivenWheels.All,
@@ -34,7 +34,7 @@ public sealed class VehicleSpecificationsPostgresTests
         Assert.Equal(specifications, saved.Candidates.Single().Specifications);
         await fixture.AsAsync(owner, async w => { await w.EditAsync(id, saved.Version, e => e.CopyCandidate(saved.Candidates.Single().Id, "Copy")); return true; });
         var bytes = await fixture.TransferAsync(owner, t => t.ExportAsync(id));
-        Assert.Equal(7, JsonNode.Parse(bytes)!["version"]!.GetValue<int>());
+        Assert.Equal(8, JsonNode.Parse(bytes)!["version"]!.GetValue<int>());
         var copyId = await fixture.TransferAsync(owner, t => t.ImportAsync(bytes));
         var imported = await fixture.AsAsync(owner, w => w.ReadAsync(copyId));
         Assert.All(imported.Candidates, candidate => Assert.Equal(specifications, candidate.Specifications));
@@ -42,7 +42,7 @@ public sealed class VehicleSpecificationsPostgresTests
         Assert.All(imported.Candidates, candidate => Assert.Equal(500, candidate.Specifications.GetPayloadKg()));
         Assert.Empty(imported.Assessments);
         var legacy = JsonNode.Parse(bytes)!; legacy.AsObject().Remove("calculationSettings"); legacy.AsObject().Remove("scenarios");
-        legacy["version"] = 2;
+        legacy["version"] = 2; legacy.AsObject().Remove("country");
         foreach (var property in new[] { "currency", "offers", "offerAssessments", "costPlanning", "costs" }) legacy.AsObject().Remove(property);
         foreach (var candidate in legacy["candidates"]!.AsArray()) candidate!.AsObject().Remove("specifications");
         var legacyId = await fixture.TransferAsync(owner, t => t.ImportAsync(Encoding.UTF8.GetBytes(legacy.ToJsonString())));
@@ -57,7 +57,7 @@ public sealed class VehicleSpecificationsPostgresTests
     {
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync();
-        var id = await fixture.AsAsync(owner, w => w.CreateAsync("Existing decision", null));
+        var id = await fixture.AsAsync(owner, w => w.CreateAsync("Existing decision", null, "CH", "EUR"));
         Guid candidateId = default, criterionId = default;
         await fixture.AsAsync(owner, async w => { await w.EditAsync(id, 1, e => {
             candidateId = e.AddCandidate(new("Existing vehicle", Notes: "Keep this note"));

@@ -372,7 +372,7 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="OfferForCandidate" xml:space="preserve"><value>Offerten für dieses Auto</value></data>
   <data name="OfferCandidate" xml:space="preserve"><value>Auto</value></data>
   <data name="OfferCurrency" xml:space="preserve"><value>Währung der Evaluation</value></data>
-  <data name="OfferCurrencyHelp" xml:space="preserve"><value>Drei Buchstaben, z. B. CHF oder EUR. Diese Währung gilt für alle Offerten der Evaluation und bleibt nach der ersten Erfassung fest.</value></data>
+  <data name="OfferCurrencyHelp" xml:space="preserve"><value>Die Währung wird in den Evaluationseigenschaften festgelegt.</value></data>
   <data name="CurrencyRequired" xml:space="preserve"><value>Bitte gib ein Währungskürzel mit drei Buchstaben an.</value></data>
   <data name="CurrencyFixed" xml:space="preserve"><value>Die Währung dieser Evaluation ist bereits festgelegt. Vorhandene Beträge werden nicht in eine andere Währung umgedeutet.</value></data>
   <data name="OfferKind" xml:space="preserve"><value>Beschaffungsform</value></data>
@@ -587,7 +587,7 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="InvalidCost" xml:space="preserve"><value>Bitte prüfe Betrag, Zahlungsrhythmus und Zeitraum. Beträge haben höchstens zwei Nachkommastellen; der letzte Monat darf nicht vor dem ersten liegen.</value></data>
   <data name="InvalidCostPlanning" xml:space="preserve"><value>Wähle einen gültigen Startmonat und eine Dauer zwischen 1 und 1’200 Monaten.</value></data>
   <data name="CostPlanningRequired" xml:space="preserve"><value>Für diese Evaluation ist noch kein Planungszeitraum festgelegt.</value></data>
-  <data name="CostCurrencyRequired" xml:space="preserve"><value>Die gemeinsame Währung wird bei der ersten Offerte festgelegt. Erfasse zuerst eine Offerte, bevor du Kostenpositionen hinzufügst.</value></data>
+  <data name="CostCurrencyRequired" xml:space="preserve"><value>Bitte lege zuerst die Währung in den Evaluationseigenschaften fest.</value></data>
   <data name="TooManyCosts" xml:space="preserve"><value>Eine Evaluation kann höchstens 1’000 Kostenpositionen enthalten.</value></data>
   <data name="CostRemove" xml:space="preserve"><value>Kostenposition löschen</value></data>
   <data name="Calculations" xml:space="preserve"><value>Kostenvergleich</value></data>
@@ -846,4 +846,14 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="ScenarioSummaryOpen" xml:space="preserve"><value>Ergebnis noch offen</value></data>
   <data name="CostFullComparison" xml:space="preserve"><value>Gesamtkosten vergleichen</value></data>
   <data name="ScenarioSetupLink" xml:space="preserve"><value>Zusatzkosten und Zeitraum bearbeiten</value></data>
+  <data name="EvaluationCountry" xml:space="preserve"><value>Land</value></data>
+  <data name="EvaluationCurrency" xml:space="preserve"><value>Währung</value></data>
+  <data name="SelectCountry" xml:space="preserve"><value>Land auswählen</value></data>
+  <data name="CountryRequired" xml:space="preserve"><value>Bitte wähle ein gültiges Land für die Evaluation.</value></data>
+  <data name="EvaluationCountryHelp" xml:space="preserve"><value>Das Land, für das du das Auto evaluierst. Es bestimmt den Markt für länderspezifische Funktionen.</value></data>
+  <data name="EvaluationCurrencyHelp" xml:space="preserve"><value>Drei Buchstaben, z. B. CHF oder EUR. Gilt für alle Beträge. Änderbar, solange keine Offerten, Kostenpositionen oder Szenarien erfasst sind.</value></data>
+  <data name="EvaluationCurrencyLocked" xml:space="preserve"><value>Die Währung ist durch bestehende Offerten, Kostenpositionen oder Szenarien festgelegt. Beträge werden nicht umgerechnet.</value></data>
+  <data name="RegionalSettingsMissing" xml:space="preserve"><value>Bitte ergänze Land und Währung in den Evaluationseigenschaften. Bestehende Angaben und Beträge bleiben erhalten.</value></data>
+  <data name="CompleteRegionalSettings" xml:space="preserve"><value>Evaluationseigenschaften ergänzen</value></data>
+  <data name="RegionalSettingsReaderHelp" xml:space="preserve"><value>Ein Besitzer oder Bearbeiter kann die fehlenden Angaben ergänzen.</value></data>
 </root>

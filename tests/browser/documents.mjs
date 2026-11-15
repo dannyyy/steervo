@@ -10,6 +10,8 @@ export async function checkDocuments({ page, reader, readerEmail, origin, output
   await page.locator('[data-dialog-open="new-evaluation"]').first().click();
   const creation = page.getByRole('dialog', { name: 'Neue Evaluation', exact: true });
   await creation.getByLabel('Name der Evaluation').fill('Dokumentenprüfung');
+  await page.locator('#new-region-country').selectOption('CH');
+  await page.locator('#new-region-currency').fill('EUR');
   await creation.getByRole('button', { name: 'Evaluation anlegen', exact: false }).click();
   await page.waitForURL(/\/evaluations\//);
   const casePath = new URL(page.url()).pathname;
@@ -22,7 +24,7 @@ export async function checkDocuments({ page, reader, readerEmail, origin, output
   assert.equal((await post(page, `${casePath}/candidates`, { action: 'add-candidate', 'Input.Model': 'Dokumentenauto', version })).status(), 0);
   await page.goto(`${origin}${casePath}/offers/edit`);
   await page.locator('#offer-candidate').selectOption(await page.locator('#offer-candidate option').nth(1).getAttribute('value'));
-  await page.locator('#offer-currency').fill('EUR');
+  assert.equal(await page.locator('#offer-currency').inputValue(), 'EUR');
   await page.locator('#offer-Name').fill('Dokumentenofferte');
   await page.getByRole('button', { name: /Offerte anlegen/ }).click();
   await page.locator('#offer-workspace').waitFor();

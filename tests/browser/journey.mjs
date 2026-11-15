@@ -178,6 +178,8 @@ try {
   assert.equal(await firstEvaluation.evaluate(button => button === document.activeElement), true);
   await firstEvaluation.click();
   await creation.getByLabel('Name der Evaluation').fill('   ');
+  await page.locator('#new-region-country').selectOption('CH');
+  await page.locator('#new-region-currency').fill('EUR');
   await creation.getByLabel('Worum geht es?').fill('Ein unabhängiger Browser-Test.');
   await creation.getByRole('button', { name: 'Evaluation anlegen', exact: false }).click();
   await creation.locator('.validation-summary-errors').waitFor();
@@ -196,6 +198,8 @@ try {
   assert.equal(await creation.getByLabel('Worum geht es?').inputValue(), 'Ein unabhängiger Browser-Test.');
   await page.setViewportSize({ width: 1440, height: 1050 });
   await page.getByLabel('Name der Evaluation').fill('Meine Testentscheidung');
+  await page.locator('#new-region-country').selectOption('CH');
+  await page.locator('#new-region-currency').fill('EUR');
   await page.getByLabel('Worum geht es?').fill('Ein unabhängiger Browser-Test.');
   await creation.getByRole('button', { name: 'Evaluation anlegen' }).click();
   await page.waitForURL(/\/evaluations\//);

@@ -21,7 +21,7 @@ public sealed class DocumentPostgresTests
 {
     private static async Task<(string Owner, Guid Evaluation, Guid Offer)> SetupAsync(PostgresFixture fixture)
     {
-        var owner = await fixture.SetupAsync(); var id = await fixture.AsAsync(owner, w => w.CreateAsync("Decision", null)); var offer = Guid.Empty;
+        var owner = await fixture.SetupAsync(); var id = await fixture.AsAsync(owner, w => w.CreateAsync("Decision", null, "CH", "EUR")); var offer = Guid.Empty;
         await fixture.AsAsync(owner, async w => { await w.EditAsync(id, 1, e => offer = e.AddOffer(e.AddCandidate(new("Vehicle")), new() { Name = "Offer" }, [], "EUR")); return true; });
         return (owner, id, offer);
     }
@@ -54,7 +54,7 @@ public sealed class DocumentPostgresTests
         await Assert.ThrowsAsync<RuleException>(() => UploadAsync(fixture, editor, id, 6, offer, document: doc.Id));
         await fixture.AsAsync(owner, async w => { await w.RevokeAsync(id, 7, reader); return true; });
         await Assert.ThrowsAsync<RuleException>(() => DownloadAsync(fixture, reader, id, doc.Id, 1));
-        var foreign = await fixture.AsAsync(owner, w => w.CreateAsync("Other", null));
+        var foreign = await fixture.AsAsync(owner, w => w.CreateAsync("Other", null, "CH", "EUR"));
         await Assert.ThrowsAsync<RuleException>(() => DownloadAsync(fixture, owner, foreign, doc.Id, 1));
         var content = doc.Revisions.Select(r => r.File).ToArray();
         await fixture.AsAsync(owner, async w => { await w.DeleteAsync(id, 8); return true; });
@@ -76,6 +76,7 @@ public sealed class DocumentPostgresTests
         await using var archive = export.Content; Assert.Equal("application/zip", export.ContentType);
         var copyId = await fixture.ArchiveAsync(owner, a => a.ImportAsync(archive));
         var copy = await fixture.AsAsync(owner, w => w.ReadAsync(copyId)); var copied = copy.Documents.Single();
+        Assert.Equal("CH", copy.Country); Assert.Equal("EUR", copy.Currency);
         Assert.Equal(2, copied.Revisions.Count); Assert.NotEqual(doc.Id, copied.Id); Assert.NotEqual(doc.Latest.File.ContentId, copied.Revisions[0].File.ContentId);
         Assert.Empty(copy.Shares); Assert.Equal("first", await DownloadAsync(fixture, owner, copyId, copied.Id, 1));
         await fixture.AsAsync(owner, async w => { await w.DeleteAsync(id, 4); return true; });
@@ -135,8 +136,8 @@ public sealed class DocumentPostgresTests
         evaluation.ReviseOffer(offerId, new() { Name = "Completed offer", BasePrice = 23000 }, [], "Updated");
         await fixture.RunAsync(async p => {
             var db = p.GetRequiredService<AppDbContext>();
-            await db.GetService<IMigrator>().MigrateAsync("20261110184627_OffersAndRevisions");
-            db.Evaluations.Add(evaluation); await db.SaveChangesAsync();
+
+            db.Evaluations.Add(evaluation); await db.SaveChangesAsync(); await db.GetService<IMigrator>().MigrateAsync("20261110184627_OffersAndRevisions");
             await db.Database.MigrateAsync(); return true;
         });
         var saved = await fixture.AsAsync(owner, w => w.ReadAsync(evaluation.Id));

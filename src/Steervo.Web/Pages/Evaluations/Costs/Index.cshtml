@@ -13,7 +13,7 @@
 else { <p class="muted">@T["CostPlanningRequired"]</p> }</div>
 @if (edit) { <button type="button" id="open-cost-plan" class="button secondary" data-editor-open="cost-plan-editor" aria-controls="cost-plan-editor" aria-expanded="@((plan is null || Model.FailedAction == "plan").ToString().ToLowerInvariant())">@T[plan is null ? "CostPlanSetup" : "CostPlanChange"]</button> }</div>
 @if (edit) { <partial name="_PlanEditor" model="Model" /> }
-@if (e.Currency is null) { <p class="notice">@T["CostCurrencyRequired"] <a asp-page="/Evaluations/Offers/Index" asp-route-id="@e.Id">@T["Offers"] →</a></p> }
+@if (e.Currency is null) { <p class="notice">@T["CostCurrencyRequired"] @if (edit) { <a asp-page="/Evaluations/Details" asp-route-id="@e.Id" asp-route-section="settings">@T["CaseSettings"] →</a> }</p> }
 @if (plan is not null && e.Currency is not null && Model.Projection is { } projection)
 {
 <nav class="cost-scopes" aria-label="@T["CostScope"]">

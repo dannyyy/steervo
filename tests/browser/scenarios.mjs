@@ -10,6 +10,8 @@ export async function checkScenarios({ page, reader, readerEmail, origin, output
   await page.locator('[data-dialog-open="new-evaluation"]').first().click();
   const creation = page.getByRole('dialog', { name: 'Neue Evaluation', exact: true });
   await creation.getByLabel('Name der Evaluation').fill('Szenarienprüfung');
+  await page.locator('#new-region-country').selectOption('CH');
+  await page.locator('#new-region-currency').fill('EUR');
   await creation.getByRole('button', { name: 'Evaluation anlegen', exact: false }).click(); await page.waitForURL(/\/evaluations\//);
   const casePath = new URL(page.url()).pathname; const path = `${casePath}/scenarios`;
   async function version() { await page.goto(`${origin}${casePath}`); return page.locator('#evaluation-workspace').getAttribute('data-version'); }
@@ -17,7 +19,7 @@ export async function checkScenarios({ page, reader, readerEmail, origin, output
   let v = await version();
   assert.equal((await post(page, `${casePath}/candidates`, { action: 'add-candidate', 'Input.Model': 'Rechenauto', version: v })).status(), 0);
   const car = (await exportCase()).candidates[0].id;
-  await page.goto(`${origin}${casePath}/offers/edit?candidateId=${car}`); await page.locator('#offer-currency').fill('EUR');
+  await page.goto(`${origin}${casePath}/offers/edit?candidateId=${car}`); assert.equal(await page.locator('#offer-currency').inputValue(), 'EUR');
   await page.locator('#offer-Name').fill('Rechenofferte'); await page.getByRole('button', { name: /Offerte anlegen/ }).click(); await page.locator('#offer-workspace').waitFor();
   const offer = (await exportCase()).offers[0].id;
   await page.goto(`${origin}${casePath}/costs`); await page.getByLabel('Beginn der Planung').fill('2027-10'); await page.getByLabel('Dauer in Monaten').fill('12');
@@ -100,7 +102,7 @@ export async function checkScenarios({ page, reader, readerEmail, origin, output
   const copiedScenario = new URL(page.url()).pathname.split('/').at(-1); assert.equal(Number(await amount()), 820);
   await page.goto(`${origin}${path}/${copiedScenario}?costId=${cost}`); await page.getByLabel('Abweichender Betrag je Zahlung (EUR)').fill('5'); await save(() => page.getByRole('button', { name: 'Kostenanpassung speichern' }).click()); await page.locator('#scenario-detail').waitFor(); assert.equal(Number(await amount()), 850);
   await page.goto(`${origin}${path}/${lease}`); assert.equal(Number(await amount()), 820);
-  const json = await exportCase(); assert.equal(json.version, 7); assert.equal(json.scenarios.length, 5);
+  const json = await exportCase(); assert.equal(json.version, 8); assert.equal(json.scenarios.length, 5);
   await page.goto(origin); await page.getByRole('button', { name: 'Evaluation importieren', exact: true }).click();
   await page.getByLabel('Exportdatei (JSON oder ZIP)').setInputFiles({ name: 'scenarios.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(json)) }); await page.getByRole('button', { name: 'Als neue Evaluation importieren', exact: true }).click(); await page.waitForURL(/\/evaluations\//);
   const importedPath = new URL(page.url()).pathname; const imported = JSON.parse(await (await browserRequest(page, `${importedPath}?handler=Export`)).text()); assert.equal(imported.scenarios.length, 5);

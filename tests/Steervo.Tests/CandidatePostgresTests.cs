@@ -22,7 +22,7 @@ public sealed class CandidatePostgresTests
         var owner = await fixture.SetupAsync();
         var reader = await fixture.InviteAsync(owner, "reader@example.test");
         var editor = await fixture.InviteAsync(owner, "editor@example.test");
-        var caseId = await fixture.AsAsync(owner, w => w.CreateAsync("Decision", null));
+        var caseId = await fixture.AsAsync(owner, w => w.CreateAsync("Decision", null, "CH", "EUR"));
         Guid candidate = default, criterion = default;
         await fixture.AsAsync(owner, async w => { await w.EditAsync(caseId, 1, e => {
             candidate = e.AddCandidate(new("Example model"));
@@ -77,7 +77,7 @@ public sealed class CandidatePostgresTests
     {
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync();
-        var id = await fixture.AsAsync(owner, w => w.CreateAsync("Decision", null));
+        var id = await fixture.AsAsync(owner, w => w.CreateAsync("Decision", null, "CH", "EUR"));
         await fixture.AsAsync(owner, async w => { await w.EditAsync(id, 1, e => {
             var group = e.AddGroup("Group");
             var criterion = e.AddCriterion(new("Impression", CriterionType.Rating, Priority.Required, CriterionScope.Vehicle, group));

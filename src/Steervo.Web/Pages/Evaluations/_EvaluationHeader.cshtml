@@ -15,6 +15,7 @@
         <a asp-page="/Index" asp-fragment="import-evaluation">@T["ImportEvaluation"]</a>
     </div></details></div></div>
 </div>
+<partial name="/Pages/Evaluations/_RegionalSettingsNotice.cshtml" model="Model" />
 <nav class="section-nav workflow-nav" aria-label="@T["EvaluationNavigation"]">
     <a asp-page="/Evaluations/Details" asp-route-id="@e.Id" class="@(group == "setup" ? "active" : null)" aria-current="@(group == "setup" ? "true" : null)"><partial name="/Pages/Shared/_Icon.cshtml" model='"list"' />@T["WorkflowSetup"]</a>
     <a href="@candidatesUrl" class="@(group == "workspace" ? "active" : null)" aria-current="@(group == "workspace" ? "true" : null)"><partial name="/Pages/Shared/_Icon.cshtml" model='"car"' />@T["WorkflowWorkspace"]</a>

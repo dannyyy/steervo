@@ -1,0 +1,10 @@
+@model Steervo.Web.Pages.Evaluations.EvaluationHeader
+@if (!Model.Evaluation.HasRegionalSettings)
+{
+    <div class="notice" data-regional-settings-notice>
+        <p>@T["RegionalSettingsMissing"]</p>
+        @if (Model.Access >= AccessLevel.Editor)
+        { <a asp-page="/Evaluations/Details" asp-route-id="@Model.Evaluation.Id" asp-route-section="settings">@T["CompleteRegionalSettings"]</a> }
+        else { <p>@T["RegionalSettingsReaderHelp"]</p> }
+    </div>
+}

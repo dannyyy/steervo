@@ -62,7 +62,7 @@ public sealed class ScenarioPostgresTests
         e.SetCostAdjustment(scenario, new(e.Costs.Single().Id, 0, 1, 4, "Included period"));
         var copyScenario = e.CopyScenario(scenario, "Unknown price"); e.EditScenario(copyScenario, e.FindScenario(copyScenario).ToInput() with { Terms = Terms with { PurchasePrice = null } });
         await f.RunAsync(async p => { await p.GetRequiredService<IEvaluationStore>().CreateAsync(e); return true; });
-        var bytes = await f.TransferAsync(owner, t => t.ExportAsync(e.Id)); Assert.Equal(7, JsonNode.Parse(bytes)!["version"]!.GetValue<int>());
+        var bytes = await f.TransferAsync(owner, t => t.ExportAsync(e.Id)); Assert.Equal(8, JsonNode.Parse(bytes)!["version"]!.GetValue<int>());
         var copied = await f.TransferAsync(owner, t => t.ImportAsync(bytes)); var imported = await f.AsAsync(owner, w => w.ReadAsync(copied));
         Assert.Equal(3.25m, imported.CalculationSettings!.AnnualReturnPercent); Assert.Equal(2, imported.Scenarios.Count); Assert.Empty(imported.Shares);
         foreach (var item in imported.Scenarios)
@@ -86,7 +86,7 @@ public sealed class ScenarioPostgresTests
             }
             await Assert.ThrowsAsync<RuleException>(() => f.TransferAsync(owner, t => t.ImportAsync(Encoding.UTF8.GetBytes(json.ToJsonString()))));
         }
-        var legacy = JsonNode.Parse(bytes)!; legacy["version"] = 5; legacy.AsObject().Remove("calculationSettings"); legacy.AsObject().Remove("scenarios");
+        var legacy = JsonNode.Parse(bytes)!; legacy["version"] = 5; legacy.AsObject().Remove("country"); legacy.AsObject().Remove("calculationSettings"); legacy.AsObject().Remove("scenarios");
         var legacyId = await f.TransferAsync(owner, t => t.ImportAsync(Encoding.UTF8.GetBytes(legacy.ToJsonString())));
         var old = await f.AsAsync(owner, w => w.ReadAsync(legacyId)); Assert.Empty(old.Scenarios); Assert.Null(old.CalculationSettings); Assert.Single(old.Costs);
     }
@@ -94,7 +94,7 @@ public sealed class ScenarioPostgresTests
     public async Task Upgrade_preserves_existing_costs_and_database_rejects_invalid_bands(int port)
     {
         await using var f = await PostgresFixture.CreateAsync(port); var owner = await f.SetupAsync(); var e = Seed(owner);
-        await f.RunAsync(async p => { var db = p.GetRequiredService<AppDbContext>(); await db.GetService<IMigrator>().MigrateAsync("20261110195608_CostPlanning"); db.Evaluations.Add(e); await db.SaveChangesAsync(); await db.Database.MigrateAsync(); return true; });
+        await f.RunAsync(async p => { var db = p.GetRequiredService<AppDbContext>();  db.Evaluations.Add(e); await db.SaveChangesAsync(); await db.GetService<IMigrator>().MigrateAsync("20261110195608_CostPlanning"); await db.Database.MigrateAsync(); return true; });
         var saved = await f.AsAsync(owner, w => w.ReadAsync(e.Id)); Assert.Empty(saved.Scenarios); Assert.Null(saved.CalculationSettings); Assert.Equal(20, saved.Costs.Single().Amount);
         Guid scenario = default;
         await f.AsAsync(owner, async w => { await w.EditAsync(e.Id, 1, x => { scenario = x.AddScenario(new("Cash", x.Offers.Single().Id, 1, Terms)); x.SetResidual(scenario, new(12, 500, 600, 700)); }); return true; });

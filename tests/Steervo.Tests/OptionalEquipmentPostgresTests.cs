@@ -19,7 +19,7 @@ public sealed class OptionalEquipmentPostgresTests
     {
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync();
-        var id = await fixture.AsAsync(owner, w => w.CreateAsync("Existing answers", null));
+        var id = await fixture.AsAsync(owner, w => w.CreateAsync("Existing answers", null, "CH", "EUR"));
         await fixture.AsAsync(owner, async w => { await w.EditAsync(id, 1, e => {
             var candidate = e.AddCandidate(new("Vehicle"));
             var offer = e.AddOffer(candidate, new() { Name = "Offer" }, [], "EUR");
@@ -57,7 +57,7 @@ public sealed class OptionalEquipmentPostgresTests
     {
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync();
-        var id = await fixture.AsAsync(owner, w => w.CreateAsync("Optional equipment", null));
+        var id = await fixture.AsAsync(owner, w => w.CreateAsync("Optional equipment", null, "CH", "EUR"));
         Guid offerId = default;
         await fixture.AsAsync(owner, async w => { await w.EditAsync(id, 1, e => {
             var candidate = e.AddCandidate(new("Vehicle"));
@@ -69,14 +69,14 @@ public sealed class OptionalEquipmentPostgresTests
         }); return true; });
         var bytes = await fixture.TransferAsync(owner, t => t.ExportAsync(id));
         var json = JsonNode.Parse(bytes)!;
-        Assert.Equal(7, json["version"]!.GetValue<int>());
+        Assert.Equal(8, json["version"]!.GetValue<int>());
         var copyId = await fixture.TransferAsync(owner, t => t.ImportAsync(bytes));
         var copy = await fixture.AsAsync(owner, w => w.ReadAsync(copyId));
         AssertOptional(copy);
         Assert.NotEqual(offerId, copy.Offers.Single().Id);
 
         // Old formats cannot label a newly introduced optional answer as an old boolean.
-        json["version"] = 6;
+        json["version"] = 6; json.AsObject().Remove("country");
         await Assert.ThrowsAsync<RuleException>(() => fixture.TransferAsync(owner, t => t.ImportAsync(Encoding.UTF8.GetBytes(json.ToJsonString()))));
         json["assessments"]![0]!.AsObject().Remove("optionalAvailable");
         json["offerAssessments"]![0]!.AsObject().Remove("optionalAvailable");

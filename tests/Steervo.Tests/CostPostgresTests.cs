@@ -22,7 +22,7 @@ public sealed class CostPostgresTests
     {
         await using var f = await PostgresFixture.CreateAsync(port); var owner = await f.SetupAsync();
         var reader = await f.InviteAsync(owner, "reader@example.test"); var editor = await f.InviteAsync(owner, "editor@example.test");
-        var id = await f.AsAsync(owner, w => w.CreateAsync("Planning", null)); Guid car = default;
+        var id = await f.AsAsync(owner, w => w.CreateAsync("Planning", null, "CH", "EUR")); Guid car = default;
         await f.AsAsync(owner, async w => { await w.EditAsync(id, 1, e => { car = e.AddCandidate(new("Vehicle")); e.AddOffer(car, new() { Name = "Offer" }, [], "EUR"); }); return true; });
         await f.AsAsync(owner, async w => { await w.ShareAsync(id, 2, "reader@example.test", AccessLevel.Reader); await w.ShareAsync(id, 3, "editor@example.test", AccessLevel.Editor); return true; });
         await Assert.ThrowsAsync<RuleException>(() => f.AsAsync(reader, async w => { await new CostWorkspace(w).PlanAsync(id, 4, new(2027, 1, 1), 24); return true; }));
@@ -45,7 +45,7 @@ public sealed class CostPostgresTests
     public async Task Transfer_preserves_unknown_included_timing_and_independent_candidate_costs(int port)
     {
         await using var f = await PostgresFixture.CreateAsync(port); var owner = await f.SetupAsync();
-        var id = await f.AsAsync(owner, w => w.CreateAsync("Planning", null));
+        var id = await f.AsAsync(owner, w => w.CreateAsync("Planning", null, "CH", "EUR"));
         await f.AsAsync(owner, async w => { await w.EditAsync(id, 1, e => {
             var car = e.AddCandidate(new("Vehicle")); e.SetCurrency("EUR"); e.SetCostPlanning(new(2027, 10, 1), 18);
             e.AddCost(new("Shared", CostCategory.Parking, CostFrequency.Monthly, 25));
@@ -53,7 +53,7 @@ public sealed class CostPostgresTests
             e.AddCost(new("Included", CostCategory.Service, CostFrequency.Included, null, 1, 12, car));
             e.AddCost(new("Credit", CostCategory.Other, CostFrequency.Once, 80, 3, CandidateId: car, Direction: CostDirection.Income));
         }); return true; });
-        var bytes = await f.TransferAsync(owner, t => t.ExportAsync(id)); Assert.Equal(7, JsonNode.Parse(bytes)!["version"]!.GetValue<int>());
+        var bytes = await f.TransferAsync(owner, t => t.ExportAsync(id)); Assert.Equal(8, JsonNode.Parse(bytes)!["version"]!.GetValue<int>());
         var copyId = await f.TransferAsync(owner, t => t.ImportAsync(bytes)); var copy = await f.AsAsync(owner, w => w.ReadAsync(copyId));
         var original = await f.AsAsync(owner, w => w.ReadAsync(id));
         Assert.Equal(original.CostPlanning!.Start, copy.CostPlanning!.Start); Assert.Equal(18, copy.CostPlanning.Months);
@@ -66,7 +66,7 @@ public sealed class CostPostgresTests
             var invalid = JsonNode.Parse(bytes)!; invalid["costs"]![0]!["input"]![property] = property switch { "candidateId" => JsonValue.Create(Guid.NewGuid()), "frequency" => JsonValue.Create("Hourly"), _ => JsonValue.Create(-1) };
             await Assert.ThrowsAsync<RuleException>(() => f.TransferAsync(owner, t => t.ImportAsync(Encoding.UTF8.GetBytes(invalid.ToJsonString()))));
         }
-        var legacy = JsonNode.Parse(bytes)!; legacy.AsObject().Remove("calculationSettings"); legacy.AsObject().Remove("scenarios"); legacy["version"] = 4; legacy.AsObject().Remove("costPlanning"); legacy.AsObject().Remove("costs");
+        var legacy = JsonNode.Parse(bytes)!; legacy.AsObject().Remove("calculationSettings"); legacy.AsObject().Remove("scenarios"); legacy["version"] = 4; legacy.AsObject().Remove("country"); legacy.AsObject().Remove("costPlanning"); legacy.AsObject().Remove("costs");
         var legacyId = await f.TransferAsync(owner, t => t.ImportAsync(Encoding.UTF8.GetBytes(legacy.ToJsonString())));
         var old = await f.AsAsync(owner, w => w.ReadAsync(legacyId)); Assert.Null(old.CostPlanning); Assert.Empty(old.Costs);
     }
@@ -76,8 +76,8 @@ public sealed class CostPostgresTests
         await using var f = await PostgresFixture.CreateAsync(port); var owner = await f.SetupAsync();
         var e = new Evaluation(owner, "Existing", null); var car = e.AddCandidate(new("Existing car")); var offer = e.AddOffer(car, new() { Name = "Existing offer", BasePrice = 23456 }, [], "EUR");
         await f.RunAsync(async p => {
-            var db = p.GetRequiredService<AppDbContext>(); await db.GetService<IMigrator>().MigrateAsync("20261110191928_OfferDocuments");
-            db.Evaluations.Add(e); await db.SaveChangesAsync(); await db.Database.MigrateAsync(); return true;
+            var db = p.GetRequiredService<AppDbContext>();
+            db.Evaluations.Add(e); await db.SaveChangesAsync(); await db.GetService<IMigrator>().MigrateAsync("20261110191928_OfferDocuments"); await db.Database.MigrateAsync(); return true;
         });
         var saved = await f.AsAsync(owner, w => w.ReadAsync(e.Id)); Assert.Null(saved.CostPlanning); Assert.Empty(saved.Costs);
         Assert.Equal(23456, saved.FindOffer(offer).Latest.Terms.BasePrice); Assert.Equal("EUR", saved.Currency);

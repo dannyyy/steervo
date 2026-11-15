@@ -26,6 +26,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
         model.Entity<MailReservation>().HasKey(x => x.Id);
         model.Entity<Evaluation>(b => {
             b.HasKey(x => x.Id); b.Property(x => x.Id).ValueGeneratedNever(); b.Property(x => x.Name).HasMaxLength(160); b.Property(x => x.Purpose).HasMaxLength(2000);
+            b.Property(x => x.Country).HasMaxLength(2);
+            b.ToTable(t => t.HasCheckConstraint("ValidEvaluationCountry", "\"Country\" IS NULL OR \"Country\" ~ '^[A-Z]{2}$'"));
             b.Property(x => x.Version).IsConcurrencyToken(); b.Property(x => x.Currency).HasMaxLength(3);
             b.ToTable(t => t.HasCheckConstraint("ValidEvaluationCurrency", "\"Currency\" IS NULL OR \"Currency\" ~ '^[A-Z]{3}$'"));
             b.HasOne<AppUser>().WithMany().HasForeignKey(x => x.OwnerId).OnDelete(DeleteBehavior.Restrict);

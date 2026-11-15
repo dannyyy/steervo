@@ -9,6 +9,8 @@ export async function checkCosts({ page, reader, readerEmail, origin, output, po
   await page.locator('[data-dialog-open="new-evaluation"]').first().click();
   const creation = page.getByRole('dialog', { name: 'Neue Evaluation', exact: true });
   await creation.getByLabel('Name der Evaluation').fill('Kostenprüfung');
+  await page.locator('#new-region-country').selectOption('CH');
+  await page.locator('#new-region-currency').fill('EUR');
   await creation.getByRole('button', { name: 'Evaluation anlegen', exact: false }).click();
   await page.waitForURL(/\/evaluations\//);
   const casePath = new URL(page.url()).pathname;
@@ -20,14 +22,14 @@ export async function checkCosts({ page, reader, readerEmail, origin, output, po
   await page.getByLabel('Dauer in Monaten', { exact: true }).fill('15');
   await save(() => page.getByRole('button', { name: 'Zeitraum speichern', exact: true }).click());
   await page.locator('#cost-workspace').waitFor();
-  await page.getByText('Die gemeinsame Währung wird bei der ersten Offerte festgelegt.', { exact: false }).waitFor();
-  assert.equal(await page.getByRole('link', { name: /Kostenposition hinzufügen/ }).count(), 0);
+  assert.equal(await page.getByRole('link', { name: /Kostenposition hinzufügen/ }).count(), 1);
+  record('Evaluation currency allows cost planning before any offer exists');
   await page.goto(`${origin}${casePath}/candidates`);
   let version = await page.locator('#candidate-workspace').getAttribute('data-version');
   assert.equal((await post(page, `${casePath}/candidates`, { action: 'add-candidate', 'Input.Model': 'Planungsauto', version })).status(), 0);
   const candidateId = (await exportCase()).candidates[0].id;
   await page.goto(`${origin}${casePath}/offers/edit?candidateId=${candidateId}`);
-  await page.locator('#offer-currency').fill('EUR'); await page.locator('#offer-Name').fill('Kostenbasis');
+  assert.equal(await page.locator('#offer-currency').inputValue(), 'EUR'); await page.locator('#offer-Name').fill('Kostenbasis');
   await page.getByRole('button', { name: /Offerte anlegen/ }).click(); await page.locator('#offer-workspace').waitFor();
   async function addCost({ name, frequency = 'Monthly', amount, start = '1', end, candidate, direction = 'Expense' }) {
     await page.goto(`${origin}${costPath}`);
@@ -60,7 +62,7 @@ export async function checkCosts({ page, reader, readerEmail, origin, output, po
   assert.match(await page.locator('[data-cost-period="2"]').textContent(), /145,00/);
   assert.match(await page.locator('[data-cost-period="5"]').textContent(), /-15,00/);
   const exported = await exportCase();
-  assert.equal(exported.version, 7); assert.deepEqual(exported.costPlanning, { start: '2027-10-01', months: 15 });
+  assert.equal(exported.version, 8); assert.deepEqual(exported.costPlanning, { start: '2027-10-01', months: 15 });
   assert.equal(exported.costs.find(c => c.input.name === 'Bekannte Null').input.amount, 0);
   assert.equal(exported.costs.find(c => c.input.name === 'Offener Betrag').input.amount, null);
   assert.equal(exported.costs.find(c => c.input.name === 'Service inklusive').input.frequency, 'Included');

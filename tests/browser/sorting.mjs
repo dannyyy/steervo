@@ -6,6 +6,8 @@ export async function checkSorting({ page, owner, origin, output, post, mutate, 
   await page.goto(origin);
   await page.getByRole('button', { name: /Neue Evaluation/ }).click();
   await page.getByRole('dialog', { name: 'Neue Evaluation', exact: true }).getByLabel('Name der Evaluation').fill('Anforderungen übersichtlich ordnen');
+  await page.locator('#new-region-country').selectOption('CH');
+  await page.locator('#new-region-currency').fill('EUR');
   await page.getByRole('dialog', { name: 'Neue Evaluation', exact: true }).getByRole('button', { name: 'Evaluation anlegen' }).click();
   await page.waitForURL(/\/evaluations\//);
   const path = new URL(page.url()).pathname;

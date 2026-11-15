@@ -60,7 +60,7 @@ public sealed class PostgresTests
     {
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync(); var invited = await fixture.InviteAsync(owner, "invited@example.test");
-        var caseId = await fixture.AsAsync(owner, w => w.CreateAsync("Private decision", null));
+        var caseId = await fixture.AsAsync(owner, w => w.CreateAsync("Private decision", null, "CH", "EUR"));
         Assert.Empty(await fixture.AsAsync(invited, w => w.ListAsync()));
         await Assert.ThrowsAsync<RuleException>(() => fixture.AsAsync(invited, w => w.ReadAsync(caseId)));
         await Assert.ThrowsAsync<RuleException>(() => fixture.RunAsync(async p => { await p.GetRequiredService<IAccountAccess>().InviteAsync(invited, "third@example.test", "Third"); return true; }));
@@ -76,7 +76,7 @@ public sealed class PostgresTests
     {
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync(); var editor = await fixture.InviteAsync(owner, "editor@example.test"); var reader = await fixture.InviteAsync(owner, "reader@example.test");
-        var id = await fixture.AsAsync(editor, w => w.CreateAsync("Owned by invited user", null));
+        var id = await fixture.AsAsync(editor, w => w.CreateAsync("Owned by invited user", null, "CH", "EUR"));
         await Assert.ThrowsAsync<RuleException>(() => fixture.AsAsync(owner, w => w.ReadAsync(id)));
         await fixture.AsAsync(editor, async w => { await w.ShareAsync(id, 1, "reader@example.test", AccessLevel.Reader); return true; });
         await Assert.ThrowsAsync<RuleException>(() => fixture.AsAsync(reader, async w => { await w.EditAsync(id, 2, e => e.AddGroup("Blocked")); return true; }));
@@ -106,7 +106,7 @@ public sealed class PostgresTests
     {
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync(); var invited = await fixture.InviteAsync(owner, "reader@example.test");
-        var id = await fixture.AsAsync(owner, w => w.CreateAsync("Export test", "User-entered purpose"));
+        var id = await fixture.AsAsync(owner, w => w.CreateAsync("Export test", "User-entered purpose", "CH", "EUR"));
         await fixture.AsAsync(owner, async w => { await w.EditAsync(id, 1, e => { var group = e.AddGroup("Group"); e.AddCriterion(new("Measurement", CriterionType.Measurement, Priority.Required, CriterionScope.Vehicle, group, 12.5m, "units")); }); return true; });
         await Assert.ThrowsAsync<RuleException>(() => fixture.TransferAsync(invited, t => t.ExportAsync(id)));
         await fixture.AsAsync(owner, async w => { await w.ShareAsync(id, 2, "reader@example.test", AccessLevel.Reader); return true; });
