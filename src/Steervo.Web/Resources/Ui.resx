@@ -856,4 +856,7 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="RegionalSettingsMissing" xml:space="preserve"><value>Bitte ergänze Land und Währung in den Evaluationseigenschaften. Bestehende Angaben und Beträge bleiben erhalten.</value></data>
   <data name="CompleteRegionalSettings" xml:space="preserve"><value>Evaluationseigenschaften ergänzen</value></data>
   <data name="RegionalSettingsReaderHelp" xml:space="preserve"><value>Ein Besitzer oder Bearbeiter kann die fehlenden Angaben ergänzen.</value></data>
+  <data name="OfferAttachmentTitle" xml:space="preserve"><value>PDF anhängen</value></data>
+  <data name="OfferAttachmentFile" xml:space="preserve"><value>PDF-Datei auswählen</value></data>
+  <data name="OfferAttachmentHelp" xml:space="preserve"><value>Die PDF wird zusammen mit der Offerte gespeichert. Bis zu 25 MB. Die Angaben in diesem Formular erfasst du selbst.</value></data>
 </root>

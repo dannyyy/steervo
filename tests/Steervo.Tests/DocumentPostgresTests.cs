@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Steervo.Application.Documents;
+using Steervo.Application.Offers;
 using Steervo.Application.Evaluations;
 using Steervo.Core;
 using Steervo.Infrastructure.Data;
@@ -19,6 +20,39 @@ namespace Steervo.Tests;
 [Collection("Postgres")]
 public sealed class DocumentPostgresTests
 {
+    [Theory, InlineData(55437), InlineData(55438)]
+    public async Task Creating_and_revising_an_offer_with_attachment_is_atomic(int port)
+    {
+        await using var fixture = await PostgresFixture.CreateAsync(port);
+        var owner = await fixture.SetupAsync();
+        var id = await fixture.AsAsync(owner, w => w.CreateAsync("Attached quote", null, "CH", "CHF"));
+        Guid car = default;
+        await fixture.AsAsync(owner, async w => { await w.EditAsync(id, 1, e => car = e.AddCandidate(new("Test car"))); return true; });
+        async Task<DocumentFile> File(string name) => await fixture.RunAsync(async p => {
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes("Synthetic attachment"));
+            return await p.GetRequiredService<IDocumentStorage>().SaveAsync(stream, name);
+        });
+        var file = await File("offer.pdf");
+        await Assert.ThrowsAsync<RuleException>(() => fixture.AsAsync(owner, w => new OfferWorkspace(w).AddAsync(id, 2, car,
+            new() { Name = "Invalid attachment" }, [], "CHF", null, file with { Length = 0 })));
+        var before = await fixture.AsAsync(owner, w => w.ReadAsync(id)); Assert.Empty(before.Offers); Assert.Empty(before.Documents); Assert.Equal(2, before.Version);
+        var offer = await fixture.AsAsync(owner, w => new OfferWorkspace(w).AddAsync(id, 2, car,
+            new() { Name = "Quote" }, [], "CHF", null, file));
+        var saved = await fixture.AsAsync(owner, w => w.ReadAsync(id));
+        Assert.Single(saved.Offers); Assert.Equal(offer, saved.Documents.Single().OfferId);
+        Assert.Equal(1, saved.Documents.Single().Latest.OfferRevisionNumber);
+        Assert.Equal("Synthetic attachment", await DownloadAsync(fixture, owner, id, saved.Documents.Single().Id, 1));
+        var revision = await File("revised.pdf");
+        await Assert.ThrowsAsync<RuleException>(() => fixture.AsAsync(owner, async w => {
+            await new OfferWorkspace(w).ReviseAsync(id, 2, offer, new() { Name = "Stale" }, [], null, revision); return true;
+        }));
+        Assert.Single((await fixture.AsAsync(owner, w => w.ReadAsync(id))).Documents);
+        await fixture.AsAsync(owner, async w => { await new OfferWorkspace(w).ReviseAsync(id, 3, offer,
+            new() { Name = "Updated" }, [], null, revision); return true; });
+        saved = await fixture.AsAsync(owner, w => w.ReadAsync(id));
+        Assert.Equal(2, saved.FindOffer(offer).Latest.Number); Assert.Equal(2, saved.Documents.Count);
+        Assert.Contains(saved.Documents, d => d.Latest.OfferRevisionNumber == 2 && d.Latest.File.FileName == "revised.pdf");
+    }
     private static async Task<(string Owner, Guid Evaluation, Guid Offer)> SetupAsync(PostgresFixture fixture)
     {
         var owner = await fixture.SetupAsync(); var id = await fixture.AsAsync(owner, w => w.CreateAsync("Decision", null, "CH", "EUR")); var offer = Guid.Empty;

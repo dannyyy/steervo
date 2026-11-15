@@ -2,12 +2,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Localization;
 using Steervo.Application.Evaluations;
+using Steervo.Application.Documents;
 using Steervo.Application.Offers;
 using Steervo.Core;
 
 namespace Steervo.Web.Pages.Evaluations.Offers;
 
-public sealed class EditModel(OfferWorkspace workspace, ICurrentUser current, IStringLocalizer<Ui> text) : PageModel
+[RequestSizeLimit(DocumentFile.MaximumBytes + 1_000_000)]
+[RequestFormLimits(MultipartBodyLengthLimit = DocumentFile.MaximumBytes)]
+public sealed class EditModel(OfferWorkspace workspace, ICurrentUser current, IStringLocalizer<Ui> text, IDocumentStorage documents) : PageModel
 {
     public Evaluation Evaluation { get; private set; } = null!;
     public Offer? Offer { get; private set; }
@@ -36,16 +39,31 @@ public sealed class EditModel(OfferWorkspace workspace, ICurrentUser current, IS
         }
         catch (RuleException error) { return StatusCode(error.Message == "Forbidden" ? 403 : 404); }
     }
-    public async Task<IActionResult> OnPostAsync(Guid id, Guid? offerId)
+    public async Task<IActionResult> OnPostAsync(Guid id, Guid? offerId, IFormFile? upload)
     {
         try
         {
             await LoadAsync(id, offerId);
             if (!ModelState.IsValid) throw new RuleException("InvalidOfferTerms");
             var terms = Input.ToTerms(); var lines = Input.Lines.Select(line => line.ToInput()).ToArray();
+            if (Evaluation.Version != Version) throw new RuleException("Conflict");
+            if (Offer?.Archived == true) throw new RuleException("OfferArchived");
+            if (Offer is null) _ = Evaluation.FindCandidate(Input.CandidateId);
+            DocumentFile? attachment = null;
+            if (upload is not null) {
+                if (upload.Length == 0 || !upload.FileName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)) throw new RuleException("InvalidDocument");
+                if (upload.Length > DocumentFile.MaximumBytes) throw new RuleException("DocumentTooLarge");
+                await using (var probe = upload.OpenReadStream()) {
+                    var header = new byte[5];
+                    var count = await probe.ReadAtLeastAsync(header, header.Length, false, HttpContext.RequestAborted);
+                    if (count != header.Length || !header.AsSpan().SequenceEqual("%PDF-"u8)) throw new RuleException("InvalidDocument");
+                }
+                await using var stream = upload.OpenReadStream();
+                attachment = await documents.SaveAsync(stream, upload.FileName, HttpContext.RequestAborted);
+            }
             if (Offer is null)
-                offerId = await workspace.AddAsync(id, Version, Input.CandidateId, terms, lines, Input.Currency, Input.ChangeNote);
-            else await workspace.ReviseAsync(id, Version, Offer.Id, terms, lines, Input.ChangeNote);
+                offerId = await workspace.AddAsync(id, Version, Input.CandidateId, terms, lines, Input.Currency, Input.ChangeNote, attachment);
+            else await workspace.ReviseAsync(id, Version, Offer.Id, terms, lines, Input.ChangeNote, attachment);
             if (Request.Headers.ContainsKey("HX-Request"))
             {
                 Response.Headers["HX-Redirect"] = Url.Page("Details", new { id, offerId, first = First, second = Second });
@@ -56,7 +74,9 @@ public sealed class EditModel(OfferWorkspace workspace, ICurrentUser current, IS
         catch (RuleException error)
         {
             if (error.Message is "Forbidden" or "NotFound") return StatusCode(error.Message == "Forbidden" ? 403 : 404);
-            Notice = text[error.Message]; Response.StatusCode = error.Message == "Conflict" ? 409 : 422;
+            Notice = text[error.Message];
+            if (!Request.Headers.ContainsKey("HX-Request") && upload is not null) Notice += " " + text["DocumentReselect"];
+            Response.StatusCode = error.Message == "Conflict" ? 409 : 422;
             if (Request.Headers.ContainsKey("HX-Request")) return new JsonResult(new { error = Notice, version = Evaluation.Version,
                 reviewUrl = ReturnUrl, context = Offer is null ? Evaluation.Name : $"{Offer.Latest.Terms.Name} · {text["OfferVersion", Offer.Latest.Number]}" });
             return Page();
