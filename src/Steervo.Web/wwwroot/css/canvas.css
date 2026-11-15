@@ -72,18 +72,20 @@ h3, h4 { font-weight: 600; }
 .record-section-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
 .record-section-heading h3 { font-size: 19px; font-weight: 560; }
 .record-section-heading > span { font-size: 11px; color: var(--muted); }
-.record-assessment-group { margin-bottom: 24px; }
-.record-assessment-group > h4 { padding: 12px 0 8px; font-size: 12px; color: var(--muted); font-weight: 550; }
+.record-assessment-group { margin-bottom: 28px; }
+.record-assessment-group > h4 { padding: 14px 0 10px; font-size: 14px; color: var(--ink); font-weight: 600; }
 .vehicle-record .assessment-list { border: 0; border-radius: 0; }
 .vehicle-record .assessment-row { padding: 0; border-bottom: 1px solid var(--line); }
-.assessment-summary { display: grid; grid-template-columns: minmax(0, 1fr) minmax(110px, .6fr) auto 18px; gap: 16px; align-items: center; width: 100%; text-align: left; background: transparent; border: 0; padding: 18px 0; min-height: 83px; }
+/* A fixed status track keeps answers aligned across different fulfillment labels. */
+.assessment-summary { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(110px, 1fr) 150px 18px; gap: 16px; align-items: start; width: 100%; text-align: left; background: transparent; border: 0; padding: 18px 0; min-height: 83px; }
+.assessment-summary .fulfillment { justify-self: start; max-width: 100%; margin: 0; overflow-wrap: anywhere; }
 button.assessment-summary:hover { background: var(--row-hover); }
 button.assessment-summary[aria-expanded=true] { color: var(--accent); }
 .assessment-label, .assessment-answer { min-width: 0; }
 .assessment-label > strong { font-size: 14px; font-weight: 550; display: block; overflow-wrap: anywhere; }
 .assessment-requirement { display: block; font-size: 11px; font-weight: 400; color: var(--muted); margin-top: 5px; line-height: 1.5; overflow-wrap: anywhere; }
-.assessment-answer > strong { font-size: 18px; font-weight: 560; line-height: 1.25; display: block; overflow-wrap: anywhere; }
-.assessment-answer > span { display: block; color: var(--muted); font-size: 11px; margin-top: 5px; }
+.assessment-answer > strong { font-size: 16px; font-weight: 560; line-height: 1.4; display: block; overflow-wrap: anywhere; }
+.assessment-answer > span { display: block; color: var(--muted); font-size: 11px; margin-top: 5px; line-height: 1.5; overflow-wrap: anywhere; }
 .assessment-edit-icon { color: var(--muted); }
 .assessment-edit-icon .icon { width: 15px; height: 15px; }
 .fulfillment { padding: 4px 7px; border-radius: 6px; font-size: 11px; font-style: normal; font-weight: 400; line-height: 1.45; color: var(--muted); background: var(--neutral-surface); }
@@ -91,7 +93,7 @@ button.assessment-summary[aria-expanded=true] { color: var(--accent); }
 .fulfillment.unmet { background: var(--negative-bg); color: var(--negative); }
 .fulfillment.optional { background: var(--soft); color: var(--accent); }
 .fulfillment.unknown { background: var(--warning-bg); color: var(--warning); font-style: normal; }
-.vehicle-record .assessment-notes-text { margin: -4px 0 16px; font-size: 12px; max-width: 65ch; }
+.vehicle-record .assessment-notes-text { margin: 0 0 18px; font-size: 12px; line-height: 1.65; max-width: 72ch; }
 .record-notes > section + section { border-top: 1px solid var(--line); padding-top: 24px; margin-top: 28px; }
 .record-notes h3 { font-size: 16px; }
 .record-notes h4 { font-size: 12px; margin-top: 24px; }
@@ -191,8 +193,8 @@ body:has(dialog[open]) { overflow: hidden; }
   .vehicle-record, .comparison-surface { padding: 28px; }
   .record-body { grid-template-columns: minmax(0, 1fr) 220px; gap: 35px; }
   .vehicle-introduction h2 { font-size: 33px; }
-  .assessment-summary { gap: 10px; grid-template-columns: minmax(0, 1fr) minmax(90px, .7fr) auto 15px; }
-  .assessment-summary .fulfillment { max-width: 100px; }
+  .assessment-summary { gap: 10px; grid-template-columns: minmax(0, 1.4fr) minmax(90px, 1fr) 108px 15px; }
+  .assessment-summary .fulfillment { max-width: 108px; }
 }
 @media (max-width: 980px) {
   main { padding-inline: 24px; }
@@ -245,7 +247,7 @@ body:has(dialog[open]) { overflow: hidden; }
   .record-navigation > a { padding: 12px 0; font-size: 11px; }
   .record-section-heading h3 { font-size: 18px; }
   .record-section-heading > span { font-size: 10px; }
-  .assessment-summary { grid-template-columns: minmax(0, 1fr) minmax(95px, .7fr) 14px; gap: 6px 14px; padding: 17px 0; min-height: 91px; }
+  .assessment-summary { grid-template-columns: minmax(0, 1fr) minmax(95px, .7fr) 15px; gap: 6px 14px; padding: 17px 0; min-height: 91px; }
   .assessment-label { grid-column: 1; grid-row: 1 / 3; }
   .assessment-label > strong { font-size: 13px; }
   .assessment-requirement { font-size: 10px; }

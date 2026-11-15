@@ -289,3 +289,9 @@ Verifiziert: 123 automatisierte Tests (einschliesslich PostgreSQL 17/18 und Migr
 Die technischen Formularfelder teilen sich je Zeile die Höhen für Beschriftung, Eingabe und berechneten Hinweis. Mehrzeilige Beschriftungen verschieben dadurch keine benachbarten Eingaben; Berechnungshinweise behalten ihren eigenen Platz. Die Spalten bleiben responsiv und Zahlenwerte unverändert.
 
 Geprüft mit isoliertem Playwright im Anlage- und Bearbeitungsdialog bei 320, 390, 768, 1024 und 1440 px, einschliesslich mehrzeiliger Labels und berechneter Werte: gleiche Eingabehöhen je Zeile und kein horizontaler Überlauf.
+
+## Korrektur: Anforderungen in der Fahrzeugakte (15. November 2026)
+
+Kriterium, Angabe, Erfüllungsstatus und Bearbeiten-Symbol verwenden einheitliche Spalten. Unterschiedlich lange Statusmeldungen verschieben die Werte nicht mehr; mehrzeilige Kriterien beginnen auf gleicher Höhe wie ihre Angabe. Gruppenüberschriften sind deutlicher, Notizen erhalten einen eigenen Abstand. Auf Mobilgeräten steht der Status weiterhin unter der Angabe.
+
+Geprüft mit isoliertem Playwright bei 320, 390, 768, 1024 und 1440 px: gleiche Spaltenpositionen, lange Kriteriennamen, Ja/Nein, persönliche Bewertungen, Messwerte einschliesslich null, optionale und unbekannte Angaben sowie mehrzeilige Notizen ohne Überlauf. Tastaturöffnung, Escape, Entwurfserhalt, Speichern, Abbrechen und Rückkehr des Fokus im Inline-Editor geprüft.
