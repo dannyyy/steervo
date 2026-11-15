@@ -264,7 +264,7 @@ body:has(dialog[open]) { overflow: hidden; }
   .editor-actions .button { flex: 1; min-width: 0; }
   .side-sheet { width: 100%; padding: 27px 21px; border: 0; border-radius: 0; }
   .side-sheet .editor-actions { bottom: -27px; }
-  .side-sheet .field-pair { grid-template-columns: 1fr; }
+  .side-sheet .field-pair, .evaluation-region-fields { grid-template-columns: 1fr; }
   .side-sheet .field-pair select, .inline-editor .field-pair select { font-size: 16px; }
   .comparison-introduction h2 { font-size: 26px; }
   .comparison-surface .comparison-picker { grid-template-columns: minmax(0, 1fr); padding: 14px; gap: 14px; }

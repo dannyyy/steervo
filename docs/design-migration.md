@@ -277,3 +277,9 @@ Am Ende müssen alle folgenden Punkte nachgewiesen sein:
 Der Hauptbranch heisst `main`. Die ausgewählte Referenz und diese Dokumentation werden als eigener nachvollziehbarer Commit übernommen. Der breite Designwerkzeug-Commit `b610c56` ist dafür keine Voraussetzung. Die Prototyp-Branches und der andere Design-Worktree bleiben als Referenzen erhalten.
 
 Die Implementierung beginnt aus dem aktualisierten `main`; kurze Umsetzungsbranches dürfen jeweils ein Paket abbilden und nach Prüfung wieder in `main` einfliessen. Keine erneute Auswahlrunde für Studio oder alternative Farben starten, solange der Nutzer Canvas/Tinte nicht ändert. Kein Release oder Deployment wird durch diese Dokumentationsübergabe ausgelöst.
+
+## Folgeänderung: Land und Währung (15. November 2026)
+
+Der bestehende Erstellungsdialog und der Inline-Editor der Evaluation erfassen Land und Währung als Pflichtangaben. Alte Evaluationen erhalten einen Ergänzungshinweis; vorhandene Beträge werden nicht umgedeutet. Die beiden neuen Felder stehen auf schmalen Bildschirmen untereinander. Canvas/Tinte, Draft-Erhalt und Zugriffs-/Versionsprüfungen bleiben unverändert.
+
+Verifiziert: 123 automatisierte Tests (einschliesslich PostgreSQL 17/18 und Migration alter Daten) und 91 Playwright-Prüfungen, darunter Pflichtfelder ohne Vorbelegung, Validierungsentwürfe, Währungssperre und Ergänzen alter Importe. Die lokale Anwendung wurde zusätzlich lesend auf Desktop und Mobilgerät geprüft.
