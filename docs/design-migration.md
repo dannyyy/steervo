@@ -283,3 +283,9 @@ Die Implementierung beginnt aus dem aktualisierten `main`; kurze Umsetzungsbranc
 Der bestehende Erstellungsdialog und der Inline-Editor der Evaluation erfassen Land und Währung als Pflichtangaben. Alte Evaluationen erhalten einen Ergänzungshinweis; vorhandene Beträge werden nicht umgedeutet. Die beiden neuen Felder stehen auf schmalen Bildschirmen untereinander. Canvas/Tinte, Draft-Erhalt und Zugriffs-/Versionsprüfungen bleiben unverändert.
 
 Verifiziert: 123 automatisierte Tests (einschliesslich PostgreSQL 17/18 und Migration alter Daten) und 91 Playwright-Prüfungen, darunter Pflichtfelder ohne Vorbelegung, Validierungsentwürfe, Währungssperre und Ergänzen alter Importe. Die lokale Anwendung wurde zusätzlich lesend auf Desktop und Mobilgerät geprüft.
+
+## Korrektur: Ausrichtung technischer Eingaben (15. November 2026)
+
+Die technischen Formularfelder teilen sich je Zeile die Höhen für Beschriftung, Eingabe und berechneten Hinweis. Mehrzeilige Beschriftungen verschieben dadurch keine benachbarten Eingaben; Berechnungshinweise behalten ihren eigenen Platz. Die Spalten bleiben responsiv und Zahlenwerte unverändert.
+
+Geprüft mit isoliertem Playwright im Anlage- und Bearbeitungsdialog bei 320, 390, 768, 1024 und 1440 px, einschliesslich mehrzeiliger Labels und berechneter Werte: gleiche Eingabehöhen je Zeile und kein horizontaler Überlauf.

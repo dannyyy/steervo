@@ -94,10 +94,11 @@ html.workspace-swapping{overflow-anchor:none}
 .specification-section{border-top:1px solid var(--line);padding:.65rem 0}
 .specification-section>summary{font-weight:560;color:var(--ink);cursor:pointer}
 .specification-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:.8rem 1rem;padding-top:.6rem}
-.specification-grid label{margin:0 0 .35rem;line-height:1.4;font-size:.84rem}
+.specification-grid>div{display:grid;grid-template-rows:subgrid;grid-row:span 3;row-gap:.35rem;align-items:start}
+.specification-grid label{margin:0;line-height:1.4;font-size:.84rem;align-self:end}
 .specification-grid input,.specification-grid select{margin:0;min-width:0;width:100%}
 .field-unit{color:var(--muted);font-weight:400;font-size:.82em;white-space:nowrap}
-.specification-calculated{display:block;color:var(--accent);font-size:.76rem;margin-top:.2rem;min-height:1em}
+.specification-calculated{display:block;color:var(--accent);font-size:.76rem;min-height:1em}
 .specification-sheet{margin:0 0 1.5rem;border:1px solid var(--line);border-radius:14px;padding:1rem 1.2rem;background:#fff}
 .specification-sheet>summary{font-size:1.05rem;font-weight:600;cursor:pointer}
 .specification-overview{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,285px),1fr));gap:.8rem 1.6rem}
