@@ -194,6 +194,38 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   const monthly = page.locator('[data-offer-comparison-field="MonthlyPayment"]');
   assert.equal((await monthly.locator(`[data-offer-cell="${firstId}"]`).textContent()).trim(), '610,00');
   assert.equal((await monthly.locator(`[data-offer-cell="${secondId}"]`).textContent()).trim(), '625,00');
+
+  // Offers are marked in the overview and compared side by side; the comparison adds and removes offers.
+  const offerColumns = () => page.locator('[data-offer-column]').evaluateAll(cells => cells.map(cell => cell.dataset.offerColumn));
+  assert.deepEqual(await offerColumns(), [firstId, secondId]);
+  assert.equal(await page.locator('.comparison-picker, .comparison-introduction').count(), 0);
+  await page.goto(`${origin}${casePath}/offers`);
+  assert.equal(await page.locator('.offer-card-actions').count(), 0);
+  assert.equal((await page.locator('#compare-selected').innerText()).trim(), 'Vergleichen (0/5)');
+  const firstOfferCard = page.locator(`[data-offer-id="${firstId}"]`);
+  assert.ok(await firstOfferCard.locator('.fulfillment-counts > li').count() > 0);
+  const offerChip = firstOfferCard.locator('.summary-chip').first();
+  await offerChip.hover();
+  assert.equal(await firstOfferCard.locator('.summary-popover').first().isVisible(), true);
+  assert.equal(await firstOfferCard.locator('.summary-popover').first().locator('ol li').count(), Number((await offerChip.innerText()).match(/\d+/)[0]));
+  await page.mouse.move(5, 5);
+  await page.locator(`#compare-${secondId}`).check(); await page.locator(`#compare-${firstId}`).check();
+  assert.equal((await page.locator('#compare-selected').innerText()).trim(), 'Vergleichen (2/5)');
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.screenshot({ path: join(output, '16-offer-overview.png'), fullPage: true });
+  await page.locator('#compare-selected').click();
+  await page.waitForURL(/\/offers\/compare\?/);
+  assert.deepEqual((await offerColumns()).sort(), [firstId, secondId].sort());
+  await page.locator(`[data-offer-column="${secondId}"] .comparison-remove`).click();
+  assert.deepEqual(await offerColumns(), [firstId]);
+  assert.equal(await page.locator('.comparison-remove').count(), 0);
+  await page.locator('#compare-add').selectOption(secondId); await page.locator('#compare-add-submit').click();
+  assert.deepEqual(await offerColumns(), [firstId, secondId]);
+  await page.goto(`${origin}${casePath}/offers/compare?first=${firstId}&second=${firstId}&more=${firstId}&more=00000000-0000-0000-0000-000000000001`);
+  assert.deepEqual(await offerColumns(), [firstId]);
+  assert.equal((await browserRequest(page, `${casePath}/offers/compare?first=00000000-0000-0000-0000-000000000001`)).status(), 404);
+  record('Offers are selected in the overview, summarised by state, and added to or removed from the comparison');
+  await page.goto(`${origin}${casePath}/offers/compare?first=${firstId}&second=${secondId}`);
   await page.screenshot({ path: join(output, '16-offer-comparison-desktop.png'), fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
@@ -207,8 +239,7 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   await page.locator('#save-offer').click();
   await page.locator('#offer-workspace[data-revision="2"]').waitFor();
   await page.getByRole('link', { name: 'Offerten vergleichen', exact: true }).click();
-  assert.equal(await page.locator('#offer-compare-first').inputValue(), firstId);
-  assert.equal(await page.locator('#offer-compare-second').inputValue(), secondId);
+  assert.deepEqual(await offerColumns(), [firstId, secondId]);
   await page.waitForFunction(() => document.querySelector('#offer-comparison-scroll').scrollLeft > 50);
   assert.equal(await page.locator('.vehicle-table thead th').first().evaluate(el => getComputedStyle(el).position), 'sticky');
   await page.locator(`[data-offer-column="${secondId}"] .comparison-candidate-link`).click();

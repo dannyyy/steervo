@@ -20,27 +20,13 @@ else
         var vehicleCriteria = e.Criteria.Where(x => x.Scope == CriterionScope.Vehicle).OrderBy(x => x.Position).ToList();
         var results = vehicleCriteria.Select(x => (Criterion: x, Result: e.ResultFor(c.Id, x.Id))).ToList();
         var failures = results.Where(x => x.Criterion.Priority == Priority.Required && x.Result == Fulfillment.Unmet).Select(x => x.Criterion.Name).ToList();
-        var counts = new[] { Fulfillment.Met, Fulfillment.Unmet, Fulfillment.Optional, Fulfillment.Unknown, Fulfillment.Rated }.Select(state => (State: state, Count: results.Count(x => x.Result == state))).Where(x => x.Count > 0).ToList();
-        var summary = string.Join(", ", counts.Select(x => T["Summary" + x.State, x.Count].Value));
         <article class="candidate-card" id="candidate-@c.Id" data-candidate-id="@c.Id">
             <div class="candidate-identity"><h3><a asp-page="Details" asp-route-id="@e.Id" asp-route-candidateId="@c.Id">@c.DisplayName</a></h3>
             <p class="candidate-tags"><span class="candidate-status @c.Status.ToString().ToLowerInvariant()">@T["CandidateStatus" + c.Status]</span><span class="muted candidate-meta">@T["Condition" + c.Condition]@if (c.Year.HasValue) { <span> · @c.Year</span> }@if (c.Mileage.HasValue) { <span> · @c.Mileage.Value.ToString("N0") km</span> }</span></p>
             @if (c.StatusReason.Length > 0) { <p class="candidate-reason">@c.StatusReason</p> }</div>
             <div class="candidate-assessment-status">
             @if (results.Count == 0) { <p class="candidate-next">@T["CandidateNoCriteria"]</p> }
-            else
-            {
-                var offset = 0;
-                <svg class="fulfillment-bar" viewBox="0 0 @results.Count 1" preserveAspectRatio="none" role="img" aria-label="@summary">@foreach (var item in counts) { <rect class="summary-@item.State.ToString().ToLowerInvariant()" x="@offset" y="0" width="@item.Count" height="1" /> offset += item.Count; }</svg>
-                <ul class="fulfillment-counts">
-                @foreach (var item in counts)
-                {
-                    var state = item.State.ToString().ToLowerInvariant();
-                    <li class="summary-@state" data-summary="@item.State"><button type="button" class="summary-chip" id="summary-@c.Id-@state" aria-describedby="summary-list-@c.Id-@state">@T["Summary" + item.State, item.Count]</button>
-                    <div class="summary-popover" role="tooltip" id="summary-list-@c.Id-@state"><strong>@T["Summary" + item.State, item.Count]</strong><ol>@foreach (var entry in results.Where(x => x.Result == item.State)) { <li><span>@entry.Criterion.Name@if (item.State == Fulfillment.Rated) { <em> · @(new AssessmentRow(e, c, entry.Criterion, Model.Access, "").ValueText)</em> }</span><span class="summary-priority @entry.Criterion.Priority.ToString().ToLowerInvariant()">@T[entry.Criterion.Priority.ToString()]</span></li> }</ol></div></li>
-                }
-                </ul>
-            }
+            else { <partial name="/Pages/Shared/_FulfillmentSummary.cshtml" model="new FulfillmentSummary(c.Id.ToString(), results.Select(x => new FulfillmentEntry(x.Criterion, x.Result, x.Result == Fulfillment.Rated ? new AssessmentRow(e, c, x.Criterion, Model.Access, string.Empty).ValueText : null)).ToList())" /> }
             @if (failures.Count > 0) { <p class="candidate-warning"><strong>@T["RequiredNotMet"]:</strong> @string.Join(" · ", failures)</p> }
             </div>
             <div class="candidate-side">

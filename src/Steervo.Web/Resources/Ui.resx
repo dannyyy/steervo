@@ -237,6 +237,11 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="NoAutomaticExclusion" xml:space="preserve"><value>Ein verfehltes Muss führt nicht automatisch zum Ausschluss. Du entscheidest, welche Abstriche für dich in Frage kommen.</value></data>
   <data name="ComparisonRowLabel" xml:space="preserve"><value>Angabe</value></data>
   <data name="ComparisonSections" xml:space="preserve"><value>Abschnitte des Vergleichs</value></data>
+  <data name="OfferComparisonAdd" xml:space="preserve"><value>Offerte hinzufügen</value></data>
+  <data name="OfferComparisonAddLabel" xml:space="preserve"><value>Offerte zum Vergleich hinzufügen</value></data>
+  <data name="OfferComparisonFull" xml:space="preserve"><value>Maximal {0} Offerten. Entferne eine, um eine andere hinzuzufügen.</value></data>
+  <data name="OfferComparisonLimited" xml:space="preserve"><value>Es werden höchstens {0} Offerten verglichen. Angezeigt werden die ersten {0} der Auswahl.</value></data>
+  <data name="OfferHistoryHelp" xml:space="preserve"><value>Jede gespeicherte Änderung ist ein eigener Stand. Frühere Versionen können gelesen, aber nicht überschrieben werden.</value></data>
   <data name="CandidateStatusWatching" xml:space="preserve"><value>Beobachtet</value></data>
   <data name="CandidateStatusAlternative" xml:space="preserve"><value>Alternative</value></data>
   <data name="CandidateStatusFavorite" xml:space="preserve"><value>Favorit</value></data>
@@ -360,11 +365,8 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="ComparisonAssessmentsTitle" xml:space="preserve"><value>Kriterienbewertungen</value></data>
   <data name="Offers" xml:space="preserve"><value>Offerten</value></data>
 
-  <data name="OfferHeading" xml:space="preserve"><value>Angebote einholen und nachverfolgen</value></data>
-  <data name="OffersHelp" xml:space="preserve"><value>Sammle die Angebote deiner Anbieter. Ergänzungen und Nachverhandlungen bleiben als eigene Versionen erhalten.</value></data>
   <data name="NewOffer" xml:space="preserve"><value>Offerte erfassen</value></data>
   <data name="NoOffers" xml:space="preserve"><value>Noch keine Offerten</value></data>
-  <data name="NoOffersHelp" xml:space="preserve"><value>Wähle ein Auto und erfasse eine erste Anfrage oder ein vorhandenes Angebot. Unbekannte Werte können offen bleiben.</value></data>
   <data name="OffersNeedCandidate" xml:space="preserve"><value>Erfasse zuerst ein Auto, damit du ihm Offerten zuordnen kannst.</value></data>
   <data name="AllOffers" xml:space="preserve"><value>Alle Offerten</value></data>
   <data name="OfferForCandidate" xml:space="preserve"><value>Offerten für dieses Auto</value></data>
@@ -429,7 +431,6 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="OfferEdit" xml:space="preserve"><value>Neue Version erfassen</value></data>
   <data name="OfferVersion" xml:space="preserve"><value>Version {0}</value></data>
   <data name="OfferHistory" xml:space="preserve"><value>Versionshistorie</value></data>
-  <data name="OfferHistoryHelp" xml:space="preserve"><value>Jede gespeicherte Änderung ist ein eigener Stand. Frühere Versionen können gelesen, aber nicht überschrieben werden.</value></data>
   <data name="OfferCurrent" xml:space="preserve"><value>Aktuelle Version</value></data>
   <data name="OfferHistorical" xml:space="preserve"><value>Du siehst einen früheren Stand dieser Offerte.</value></data>
   <data name="OfferBackToCurrent" xml:space="preserve"><value>Zur aktuellen Version</value></data>
@@ -443,23 +444,16 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="OfferArchivedLabel" xml:space="preserve"><value>Archiviert</value></data>
   <data name="ShowArchivedOffers" xml:space="preserve"><value>Archivierte Offerten anzeigen</value></data>
   <data name="OfferOpenFields" xml:space="preserve"><value>Noch offene Angaben</value></data>
-  <data name="OfferNoOpenFields" xml:space="preserve"><value>Die wichtigsten Angaben sind erfasst.</value></data>
   <data name="OfferNoLines" xml:space="preserve"><value>Keine einzelnen Positionen erfasst.</value></data>
   <data name="OfferNoChangeNote" xml:space="preserve"><value>Ohne Änderungsnotiz</value></data>
   <data name="OfferCompare" xml:space="preserve"><value>Offerten vergleichen</value></data>
-  <data name="OfferCompareHelp" xml:space="preserve"><value>Wähle zwei Offerten desselben Autos. Vergleiche die Angaben und offenen Punkte; Beträge sind keine Gesamtkostenrechnung.</value></data>
-  <data name="FirstOffer" xml:space="preserve"><value>Erste Offerte</value></data>
-  <data name="SecondOffer" xml:space="preserve"><value>Zweite Offerte</value></data>
-  <data name="SelectOffer" xml:space="preserve"><value>Offerte auswählen</value></data>
-  <data name="OfferCompareNeedTwo" xml:space="preserve"><value>Für einen direkten Vergleich brauchst du zwei Offerten desselben Autos.</value></data>
-  <data name="OfferSameCandidateRequired" xml:space="preserve"><value>Vergleiche hier zwei unterschiedliche Offerten desselben Autos.</value></data>
+  <data name="OfferCompareNeedTwo" xml:space="preserve"><value>Füge eine weitere Offerte hinzu, um zu vergleichen.</value></data>
   <data name="InvalidOfferTerms" xml:space="preserve"><value>Bitte prüfe die Offerte: Beträge dürfen nicht negativ sein; Laufzeit, Kilometer und Datumsangaben müssen gültig sein.</value></data>
   <data name="InvalidOfferLine" xml:space="preserve"><value>Bitte prüfe die Position: Ein bekannter Preis benötigt einen Betrag. Inklusive und offene Preise enthalten keinen Betrag. Wirkung und Dauer gehören zu Sonderkonditionen.</value></data>
   <data name="TooManyOfferLines" xml:space="preserve"><value>Eine Version kann höchstens 500 Positionen enthalten.</value></data>
   <data name="InvalidOfferDate" xml:space="preserve"><value>Der Zeitpunkt der Offertversion ist ungültig oder liegt vor der vorherigen Version.</value></data>
   <data name="OfferCriteriaOnly" xml:space="preserve"><value>Hier können nur Kriterien mit dem Bezug Offerte bewertet werden.</value></data>
   <data name="OfferAssessmentTitle" xml:space="preserve"><value>Anforderungen an diese Offerte</value></data>
-  <data name="OfferAssessmentHelp" xml:space="preserve"><value>Diese Einschätzungen beziehen sich auf die aktuelle Offertversion. Eine neue Version kennzeichnet frühere Einschätzungen zur erneuten Prüfung.</value></data>
   <data name="OfferAssessmentStale" xml:space="preserve"><value>Aus Version {0} – bitte erneut prüfen</value></data>
   <data name="OfferAssessmentReview" xml:space="preserve"><value>Für aktuelle Version bestätigen</value></data>
   <data name="OfferNoCriteria" xml:space="preserve"><value>Noch keine Kriterien mit dem Bezug Offerte vorhanden.</value></data>

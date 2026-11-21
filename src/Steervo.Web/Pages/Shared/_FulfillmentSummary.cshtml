@@ -1,0 +1,11 @@
+@model Steervo.Web.Pages.Shared.FulfillmentSummary
+@{ var groups = Model.Groups; var offset = 0; var summary = string.Join(", ", groups.Select(group => T["Summary" + group.State, group.Entries.Count].Value)); }
+<svg class="fulfillment-bar" viewBox="0 0 @Model.Entries.Count 1" preserveAspectRatio="none" role="img" aria-label="@summary">@foreach (var group in groups) { <rect class="summary-@group.State.ToString().ToLowerInvariant()" x="@offset" y="0" width="@group.Entries.Count" height="1" /> offset += group.Entries.Count; }</svg>
+<ul class="fulfillment-counts">
+@foreach (var group in groups)
+{
+    var state = group.State.ToString().ToLowerInvariant();
+    <li class="summary-@state" data-summary="@group.State"><button type="button" class="summary-chip" id="summary-@Model.Key-@state" aria-describedby="summary-list-@Model.Key-@state">@T["Summary" + group.State, group.Entries.Count]</button>
+    <div class="summary-popover" role="tooltip" id="summary-list-@Model.Key-@state"><strong>@T["Summary" + group.State, group.Entries.Count]</strong><ol>@foreach (var entry in group.Entries) { <li><span>@entry.Criterion.Name@if (!string.IsNullOrEmpty(entry.Value)) { <em> · @entry.Value</em> }</span><span class="summary-priority @entry.Criterion.Priority.ToString().ToLowerInvariant()">@T[entry.Criterion.Priority.ToString()]</span></li> }</ol></div></li>
+}
+</ul>

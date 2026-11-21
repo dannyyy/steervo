@@ -20,7 +20,8 @@ public sealed class DetailsModel(OfferWorkspace workspace, ICurrentUser current,
     public AssessmentDraft? Draft { get; private set; }
     [BindProperty(SupportsGet = true)] public Guid? First { get; set; }
     [BindProperty(SupportsGet = true)] public Guid? Second { get; set; }
-    public string ReturnContext => $"?first={First}&second={Second}";
+    [BindProperty(SupportsGet = true)] public Guid[]? More { get; set; }
+    public string ReturnContext => $"?first={First}&second={Second}{Steervo.Web.Pages.Evaluations.Candidates.ComparisonSelection.More(More)}";
     public async Task<IActionResult> OnGetAsync(Guid id, Guid offerId, int? revision)
     {
         try { await LoadAsync(id, offerId, revision); return Page(); }
@@ -62,5 +63,6 @@ public sealed class DetailsModel(OfferWorkspace workspace, ICurrentUser current,
         First = Evaluation.Offers.Any(item => item.Id == First && item.CandidateId == Offer.CandidateId) ? First : offerId;
         Second = Evaluation.Offers.Any(item => item.Id == Second && item.Id != First && item.CandidateId == Offer.CandidateId) ? Second
             : Request.Query.ContainsKey("second") ? null : Evaluation.Offers.OrderBy(item => item.Archived).FirstOrDefault(item => item.CandidateId == Offer.CandidateId && item.Id != First)?.Id;
+        More = (More ?? []).Distinct().Where(item => item != First && item != Second && Evaluation.Offers.Any(other => other.Id == item)).Take(Steervo.Web.Pages.Evaluations.Candidates.ComparisonSelection.Maximum - 2).ToArray();
     }
 }
