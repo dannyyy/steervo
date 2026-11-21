@@ -23,6 +23,8 @@ footer { max-width: 1236px; width: calc(100% - 64px); margin: auto auto 0; paddi
 button:disabled { opacity: .45; }
 input, select, textarea { border-radius: var(--radius-control); border-color: var(--field-border); }
 select { text-overflow: ellipsis; }
+/* One arrow for every dropdown, inset from the border instead of the browser's own. */
+select:not([multiple]):not([size]) { -webkit-appearance: none; appearance: none; padding-right: 38px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23657077' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m4 6 4 4 4-4'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px 16px; }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 h1 { font-size: 30px; font-weight: 560; }
 h2 { font-weight: 560; }
