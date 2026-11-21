@@ -2,6 +2,12 @@
 
 ## Unveröffentlicht
 
+- Navigation neu gegliedert: Grundlagen (Allgemein, Kriterien), Autos, Offerten & Kosten (Offerten, Zusatzkosten) und Auswertungen. Eigenschaften, Freigaben, Import, Export und Löschen einer Evaluation stehen gesammelt unter «Allgemein»; das separate Verwaltungsmenü entfällt. Eine Evaluation öffnet sich auf «Allgemein».
+- Autoübersicht mit farbiger Zusammenfassung der Kriterien je Auto und den Kriterien hinter jedem Zähler. Bis zu fünf Autos lassen sich markieren und nebeneinander vergleichen; im Vergleich können Autos hinzugefügt und entfernt werden, technische Daten stehen vor den Anforderungen.
+- Die Fahrzeugakte öffnet sich bei den technischen Daten. Kopieren und Löschen eines Autos stehen in der Akte; mehrfach vorhandene Bearbeitungsknöpfe und erklärende Fülltexte sind entfernt.
+- Offertenübersicht und Offertenvergleich folgen denselben Regeln: Auswahl von bis zu fünf Offerten, auch verschiedener Autos, farbige Zusammenfassung der Offertkriterien sowie Hinzufügen und Entfernen im Vergleich.
+- Die leere Gruppe «Ohne Gruppe» erscheint nur noch mit mindestens einem Kriterium. Dropdowns haben einen einheitlichen, vom Rand abgesetzten Pfeil.
+
 - Favicon aus dem Steervo-Bildzeichen in Canvas/Tinte: SVG, ICO mit mehreren Grössen und Touch-Icon, auf allen Seiten eingebunden. Build und Auslieferung über Playwright geprüft; Vorschau bei 16, 32 und 48 px auf hellen und dunklen Hintergründen.
 
 - Evaluationsübersicht: Hover über die gesamte Zeilenbreite mit passenden äusseren Rundungen und Innenabstand; sichtbarer Tastaturfokus und mehr Platz für mobile Titel. Am 13. November 2026 mit Playwright für eine und mehrere Evaluationen bei 320–1440 px sowie per Tastatur und Touch geprüft.
