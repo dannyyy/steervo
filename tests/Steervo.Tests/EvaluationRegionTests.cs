@@ -46,7 +46,7 @@ public sealed class EvaluationRegionTests
     {
         var e = new Evaluation("owner", "Decision", null);
         e.SetProperties(e.Name, null, "CH", "CHF");
-        if (offer) e.AddOffer(e.AddCandidate(new("Car")), new() { Name = "Offer", BasePrice = 1000 }, []);
+        if (offer) e.AddOffer(e.AddCandidate(new("Car")), new() { Name = "Offer", StatedTotal = 1000 }, []);
         else { e.SetCostPlanning(new(2026, 1, 1), 12); e.AddCost(new("Parking", CostCategory.Other, Frequency: CostFrequency.Monthly, Amount: 100)); }
         Assert.True(e.IsCurrencyFixed);
         Assert.Equal("CurrencyFixed", Assert.Throws<RuleException>(() => e.SetProperties("Changed", null, "DE", "EUR")).Message);

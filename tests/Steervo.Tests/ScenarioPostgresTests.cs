@@ -21,7 +21,7 @@ public sealed class ScenarioPostgresTests
     private static Evaluation Seed(string owner)
     {
         var e = new Evaluation(owner, "Scenario case", null); var car = e.AddCandidate(new("Vehicle"));
-        e.AddOffer(car, new() { Name = "Source", BasePrice = 1700 }, [], "EUR"); e.SetCostPlanning(new(2027, 10, 1), 24);
+        e.AddOffer(car, new() { Name = "Source", StatedTotal = 1700 }, [], "EUR"); e.SetCostPlanning(new(2027, 10, 1), 24);
         e.AddCost(new("Shared", CostCategory.Parking, CostFrequency.Monthly, 20)); return e;
     }
     [Theory, InlineData(55437), InlineData(55438)]
@@ -45,7 +45,7 @@ public sealed class ScenarioPostgresTests
         var error = await Assert.ThrowsAsync<PostgresException>(() => f.RunAsync(async p => { await p.GetRequiredService<AppDbContext>().Database.ExecuteSqlInterpolatedAsync($"UPDATE \"Scenario\" SET \"OfferId\" = {foreign.Offers.Single().Id} WHERE \"Id\" = {scenarioId}"); return true; }));
         Assert.Equal(PostgresErrorCodes.ForeignKeyViolation, error.SqlState);
         await Assert.ThrowsAsync<RuleException>(() => f.AsAsync(editor, async w => { await new ScenarioWorkspace(w).AdjustmentAsync(e.Id, 7, scenarioId, new(foreign.Costs.Single().Id, 0)); return true; }));
-        await f.AsAsync(owner, async w => { await w.EditAsync(e.Id, 7, x => x.ReviseOffer(offer, new() { Name = "Revised", BasePrice = 2000 }, [])); return true; });
+        await f.AsAsync(owner, async w => { await w.EditAsync(e.Id, 7, x => x.ReviseOffer(offer, new() { Name = "Revised", StatedTotal = 2000 }, [])); return true; });
         saved = await f.AsAsync(reader, w => w.ReadAsync(e.Id)); Assert.Equal(1, saved.FindScenario(scenarioId).RevisionNumber); Assert.Equal(1020, ScenarioCalculation.Calculate(saved, scenarioId, 12).ExpectedCost);
         await f.AsAsync(owner, async w => { await w.RevokeAsync(e.Id, 8, editor); return true; });
         await Assert.ThrowsAsync<RuleException>(() => f.AsAsync(editor, w => w.ReadAsync(e.Id)));
@@ -62,7 +62,7 @@ public sealed class ScenarioPostgresTests
         e.SetCostAdjustment(scenario, new(e.Costs.Single().Id, 0, 1, 4, "Included period"));
         var copyScenario = e.CopyScenario(scenario, "Unknown price"); e.EditScenario(copyScenario, e.FindScenario(copyScenario).ToInput() with { Terms = Terms with { PurchasePrice = null } });
         await f.RunAsync(async p => { await p.GetRequiredService<IEvaluationStore>().CreateAsync(e); return true; });
-        var bytes = await f.TransferAsync(owner, t => t.ExportAsync(e.Id)); Assert.Equal(8, JsonNode.Parse(bytes)!["version"]!.GetValue<int>());
+        var bytes = await f.TransferAsync(owner, t => t.ExportAsync(e.Id)); Assert.Equal(9, JsonNode.Parse(bytes)!["version"]!.GetValue<int>());
         var copied = await f.TransferAsync(owner, t => t.ImportAsync(bytes)); var imported = await f.AsAsync(owner, w => w.ReadAsync(copied));
         Assert.Equal(3.25m, imported.CalculationSettings!.AnnualReturnPercent); Assert.Equal(2, imported.Scenarios.Count); Assert.Empty(imported.Shares);
         foreach (var item in imported.Scenarios)

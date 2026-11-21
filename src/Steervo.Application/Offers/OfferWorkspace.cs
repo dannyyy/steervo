@@ -23,8 +23,10 @@ public sealed class OfferWorkspace(EvaluationWorkspace evaluations)
             if (attachment is not null) evaluation.AddDocument(offerId, AttachmentName(attachment), attachment, null);
         });
     private static string AttachmentName(DocumentFile file) => file.FileName[..Math.Min(file.FileName.Length, 160)];
-    public Task ArchiveAsync(Guid evaluationId, long version, Guid offerId, bool archived) =>
-        evaluations.EditAsync(evaluationId, version, evaluation => evaluation.ArchiveOffer(offerId, archived));
+    public Task MoveAsync(Guid evaluationId, long version, Guid offerId, int direction, Guid? candidateId) =>
+        evaluations.EditAsync(evaluationId, version, evaluation => evaluation.MoveOffer(offerId, direction, candidateId));
+    public Task RemoveAsync(Guid evaluationId, long version, Guid offerId) =>
+        evaluations.EditAsync(evaluationId, version, evaluation => evaluation.RemoveOffer(offerId));
     public Task AssessAsync(Guid evaluationId, long version, Guid offerId, Guid criterionId, AssessmentInput input) =>
         evaluations.EditAsync(evaluationId, version, evaluation => evaluation.AssessOffer(offerId, criterionId, input));
     public Task ClearAssessmentAsync(Guid evaluationId, long version, Guid offerId, Guid criterionId) =>

@@ -703,14 +703,14 @@ namespace Steervo.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("Archived")
-                        .HasColumnType("boolean");
-
                     b.Property<Guid>("CandidateId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("EvaluationId")
                         .HasColumnType("uuid");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -810,11 +810,19 @@ namespace Steervo.Infrastructure.Migrations
                     b.Property<string>("CostCategory")
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("CriterionId")
+                        .HasColumnType("uuid");
+
                     b.Property<int?>("DurationMonths")
                         .HasColumnType("integer");
 
                     b.Property<string>("Effect")
                         .HasColumnType("text");
+
+                    b.Property<bool>("Financed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("Kind")
                         .IsRequired()
@@ -840,6 +848,9 @@ namespace Steervo.Infrastructure.Migrations
                     b.Property<Guid>("RevisionId")
                         .HasColumnType("uuid");
 
+                    b.Property<decimal?>("Value")
+                        .HasColumnType("numeric");
+
                     b.HasKey("Id");
 
                     b.HasIndex("RevisionId", "Position")
@@ -847,9 +858,11 @@ namespace Steervo.Infrastructure.Migrations
 
                     b.ToTable("OfferLine", t =>
                         {
-                            t.HasCheckConstraint("ValidOfferLineKind", "\"Kind\" IN ('Accessory','Fee','Benefit','Equipment')");
+                            t.HasCheckConstraint("ValidOfferLineKind", "\"Kind\" IN ('Accessory','Fee','Benefit','Equipment','Vehicle','Discount')");
 
                             t.HasCheckConstraint("ValidOfferLinePrice", "(\"PriceKind\" = 'Amount' AND \"Amount\" IS NOT NULL AND \"Amount\" >= 0) OR (\"PriceKind\" IN ('Unknown','Included') AND \"Amount\" IS NULL)");
+
+                            t.HasCheckConstraint("ValidOfferLineValue", "\"Value\" IS NULL OR (\"PriceKind\" = 'Included' AND \"Value\" >= 0)");
                         });
                 });
 
@@ -880,9 +893,6 @@ namespace Steervo.Infrastructure.Migrations
                             b1.IsRequired();
 
                             b1.Property<decimal?>("AnnualInterestPercent")
-                                .HasColumnType("numeric");
-
-                            b1.Property<decimal?>("BasePrice")
                                 .HasColumnType("numeric");
 
                             b1.Property<string>("Commitment")
@@ -933,6 +943,9 @@ namespace Steervo.Infrastructure.Migrations
                                 .HasColumnType("character varying(200)");
 
                             b1.Property<decimal?>("ResidualPayment")
+                                .HasColumnType("numeric");
+
+                            b1.Property<decimal?>("StatedTotal")
                                 .HasColumnType("numeric");
 
                             b1.Property<int?>("TermMonths")

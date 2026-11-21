@@ -2,6 +2,8 @@
 
 ## Unveröffentlicht
 
+- Offerten rechnen: Jede Offerte hat eine Preisaufstellung aus Fahrzeug, Ausstattung, Zubehör, Gebühren, Rabatten und Sonderkonditionen. Der Gesamtpreis ist die Summe der Positionen; ein Häkchen je Position trennt den Betrag im Leasing bzw. in der Finanzierung von der Zahlung bei Übernahme. Rabatte und der Wert von Gratisleistungen ergeben das Entgegenkommen in Betrag und Prozent. Das Total laut Offerte dient als Kontrolle. Eine Position kann eine Ja/Nein-Anforderung an die Offerte erfüllen. Der Kostenvergleich übernimmt Kaufpreis und Anfangskosten aus der Offerte.
+- Offerten lassen sich in der Übersicht umsortieren und in der Akte löschen; das Archivieren entfällt, bisher archivierte Offerten sind wieder sichtbar. Der bisherige Basispreis wird bei der Umstellung zur ersten Position jeder Version. Exportformat Version 9; ältere Dateien bleiben importierbar.
 - Navigation neu gegliedert: Grundlagen (Allgemein, Kriterien), Autos, Offerten & Kosten (Offerten, Zusatzkosten) und Auswertungen. Eigenschaften, Freigaben, Import, Export und Löschen einer Evaluation stehen gesammelt unter «Allgemein»; das separate Verwaltungsmenü entfällt. Eine Evaluation öffnet sich auf «Allgemein».
 - Autoübersicht mit farbiger Zusammenfassung der Kriterien je Auto und den Kriterien hinter jedem Zähler. Bis zu fünf Autos lassen sich markieren und nebeneinander vergleichen; im Vergleich können Autos hinzugefügt und entfernt werden, technische Daten stehen vor den Anforderungen.
 - Die Fahrzeugakte öffnet sich bei den technischen Daten. Kopieren und Löschen eines Autos stehen in der Akte; mehrfach vorhandene Bearbeitungsknöpfe und erklärende Fülltexte sind entfernt.

@@ -166,8 +166,9 @@ public sealed class DocumentPostgresTests
     {
         await using var fixture = await PostgresFixture.CreateAsync(port); var owner = await fixture.SetupAsync();
         var evaluation = new Evaluation(owner, "Existing", null); var candidate = evaluation.AddCandidate(new("Existing vehicle"));
-        var offerId = evaluation.AddOffer(candidate, new() { Name = "Existing offer", BasePrice = 23456 }, [], "EUR");
-        evaluation.ReviseOffer(offerId, new() { Name = "Completed offer", BasePrice = 23000 }, [], "Updated");
+        var offerId = evaluation.AddOffer(candidate, new() { Name = "Existing offer", StatedTotal = 23456 }, [new("Mats", PriceKind: OfferPriceKind.Included), new("Delivery", OfferLineKind.Fee, OfferPriceKind.Amount, 500)], "EUR");
+        evaluation.ReviseOffer(offerId, new() { Name = "Completed offer", StatedTotal = 23000, VehicleDescription = "Existing vehicle Touring" }, [], "Updated");
+        var other = evaluation.AddOffer(candidate, new() { Name = "Newest offer" }, [], createdAt: null);
         await fixture.RunAsync(async p => {
             var db = p.GetRequiredService<AppDbContext>();
 
@@ -176,8 +177,20 @@ public sealed class DocumentPostgresTests
         });
         var saved = await fixture.AsAsync(owner, w => w.ReadAsync(evaluation.Id));
         Assert.Equal("EUR", saved.Currency); Assert.Empty(saved.Documents);
-        Assert.Equal(23456, saved.FindOffer(offerId).Revision(1).Terms.BasePrice);
-        Assert.Equal(23000, saved.FindOffer(offerId).Latest.Terms.BasePrice);
+        // The former base price leads each version as the vehicle line; the other lines keep their order.
+        var first = saved.FindOffer(offerId).Revision(1); var latest = saved.FindOffer(offerId).Latest;
+        Assert.Equal(["Fahrzeug", "Mats", "Delivery"], first.Lines.OrderBy(line => line.Position).Select(line => line.Name));
+        Assert.Equal([0, 1, 2], first.Lines.Select(line => line.Position).Order());
+        Assert.Equal(23956, first.Pricing.Total); Assert.Null(first.Terms.StatedTotal);
+        Assert.Equal("Existing vehicle Touring", latest.Lines.Single().Name); Assert.Equal(OfferLineKind.Vehicle, latest.Lines.Single().Kind);
+        Assert.Equal(23000, latest.Pricing.Total); Assert.True(latest.Lines.Single().Financed);
+        Assert.Empty(saved.FindOffer(other).Latest.Lines);
+        Assert.Equal([0, 1], saved.Offers.Select(offer => offer.Position).Order());
+        // Versions stay protected after the conversion.
+        var error = await Assert.ThrowsAsync<Npgsql.PostgresException>(() => fixture.RunAsync(async p => {
+            await p.GetRequiredService<AppDbContext>().Database.ExecuteSqlInterpolatedAsync($"UPDATE \"OfferLine\" SET \"Name\" = 'Changed' WHERE \"Id\" = {latest.Lines.Single().Id}"); return true;
+        }));
+        Assert.Equal(Npgsql.PostgresErrorCodes.CheckViolation, error.SqlState);
     }
     private sealed class UnavailableObjects : IDocumentObjects
     {

@@ -42,10 +42,17 @@ public sealed class ScenarioForm
     }
     public static ScenarioForm FromOffer(Offer offer)
     {
-        var t = offer.Latest.Terms;
+        var t = offer.Latest.Terms; var pricing = offer.Latest.Pricing;
+        // Purchase pays everything at once; fees count as initial costs. With a contract, the lines that are
+        // not part of it are due at handover.
+        var lines = offer.Latest.Lines.Where(line => line.PriceKind == OfferPriceKind.Amount).ToList();
+        var fees = lines.Where(line => line.Kind == OfferLineKind.Fee).Sum(line => line.Amount ?? 0);
+        var contract = t.Kind is OfferKind.Leasing or OfferKind.Financing;
+        decimal? price = pricing.Known ? contract ? pricing.Financed : pricing.Total - fees : null;
+        decimal? initial = pricing.Known ? contract ? pricing.DueAtHandover : fees : null;
         return new() { Name = t.Name, OfferId = offer.Id, RevisionNumber = offer.Latest.Number,
             Mode = t.Kind switch { OfferKind.Leasing => AcquisitionMode.LeaseReturn, OfferKind.Financing => AcquisitionMode.Financing, _ => AcquisitionMode.Purchase },
-            Values = new() { ["DownPayment"] = Format(t.DownPayment), ["MonthlyPayment"] = Format(t.MonthlyPayment),
+            Values = new() { ["PurchasePrice"] = Format(price), ["InitialFees"] = Format(initial is < 0 ? 0 : initial), ["DownPayment"] = Format(t.DownPayment), ["MonthlyPayment"] = Format(t.MonthlyPayment),
                 ["TermMonths"] = t.TermMonths?.ToString(CultureInfo.InvariantCulture), ["FinalPayment"] = Format(t.ResidualPayment),
                 ["LoanInterestPercent"] = t.Kind == OfferKind.Financing ? Format(t.AnnualInterestPercent) : null,
                 ["IncludedKilometresPerYear"] = t.IncludedKilometresPerYear?.ToString(CultureInfo.InvariantCulture),

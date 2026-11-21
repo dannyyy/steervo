@@ -24,11 +24,11 @@ public sealed class CompareModel(OfferWorkspace workspace, ICurrentUser current)
         try
         {
             Evaluation = await workspace.ReadAsync(id);
-            var ordered = Evaluation.Offers.OrderBy(offer => offer.Archived).ThenByDescending(offer => offer.Latest.CreatedAt).ToList();
+            var ordered = Evaluation.Offers.OrderBy(offer => offer.Position).ToList();
             var further = (more ?? []).Where(item => Evaluation.Offers.Any(offer => offer.Id == item)).ToList();
             List<Offer> chosen;
             if (!first.HasValue && !second.HasValue && further.Count == 0 && !Request.Query.ContainsKey("second"))
-                chosen = (ordered.Any(offer => !offer.Archived) ? ordered.Where(offer => !offer.Archived) : ordered).Take(ComparisonSelection.Maximum).ToList();
+                chosen = ordered.Take(ComparisonSelection.Maximum).ToList();
             else
             {
                 chosen = [];

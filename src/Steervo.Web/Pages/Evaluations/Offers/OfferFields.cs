@@ -17,7 +17,7 @@ public static class OfferFields
         new(nameof(OfferTerms.ValidUntil), "Delivery", "date", 0, terms => terms.ValidUntil?.ToString("dd.MM.yyyy"), terms => terms.ValidUntil),
         new(nameof(OfferTerms.DeliveryOn), "Delivery", "date", 0, terms => terms.DeliveryOn?.ToString("dd.MM.yyyy"), terms => terms.DeliveryOn),
         new(nameof(OfferTerms.DeliveryNotes), "Delivery", "textarea", 1000, terms => terms.DeliveryNotes, terms => terms.DeliveryNotes),
-        new(nameof(OfferTerms.BasePrice), "Price", "money", 0, terms => terms.BasePrice?.ToString("N2"), terms => terms.BasePrice),
+        new(nameof(OfferTerms.StatedTotal), "Price", "money", 0, terms => terms.StatedTotal?.ToString("N2"), terms => terms.StatedTotal),
         new(nameof(OfferTerms.TermMonths), "Contract", "integer", 0, terms => terms.TermMonths?.ToString("0.####"), terms => terms.TermMonths),
         new(nameof(OfferTerms.AnnualInterestPercent), "Contract", "number", 0, terms => terms.AnnualInterestPercent?.ToString("0.####"), terms => terms.AnnualInterestPercent),
         new(nameof(OfferTerms.MonthlyPayment), "Contract", "money", 0, terms => terms.MonthlyPayment?.ToString("N2"), terms => terms.MonthlyPayment),

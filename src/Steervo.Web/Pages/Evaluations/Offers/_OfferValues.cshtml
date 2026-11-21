@@ -8,6 +8,8 @@
     if (group.Key == "Contract" && terms.Kind is not (OfferKind.Leasing or OfferKind.Financing) && !fields.Any(field => field.Raw(terms) is not null)) { continue; }
     if (group.Key == "Mileage" && terms.Kind != OfferKind.Leasing && !fields.Any(field => field.Raw(terms) is not null)) { continue; }
     if (group.Key == "Notes" && string.IsNullOrEmpty(terms.Notes)) { continue; }
+    // Prices are shown with the price list below.
+    if (group.Key == "Price") { continue; }
     <section><h3>@T["OfferGroup" + group.Key]</h3><dl class="offer-values">
     @foreach (var field in fields)
     {

@@ -1,6 +1,6 @@
 @model Steervo.Web.Pages.Evaluations.Offers.OfferAssessmentRow
 @using Steervo.Web.Pages.Shared
-@{ var c = Model.Criterion; var a = Model.Assessment; var field = Model.FieldId; var edit = Model.Access >= AccessLevel.Editor && !Model.Offer.Archived; }
+@{ var c = Model.Criterion; var a = Model.Assessment; var field = Model.FieldId; var edit = Model.Access >= AccessLevel.Editor; }
 <article class="assessment-row" id="@field" data-offer-assessment="@c.Id" data-result="@Model.Result" data-stale="@Model.Stale.ToString().ToLowerInvariant()">
 @if (edit)
 {

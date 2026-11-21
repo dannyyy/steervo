@@ -45,11 +45,11 @@ public sealed class OfferPostgresTests
         }));
         Assert.Equal(PostgresErrorCodes.CheckViolation, lineError.SqlState);
         await fixture.AsAsync(owner, async workspace => { await workspace.RevokeAsync(id, saved.Version, editor); return true; });
-        await Assert.ThrowsAsync<RuleException>(() => fixture.AsAsync(editor, async workspace => { await new OfferWorkspace(workspace).ArchiveAsync(id, saved.Version + 1, offerId, true); return true; }));
+        await Assert.ThrowsAsync<RuleException>(() => fixture.AsAsync(editor, async workspace => { await new OfferWorkspace(workspace).RemoveAsync(id, saved.Version + 1, offerId); return true; }));
     }
 
     [Theory, InlineData(55437), InlineData(55438)]
-    public async Task Export_remaps_offer_history_and_retains_stale_assessments_and_archives(int port)
+    public async Task Export_remaps_offer_history_linked_lines_and_order(int port)
     {
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync();
@@ -57,24 +57,35 @@ public sealed class OfferPostgresTests
         await fixture.AsAsync(owner, async workspace => { await workspace.EditAsync(id, 1, evaluation => {
             var candidate = evaluation.AddCandidate(new("Vehicle"));
             var criterion = evaluation.AddCriterion(new("Service", CriterionType.Boolean, Priority.Required, CriterionScope.Offer));
+            var wheels = evaluation.AddCriterion(new("Wheels", CriterionType.Boolean, Priority.Preferred, CriterionScope.Offer));
             var offer = evaluation.AddOffer(candidate, new() { Name = "Request" }, [new("Service", OfferLineKind.Benefit, OfferPriceKind.Included, Effect: OfferBenefitEffect.CostSaving, CostCategory: CostCategory.Service, DurationMonths: 24)], "EUR");
             evaluation.AssessOffer(offer, criterion, new(BooleanValue: true, Notes: "Confirmed"));
-            evaluation.ReviseOffer(offer, new() { Name = "Negotiated", BasePrice = 27800 }, [], "Completed");
-            evaluation.ArchiveOffer(offer, true);
+            evaluation.ReviseOffer(offer, new() { Name = "Negotiated", StatedTotal = 27800 }, [new("Car", OfferLineKind.Vehicle, OfferPriceKind.Amount, 28000),
+                new("Delivery", OfferLineKind.Fee, OfferPriceKind.Amount, 800, Financed: false), new("Fleet", OfferLineKind.Discount, OfferPriceKind.Amount, 1000),
+                new("Wheels", OfferLineKind.Benefit, OfferPriceKind.Included, Value: 900, CriterionId: wheels)], "Completed");
+            evaluation.AddOffer(candidate, new() { Name = "Second" }, []);
+            evaluation.MoveOffer(evaluation.AddOffer(candidate, new() { Name = "Third" }, []), -1);
         }); return true; });
         var original = await fixture.AsAsync(owner, workspace => workspace.ReadAsync(id));
         var bytes = await fixture.TransferAsync(owner, transfer => transfer.ExportAsync(id));
         var copyId = await fixture.TransferAsync(owner, transfer => transfer.ImportAsync(bytes));
         var copy = await fixture.AsAsync(owner, workspace => workspace.ReadAsync(copyId));
-        var offer = copy.Offers.Single(); var originalOffer = original.Offers.Single();
-        Assert.True(offer.Archived); Assert.Equal("EUR", copy.Currency);
+        Assert.Equal(["Negotiated", "Third", "Second"], copy.Offers.OrderBy(item => item.Position).Select(item => item.Latest.Terms.Name));
+        var offer = copy.Offers.Single(item => item.Latest.Terms.Name == "Negotiated"); var originalOffer = original.Offers.Single(item => item.Latest.Terms.Name == "Negotiated");
+        Assert.Equal("EUR", copy.Currency);
+        var linked = offer.Latest.Lines.Single(line => line.CriterionId.HasValue);
+        var wheels = copy.Criteria.Single(criterion => criterion.Name == "Wheels").Id;
+        Assert.Equal(wheels, linked.CriterionId); Assert.NotEqual(original.Criteria.Single(criterion => criterion.Name == "Wheels").Id, linked.CriterionId);
+        Assert.Equal(Fulfillment.Met, copy.OfferResult(offer.Id, wheels));
+        Assert.Equal(27800, offer.Latest.Pricing.Total); Assert.Equal(800, offer.Latest.Pricing.DueAtHandover);
+        Assert.False(offer.Latest.Lines.Single(line => line.Name == "Delivery").Financed);
         Assert.NotEqual(originalOffer.Id, offer.Id); Assert.NotEqual(originalOffer.CandidateId, offer.CandidateId);
         Assert.Equal(originalOffer.Revision(1).CreatedAt, offer.Revision(1).CreatedAt);
         Assert.Equal(originalOffer.Revision(1).Terms, offer.Revision(1).Terms);
         Assert.NotEqual(originalOffer.Revision(1).Lines.Single().Id, offer.Revision(1).Lines.Single().Id);
         Assert.Equal(originalOffer.Revision(1).Lines.Single().ToInput(), offer.Revision(1).Lines.Single().ToInput());
         Assert.Equal(1, copy.OfferAssessments.Single().RevisionNumber);
-        Assert.Equal(Fulfillment.Unknown, copy.OfferResult(offer.Id, copy.Criteria.Single().Id));
+        Assert.Equal(Fulfillment.Unknown, copy.OfferResult(offer.Id, copy.Criteria.Single(criterion => criterion.Name == "Service").Id));
         Assert.Empty(copy.Shares);
         foreach (var property in new[] { "candidateId", "id" })
         {
@@ -103,7 +114,7 @@ public sealed class OfferPostgresTests
         first.AssessOffer(offer, criterion, new(BooleanValue: false));
         await fixture.RunAsync(async provider => { var db = provider.GetRequiredService<AppDbContext>(); db.AddRange(first, second); await db.SaveChangesAsync(); return true; });
         var error = await Assert.ThrowsAsync<PostgresException>(() => fixture.RunAsync(async provider => {
-            await provider.GetRequiredService<AppDbContext>().Database.ExecuteSqlInterpolatedAsync($"INSERT INTO \"Offer\" (\"Id\", \"EvaluationId\", \"CandidateId\", \"Archived\") VALUES ({Guid.NewGuid()}, {first.Id}, {foreignCandidate}, false)"); return true;
+            await provider.GetRequiredService<AppDbContext>().Database.ExecuteSqlInterpolatedAsync($"INSERT INTO \"Offer\" (\"Id\", \"EvaluationId\", \"CandidateId\", \"Position\") VALUES ({Guid.NewGuid()}, {first.Id}, {foreignCandidate}, 0)"); return true;
         }));
         Assert.Equal(PostgresErrorCodes.ForeignKeyViolation, error.SqlState);
         var assessmentError = await Assert.ThrowsAsync<PostgresException>(() => fixture.RunAsync(async provider => {
@@ -130,5 +141,28 @@ public sealed class OfferPostgresTests
         var saved = await fixture.AsAsync(owner, workspace => workspace.ReadAsync(id));
         Assert.Equal(450, saved.Candidates.Single().Specifications.GetPayloadKg());
         Assert.Empty(saved.Offers); Assert.Null(saved.Currency);
+    }
+
+    [Theory, InlineData(55437), InlineData(55438)]
+    public async Task Files_from_before_the_price_list_import_with_a_vehicle_line_and_without_the_archive(int port)
+    {
+        await using var fixture = await PostgresFixture.CreateAsync(port);
+        var owner = await fixture.SetupAsync();
+        var id = await fixture.AsAsync(owner, workspace => workspace.CreateAsync("Decision", null, "CH", "EUR"));
+        await fixture.AsAsync(owner, async workspace => { await workspace.EditAsync(id, 1, evaluation => {
+            var candidate = evaluation.AddCandidate(new("Vehicle"));
+            evaluation.AddOffer(candidate, new() { Name = "Request", VehicleDescription = "Vehicle Long Range" }, [new("Mats", OfferLineKind.Accessory, OfferPriceKind.Included)], "EUR");
+        }); return true; });
+        var content = System.Text.Json.Nodes.JsonNode.Parse(await fixture.TransferAsync(owner, transfer => transfer.ExportAsync(id)))!;
+        content["version"] = 8; var offer = content["offers"]![0]!; offer["archived"] = true;
+        var revision = offer["revisions"]![0]!; revision["terms"]!.AsObject().Remove("statedTotal"); revision["terms"]!["basePrice"] = 41000;
+        foreach (var line in revision["lines"]!.AsArray()) { line!.AsObject().Remove("financed"); line.AsObject().Remove("value"); line.AsObject().Remove("criterionId"); }
+        var copyId = await fixture.TransferAsync(owner, transfer => transfer.ImportAsync(System.Text.Encoding.UTF8.GetBytes(content.ToJsonString())));
+        var copy = (await fixture.AsAsync(owner, workspace => workspace.ReadAsync(copyId))).Offers.Single().Latest;
+        Assert.Equal(["Vehicle Long Range", "Mats"], copy.Lines.OrderBy(line => line.Position).Select(line => line.Name));
+        Assert.Equal(41000, copy.Pricing.Total); Assert.Null(copy.Terms.StatedTotal); Assert.All(copy.Lines, line => Assert.True(line.Financed));
+        // A current file must not carry the fields of the old format.
+        content["version"] = 9;
+        await Assert.ThrowsAsync<RuleException>(() => fixture.TransferAsync(owner, transfer => transfer.ImportAsync(System.Text.Encoding.UTF8.GetBytes(content.ToJsonString()))));
     }
 }

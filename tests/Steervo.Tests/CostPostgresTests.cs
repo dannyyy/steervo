@@ -53,7 +53,7 @@ public sealed class CostPostgresTests
             e.AddCost(new("Included", CostCategory.Service, CostFrequency.Included, null, 1, 12, car));
             e.AddCost(new("Credit", CostCategory.Other, CostFrequency.Once, 80, 3, CandidateId: car, Direction: CostDirection.Income));
         }); return true; });
-        var bytes = await f.TransferAsync(owner, t => t.ExportAsync(id)); Assert.Equal(8, JsonNode.Parse(bytes)!["version"]!.GetValue<int>());
+        var bytes = await f.TransferAsync(owner, t => t.ExportAsync(id)); Assert.Equal(9, JsonNode.Parse(bytes)!["version"]!.GetValue<int>());
         var copyId = await f.TransferAsync(owner, t => t.ImportAsync(bytes)); var copy = await f.AsAsync(owner, w => w.ReadAsync(copyId));
         var original = await f.AsAsync(owner, w => w.ReadAsync(id));
         Assert.Equal(original.CostPlanning!.Start, copy.CostPlanning!.Start); Assert.Equal(18, copy.CostPlanning.Months);
@@ -74,12 +74,12 @@ public sealed class CostPostgresTests
     public async Task Upgrade_keeps_existing_offers_and_does_not_seed_a_plan(int port)
     {
         await using var f = await PostgresFixture.CreateAsync(port); var owner = await f.SetupAsync();
-        var e = new Evaluation(owner, "Existing", null); var car = e.AddCandidate(new("Existing car")); var offer = e.AddOffer(car, new() { Name = "Existing offer", BasePrice = 23456 }, [], "EUR");
+        var e = new Evaluation(owner, "Existing", null); var car = e.AddCandidate(new("Existing car")); var offer = e.AddOffer(car, new() { Name = "Existing offer", StatedTotal = 23456 }, [], "EUR");
         await f.RunAsync(async p => {
             var db = p.GetRequiredService<AppDbContext>();
             db.Evaluations.Add(e); await db.SaveChangesAsync(); await db.GetService<IMigrator>().MigrateAsync("20261110191928_OfferDocuments"); await db.Database.MigrateAsync(); return true;
         });
         var saved = await f.AsAsync(owner, w => w.ReadAsync(e.Id)); Assert.Null(saved.CostPlanning); Assert.Empty(saved.Costs);
-        Assert.Equal(23456, saved.FindOffer(offer).Latest.Terms.BasePrice); Assert.Equal("EUR", saved.Currency);
+        Assert.Null(saved.FindOffer(offer).Latest.Terms.StatedTotal); Assert.Equal(23456, saved.FindOffer(offer).Latest.Pricing.Total); Assert.Equal("EUR", saved.Currency);
     }
 }

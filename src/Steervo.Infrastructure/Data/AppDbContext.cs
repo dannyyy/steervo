@@ -88,7 +88,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
         });
         model.Entity<OfferRevision>(b => {
             b.HasKey(x => x.Id); b.Property(x => x.Id).ValueGeneratedNever(); b.HasAlternateKey(x => new { x.EvaluationId, x.OfferId, x.Number });
-            b.Property(x => x.ChangeNote).HasMaxLength(2000);
+            b.Property(x => x.ChangeNote).HasMaxLength(2000); b.Ignore(x => x.Pricing);
             b.ComplexProperty(x => x.Terms, terms => {
                 terms.Property(x => x.Name).HasMaxLength(160); terms.Property(x => x.Provider).HasMaxLength(200); terms.Property(x => x.Lender).HasMaxLength(200);
                 terms.Property(x => x.VehicleDescription).HasMaxLength(400); terms.Property(x => x.DeliveryNotes).HasMaxLength(1000); terms.Property(x => x.Notes).HasMaxLength(4000);
@@ -107,9 +107,11 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
             b.Property(x => x.Name).HasMaxLength(300); b.Property(x => x.Notes).HasMaxLength(2000);
             b.Property(x => x.Kind).HasConversion<string>(); b.Property(x => x.PriceKind).HasConversion<string>();
             b.Property(x => x.Effect).HasConversion<string>(); b.Property(x => x.CostCategory).HasConversion<string>();
+            b.Property(x => x.Financed).HasDefaultValue(true);
             b.ToTable(t => {
                 t.HasCheckConstraint("ValidOfferLinePrice", "(\"PriceKind\" = 'Amount' AND \"Amount\" IS NOT NULL AND \"Amount\" >= 0) OR (\"PriceKind\" IN ('Unknown','Included') AND \"Amount\" IS NULL)");
-                t.HasCheckConstraint("ValidOfferLineKind", "\"Kind\" IN ('Accessory','Fee','Benefit','Equipment')");
+                t.HasCheckConstraint("ValidOfferLineKind", "\"Kind\" IN ('Accessory','Fee','Benefit','Equipment','Vehicle','Discount')");
+                t.HasCheckConstraint("ValidOfferLineValue", "\"Value\" IS NULL OR (\"PriceKind\" = 'Included' AND \"Value\" >= 0)");
             });
         });
         model.Entity<OfferAssessment>(b => {

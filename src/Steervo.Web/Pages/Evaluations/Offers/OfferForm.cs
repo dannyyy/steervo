@@ -19,7 +19,7 @@ public sealed class OfferForm
     public string? ValidUntil { get; set; }
     public string? DeliveryOn { get; set; }
     public string? DeliveryNotes { get; set; }
-    public string? BasePrice { get; set; }
+    public string? StatedTotal { get; set; }
     public string? TermMonths { get; set; }
     public string? AnnualInterestPercent { get; set; }
     public string? MonthlyPayment { get; set; }
@@ -40,7 +40,7 @@ public sealed class OfferForm
         ValidUntil = ParseDate(ValidUntil),
         DeliveryOn = ParseDate(DeliveryOn),
         DeliveryNotes = DeliveryNotes,
-        BasePrice = ParseNumber(BasePrice),
+        StatedTotal = ParseNumber(StatedTotal),
         TermMonths = ParseInteger(TermMonths),
         AnnualInterestPercent = ParseNumber(AnnualInterestPercent),
         MonthlyPayment = ParseNumber(MonthlyPayment),
@@ -67,7 +67,7 @@ public sealed class OfferForm
             ValidUntil = terms.ValidUntil?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
             DeliveryOn = terms.DeliveryOn?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
             DeliveryNotes = terms.DeliveryNotes,
-            BasePrice = terms.BasePrice?.ToString(CultureInfo.InvariantCulture),
+            StatedTotal = terms.StatedTotal?.ToString(CultureInfo.InvariantCulture),
             TermMonths = terms.TermMonths?.ToString(CultureInfo.InvariantCulture),
             AnnualInterestPercent = terms.AnnualInterestPercent?.ToString(CultureInfo.InvariantCulture),
             MonthlyPayment = terms.MonthlyPayment?.ToString(CultureInfo.InvariantCulture),
@@ -89,7 +89,7 @@ public sealed class OfferForm
         nameof(OfferTerms.ValidUntil) => ValidUntil,
         nameof(OfferTerms.DeliveryOn) => DeliveryOn,
         nameof(OfferTerms.DeliveryNotes) => DeliveryNotes,
-        nameof(OfferTerms.BasePrice) => BasePrice,
+        nameof(OfferTerms.StatedTotal) => StatedTotal,
         nameof(OfferTerms.TermMonths) => TermMonths,
         nameof(OfferTerms.AnnualInterestPercent) => AnnualInterestPercent,
         nameof(OfferTerms.MonthlyPayment) => MonthlyPayment,
@@ -131,11 +131,16 @@ public sealed class OfferLineForm
     public CostCategory? CostCategory { get; set; }
     public string? DurationMonths { get; set; }
     public string? Notes { get; set; }
-    public OfferLineInput ToInput() => new(Name ?? "", Kind, PriceKind, OfferForm.ParseNumber(Amount), Effect, CostCategory, OfferForm.ParseInteger(DurationMonths), Notes);
+    public bool Financed { get; set; }
+    public string? Value { get; set; }
+    public Guid? CriterionId { get; set; }
+    public OfferLineInput ToInput() => new(Name ?? "", Kind, PriceKind, OfferForm.ParseNumber(Amount), Effect, CostCategory, OfferForm.ParseInteger(DurationMonths), Notes,
+        Financed, OfferForm.ParseNumber(Value), CriterionId);
     public static OfferLineForm From(OfferLineInput input) => new()
     {
         Name = input.Name, Kind = input.Kind, PriceKind = input.PriceKind, Amount = input.Amount?.ToString(CultureInfo.InvariantCulture),
-        Effect = input.Effect, CostCategory = input.CostCategory, DurationMonths = input.DurationMonths?.ToString(CultureInfo.InvariantCulture), Notes = input.Notes
+        Effect = input.Effect, CostCategory = input.CostCategory, DurationMonths = input.DurationMonths?.ToString(CultureInfo.InvariantCulture), Notes = input.Notes,
+        Financed = input.Financed, Value = input.Value?.ToString(CultureInfo.InvariantCulture), CriterionId = input.CriterionId
     };
 }
-public sealed record OfferLineEditor(OfferLineForm Line, string Key);
+public sealed record OfferLineEditor(OfferLineForm Line, string Key, IReadOnlyList<Criterion> Criteria);

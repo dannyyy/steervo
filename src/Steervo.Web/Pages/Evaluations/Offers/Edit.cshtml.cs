@@ -21,13 +21,13 @@ public sealed class EditModel(OfferWorkspace workspace, ICurrentUser current, IS
     [BindProperty(SupportsGet = true)] public Guid? Second { get; set; }
     public string ReturnUrl => Offer is null ? $"/evaluations/{Evaluation.Id}/offers" : $"/evaluations/{Evaluation.Id}/offers/{Offer.Id}?first={First}&second={Second}";
     public string? Notice { get; private set; }
+    public IReadOnlyList<Criterion> LineCriteria => Evaluation.Criteria.Where(criterion => criterion is { Scope: CriterionScope.Offer, Type: CriterionType.Boolean }).OrderBy(criterion => criterion.Position).ToList();
     public async Task<IActionResult> OnGetAsync(Guid id, Guid? offerId, Guid? candidateId)
     {
         try
         {
             await LoadAsync(id, offerId);
             if (Evaluation.Currency is null) return RedirectToPage("/Evaluations/Details", new { id, section = "settings" });
-            if (Offer?.Archived == true) return RedirectToPage("Details", new { id, offerId });
             Version = Evaluation.Version;
             if (Offer is not null) Input = OfferForm.From(Offer, Evaluation.Currency);
             else
@@ -47,7 +47,6 @@ public sealed class EditModel(OfferWorkspace workspace, ICurrentUser current, IS
             if (!ModelState.IsValid) throw new RuleException("InvalidOfferTerms");
             var terms = Input.ToTerms(); var lines = Input.Lines.Select(line => line.ToInput()).ToArray();
             if (Evaluation.Version != Version) throw new RuleException("Conflict");
-            if (Offer?.Archived == true) throw new RuleException("OfferArchived");
             if (Offer is null) _ = Evaluation.FindCandidate(Input.CandidateId);
             DocumentFile? attachment = null;
             if (upload is not null) {

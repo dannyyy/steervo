@@ -8,7 +8,7 @@
 {
 <section class="workspace-surface scenario-editor"><h1>@T["ScenarioChooseOffer"]</h1><p class="muted">@T["ScenarioChooseOfferHelp"]</p>
 <div class="scenario-offer-picker">@foreach (var option in e.Offers.OrderBy(o => e.FindCandidate(o.CandidateId).DisplayName).ThenBy(o => o.Latest.Terms.Name))
-{ <a class="scenario-offer-option" asp-page="Edit" asp-route-id="@e.Id" asp-route-offerId="@option.Id"><strong>@option.Latest.Terms.Name</strong><span>@e.FindCandidate(option.CandidateId).DisplayName · @T["ScenarioVersion", option.Latest.Number] @if (option.Archived) { <span>· @T["OfferArchivedLabel"]</span> }</span><span>→</span></a> }</div>
+{ <a class="scenario-offer-option" asp-page="Edit" asp-route-id="@e.Id" asp-route-offerId="@option.Id"><strong>@option.Latest.Terms.Name</strong><span>@e.FindCandidate(option.CandidateId).DisplayName · @T["ScenarioVersion", option.Latest.Number]</span><span>→</span></a> }</div>
 @if (e.Offers.Count == 0) { <a class="button primary" asp-page="/Evaluations/Offers/Index" asp-route-id="@e.Id">@T["Offers"] →</a> }</section>
 }
 else

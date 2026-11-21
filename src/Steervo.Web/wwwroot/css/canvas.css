@@ -555,8 +555,25 @@ body:has(dialog[open]) { overflow: hidden; }
 .offer-history li:has([aria-current=page]) { border-left-color: var(--accent); }
 .offer-history p { font-size: 12px; color: var(--muted); }
 .offer-history .micro { margin-bottom: 18px; }
-.offer-archive { padding-top: 20px; border-top: 1px solid var(--line); }
-.offer-archive .micro { max-width: 65ch; margin: 0; }
+.offer-totals { max-width: 460px; margin: 20px 0 0 auto; font-size: 13px; font-variant-numeric: tabular-nums; }
+.offer-totals > div { display: flex; justify-content: space-between; gap: 20px; padding: 7px 0; border-bottom: 1px solid var(--line); }
+.offer-totals > div:last-child { border-bottom: 0; }
+.offer-totals dt { color: var(--muted); }
+.offer-totals dd { margin: 0; text-align: right; font-weight: 500; }
+.offer-totals .offer-total { border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); font-size: 15px; }
+.offer-totals .offer-total dt { color: var(--ink); font-weight: 600; }
+.offer-totals .offer-total dd { font-weight: 650; }
+.offer-totals .offer-open, .offer-lines [data-offer-line-price=Unknown] .offer-line-price { color: var(--warning); }
+.offer-percent { color: var(--muted); font-weight: 400; }
+.offer-positions .offer-review { max-width: 460px; margin: 12px 0 0 auto; }
+.offer-lines [data-offer-line-kind=Discount] .offer-line-price { color: var(--positive); }
+.offer-line-criterion { color: var(--positive); }
+.offer-form .offer-totals { margin-top: 24px; }
+.offer-line-check { align-self: end; }
+.offer-line-check label { display: flex; align-items: center; gap: 8px; min-height: 44px; margin: 0; font-weight: 400; }
+.offer-line-check input { width: auto; margin: 0; }
+.offer-table .offer-total-row th, .offer-table .offer-total-row td { font-weight: 650; }
+.offer-card-actions .vehicle-remove, .offer-card-actions .vehicle-remove .button { margin: 0; }
 .offer-documents .section-heading { margin-bottom: 16px; align-items: center; }
 .offer-documents .document-row:first-of-type { border-top: 0; }
 .document-row { padding: 20px 0; }

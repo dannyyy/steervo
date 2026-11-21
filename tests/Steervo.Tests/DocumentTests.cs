@@ -20,9 +20,9 @@ public sealed class DocumentTests
         Assert.Equal(first, document.Revisions[0].File); Assert.Equal(1, document.Revisions[0].OfferRevisionNumber);
         Assert.Equal(2, document.Latest.Number); Assert.Equal(2, document.Latest.OfferRevisionNumber);
         evaluation.CopyCandidate(candidate, "Copy"); Assert.Single(evaluation.Documents);
-        evaluation.ArchiveOffer(offer, true);
-        Assert.Throws<RuleException>(() => evaluation.ReviseDocument(id, File()));
-        Assert.Throws<RuleException>(() => evaluation.RemoveDocument(id));
+        var other = evaluation.AddOffer(candidate, new() { Name = "Other" }, []);
+        evaluation.AddDocument(other, "Other PDF", File(value: "other"));
+        evaluation.RemoveOffer(other); Assert.Single(evaluation.Documents);
         evaluation.RemoveCandidate(candidate); Assert.Empty(evaluation.Documents);
     }
     [Theory, InlineData("../secret"), InlineData("..\\secret"), InlineData("."), InlineData("file\r\nheader"), InlineData("")]

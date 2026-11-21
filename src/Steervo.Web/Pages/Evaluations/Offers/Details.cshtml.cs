@@ -36,8 +36,10 @@ public sealed class DetailsModel(OfferWorkspace workspace, ICurrentUser current,
             if (!ModelState.IsValid || !Current) throw new RuleException("InvalidValue");
             switch (action)
             {
-                case "archive-offer": await workspace.ArchiveAsync(id, version, offerId, true); break;
-                case "restore-offer": await workspace.ArchiveAsync(id, version, offerId, false); break;
+                case "remove-offer":
+                    await workspace.RemoveAsync(id, version, offerId);
+                    if (Request.Headers.ContainsKey("HX-Request")) { Response.Headers["HX-Redirect"] = Url.Page("Index", new { id }); return new EmptyResult(); }
+                    return RedirectToPage("Index", new { id });
                 case "assess-offer": await workspace.AssessAsync(id, version, offerId, criterionId, AssessmentForm.ToInput(booleanValue, measurementValue, ratingValue, source, notes)); break;
                 case "clear-assessment": await workspace.ClearAssessmentAsync(id, version, offerId, criterionId); break;
                 case "remove-document": await workspace.RemoveDocumentAsync(id, version, offerId, documentId); break;
@@ -62,7 +64,7 @@ public sealed class DetailsModel(OfferWorkspace workspace, ICurrentUser current,
         Revision = revision.HasValue ? Offer.Revision(revision.Value) : Offer.Latest;
         First = Evaluation.Offers.Any(item => item.Id == First && item.CandidateId == Offer.CandidateId) ? First : offerId;
         Second = Evaluation.Offers.Any(item => item.Id == Second && item.Id != First && item.CandidateId == Offer.CandidateId) ? Second
-            : Request.Query.ContainsKey("second") ? null : Evaluation.Offers.OrderBy(item => item.Archived).FirstOrDefault(item => item.CandidateId == Offer.CandidateId && item.Id != First)?.Id;
+            : Request.Query.ContainsKey("second") ? null : Evaluation.Offers.OrderBy(item => item.Position).FirstOrDefault(item => item.CandidateId == Offer.CandidateId && item.Id != First)?.Id;
         More = (More ?? []).Distinct().Where(item => item != First && item != Second && Evaluation.Offers.Any(other => other.Id == item)).Take(Steervo.Web.Pages.Evaluations.Candidates.ComparisonSelection.Maximum - 2).ToArray();
     }
 }

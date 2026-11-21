@@ -33,9 +33,12 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   assert.equal((await post(page, casePath, { action: 'add-criterion', name: 'Kaufrecht', type: 'Boolean', priority: 'Required', scope: 'Offer', version })).status(), 200);
   version = await caseVersion();
   assert.equal((await post(page, casePath, { action: 'add-criterion', name: 'Zins', type: 'Measurement', priority: 'Required', scope: 'Offer', threshold: '3', unit: '%', comparison: 'AtMost', version })).status(), 200);
+  version = await caseVersion();
+  assert.equal((await post(page, casePath, { action: 'add-criterion', name: 'Winterräder', type: 'Boolean', priority: 'Preferred', scope: 'Offer', version })).status(), 200);
   const definition = JSON.parse(await (await browserRequest(page, `${casePath}?handler=Export`)).text());
   const booleanId = definition.criteria.find(criterion => criterion.type === 'Boolean').id;
   const measurementId = definition.criteria.find(criterion => criterion.type === 'Measurement').id;
+  const wheelsId = definition.criteria.find(criterion => criterion.name === 'Winterräder').id;
   await page.goto(`${origin}${casePath}/offers`);
   await page.getByRole('link', { name: /Offerte erfassen/ }).click();
   await page.getByRole('link', { name: /Alle Offerten/ }).click();
@@ -53,7 +56,8 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   const firstPath = new URL(page.url()).pathname;
   const firstId = firstPath.split('/').at(-1);
   assert.equal(await page.locator('#offer-workspace').getAttribute('data-revision'), '1');
-  assert.match(await page.locator('.offer-missing').textContent(), /Basispreis/);
+  assert.match(await page.locator('.offer-missing').textContent(), /Preis/);
+  assert.match(await page.locator('[data-offer-price="Total"]').textContent(), /Offen/);
   record('Offers can start incomplete, inherit their candidate and use the evaluation currency');
   await page.goto(`${origin}${casePath}?section=settings`);
   await page.locator('#edit-evaluation').click();
@@ -73,7 +77,7 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   await page.locator('#offer-Lender').fill('Finanzierungspartner');
   await page.locator('#offer-kind').selectOption('Leasing');
   await page.locator('#offer-commitment').selectOption('NonBinding');
-  for (const [name, value] of Object.entries({ BasePrice: '27800', TermMonths: '24', AnnualInterestPercent: '2.75', MonthlyPayment: '640', DownPayment: '0', ResidualPayment: '14500', IncludedKilometresPerYear: '12000', ExcessKilometrePrice: '0.18', UnusedKilometreCredit: '0', IssuedOn: '2026-10-01', ValidUntil: '2026-09-01', DeliveryNotes: 'Nach Absprache' }))
+  for (const [name, value] of Object.entries({ TermMonths: '24', AnnualInterestPercent: '2.75', MonthlyPayment: '640', DownPayment: '0', ResidualPayment: '14500', IncludedKilometresPerYear: '12000', ExcessKilometrePrice: '0.18', UnusedKilometreCredit: '0', IssuedOn: '2026-10-01', ValidUntil: '2026-09-01', DeliveryNotes: 'Nach Absprache' }))
     await page.locator(`#offer-${name}`).fill(value);
   async function addLine(name, kind, price, amount) {
     await page.getByRole('button', { name: /Position hinzufügen/ }).click();
@@ -111,8 +115,38 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   await page.locator('[data-confirm-cancel]').click();
   assert.equal(await page.locator('#offer-ValidUntil').inputValue(), '2026-11-01');
   await page.unroute('**/offers/edit/**');
+  // The price list adds up while typing: fees outside the leasing are due at handover, discounts reduce the total.
+  const totals = page.locator('[data-offer-totals]');
+  assert.match(await totals.locator('[data-total="total"]').textContent(), /^275,00\sEUR$/);
+  const fee = page.locator('[data-offer-line]').first();
+  assert.equal(await fee.getByLabel('Im Leasing').isChecked(), true);
+  await fee.getByLabel('Im Leasing').uncheck();
+  await addLine('Angebotsauto Touring', 'Vehicle', 'Amount', '27800');
+  const discount = await addLine('Flottenrabatt', 'Discount', 'Amount', '500');
+  assert.equal(await discount.getByLabel('Wert der Gratisleistung', { exact: false }).isVisible(), false);
+  await page.locator('[data-offer-line]').nth(2).getByLabel('Wert der Gratisleistung', { exact: false }).fill('900');
+  assert.match(await totals.locator('[data-total="total"]').textContent(), /^27\.575,00\sEUR$/);
+  assert.match(await totals.locator('[data-total="financed"]').textContent(), /^27\.300,00\sEUR$/);
+  assert.match(await totals.locator('[data-total="handover"]').textContent(), /^275,00\sEUR$/);
+  assert.match(await totals.locator('[data-total="concession"]').textContent(), /^1\.400,00\sEUR · 5 %$/);
+  await page.locator('#offer-kind').selectOption('Purchase');
+  assert.equal(await fee.getByLabel('Im Leasing').isVisible(), false);
+  assert.equal(await totals.locator('[data-total-contract]').first().isVisible(), false);
+  await page.locator('#offer-kind').selectOption('Leasing');
+  assert.equal(await fee.getByLabel('Im Leasing').isChecked(), false);
+  await page.locator('#offer-StatedTotal').fill('27000');
   await page.locator('#save-offer').click();
   await page.locator('#offer-workspace[data-revision="2"]').waitFor();
+  const price = key => page.locator(`.offer-positions [data-offer-price="${key}"] dd`).textContent();
+  assert.match(await price('Vehicle'), /27\.800,00 EUR/); assert.match(await price('Extras'), /275,00 EUR/); assert.match(await price('Discounts'), /−500,00 EUR/);
+  assert.match(await price('Total'), /27\.575,00 EUR/); assert.match(await price('Financed'), /27\.300,00 EUR/); assert.match(await price('DueAtHandover'), /275,00 EUR/);
+  assert.match(await price('BenefitValue'), /900,00 EUR/); assert.match(await price('Concession'), /1\.400,00 EUR\s+· 5 %/);
+  assert.match(await page.locator('[data-offer-open-lines]').textContent(), /Positionen ohne Preis: 1/);
+  assert.match(await page.locator('[data-offer-difference]').textContent(), /27\.000,00 EUR.*575,00 EUR/);
+  assert.equal(await page.locator('.offer-positions [data-offer-line-handover]').count(), 1);
+  assert.match(await page.locator('.offer-positions [data-offer-line-kind="Discount"]').textContent(), /−500,00 EUR/);
+  assert.equal(await page.locator('.offer-missing').getByText('Preis', { exact: true }).count(), 0);
+  record('The price list sums vehicle, equipment, fees and discounts, separates the leasing basis from the handover payment and shows the concession');
   assert.match(await page.locator('.offer-value-groups [data-offer-field="DownPayment"]').textContent(), /0,00\s+EUR/);
   assert.match(await page.locator('.offer-positions [data-offer-line-kind="Benefit"]').textContent(), /Inklusive/);
   assert.match(await page.locator('.offer-positions [data-offer-line-kind="Accessory"]').textContent(), /Preis offen/);
@@ -191,6 +225,10 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   await page.locator('#offer-workspace').waitFor();
   const secondId = new URL(page.url()).pathname.split('/').at(-1);
   await page.goto(`${origin}${casePath}/offers/compare?first=${firstId}&second=${secondId}`);
+  const comparedTotal = page.locator('[data-offer-comparison-price="Total"]');
+  assert.equal((await comparedTotal.locator(`[data-offer-cell="${firstId}"]`).textContent()).trim(), '27.300,00');
+  assert.equal((await comparedTotal.locator(`[data-offer-cell="${secondId}"]`).textContent()).trim(), 'Offen');
+  assert.match(await page.locator(`[data-offer-comparison-price="Concession"] [data-offer-cell="${firstId}"]`).textContent(), /1\.400,00\s+· 5 %/);
   const monthly = page.locator('[data-offer-comparison-field="MonthlyPayment"]');
   assert.equal((await monthly.locator(`[data-offer-cell="${firstId}"]`).textContent()).trim(), '610,00');
   assert.equal((await monthly.locator(`[data-offer-cell="${secondId}"]`).textContent()).trim(), '625,00');
@@ -250,21 +288,51 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   await page.getByRole('link', { name: 'Abbrechen', exact: true }).click();
   await page.locator('#offer-workspace').waitFor();
   assert.equal(new URL(page.url()).searchParams.get('second'), secondId);
-  await change(() => page.getByRole('button', { name: 'Offerte archivieren', exact: true }).click());
+  // A line that names a requirement fulfils it; an own answer still wins.
+  await page.getByRole('link', { name: 'Neue Version erfassen', exact: true }).click();
+  const wheelsLine = await addLine('Winterkompletträder', 'Benefit', 'Included');
+  await wheelsLine.getByLabel('Wert der Gratisleistung', { exact: false }).fill('1800');
+  await wheelsLine.getByLabel('Erfüllt Anforderung', { exact: false }).selectOption(wheelsId);
+  await page.locator('#save-offer').click();
+  await page.locator('#offer-workspace[data-revision="3"]').waitFor();
+  const wheels = page.locator(`[data-offer-assessment="${wheelsId}"]`);
+  assert.equal(await wheels.getAttribute('data-result'), 'Met');
+  assert.match(await wheels.textContent(), /Erfüllt durch «Winterkompletträder»/);
+  assert.match(await page.locator('.offer-positions .offer-line-criterion').textContent(), /Winterräder/);
+  assert.match(await page.locator('.offer-positions [data-offer-price="BenefitValue"] dd').textContent(), /1\.800,00 EUR/);
+  await wheels.locator('[data-editor-open]').click();
+  await wheels.getByLabel('Deine Angabe').selectOption('false');
+  await change(() => wheels.locator('.value-editor button[type=submit]').click());
+  assert.equal(await page.locator(`[data-offer-assessment="${wheelsId}"]`).getAttribute('data-result'), 'Unmet');
+  assert.equal(await page.locator('#offer-archive-toggle').count(), 0);
+  assert.equal((await post(page, `${casePath}/offers/edit/${secondId}`, { Version: await page.locator('#offer-workspace').getAttribute('data-version'), 'Input.Name': 'Fremde Anforderung', 'Input.Lines.Index': '0', 'Input.Lines[0].Name': 'Zins', 'Input.Lines[0].PriceKind': 'Unknown', 'Input.Lines[0].CriterionId': measurementId })).status(), 422);
+  record('A price line fulfils the requirement it names; measurements cannot be linked and an own answer overrides the line');
+
+  // Offers keep a manual order and are deleted from their record, like cars.
   await page.goto(`${origin}${casePath}/offers`);
-  assert.equal(await page.locator('.offer-card').count(), 1);
-  await page.getByLabel('Archivierte Offerten anzeigen').check();
-  await page.getByRole('button', { name: 'Filter anwenden' }).click();
-  assert.equal(await page.locator('.offer-card').count(), 2);
-  await page.goto(`${origin}${casePath}/offers/edit/${secondId}`);
-  assert.equal(new URL(page.url()).pathname, `${casePath}/offers/${secondId}`);
-  await page.getByRole('button', { name: 'Offerte wieder aktivieren', exact: true }).waitFor();
-  await change(() => page.getByRole('button', { name: 'Offerte wieder aktivieren', exact: true }).click());
-  await page.getByRole('link', { name: 'Neue Version erfassen', exact: true }).waitFor();
-  assert.equal(await page.locator('[data-offer-version]').count(), 2);
-  await change(() => page.getByRole('button', { name: 'Offerte archivieren', exact: true }).click());
+  const offerOrder = () => page.locator('.offer-card').evaluateAll(cards => cards.map(card => card.dataset.offerId));
+  assert.deepEqual(await offerOrder(), [firstId, secondId]);
+  assert.equal(await page.getByLabel('Archivierte Offerten anzeigen').count(), 0);
+  assert.equal(await page.locator(`#move-offer-${firstId}--1`).isDisabled(), true);
+  await page.locator(`#move-offer-${secondId}--1`).click();
+  await page.waitForFunction(id => document.querySelector('.offer-card')?.dataset.offerId === id, secondId);
+  assert.deepEqual(await offerOrder(), [secondId, firstId]);
+  await page.goto(`${origin}${casePath}/offers/edit?candidateId=${candidateId}`);
+  await page.locator('#offer-Name').fill('Wegwerfofferte');
+  await page.locator('#save-offer').click();
+  await page.locator('#offer-workspace').waitFor();
+  const thirdPath = new URL(page.url()).pathname;
+  await page.locator('#remove-offer').click();
+  assert.match(await page.locator('#action-confirmation').textContent(), /Wegwerfofferte/);
+  await page.locator('#action-confirmation [data-confirm-cancel]').click();
+  assert.equal(new URL(page.url()).pathname, thirdPath);
+  await page.locator('#remove-offer').click();
+  await page.locator('#action-confirmation [data-confirm-accept]').click();
+  await page.waitForURL(`${origin}${casePath}/offers`);
+  assert.deepEqual(await offerOrder(), [secondId, firstId]);
+  assert.equal((await browserRequest(page, thirdPath)).status(), 404);
   await page.setViewportSize({ width: 1440, height: 1050 });
-  record('Dealer comparison and mobile editing work; currency cannot change and archived offers remain accessible');
+  record('Offers are reordered in the overview and deleted from their record after confirmation; nothing is archived');
 
   version = await caseVersion();
   assert.equal((await post(page, casePath, { action: 'share', email: readerEmail, access: 'Reader', version })).status(), 200);
@@ -274,9 +342,11 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   assert.equal((await browserRequest(reader.page, `${casePath}/offers/edit/${firstId}`)).status(), 403);
   await reader.page.goto(`${origin}${firstPath}`);
   version = await reader.page.locator('#offer-workspace').getAttribute('data-version');
-  for (const action of ['archive-offer', 'restore-offer', 'assess-offer', 'clear-assessment'])
+  for (const action of ['remove-offer', 'archive-offer', 'assess-offer', 'clear-assessment'])
     assert.equal((await post(reader.page, firstPath, { action, version, criterionId: booleanId, booleanValue: 'false' })).status(), 403);
   assert.equal((await post(reader.page, `${casePath}/offers/edit/${firstId}`, { Version: version, 'Input.Name': 'Forbidden edit' })).status(), 403);
+  assert.equal((await post(reader.page, `${casePath}/offers`, { action: 'move-offer', itemId: firstId, direction: '-1', version })).status(), 403);
+  assert.equal(await reader.page.locator('#remove-offer').count(), 0);
   version = await caseVersion();
   assert.equal((await post(page, casePath, { action: 'share', email: readerEmail, access: 'Editor', version })).status(), 200);
   await reader.page.goto(`${origin}${firstPath}`);
@@ -315,11 +385,14 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   assert.equal(await reader.page.locator('#save-offer').isDisabled(), true);
   record('Revoked editing permission keeps the long offer draft visible and prevents further saves');
   const exported = JSON.parse(await (await browserRequest(page, `${casePath}?handler=Export`)).text());
-  assert.equal(exported.version, 8);
+  assert.equal(exported.version, 9);
   assert.equal(exported.currency, 'EUR');
   assert.equal(exported.offers.length, 2);
   assert.equal(exported.offers.find(offer => offer.id === firstId).revisions.length, 4);
-  assert.equal(exported.offers.find(offer => offer.id === secondId).archived, true);
+  assert.deepEqual(exported.offers.map(offer => offer.id), [secondId, firstId]);
+  assert.equal(exported.offers[0].archived, undefined);
+  assert.equal(exported.offers[0].revisions.at(-1).lines.at(-1).criterionId, wheelsId);
+  assert.equal(exported.offers[1].revisions[1].lines.find(line => line.kind === 'Fee').financed, false);
   record('Offer access checks cover history and direct writes; concurrency preserves drafts and revocation is immediate');
 
   await page.goto(origin);
@@ -332,7 +405,9 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   assert.equal(imported.offers.length, 2);
   assert.ok(imported.offers.every(offer => !exported.offers.some(original => original.id === offer.id)));
   assert.equal(imported.offers.find(offer => offer.revisions[0].terms.name === 'Anbieter Nord').revisions.length, 4);
-  assert.equal(imported.offerAssessments.length, 2);
+  assert.equal(imported.offerAssessments.length, 3);
+  assert.deepEqual(imported.offers.map(offer => offer.revisions[0].terms.name), ['Anbieter Süd', 'Anbieter Nord']);
+  assert.equal(imported.offers[0].revisions.at(-1).lines.at(-1).criterionId, imported.criteria.find(criterion => criterion.name === 'Winterräder').id);
   assert.equal(await page.locator('.share-row').count(), 0);
   record('JSON import keeps offer histories, positions, currency and assessments with independent IDs and private access');
   await page.goto(`${origin}${originalPath}`);

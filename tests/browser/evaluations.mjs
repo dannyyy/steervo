@@ -208,7 +208,7 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   await mutate(page, () => page.locator('#save-evaluation').click());
   assert.equal(await page.locator('[data-regional-settings-notice]').count(), 0);
   const completed = JSON.parse(await (await browserRequest(page, `${importedPath}?handler=Export`)).text());
-  assert.equal(completed.country, 'LI'); assert.equal(completed.currency, 'CHF'); assert.equal(completed.version, 8);
+  assert.equal(completed.country, 'LI'); assert.equal(completed.currency, 'CHF'); assert.equal(completed.version, 9);
   record('Legacy imports keep their currency and unknown country, then allow explicit completion in properties');
   await page.goto(returnUrl);
 }

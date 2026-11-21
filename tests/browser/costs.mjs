@@ -63,7 +63,7 @@ export async function checkCosts({ page, reader, readerEmail, origin, output, po
   assert.match(await page.locator('[data-cost-period="2"]').textContent(), /145,00/);
   assert.match(await page.locator('[data-cost-period="5"]').textContent(), /-15,00/);
   const exported = await exportCase();
-  assert.equal(exported.version, 8); assert.deepEqual(exported.costPlanning, { start: '2027-10-01', months: 15 });
+  assert.equal(exported.version, 9); assert.deepEqual(exported.costPlanning, { start: '2027-10-01', months: 15 });
   assert.equal(exported.costs.find(c => c.input.name === 'Bekannte Null').input.amount, 0);
   assert.equal(exported.costs.find(c => c.input.name === 'Offener Betrag').input.amount, null);
   assert.equal(exported.costs.find(c => c.input.name === 'Service inklusive').input.frequency, 'Included');

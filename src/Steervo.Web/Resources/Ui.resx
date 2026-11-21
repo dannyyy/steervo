@@ -386,15 +386,15 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="OfferCommitmentBinding" xml:space="preserve"><value>Verbindlich</value></data>
   <data name="OfferGroupHeader" xml:space="preserve"><value>Anbieter &amp; Fahrzeug</value></data>
   <data name="OfferGroupDelivery" xml:space="preserve"><value>Termine &amp; Lieferung</value></data>
-  <data name="OfferGroupPrice" xml:space="preserve"><value>Preis</value></data>
+  <data name="OfferGroupPrice" xml:space="preserve"><value>Preisaufstellung</value></data>
   <data name="OfferGroupContract" xml:space="preserve"><value>Leasing / Finanzierung</value></data>
   <data name="OfferGroupMileage" xml:space="preserve"><value>Leasingkilometer</value></data>
   <data name="OfferGroupNotes" xml:space="preserve"><value>Notizen</value></data>
   <data name="OfferUnknownHelp" xml:space="preserve"><value>Lass unbekannte Angaben leer. 0 bedeutet ausdrücklich keine Kosten; es ersetzt keine fehlende Angabe.</value></data>
   <data name="OfferContractHelp" xml:space="preserve"><value>Übernimm die Angaben des Anbieters. Rate, Zins und Restpreis werden hier erfasst, nicht auseinander berechnet.</value></data>
   <data name="OfferMileageHelp" xml:space="preserve"><value>Kilometer pro Jahr und Preise pro Kilometer. Fehlende Preise bleiben offen.</value></data>
-  <data name="OfferLines" xml:space="preserve"><value>Zubehör, Gebühren &amp; Sonderkonditionen</value></data>
-  <data name="OfferLinesHelp" xml:space="preserve"><value>Übernimm die Positionen so, wie sie in der Offerte stehen. Bezahlte Beträge, inklusive Leistungen und offene Preise bleiben getrennt.</value></data>
+  <data name="OfferLines" xml:space="preserve"><value>Preisaufstellung</value></data>
+  <data name="OfferLinesHelp" xml:space="preserve"><value>Erfasse jede Position mit ihrem Betrag. Der Gesamtpreis ist die Summe.</value></data>
   <data name="AddOfferLine" xml:space="preserve"><value>Position hinzufügen</value></data>
   <data name="RemoveOfferLine" xml:space="preserve"><value>Position entfernen</value></data>
   <data name="MoveOfferLineUp" xml:space="preserve"><value>Position nach oben</value></data>
@@ -412,8 +412,8 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="OfferLineKindBenefit" xml:space="preserve"><value>Sonderkondition</value></data>
   <data name="OfferLineKindEquipment" xml:space="preserve"><value>Ausstattung</value></data>
   <data name="OfferPriceKindUnknown" xml:space="preserve"><value>Preis offen</value></data>
-  <data name="OfferPriceKindAmount" xml:space="preserve"><value>Betrag bekannt</value></data>
-  <data name="OfferPriceKindIncluded" xml:space="preserve"><value>Inklusive</value></data>
+  <data name="OfferPriceKindAmount" xml:space="preserve"><value>Betrag</value></data>
+  <data name="OfferPriceKindIncluded" xml:space="preserve"><value>Inklusive / gratis</value></data>
   <data name="OfferBenefitEffectCostSaving" xml:space="preserve"><value>Kostenersparnis / Gratisleistung</value></data>
   <data name="OfferBenefitEffectRight" xml:space="preserve"><value>Recht / Option</value></data>
   <data name="CostCategoryService" xml:space="preserve"><value>Service</value></data>
@@ -438,18 +438,13 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="OfferUnchanged" xml:space="preserve"><value>Keine Änderung an diesem Feld</value></data>
   <data name="OfferLinesChanged" xml:space="preserve"><value>Die Positionen haben sich geändert. Beide Stände sind in der Historie vollständig einsehbar.</value></data>
   <data name="NoOfferChanges" xml:space="preserve"><value>Es wurden keine Änderungen erfasst. Ergänze Angaben oder eine Änderungsnotiz.</value></data>
-  <data name="OfferArchive" xml:space="preserve"><value>Offerte archivieren</value></data>
-  <data name="OfferRestore" xml:space="preserve"><value>Offerte wieder aktivieren</value></data>
-  <data name="OfferArchived" xml:space="preserve"><value>Diese Offerte ist archiviert. Aktiviere sie, um sie weiterzubearbeiten.</value></data>
-  <data name="OfferArchivedLabel" xml:space="preserve"><value>Archiviert</value></data>
-  <data name="ShowArchivedOffers" xml:space="preserve"><value>Archivierte Offerten anzeigen</value></data>
   <data name="OfferOpenFields" xml:space="preserve"><value>Noch offene Angaben</value></data>
   <data name="OfferNoLines" xml:space="preserve"><value>Keine einzelnen Positionen erfasst.</value></data>
   <data name="OfferNoChangeNote" xml:space="preserve"><value>Ohne Änderungsnotiz</value></data>
   <data name="OfferCompare" xml:space="preserve"><value>Offerten vergleichen</value></data>
   <data name="OfferCompareNeedTwo" xml:space="preserve"><value>Füge eine weitere Offerte hinzu, um zu vergleichen.</value></data>
   <data name="InvalidOfferTerms" xml:space="preserve"><value>Bitte prüfe die Offerte: Beträge dürfen nicht negativ sein; Laufzeit, Kilometer und Datumsangaben müssen gültig sein.</value></data>
-  <data name="InvalidOfferLine" xml:space="preserve"><value>Bitte prüfe die Position: Ein bekannter Preis benötigt einen Betrag. Inklusive und offene Preise enthalten keinen Betrag. Wirkung und Dauer gehören zu Sonderkonditionen.</value></data>
+  <data name="InvalidOfferLine" xml:space="preserve"><value>Bitte prüfe die Position: «Betrag» benötigt einen Betrag, ein Rabatt kann nicht inklusive sein, und Wirkung und Dauer gehören zu Sonderkonditionen.</value></data>
   <data name="TooManyOfferLines" xml:space="preserve"><value>Eine Version kann höchstens 500 Positionen enthalten.</value></data>
   <data name="InvalidOfferDate" xml:space="preserve"><value>Der Zeitpunkt der Offertversion ist ungültig oder liegt vor der vorherigen Version.</value></data>
   <data name="OfferCriteriaOnly" xml:space="preserve"><value>Hier können nur Kriterien mit dem Bezug Offerte bewertet werden.</value></data>
@@ -475,7 +470,6 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="OfferValidUntil" xml:space="preserve"><value>Gültig bis</value></data>
   <data name="OfferDeliveryOn" xml:space="preserve"><value>Lieferdatum</value></data>
   <data name="OfferDeliveryNotes" xml:space="preserve"><value>Lieferfrist / Hinweise</value></data>
-  <data name="OfferBasePrice" xml:space="preserve"><value>Basispreis</value></data>
   <data name="OfferTermMonths" xml:space="preserve"><value>Laufzeit in Monaten</value></data>
   <data name="OfferAnnualInterestPercent" xml:space="preserve"><value>Zins pro Jahr (%)</value></data>
   <data name="OfferMonthlyPayment" xml:space="preserve"><value>Monatliche Rate</value></data>
@@ -775,7 +769,6 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
 <data name="OfferContents" xml:space="preserve"><value>In dieser Offerte</value></data>
 <data name="OfferOverview" xml:space="preserve"><value>Angebot</value></data>
 <data name="OfferComparisonRegion" xml:space="preserve"><value>Offertenvergleich – horizontal scrollbar</value></data>
-<data name="OfferArchiveHelp" xml:space="preserve"><value>Archivierte Offerten bleiben mit ihren Versionen und Dokumenten erhalten. Du kannst sie jederzeit wieder aktivieren.</value></data>
 <data name="OfferAllFilters" xml:space="preserve"><value>Alle Offerten anzeigen</value></data>
   <data name="ApplyOfferFilter" xml:space="preserve"><value>Filter anwenden</value></data>
   <data name="CostPlanningPeriod" xml:space="preserve"><value>Planungszeitraum</value></data>
@@ -856,4 +849,33 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="OfferAttachmentTitle" xml:space="preserve"><value>PDF anhängen</value></data>
   <data name="OfferAttachmentFile" xml:space="preserve"><value>PDF-Datei auswählen</value></data>
   <data name="OfferAttachmentHelp" xml:space="preserve"><value>Die PDF wird zusammen mit der Offerte gespeichert. Bis zu 25 MB. Die Angaben in diesem Formular erfasst du selbst.</value></data>
+  <data name="OfferLineKindVehicle" xml:space="preserve"><value>Fahrzeug</value></data>
+  <data name="OfferLineKindDiscount" xml:space="preserve"><value>Rabatt</value></data>
+  <data name="OfferLineValue" xml:space="preserve"><value>Wert der Gratisleistung</value></data>
+  <data name="OfferLineValueOf" xml:space="preserve"><value>Wert {0}</value></data>
+  <data name="OfferLineFinanced" xml:space="preserve"><value>Im Leasing</value></data>
+  <data name="OfferLineFinancedLoan" xml:space="preserve"><value>Finanziert</value></data>
+  <data name="OfferLineAtHandover" xml:space="preserve"><value>Bei Übernahme zu zahlen</value></data>
+  <data name="OfferLineCriterion" xml:space="preserve"><value>Erfüllt Anforderung</value></data>
+  <data name="OfferLineNoCriterion" xml:space="preserve"><value>Keine</value></data>
+  <data name="OfferLineFulfils" xml:space="preserve"><value>Erfüllt durch «{0}»</value></data>
+  <data name="OfferStatedTotal" xml:space="preserve"><value>Total laut Offerte</value></data>
+  <data name="OfferStatedTotalHelp" xml:space="preserve"><value>Zur Kontrolle: Weicht die Summe der Positionen vom Total der Offerte ab, siehst du die Differenz.</value></data>
+  <data name="OfferPrice" xml:space="preserve"><value>Preis</value></data>
+  <data name="OfferPriceVehicle" xml:space="preserve"><value>Fahrzeug und Ausstattung</value></data>
+  <data name="OfferPriceExtras" xml:space="preserve"><value>Gebühren und Weiteres</value></data>
+  <data name="OfferPriceDiscounts" xml:space="preserve"><value>Rabatte</value></data>
+  <data name="OfferPriceTotal" xml:space="preserve"><value>Gesamtpreis</value></data>
+  <data name="OfferPriceFinanced" xml:space="preserve"><value>Im Leasing</value></data>
+  <data name="OfferPriceFinancedLoan" xml:space="preserve"><value>Finanziert</value></data>
+  <data name="OfferPriceFinancedAny" xml:space="preserve"><value>Im Leasing / finanziert</value></data>
+  <data name="OfferPriceDueAtHandover" xml:space="preserve"><value>Bei Übernahme zu zahlen</value></data>
+  <data name="OfferPriceBenefitValue" xml:space="preserve"><value>Wert der Gratisleistungen</value></data>
+  <data name="OfferPriceConcession" xml:space="preserve"><value>Entgegenkommen</value></data>
+  <data name="OfferPriceOpenLines" xml:space="preserve"><value>Positionen ohne Preis: {0}. Sie fehlen in der Summe.</value></data>
+  <data name="OfferPriceDifference" xml:space="preserve"><value>Total laut Offerte: {0}. Die Positionen weichen um {1} ab.</value></data>
+  <data name="RemoveOffer" xml:space="preserve"><value>Offerte löschen</value></data>
+  <data name="RemoveOfferNamed" xml:space="preserve"><value>«{0}» löschen</value></data>
+  <data name="RemoveOfferConfirm" xml:space="preserve"><value>Alle Versionen, Dokumente und Kostenvergleiche dieser Offerte werden gelöscht.</value></data>
+  <data name="OfferLinesRow" xml:space="preserve"><value>Positionen</value></data>
 </root>

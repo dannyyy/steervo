@@ -1,0 +1,15 @@
+@model Steervo.Web.Pages.Evaluations.Offers.OfferSnapshot
+@using Steervo.Web.Pages.Evaluations.Offers
+@{ var revision = Model.Revision; var pricing = revision.Pricing; var difference = pricing.Difference(revision.Terms.StatedTotal); }
+<dl class="offer-totals" data-offer-pricing>
+@foreach (var key in OfferPrices.Keys)
+{
+    var value = OfferPrices.Value(revision, key);
+    if (key == "Total" && value is null) { <div class="offer-total" data-offer-price="Total"><dt>@T["OfferPriceTotal"]</dt><dd class="offer-open">@T["OfferOpen"]</dd></div> }
+    if (value is null || (value == 0 && key is "Extras" or "Discounts")) { continue; }
+    <div class="@(key == "Total" ? "offer-total" : null)" data-offer-price="@key"><dt>@T[OfferPrices.Label(revision, key)]</dt><dd>@OfferPrices.Format(value.Value) @Model.Currency@if (key == "Concession" && pricing.ConcessionPercent is { } percent) { <span class="offer-percent"> · @percent.ToString("0.#") %</span> }</dd></div>
+}
+@if (revision.Terms.StatedTotal is { } stated) { <div data-offer-field="StatedTotal"><dt>@T["OfferStatedTotal"]</dt><dd>@stated.ToString("N2") @Model.Currency</dd></div> }
+</dl>
+@if (pricing.Open > 0) { <p class="offer-review notice" data-offer-open-lines>@T["OfferPriceOpenLines", pricing.Open]</p> }
+@if (difference is { } gap) { <p class="offer-review notice" data-offer-difference>@T["OfferPriceDifference", $"{revision.Terms.StatedTotal:N2} {Model.Currency}", $"{OfferPrices.Format(gap)} {Model.Currency}"]</p> }

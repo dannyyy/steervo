@@ -6,7 +6,7 @@ public sealed class Offer
     public Guid Id { get; private set; } = Guid.NewGuid();
     public Guid EvaluationId { get; private set; }
     public Guid CandidateId { get; private set; }
-    public bool Archived { get; private set; }
+    public int Position { get; internal set; }
     public IReadOnlyList<OfferRevision> Revisions => revisions.AsReadOnly();
     public OfferRevision Latest => revisions.MaxBy(revision => revision.Number) ?? throw new RuleException("NotFound");
     private Offer() { }
@@ -18,7 +18,6 @@ public sealed class Offer
     public OfferRevision Revision(int number) => revisions.SingleOrDefault(revision => revision.Number == number) ?? throw new RuleException("NotFound");
     internal void Revise(OfferTerms terms, IEnumerable<OfferLineInput> lines, string? changeNote, DateTimeOffset? createdAt = null)
     {
-        if (Archived) throw new RuleException("OfferArchived");
         var revision = new OfferRevision(EvaluationId, Id, revisions.Count + 1, terms, lines, changeNote, createdAt);
         if (revisions.Count > 0 && revision.Terms == Latest.Terms
             && revision.Lines.Select(line => line.ToInput()).SequenceEqual(Latest.Lines.OrderBy(line => line.Position).Select(line => line.ToInput()))
@@ -26,7 +25,6 @@ public sealed class Offer
         if (revisions.Count > 0 && revision.CreatedAt < Latest.CreatedAt) throw new RuleException("InvalidOfferDate");
         revisions.Add(revision);
     }
-    internal void SetArchived(bool archived) => Archived = archived;
 }
 
 public sealed class OfferRevision
@@ -40,6 +38,13 @@ public sealed class OfferRevision
     public string ChangeNote { get; private set; } = "";
     public OfferTerms Terms { get; private set; } = new();
     public IReadOnlyList<OfferLine> Lines => lines.AsReadOnly();
+    public OfferPricing Pricing => OfferPricing.From(lines.Select(line => line.ToInput()));
+    public IEnumerable<string> MissingFields()
+    {
+        var missing = Terms.MissingFields().ToList();
+        if (!lines.Any(line => line.PriceKind == OfferPriceKind.Amount && line.Kind != OfferLineKind.Discount)) missing.Insert(Math.Min(missing.Count, 3), "Price");
+        return missing;
+    }
     private OfferRevision() { }
     internal OfferRevision(Guid evaluationId, Guid offerId, int number, OfferTerms terms, IEnumerable<OfferLineInput> input, string? changeNote, DateTimeOffset? createdAt = null)
     {
@@ -66,6 +71,9 @@ public sealed class OfferLine
     public CostCategory? CostCategory { get; private set; }
     public int? DurationMonths { get; private set; }
     public string Notes { get; private set; } = "";
+    public bool Financed { get; private set; }
+    public decimal? Value { get; private set; }
+    public Guid? CriterionId { get; private set; }
     private OfferLine() { }
     internal OfferLine(Guid revisionId, int position, OfferLineInput input)
     {
@@ -73,6 +81,7 @@ public sealed class OfferLine
         RevisionId = revisionId; Position = position; Name = valid.Name; Kind = valid.Kind;
         PriceKind = valid.PriceKind; Amount = valid.Amount; Effect = valid.Effect;
         CostCategory = valid.CostCategory; DurationMonths = valid.DurationMonths; Notes = valid.Notes ?? "";
+        Financed = valid.Financed; Value = valid.Value; CriterionId = valid.CriterionId;
     }
-    public OfferLineInput ToInput() => new(Name, Kind, PriceKind, Amount, Effect, CostCategory, DurationMonths, Notes);
+    public OfferLineInput ToInput() => new(Name, Kind, PriceKind, Amount, Effect, CostCategory, DurationMonths, Notes, Financed, Value, CriterionId);
 }

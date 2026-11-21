@@ -75,7 +75,7 @@ export async function checkScenarios({ page, reader, readerEmail, origin, output
   assert.equal(await page.locator('#scenario-PurchasePrice').inputValue(), '1000.001');
   await page.setViewportSize({ width: 1440, height: 1050 });
   await page.goto(`${origin}${path}/${cash}`); await page.getByRole('link', { name: 'Jahre', exact: true }).click(); assert.equal(await page.locator('[data-payment-month]').count(), 2);
-  v = await version(); assert.equal((await post(page, `${casePath}/offers/edit/${offer}`, { Version: v, 'Input.Name': 'Neue Rechenofferte', 'Input.Kind': 'Purchase', 'Input.Commitment': 'NonBinding', 'Input.BasePrice': '9999' })).status(), 0);
+  v = await version(); assert.equal((await post(page, `${casePath}/offers/edit/${offer}`, { Version: v, 'Input.Name': 'Neue Rechenofferte', 'Input.Kind': 'Purchase', 'Input.Commitment': 'NonBinding', 'Input.StatedTotal': '9999' })).status(), 0);
   await page.goto(`${origin}${path}/${cash}`); await page.getByText('Offertversion 2 ist verfügbar.', { exact: false }).waitFor(); assert.equal(Number(await amount()), 920);
   await page.getByRole('link', { name: 'Szenario bearbeiten' }).click(); await page.getByLabel('Verwendete Offertversion').selectOption('2'); await save(() => page.locator('#save-scenario').click()); await page.locator('#scenario-detail').waitFor();
   assert.equal(Number(await amount()), 920); const pinned = await exportCase(); assert.equal(pinned.scenarios.find(s => s.id === cash).input.revisionNumber, 2); assert.equal(pinned.scenarios.find(s => s.id === lease).input.revisionNumber, 1);
@@ -102,7 +102,7 @@ export async function checkScenarios({ page, reader, readerEmail, origin, output
   const copiedScenario = new URL(page.url()).pathname.split('/').at(-1); assert.equal(Number(await amount()), 820);
   await page.goto(`${origin}${path}/${copiedScenario}?costId=${cost}`); await page.getByLabel('Abweichender Betrag je Zahlung (EUR)').fill('5'); await save(() => page.getByRole('button', { name: 'Kostenanpassung speichern' }).click()); await page.locator('#scenario-detail').waitFor(); assert.equal(Number(await amount()), 850);
   await page.goto(`${origin}${path}/${lease}`); assert.equal(Number(await amount()), 820);
-  const json = await exportCase(); assert.equal(json.version, 8); assert.equal(json.scenarios.length, 5);
+  const json = await exportCase(); assert.equal(json.version, 9); assert.equal(json.scenarios.length, 5);
   await page.goto(origin); await page.getByRole('button', { name: 'Evaluation importieren', exact: true }).click();
   await page.getByLabel('Exportdatei (JSON oder ZIP)').setInputFiles({ name: 'scenarios.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(json)) }); await page.getByRole('button', { name: 'Als neue Evaluation importieren', exact: true }).click(); await page.waitForURL(/\/evaluations\//);
   const importedPath = new URL(page.url()).pathname; const imported = JSON.parse(await (await browserRequest(page, `${importedPath}?handler=Export`)).text()); assert.equal(imported.scenarios.length, 5);

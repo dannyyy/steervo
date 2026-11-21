@@ -9,7 +9,7 @@ public sealed class ScenarioCalculationTests
     private static (Evaluation E, Guid Car, Guid Offer) Setup(int months = 18, decimal rate = 0)
     {
         var e = new Evaluation("owner", "Calculation", null); var car = e.AddCandidate(new("Vehicle"));
-        var offer = e.AddOffer(car, new() { Name = "Source", BasePrice = 9999 }, [new("Do not add automatically", PriceKind: OfferPriceKind.Amount, Amount: 876)], "EUR");
+        var offer = e.AddOffer(car, new() { Name = "Source", StatedTotal = 9999 }, [new("Do not add automatically", PriceKind: OfferPriceKind.Amount, Amount: 876)], "EUR");
         e.SetCostPlanning(new(2027, 10, 1), months); e.SetCalculationSettings(rate); return (e, car, offer);
     }
     private static ScenarioTerms Purchase => new() { Mode = AcquisitionMode.Purchase, PurchasePrice = 1000, InitialFees = 20, CostsReviewed = true };
@@ -99,7 +99,7 @@ public sealed class ScenarioCalculationTests
     public void Sources_stay_pinned_and_copies_have_independent_residuals()
     {
         var (e, car, offer) = Setup(); var scenario = Add(e, offer, Purchase); e.SetResidual(scenario, new(12, 300, 400, 500));
-        e.ReviseOffer(offer, new() { Name = "New price", BasePrice = 20000 }, []);
+        e.ReviseOffer(offer, new() { Name = "New price", StatedTotal = 20000 }, []);
         Assert.Equal(1, e.FindScenario(scenario).RevisionNumber); Assert.Equal(620, ScenarioCalculation.Calculate(e, scenario, 12).ExpectedCost);
         var copy = e.CopyScenario(scenario, "Copy"); e.SetResidual(copy, new(12, 400, 500, 600));
         Assert.Equal(400, e.FindScenario(scenario).Residuals.Single().Expected);

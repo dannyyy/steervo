@@ -69,7 +69,7 @@ public sealed class OptionalEquipmentPostgresTests
         }); return true; });
         var bytes = await fixture.TransferAsync(owner, t => t.ExportAsync(id));
         var json = JsonNode.Parse(bytes)!;
-        Assert.Equal(8, json["version"]!.GetValue<int>());
+        Assert.Equal(9, json["version"]!.GetValue<int>());
         var copyId = await fixture.TransferAsync(owner, t => t.ImportAsync(bytes));
         var copy = await fixture.AsAsync(owner, w => w.ReadAsync(copyId));
         AssertOptional(copy);

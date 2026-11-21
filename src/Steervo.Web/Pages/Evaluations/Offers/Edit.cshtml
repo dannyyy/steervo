@@ -14,8 +14,14 @@
 @foreach (var group in OfferFields.All.GroupBy(field => field.Group))
 {
 <section class="form-section"><h3>@T["OfferGroup" + group.Key]</h3>
+@if (group.Key == "Price")
+{
+<div data-offer-lines>@for (var index = 0; index < Model.Input.Lines.Count; index++) { <partial name="_OfferLineEditor" model="new OfferLineEditor(Model.Input.Lines[index], index.ToString(), Model.LineCriteria)" /> }</div><template data-offer-line-template><partial name="_OfferLineEditor" model='new OfferLineEditor(new() { PriceKind = OfferPriceKind.Amount, Financed = true }, "__index__", Model.LineCriteria)' /></template><button type="button" class="button secondary" data-offer-line-add><partial name="/Pages/Shared/_Icon.cshtml" model='"plus"' />@T["AddOfferLine"]</button>
+<dl class="offer-totals" data-offer-totals data-label-leasing="@T["OfferLineFinanced"]" data-label-financing="@T["OfferLineFinancedLoan"]" aria-live="polite"><div class="offer-total"><dt>@T["OfferPriceTotal"]</dt><dd data-total="total"></dd></div><div data-total-contract><dt data-financed-label>@T["OfferPriceFinanced"]</dt><dd data-total="financed"></dd></div><div data-total-contract><dt>@T["OfferPriceDueAtHandover"]</dt><dd data-total="handover"></dd></div><div data-total-concession><dt>@T["OfferPriceConcession"]</dt><dd data-total="concession"></dd></div></dl>
+}
 @if (group.Key == "Contract") { <p class="micro">@T["OfferContractHelp"]</p> }
 @if (group.Key == "Mileage") { <p class="micro">@T["OfferMileageHelp"]</p> }
+@if (group.Key == "Price") { <p class="micro">@T["OfferStatedTotalHelp"]</p> }
 <div class="offer-fields">
 @if (group.Key == "Header")
 {
@@ -31,7 +37,6 @@ else { <input id="offer-@field.Name" name="Input.@field.Name" value="@Model.Inpu
 }
 </div></section>
 }
-<section class="form-section"><h3>@T["OfferLines"]</h3><p class="micro">@T["OfferLinesHelp"]</p><div data-offer-lines>@for (var index = 0; index < Model.Input.Lines.Count; index++) { <partial name="_OfferLineEditor" model="new OfferLineEditor(Model.Input.Lines[index], index.ToString())" /> }</div><template data-offer-line-template><partial name="_OfferLineEditor" model='new OfferLineEditor(new(), "__index__")' /></template><button type="button" class="button secondary" data-offer-line-add><partial name="/Pages/Shared/_Icon.cshtml" model='"plus"' />@T["AddOfferLine"]</button></section>
 <section class="form-section"><label for="offer-change-note">@T["OfferChangeNote"] <span class="optional">@T["OptionalField"]</span></label><textarea id="offer-change-note" name="Input.ChangeNote" maxlength="2000" rows="2">@Model.Input.ChangeNote</textarea></section>
 <partial name="/Pages/Shared/_PageEditorActions.cshtml" model='new Steervo.Web.Pages.Shared.PageEditorActions(Model.ReturnUrl, "save-offer", T[Model.Offer is null ? "OfferSaveNew" : "OfferSaveRevision"].Value)' />
 </form></section>

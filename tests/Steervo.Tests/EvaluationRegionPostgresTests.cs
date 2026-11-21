@@ -25,7 +25,7 @@ public sealed class EvaluationRegionPostgresTests
         var original = await f.AsAsync(owner, w => w.ReadAsync(id));
         Assert.Equal("LI", original.Country); Assert.Equal("CHF", original.Currency);
         var bytes = await f.TransferAsync(owner, t => t.ExportAsync(id));
-        var json = JsonNode.Parse(bytes)!; Assert.Equal(8, json["version"]!.GetValue<int>());
+        var json = JsonNode.Parse(bytes)!; Assert.Equal(9, json["version"]!.GetValue<int>());
         var copyId = await f.TransferAsync(owner, t => t.ImportAsync(bytes));
         var copy = await f.AsAsync(owner, w => w.ReadAsync(copyId));
         Assert.Equal("LI", copy.Country); Assert.Equal("CHF", copy.Currency);
@@ -39,14 +39,14 @@ public sealed class EvaluationRegionPostgresTests
     {
         await using var f = await PostgresFixture.CreateAsync(port); var owner = await f.SetupAsync();
         var id = await f.AsAsync(owner, w => w.CreateAsync("Existing", null, "LI", "CHF"));
-        await f.AsAsync(owner, async w => { await w.EditAsync(id, 1, e => e.AddOffer(e.AddCandidate(new("Car")), new() { Name = "Offer", BasePrice = 23456 }, [])); return true; });
+        await f.AsAsync(owner, async w => { await w.EditAsync(id, 1, e => e.AddOffer(e.AddCandidate(new("Car")), new() { Name = "Offer", StatedTotal = 23456 }, [])); return true; });
         await f.RunAsync(async p => {
             var migrator = p.GetRequiredService<AppDbContext>().GetService<IMigrator>();
             await migrator.MigrateAsync("20261113152355_OptionalEquipment");
             await migrator.MigrateAsync(); return true;
         });
         var e = await f.AsAsync(owner, w => w.ReadAsync(id));
-        Assert.Null(e.Country); Assert.Equal("CHF", e.Currency); Assert.Equal(23456, e.Offers.Single().Latest.Terms.BasePrice);
+        Assert.Null(e.Country); Assert.Equal("CHF", e.Currency); Assert.Equal(23456, e.Offers.Single().Latest.Pricing.Total);
         var json = JsonNode.Parse(await f.TransferAsync(owner, t => t.ExportAsync(id)))!;
         json["version"] = 7; json.AsObject().Remove("country");
         var copyId = await f.TransferAsync(owner, t => t.ImportAsync(Encoding.UTF8.GetBytes(json.ToJsonString())));
@@ -54,7 +54,7 @@ public sealed class EvaluationRegionPostgresTests
         await Assert.ThrowsAsync<RuleException>(() => f.AsAsync(owner, async w => { await w.EditAsync(id, e.Version, x => x.SetProperties("Wrong", null, "DE", "EUR")); return true; }));
         var unchanged = await f.AsAsync(owner, w => w.ReadAsync(id)); Assert.Null(unchanged.Country); Assert.Equal("Existing", unchanged.Name); Assert.Equal(e.Version, unchanged.Version);
         await f.AsAsync(owner, async w => { await w.EditAsync(id, e.Version, x => x.SetProperties(x.Name, x.Purpose, "LI", "CHF")); return true; });
-        var completed = await f.AsAsync(owner, w => w.ReadAsync(id)); Assert.Equal("LI", completed.Country); Assert.Equal(23456, completed.Offers.Single().Latest.Terms.BasePrice);
+        var completed = await f.AsAsync(owner, w => w.ReadAsync(id)); Assert.Equal("LI", completed.Country); Assert.Equal(23456, completed.Offers.Single().Latest.Pricing.Total);
         await Assert.ThrowsAsync<RuleException>(() => f.AsAsync(owner, async w => { await w.EditAsync(id, e.Version, x => x.SetProperties(x.Name, x.Purpose, "DE", "CHF")); return true; }));
     }
 }

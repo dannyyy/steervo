@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Steervo.Core;
 
@@ -10,7 +11,7 @@ public sealed record CandidateExport(Guid Id, string Model, string Brand, string
     string Notes, string Links, CandidateStatus Status, string StatusReason, int Position, VehicleSpecifications? Specifications = null);
 public sealed record AssessmentExport(Guid CandidateId, Guid CriterionId, bool? BooleanValue, decimal? MeasurementValue, int? RatingValue, AssessmentSource Source, string Notes, bool OptionalAvailable = false);
 public sealed record OfferRevisionExport(int Number, DateTimeOffset CreatedAt, string ChangeNote, OfferTerms Terms, OfferLineInput[] Lines);
-public sealed record OfferExport(Guid Id, Guid CandidateId, bool Archived, OfferRevisionExport[] Revisions);
+public sealed record OfferExport(Guid Id, Guid CandidateId, OfferRevisionExport[] Revisions);
 public sealed record OfferAssessmentExport(Guid OfferId, Guid CriterionId, int RevisionNumber, bool? BooleanValue, decimal? MeasurementValue, int? RatingValue, AssessmentSource Source, string Notes, bool OptionalAvailable = false);
 public sealed record CostPlanningExport(DateOnly Start, int Months);
 public sealed record CostExport(Guid Id, CostInput Input);
@@ -36,14 +37,16 @@ public sealed class EvaluationTransfer(EvaluationWorkspace workspace, IEvaluatio
     }
     internal static byte[] Serialize(Evaluation evaluation)
     {
-        var content = new EvaluationExport("steervo-evaluation", 8, evaluation.Name, evaluation.Purpose,
+        // Stored versions never change, so a line may still name a requirement that was deleted later.
+        var known = evaluation.Criteria.Select(criterion => criterion.Id).ToHashSet();
+        var content = new EvaluationExport("steervo-evaluation", 9, evaluation.Name, evaluation.Purpose,
             evaluation.Groups.OrderBy(x => x.Position).Select(x => new GroupExport(x.Id, x.Name, x.Position)).ToArray(),
             evaluation.Criteria.OrderBy(x => x.Position).Select(x => new CriterionExport(x.Id, x.Name, x.Type, x.Priority, x.Scope, x.GroupId, x.Threshold, x.Unit, x.Comparison, x.Position)).ToArray(),
             evaluation.Candidates.OrderBy(x => x.Position).Select(x => new CandidateExport(x.Id, x.Model, x.Brand, x.Variant, x.Condition, x.Year, x.Mileage, x.Notes, x.Links, x.Status, x.StatusReason, x.Position, x.Specifications)).ToArray(),
             evaluation.Assessments.OrderBy(x => x.CandidateId).ThenBy(x => x.CriterionId).Select(x => new AssessmentExport(x.CandidateId, x.CriterionId, x.BooleanValue, x.MeasurementValue, x.RatingValue, x.Source, x.Notes, x.OptionalAvailable)).ToArray(), evaluation.Currency,
-            evaluation.Offers.Select(offer => new OfferExport(offer.Id, offer.CandidateId, offer.Archived,
+            evaluation.Offers.OrderBy(offer => offer.Position).Select(offer => new OfferExport(offer.Id, offer.CandidateId,
                 offer.Revisions.OrderBy(revision => revision.Number).Select(revision => new OfferRevisionExport(revision.Number, revision.CreatedAt, revision.ChangeNote, revision.Terms,
-                    revision.Lines.OrderBy(line => line.Position).Select(line => line.ToInput()).ToArray())).ToArray())).ToArray(),
+                    revision.Lines.OrderBy(line => line.Position).Select(line => line.ToInput()).Select(line => line.CriterionId is { } linked && !known.Contains(linked) ? line with { CriterionId = null } : line).ToArray())).ToArray())).ToArray(),
             evaluation.OfferAssessments.Select(value => new OfferAssessmentExport(value.OfferId, value.CriterionId, value.RevisionNumber, value.BooleanValue, value.MeasurementValue, value.RatingValue, value.Source, value.Notes, value.OptionalAvailable)).ToArray(),
             evaluation.CostPlanning is { } plan ? new(plan.Start, plan.Months) : null,
             evaluation.Costs.Select(cost => new CostExport(cost.Id, cost.ToInput())).ToArray(),
@@ -57,13 +60,33 @@ public sealed class EvaluationTransfer(EvaluationWorkspace workspace, IEvaluatio
         await store.CreateAsync(prepared.Evaluation);
         return prepared.Evaluation.Id;
     }
+    // Files written before version 9 carried one base price and an archive flag per offer.
+    // The base price becomes the vehicle line; archived offers are imported like any other.
+    private static JsonNode? Upgrade(JsonNode? root)
+    {
+        if (root is not JsonObject content || content["version"] is not JsonValue number || !number.TryGetValue<int>(out var version) || version >= 9
+            || content["offers"] is not JsonArray offers) return root;
+        foreach (var offer in offers.OfType<JsonObject>())
+        {
+            offer.Remove("archived");
+            if (offer["revisions"] is not JsonArray revisions) continue;
+            foreach (var revision in revisions.OfType<JsonObject>())
+            {
+                if (revision["terms"] is not JsonObject terms || !terms.Remove("basePrice", out var price) || price is null || revision["lines"] is not JsonArray lines) continue;
+                var name = terms["vehicleDescription"] is JsonValue text && text.TryGetValue<string>(out var description) && !string.IsNullOrWhiteSpace(description) ? description.Trim() : LegacyVehicleLine;
+                lines.Insert(0, new JsonObject { ["name"] = name[..Math.Min(name.Length, 300)], ["kind"] = nameof(OfferLineKind.Vehicle), ["priceKind"] = nameof(OfferPriceKind.Amount), ["amount"] = price.DeepClone() });
+            }
+        }
+        return root;
+    }
+    public const string LegacyVehicleLine = "Fahrzeug";
     internal (Evaluation Evaluation, Dictionary<Guid, Guid> OfferIds) PrepareImport(byte[] data)
     {
         if (data.Length > MaximumBytes) throw new RuleException("InvalidImport");
         EvaluationExport content;
-        try { content = JsonSerializer.Deserialize<EvaluationExport>(data, Json) ?? throw new RuleException("InvalidImport"); }
-        catch (JsonException) { throw new RuleException("InvalidImport"); }
-        if (content.Format != "steervo-evaluation" || content.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8) || content.Groups is null || content.Criteria is null || content.Groups.Length > 100 || content.Criteria.Length > 1000
+        try { content = Upgrade(JsonNode.Parse(data, documentOptions: new() { MaxDepth = 16 })).Deserialize<EvaluationExport>(Json) ?? throw new RuleException("InvalidImport"); }
+        catch (Exception error) when (error is JsonException or InvalidOperationException or FormatException) { throw new RuleException("InvalidImport"); }
+        if (content.Format != "steervo-evaluation" || content.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9) || content.Groups is null || content.Criteria is null || content.Groups.Length > 100 || content.Criteria.Length > 1000
             || content.Groups.Any(x => x is null || x.Id == Guid.Empty || x.Position < 0) || content.Criteria.Any(x => x is null || x.Id == Guid.Empty || x.Position < 0)
             || content.Groups.DistinctBy(x => x.Id).Count() != content.Groups.Length || content.Criteria.DistinctBy(x => x.Id).Count() != content.Criteria.Length
             || (content.Version == 1 && (content.Candidates is not null || content.Assessments is not null))
@@ -131,8 +154,10 @@ public sealed class EvaluationTransfer(EvaluationWorkspace workspace, IEvaluatio
             var history = offer.Revisions.OrderBy(revision => revision.Number).ToArray();
             if (!history.Select(revision => revision.Number).SequenceEqual(Enumerable.Range(1, history.Length))) throw new RuleException("InvalidImport");
             var first = history[0];
-            var id = evaluation.AddOffer(candidateId, first.Terms, first.Lines, changeNote: first.ChangeNote, createdAt: first.CreatedAt);
-            foreach (var revision in history.Skip(1)) evaluation.ReviseOffer(id, revision.Terms, revision.Lines, revision.ChangeNote, revision.CreatedAt);
+            OfferLineInput[] Lines(OfferRevisionExport revision) => revision.Lines.Select(line => line.CriterionId is { } linked
+                ? line with { CriterionId = criteria.TryGetValue(linked, out var mapped) ? mapped : throw new RuleException("InvalidImport") } : line).ToArray();
+            var id = evaluation.AddOffer(candidateId, first.Terms, Lines(first), changeNote: first.ChangeNote, createdAt: first.CreatedAt);
+            foreach (var revision in history.Skip(1)) evaluation.ReviseOffer(id, revision.Terms, Lines(revision), revision.ChangeNote, revision.CreatedAt);
             offerIds.Add(offer.Id, id);
         }
         foreach (var value in offerAssessments)
@@ -141,7 +166,6 @@ public sealed class EvaluationTransfer(EvaluationWorkspace workspace, IEvaluatio
             evaluation.AssessOffer(offerId, criterionId, new(value.BooleanValue, value.MeasurementValue, value.RatingValue, value.Source, value.Notes, value.OptionalAvailable));
             evaluation.OfferAssessments.Single(assessment => assessment.OfferId == offerId && assessment.CriterionId == criterionId).RestoreRevision(evaluation.FindOffer(offerId), value.RevisionNumber);
         }
-        foreach (var offer in offers.Where(offer => offer.Archived)) evaluation.ArchiveOffer(offerIds[offer.Id], true);
         if (content.CostPlanning is { } plan) evaluation.SetCostPlanning(plan.Start, plan.Months);
         var costIds = new Dictionary<Guid, Guid>();
         foreach (var cost in costs)

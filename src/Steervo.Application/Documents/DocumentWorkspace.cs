@@ -15,7 +15,7 @@ public sealed class DocumentWorkspace(EvaluationWorkspace evaluations, ICurrentU
     {
         var evaluation = await evaluations.ReadAsync(evaluationId);
         evaluation.Require(current.Id, AccessLevel.Editor);
-        if (evaluation.FindOffer(offerId).Archived) throw new RuleException("OfferArchived");
+        _ = evaluation.FindOffer(offerId);
         if (evaluation.Version != version) throw new RuleException("Conflict");
         if (documentId.HasValue && evaluation.FindDocument(documentId.Value).OfferId != offerId) throw new RuleException("NotFound");
         _ = Rules.Text(documentId.HasValue ? evaluation.FindDocument(documentId.Value).Name : name, 160);

@@ -26,7 +26,6 @@ public sealed class UploadModel(EvaluationWorkspace evaluations, DocumentWorkspa
         try
         {
             await LoadAsync(id, offerId, documentId);
-            if (Offer.Archived) return RedirectToPage("Details", new { id, offerId });
             Version = Evaluation.Version; Name = Document?.Name ?? ""; return Page();
         }
         catch (RuleException error) { return StatusCode(error.Message == "Forbidden" ? 403 : 404); }

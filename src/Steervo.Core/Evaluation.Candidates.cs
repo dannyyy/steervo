@@ -33,6 +33,7 @@ public sealed partial class Evaluation
         Documents.RemoveAll(document => offerIds.Contains(document.OfferId));
         OfferAssessments.RemoveAll(assessment => offerIds.Contains(assessment.OfferId));
         Offers.RemoveAll(offer => offer.CandidateId == id);
+        NormalizeOffers();
         Candidates.Remove(FindCandidate(id));
         Costs.RemoveAll(cost => cost.CandidateId == id);
         Assessments.RemoveAll(x => x.CandidateId == id);

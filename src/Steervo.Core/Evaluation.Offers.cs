@@ -25,17 +25,48 @@ public sealed partial class Evaluation
         _ = FindCandidate(candidateId);
         var code = ValidateCurrency(currency ?? Currency);
         if (Currency is not null && Currency != code) throw new RuleException("CurrencyFixed");
-        var offer = new Offer(Id, candidateId, terms, lines, changeNote, createdAt);
+        var offer = new Offer(Id, candidateId, terms, Linked(lines), changeNote, createdAt) { Position = Offers.Count };
         Currency = code; Offers.Add(offer);
         return offer.Id;
     }
     public void ReviseOffer(Guid id, OfferTerms terms, IEnumerable<OfferLineInput> lines, string? changeNote = null, DateTimeOffset? createdAt = null) =>
-        FindOffer(id).Revise(terms, lines, changeNote, createdAt);
-    public void ArchiveOffer(Guid id, bool archived) => FindOffer(id).SetArchived(archived);
+        FindOffer(id).Revise(terms, Linked(lines), changeNote, createdAt);
+    // A line may only satisfy a yes/no requirement that belongs to offers.
+    private OfferLineInput[] Linked(IEnumerable<OfferLineInput> lines)
+    {
+        var result = lines.Take(501).ToArray();
+        foreach (var line in result.Where(line => line.CriterionId.HasValue))
+            if (Criteria.SingleOrDefault(criterion => criterion.Id == line.CriterionId) is not { Scope: CriterionScope.Offer, Type: CriterionType.Boolean })
+                throw new RuleException("InvalidOfferLine");
+        return result;
+    }
+    // Moves an offer past its neighbour within the listed offers, e.g. the offers of one car.
+    public void MoveOffer(Guid id, int direction, Guid? candidateId = null)
+    {
+        if (direction is not (-1 or 1)) throw new RuleException("InvalidValue");
+        var offer = FindOffer(id);
+        var listed = Offers.Where(item => !candidateId.HasValue || item.CandidateId == candidateId).OrderBy(item => item.Position).ToList();
+        var index = listed.IndexOf(offer) + direction;
+        if (listed.IndexOf(offer) < 0 || index < 0 || index >= listed.Count) return;
+        (offer.Position, listed[index].Position) = (listed[index].Position, offer.Position);
+    }
+    public void RemoveOffer(Guid id)
+    {
+        var offer = FindOffer(id);
+        Scenarios.RemoveAll(scenario => scenario.OfferId == id);
+        Documents.RemoveAll(document => document.OfferId == id);
+        OfferAssessments.RemoveAll(assessment => assessment.OfferId == id);
+        Offers.Remove(offer);
+        NormalizeOffers();
+    }
+    private void NormalizeOffers()
+    {
+        var position = 0;
+        foreach (var offer in Offers.OrderBy(offer => offer.Position)) offer.Position = position++;
+    }
     public void AssessOffer(Guid offerId, Guid criterionId, AssessmentInput input)
     {
         var offer = FindOffer(offerId);
-        if (offer.Archived) throw new RuleException("OfferArchived");
         var criterion = FindCriterion(criterionId);
         var assessment = OfferAssessments.SingleOrDefault(value => value.OfferId == offerId && value.CriterionId == criterionId);
         if (assessment is null) OfferAssessments.Add(new OfferAssessment(Id, offer, criterion, input));
@@ -43,14 +74,18 @@ public sealed partial class Evaluation
     }
     public void ClearOfferAssessment(Guid offerId, Guid criterionId)
     {
-        if (FindOffer(offerId).Archived) throw new RuleException("OfferArchived");
-        _ = FindCriterion(criterionId);
+        _ = FindOffer(offerId); _ = FindCriterion(criterionId);
         OfferAssessments.RemoveAll(value => value.OfferId == offerId && value.CriterionId == criterionId);
     }
+    public OfferLine? OfferLineFor(Offer offer, Criterion criterion) => criterion is { Scope: CriterionScope.Offer, Type: CriterionType.Boolean }
+        ? offer.Latest.Lines.OrderBy(line => line.Position).FirstOrDefault(line => line.CriterionId == criterion.Id) : null;
     public Fulfillment OfferResult(Guid offerId, Guid criterionId)
     {
         var offer = FindOffer(offerId); var criterion = FindCriterion(criterionId);
         var assessment = OfferAssessments.SingleOrDefault(value => value.OfferId == offerId && value.CriterionId == criterionId);
+        // An own answer for the current version wins; otherwise a linked line fulfils the requirement.
+        if (!(assessment?.RevisionNumber == offer.Latest.Number && assessment.HasValue) && OfferLineFor(offer, criterion) is not null)
+            return criterion.Assess(true, null, null, false);
         return assessment?.RevisionNumber == offer.Latest.Number
             ? criterion.Assess(assessment.BooleanValue, assessment.MeasurementValue, assessment.RatingValue, assessment.OptionalAvailable) : Fulfillment.Unknown;
     }

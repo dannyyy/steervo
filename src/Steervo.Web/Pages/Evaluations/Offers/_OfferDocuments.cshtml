@@ -1,5 +1,5 @@
 @model Steervo.Web.Pages.Evaluations.Offers.DetailsModel
-@{ var e = Model.Evaluation; var offer = Model.Offer; var edit = Model.Current && !offer.Archived && Model.Access >= AccessLevel.Editor;
+@{ var e = Model.Evaluation; var offer = Model.Offer; var edit = Model.Current && Model.Access >= AccessLevel.Editor;
    var documents = e.Documents.Where(d => d.OfferId == offer.Id && d.Revisions.Any(r => r.OfferRevisionNumber <= Model.Revision.Number)).OrderBy(d => d.Name).ToArray(); }
 <section class="record-section offer-documents" id="documents">
 <div class="section-heading"><div><h3 id="documents-title" tabindex="-1">@T["Documents"]</h3><p class="micro">@T["DocumentsHelp"]</p></div>

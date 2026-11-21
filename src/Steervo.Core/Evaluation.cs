@@ -81,7 +81,9 @@ public sealed partial class Evaluation
     {
         var criterion = FindCriterion(id);
         ValidateGroup(input.GroupId);
-        if ((criterion.Scope != input.Scope && (Assessments.Any(x => x.CriterionId == id) || OfferAssessments.Any(x => x.CriterionId == id)))
+        var linked = Offers.SelectMany(offer => offer.Revisions).SelectMany(revision => revision.Lines).Any(line => line.CriterionId == id);
+        if ((linked && (criterion.Scope != input.Scope || criterion.Type != input.Type))
+            || (criterion.Scope != input.Scope && (Assessments.Any(x => x.CriterionId == id) || OfferAssessments.Any(x => x.CriterionId == id)))
             || ((Assessments.Any(x => x.CriterionId == id && x.HasValue) || OfferAssessments.Any(x => x.CriterionId == id && x.HasValue))
                 && (criterion.Type != input.Type || criterion.Unit != (input.Type == CriterionType.Measurement ? input.Unit?.Trim() : null))))
             throw new RuleException("CriterionHasAssessments");
