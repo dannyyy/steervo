@@ -2,7 +2,7 @@
 @using Steervo.Web.Pages.Evaluations.Candidates
 @if (Model.Any(candidate => candidate.Specifications.HasValues()))
 {
-    <tbody class="specification-comparison"><tr class="vehicle-group-heading"><th scope="colgroup" colspan="@(Model.Count + 1)"><span class="comparison-group-label">@T["VehicleSpecifications"]<span class="micro">@T["SpecificationsHelp"]</span></span></th></tr></tbody>
+    <tbody class="specification-comparison" id="comparison-specifications"><tr class="vehicle-group-heading comparison-section-heading"><th scope="colgroup" colspan="@(Model.Count + 1)"><span class="comparison-group-label">@T["VehicleSpecifications"]</span></th></tr></tbody>
     @foreach (var group in SpecificationFields.All.GroupBy(field => field.Group))
     {
         var fields = group.Where(field => Model.Any(candidate => field.Value(candidate.Specifications).HasValue)).ToList();

@@ -235,6 +235,8 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="SelectCandidate" xml:space="preserve"><value>Auto auswählen</value></data>
   <data name="ShowComparison" xml:space="preserve"><value>Vergleich anzeigen</value></data>
   <data name="NoAutomaticExclusion" xml:space="preserve"><value>Ein verfehltes Muss führt nicht automatisch zum Ausschluss. Du entscheidest, welche Abstriche für dich in Frage kommen.</value></data>
+  <data name="ComparisonRowLabel" xml:space="preserve"><value>Angabe</value></data>
+  <data name="ComparisonSections" xml:space="preserve"><value>Abschnitte des Vergleichs</value></data>
   <data name="CandidateStatusWatching" xml:space="preserve"><value>Beobachtet</value></data>
   <data name="CandidateStatusAlternative" xml:space="preserve"><value>Alternative</value></data>
   <data name="CandidateStatusFavorite" xml:space="preserve"><value>Favorit</value></data>
@@ -246,8 +248,8 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="CopyCandidateName" xml:space="preserve"><value>Bezeichnung der Kopie</value></data>
   <data name="CopyCandidateHelp" xml:space="preserve"><value>Stammdaten, Quellen, Bewertungen und fahrzeugspezifische Kostenpositionen werden kopiert. Die Kopie erhält eine eigene Einstufung. Prüfe die übernommenen Angaben.</value></data>
   <data name="CopyCandidate" xml:space="preserve"><value>Auto kopieren</value></data>
-  <data name="RemoveCandidate" xml:space="preserve"><value>Auto entfernen</value></data>
-  <data name="RemoveCandidateConfirm" xml:space="preserve"><value>Dieses Auto mit seinen Bewertungen, Kostenpositionen und allen Offerten samt Versionshistorie und Dokumenten unwiderruflich entfernen?</value></data>
+  <data name="RemoveCandidate" xml:space="preserve"><value>Auto löschen</value></data>
+  <data name="RemoveCandidateConfirm" xml:space="preserve"><value>Dieses Auto mit seinen Bewertungen, Kostenpositionen und allen Offerten samt Versionshistorie und Dokumenten unwiderruflich löschen?</value></data>
   <data name="NewCandidateHelp" xml:space="preserve"><value>Erfasse ein Modell oder eine konkrete Ausführung. Unbekannte Angaben dürfen offen bleiben.</value></data>
   <data name="CreateCandidate" xml:space="preserve"><value>Auto anlegen</value></data>
   <data name="AssessmentValue" xml:space="preserve"><value>Deine Angabe</value></data>
@@ -287,7 +289,7 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="SaveClassification" xml:space="preserve"><value>Einordnung speichern</value></data>
   <data name="NoCandidateReason" xml:space="preserve"><value>Noch keine Begründung erfasst.</value></data>
   <data name="NoCandidateNotes" xml:space="preserve"><value>Noch keine Notizen erfasst.</value></data>
-  <data name="EditCandidate" xml:space="preserve"><value>Stammdaten bearbeiten</value></data>
+  <data name="EditCandidate" xml:space="preserve"><value>Auto bearbeiten</value></data>
   <data name="SaveCandidate" xml:space="preserve"><value>Stammdaten speichern</value></data>
   <data name="NoComparisonCandidates" xml:space="preserve"><value>Noch keine Autos zum Vergleichen.</value></data>
   <data name="NoComparisonCandidatesHelp" xml:space="preserve"><value>Erfasse zuerst Kandidaten und prüfe ihre Ausstattung.</value></data>
@@ -461,7 +463,6 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="OfferAssessmentStale" xml:space="preserve"><value>Aus Version {0} – bitte erneut prüfen</value></data>
   <data name="OfferAssessmentReview" xml:space="preserve"><value>Für aktuelle Version bestätigen</value></data>
   <data name="OfferNoCriteria" xml:space="preserve"><value>Noch keine Kriterien mit dem Bezug Offerte vorhanden.</value></data>
-  <data name="OfferCriteriaSeparateLink" xml:space="preserve"><value>Offertkriterien prüfst du bei der jeweiligen Offerte.</value></data>
   <data name="OfferAssessmentSave" xml:space="preserve"><value>Einschätzung speichern</value></data>
   <data name="OfferAssessmentReset" xml:space="preserve"><value>Einschätzung zurücksetzen</value></data>
   <data name="OfferMonthlyUnit" xml:space="preserve"><value>/ Monat</value></data>
@@ -758,7 +759,7 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="DiscardDraftDescription" xml:space="preserve"><value>Deine Eingaben sind noch nicht gespeichert. Du kannst weiterarbeiten oder sie verwerfen.</value></data>
   <data name="DiscardDraft" xml:space="preserve"><value>Änderungen verwerfen</value></data>
   <data name="ContinueEditing" xml:space="preserve"><value>Weiterbearbeiten</value></data>
-  <data name="RemoveCandidateNamed" xml:space="preserve"><value>{0} entfernen</value></data>
+  <data name="RemoveCandidateNamed" xml:space="preserve"><value>{0} löschen</value></data>
   <data name="EditorPermissionError" xml:space="preserve"><value>Du kannst hier nicht mehr bearbeiten. Dein Entwurf bleibt sichtbar; lade die Seite neu, um deine aktuellen Zugriffsrechte zu prüfen.</value></data>
   <data name="EditorNetworkError" xml:space="preserve"><value>Die Änderung konnte nicht gespeichert werden. Deine Eingaben bleiben erhalten. Bitte versuche es erneut.</value></data>
   <data name="EditorConflict" xml:space="preserve"><value>Der aktuelle Stand wurde geladen. Dein Entwurf ist weiterhin im Editor. Prüfe die Angaben in der Übersicht, bevor du erneut speicherst.</value></data>

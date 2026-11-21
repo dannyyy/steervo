@@ -20,7 +20,7 @@ export async function checkOptionalEquipment({ page, reader, readerEmail, origin
     assert.equal((await response).status(), status); await settle();
   }
   await page.setViewportSize({ width: 1440, height: 1050 });
-  await page.goto(origin + firstPath);
+  await page.goto(origin + firstPath + '#requirements');
   await opener(firstId).click();
   await value(firstId).selectOption('optional');
   await note(firstId).fill('Separat beim Hersteller oder einem Drittanbieter erhältlich.');

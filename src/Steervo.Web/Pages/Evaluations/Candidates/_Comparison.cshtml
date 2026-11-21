@@ -1,6 +1,6 @@
 @model Steervo.Web.Pages.Evaluations.Candidates.CompareModel
 @using Steervo.Web.Pages.Evaluations.Candidates
-@{ var e = Model.Evaluation; var edit = Model.Access >= AccessLevel.Editor; var url = $"/evaluations/{e.Id}/compare?{Model.Query}"; var selected = Model.Selected; var available = Model.Available; }
+@{ var e = Model.Evaluation; var edit = Model.Access >= AccessLevel.Editor; var url = $"/evaluations/{e.Id}/compare?{Model.Query}"; var selected = Model.Selected; var available = Model.Available; var hasSpecifications = selected.Any(candidate => candidate.Specifications.HasValues()); var hasRequirements = e.Criteria.Any(x => x.Scope == CriterionScope.Vehicle); }
 <div id="candidate-workspace" data-version="@e.Version" data-preserve-viewport hx-target="#candidate-workspace" hx-swap="outerHTML show:none focus-scroll:false" hx-sync="this:drop">
 <partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "comparison", Model.First?.Id, Model.First?.Id, Model.Second?.Id, Model.More)' />
 @if (Model.Notice is not null && Model.Draft is null) { <div class="notice workspace-notice @(Model.Failed ? "failure" : "success")" role="@(Model.Failed ? "alert" : "status")" tabindex="-1">@Model.Notice</div> }
@@ -26,7 +26,9 @@ else
         <table class="vehicle-table cars-@selected.Count @(selected.Count == 1 ? "vehicle-table-single" : null)">
             <caption class="visually-hidden">@T["VehicleComparison"]</caption>
             <colgroup><col class="criterion-column" />@foreach (var candidate in selected) { <col /> }</colgroup>
-            <thead><tr><th scope="col">@T["VehicleRequirements"]</th>@foreach (var candidate in selected) { <th scope="col" data-comparison-column="@candidate.Id"><div class="comparison-car"><a href="/evaluations/@e.Id/candidates/@candidate.Id?@Model.Query" class="comparison-candidate-link">@candidate.DisplayName</a>@if (selected.Count > 1) { <a class="icon-button comparison-remove" href="/evaluations/@e.Id/compare?@Model.QueryWithout(candidate)" aria-label="@T["ComparisonRemove", candidate.DisplayName]" title="@T["ComparisonRemove", candidate.DisplayName]"><partial name="/Pages/Shared/_Icon.cshtml" model='"close"' /></a> }</div><span class="candidate-status @candidate.Status.ToString().ToLowerInvariant()">@T["CandidateStatus" + candidate.Status]</span>@if (candidate.StatusReason.Length > 0) { <p class="micro">@candidate.StatusReason</p> }</th> }</tr></thead>
+            <thead><tr><th scope="col"><span class="visually-hidden">@T["ComparisonRowLabel"]</span>@if (hasSpecifications && hasRequirements) { <nav class="comparison-jump" aria-label="@T["ComparisonSections"]"><a href="#comparison-specifications">@T["VehicleSpecifications"]</a><a href="#comparison-requirements">@T["VehicleRequirements"]</a></nav> }</th>@foreach (var candidate in selected) { <th scope="col" data-comparison-column="@candidate.Id"><div class="comparison-car"><a href="/evaluations/@e.Id/candidates/@candidate.Id?@Model.Query" class="comparison-candidate-link">@candidate.DisplayName</a>@if (selected.Count > 1) { <a class="icon-button comparison-remove" href="/evaluations/@e.Id/compare?@Model.QueryWithout(candidate)" aria-label="@T["ComparisonRemove", candidate.DisplayName]" title="@T["ComparisonRemove", candidate.DisplayName]"><partial name="/Pages/Shared/_Icon.cshtml" model='"close"' /></a> }</div><span class="candidate-status @candidate.Status.ToString().ToLowerInvariant()">@T["CandidateStatus" + candidate.Status]</span>@if (candidate.StatusReason.Length > 0) { <p class="micro">@candidate.StatusReason</p> }</th> }</tr></thead>
+            <partial name="_SpecificationsComparison" model="selected" />
+            @if (hasRequirements) { <tbody id="comparison-requirements"><tr class="vehicle-group-heading comparison-section-heading"><th colspan="@(selected.Count + 1)" scope="colgroup"><span class="comparison-group-label">@T["VehicleRequirements"]</span></th></tr></tbody> }
             @foreach (var group in e.Groups.OrderBy(x => x.Position).Cast<CriterionGroup?>().Append(null))
             {
                 var criteria = e.Criteria.Where(x => x.Scope == CriterionScope.Vehicle && x.GroupId == group?.Id).OrderBy(x => x.Position).ToList();
@@ -47,7 +49,6 @@ else
                 }
                 </tbody>
             }
-            <partial name="_SpecificationsComparison" model="selected" />
         </table>
     </div>
     @if (!e.Criteria.Any(x => x.Scope == CriterionScope.Vehicle)) { <p class="notice">@T["NoVehicleCriteriaHelp"]</p> }
@@ -61,7 +62,6 @@ else
         </div>
     }
     <div class="comparison-explanation"><a asp-page="/Evaluations/Details" asp-route-id="@e.Id" asp-route-section="criteria">@T["EditCriteria"]</a></div>
-    @if (e.Criteria.Any(x => x.Scope == CriterionScope.Offer)) { <p class="micro"><a asp-page="/Evaluations/Offers/Index" asp-route-id="@e.Id">@T["OfferCriteriaSeparateLink"]</a></p> }
 }
 </section>
 </div>

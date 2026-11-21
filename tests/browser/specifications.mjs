@@ -34,9 +34,9 @@ export async function checkSpecificationValidation(page, details) {
 
 export async function editCopiedSpecifications(page, change) {
   const details = page.locator('#candidate-edit');
-  await page.locator('#edit-candidate').click();
+  await page.locator('#edit-specifications').click();
   for (const group of ['Weight', 'Performance', 'Space', 'Electric', 'Combustion'])
-    await details.locator(`#spec-section-${group} > summary`).click();
+    if (!await details.locator(`#spec-section-${group}`).evaluate(section => section.open)) await details.locator(`#spec-section-${group} > summary`).click();
   await details.locator('#spec-KerbWeightKg').fill('2200');
   await details.locator('#spec-Propulsion').selectOption('Hybrid');
   await details.locator('#spec-Drive').selectOption('Rear');

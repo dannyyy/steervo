@@ -232,6 +232,12 @@ button.assessment-summary[aria-expanded=true] { color: var(--accent); }
 .car-comparison .comparison-edit-icon { top: 11px; right: 9px; opacity: 0; }
 .car-comparison .comparison-edit:hover .comparison-edit-icon, .car-comparison .comparison-edit:focus-visible .comparison-edit-icon, .car-comparison .comparison-edit[aria-expanded=true] .comparison-edit-icon { opacity: 1; }
 .car-comparison .specification-comparison .vehicle-value { font-size: 13px; }
+.car-comparison .vehicle-table .comparison-section-heading th { padding: 12px 14px; background: var(--soft); color: var(--accent); font-size: 13px; font-weight: 600; }
+.car-comparison tbody[id] { scroll-margin-top: 12px; }
+.comparison-jump { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; font-size: 12px; }
+.comparison-jump a { color: var(--accent); }
+.comparison-jump a::after { content: " ↓"; }
+.comparison-jump a:hover { text-decoration: underline; }
 @media (max-width: 1100px) { .car-comparison .comparison-scroll-hint { display: block; } }
 @media (max-width: 700px) {
   .car-comparison { padding: 16px; }

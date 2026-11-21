@@ -21,6 +21,7 @@ export async function checkCandidates({ page, reader, origin, output, post, brow
   const assessment = (target, id) => target.locator(`article[data-assessment-criterion="${id}"]`);
   const values = (target, id) => assessment(target, id).getByLabel('Deine Angabe', { exact: true });
   const open = async (target, id) => {
+    if (!await target.locator('#record-assessments').isVisible()) await target.locator('#tab-assessments').click();
     if (!await assessment(target, id).locator('[data-editor]').isVisible()) await assessment(target, id).locator('[data-editor-open]').click();
   };
   const classify = async target => { if (!await target.locator('#candidate-classification').isVisible()) await target.locator('#edit-classification').click(); };
@@ -43,8 +44,14 @@ export async function checkCandidates({ page, reader, origin, output, post, brow
   await page.getByRole('heading', { name: 'Beispiel Nord', exact: true }).waitFor();
   const firstPath = new URL(page.url()).pathname;
   const firstId = firstPath.split('/').at(-1);
+  // The record opens on its technical data; the header only compares, copies and deletes.
+  assert.equal(await page.locator('#record-specifications').isVisible(), true);
+  assert.equal(await page.locator('#record-assessments').isVisible(), false);
+  assert.deepEqual(await page.locator('[role=tab]').allTextContents(), ['Technische Daten', 'Anforderungen']);
+  assert.deepEqual((await page.locator('.vehicle-actions').locator('a, button').allTextContents()).map(text => text.trim()), ['Im Vergleich ansehen', 'Auto kopieren', 'Auto löschen']);
+  assert.equal(await page.locator('#edit-candidate, .rating-explanation').count(), 0);
   const details = page.locator('#candidate-edit');
-  await page.locator('#edit-candidate').click();
+  await page.locator('#edit-specifications').click();
   await checkSpecificationValidation(page, details);
   await details.getByLabel('Notizen', { exact: false }).fill('Aktualisierte Beobachtung.');
   await change(page, () => details.getByRole('button', { name: 'Speichern', exact: true }).click());
@@ -247,7 +254,8 @@ export async function checkCandidates({ page, reader, origin, output, post, brow
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: join(output, '13-candidate-mobile.png'), fullPage: true });
   const mobileDetails = page.locator('#candidate-edit');
-  await page.locator('#edit-candidate').click();
+  await page.locator('#tab-specifications').click();
+  await page.locator('#edit-specifications').click();
   await mobileDetails.locator('#spec-section-Electric > summary').click();
   await mobileDetails.locator('#spec-Charging20To80Minutes').fill('23.5');
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));

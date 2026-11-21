@@ -36,7 +36,7 @@ export async function checkCanvas({ page, origin, casePath, firstId, secondId, b
   await page.keyboard.press('Escape');
   // Removing a car lives in its record and asks first; cancelling keeps the car.
   await page.locator('.candidate-card h3 a').first().click();
-  await page.getByRole('button', { name: 'Auto entfernen', exact: true }).click();
+  await page.getByRole('button', { name: 'Auto löschen', exact: true }).click();
   assert.equal(await confirmation.locator('[data-confirm-cancel]').evaluate(button => button === document.activeElement), true);
   await page.keyboard.press('Escape');
   await page.getByRole('link', { name: /Alle Autos/ }).click();
@@ -154,9 +154,15 @@ export async function checkCanvas({ page, origin, casePath, firstId, secondId, b
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `comparison overflow at ${width}`);
     await page.goto(origin + firstPath);
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `record overflow at ${width}`);
-    await page.getByRole('tab', { name: 'Technische Daten', exact: true }).click();
     assert.equal(await page.locator('#record-specifications').isVisible(), true);
     await page.getByRole('tab', { name: 'Anforderungen', exact: true }).click();
+    assert.equal(await page.locator('#record-assessments').isVisible(), true);
+    assert.equal(new URL(page.url()).hash, '#requirements');
+    await page.reload();
+    assert.equal(await page.locator('#record-assessments').isVisible(), true);
+    await page.getByRole('tab', { name: 'Technische Daten', exact: true }).click();
+    assert.equal(await page.locator('#record-specifications').isVisible(), true);
+    assert.equal(new URL(page.url()).hash, '');
     await page.goto(origin + comparePath);
   }
   await page.screenshot({ path: join(output, 'canvas-comparison-desktop.png'), fullPage: true });

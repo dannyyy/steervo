@@ -119,7 +119,7 @@
       const panel = document.getElementById(tab.dataset.recordTab);
       if (panel) panel.hidden = !selected;
     });
-    if (updateUrl) history.replaceState(null, '', `${location.pathname}${location.search}${id === 'record-specifications' ? '#specifications' : ''}`);
+    if (updateUrl) history.replaceState(null, '', `${location.pathname}${location.search}${id === 'record-assessments' ? '#requirements' : ''}`);
   }
   function initialize() {
     guardedForms(document).forEach(form => {
@@ -385,7 +385,8 @@
     const target = document.getElementById(location.hash.slice(1));
     if (target?.hasAttribute('data-return-focus')) target.focus({ preventScroll: true });
   }, { once: true });
-  if (location.hash === '#specifications') selectTab('record-specifications');
+  // Technical data opens first; a link into the requirements selects their tab.
+  if (location.hash === '#requirements' || (location.hash.length > 1 && document.getElementById(location.hash.slice(1))?.closest('#record-assessments'))) selectTab('record-assessments');
   if (document.getElementById('evaluation-workspace') && ['#sharing', '#case-settings'].includes(location.hash)) {
     const url = new URL(location.href);
     url.searchParams.set('section', location.hash === '#sharing' ? 'sharing' : 'settings');
