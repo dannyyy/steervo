@@ -1,6 +1,6 @@
 @model Steervo.Web.Pages.Evaluations.DetailsModel
 @{ var e = Model.Evaluation; var owner = Model.Access == AccessLevel.Owner; }
-<section id="sharing" class="workspace-surface" data-evaluation-section="sharing" hidden="@(Model.Section != "sharing")" aria-labelledby="sharing-title">
+<section id="sharing" class="workspace-surface" data-evaluation-section="sharing" hidden="@(Model.Section != "settings")" aria-labelledby="sharing-title">
     <div class="surface-heading"><div><h2 id="sharing-title" tabindex="-1">@T["Access"]</h2><p class="muted">@T[owner ? "SharingHelp" : "OwnerManagesAccess"]</p></div>
     @if (owner) { <button type="button" id="add-share" class="button primary" data-editor-open="share-editor-new" aria-expanded="false"><partial name="/Pages/Shared/_Icon.cshtml" model='"plus"' />@T["GrantAccess"]</button> }
     </div>

@@ -83,7 +83,7 @@ public sealed class DetailsModel(EvaluationWorkspace workspace, EvaluationArchiv
     private async Task LoadAsync(Guid id)
     {
         Evaluation = await workspace.ReadAsync(id);
-        if (Section is not ("sharing" or "settings")) Section = "criteria";
+        Section = Section is "sharing" or "settings" ? "settings" : "criteria";
         ShareNames = Access == AccessLevel.Owner ? await accounts.NamesAsync(Evaluation.Shares.Select(x => x.UserId)) : new Dictionary<string, string>();
     }
 }

@@ -142,7 +142,7 @@ export async function checkDocuments({ page, reader, readerEmail, origin, output
   await page.setViewportSize({ width: 1440, height: 1050 });
   await page.goto(`${origin}${casePath}`);
   const exported = page.waitForEvent('download');
-  await page.locator('.evaluation-tools > summary').click(); await page.locator('.evaluation-tools').getByRole('link', { name: /Exportieren/ }).click();
+  await page.locator('.workflow-nav').getByRole('link', { name: 'Grundlagen', exact: true }).click(); await page.locator('.workspace-subnav').getByRole('link', { name: 'Allgemein', exact: true }).click(); await page.locator('#evaluation-data').getByRole('link', { name: 'Exportieren', exact: true }).click();
   const zip = await exported;
   assert.match(zip.suggestedFilename(), /\.zip$/);
   const zipPath = join(output, 'document-export.zip'); await zip.saveAs(zipPath);

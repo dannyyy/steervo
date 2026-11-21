@@ -1,0 +1,11 @@
+@model Steervo.Web.Pages.Evaluations.DetailsModel
+@{ var e = Model.Evaluation; }
+<section id="evaluation-data" class="workspace-surface evaluation-data" data-evaluation-section="settings" hidden="@(Model.Section != "settings")" aria-labelledby="evaluation-data-title">
+    <div class="surface-heading"><div><h2 id="evaluation-data-title">@T["EvaluationData"]</h2><p class="muted">@T["EvaluationDataHelp"]</p></div></div>
+    <div class="evaluation-transfer"><div><h3>@T["ExportEvaluation"]</h3><p>@T["ExportHelp"]</p></div><a class="button secondary" asp-page="/Evaluations/Details" asp-page-handler="Export" asp-route-id="@e.Id" download>@T["ExportEvaluation"]</a></div>
+    <div class="evaluation-transfer"><div><h3>@T["ImportEvaluation"]</h3><p>@T["ImportHelp"]</p></div><a class="button secondary" asp-page="/Index" asp-fragment="import-evaluation">@T["ImportEvaluation"]</a></div>
+    @if (Model.Access == AccessLevel.Owner)
+    {
+        <div class="evaluation-danger"><div><h3>@T["DeleteEvaluation"]</h3><p>@T["DeleteEvaluationConfirm"]</p></div><form method="post" hx-post="/evaluations/@e.Id?section=settings" data-confirm-action="@T["DeleteEvaluationNamed", e.Name]" data-confirm-description="@T["DeleteEvaluationConfirm"]"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="delete" /><button type="submit" class="button secondary danger">@T["DeleteEvaluation"]</button></form></div>
+    }
+</section>

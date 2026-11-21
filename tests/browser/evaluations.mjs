@@ -91,9 +91,8 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   await page.getByRole('button', { name: 'Änderungen verwerfen', exact: true }).click();
   record('A failed group removal preserves the adjacent rename draft and does not remove criteria');
 
-  await page.locator('.evaluation-tools > summary').click();
-  assert.equal(await page.locator('.evaluation-tools').getByRole('link', { name: 'Evaluation bearbeiten', exact: true }).count(), 0);
-  await page.locator('.evaluation-tools > summary').click();
+  assert.equal(await page.locator('.evaluation-tools').count(), 0);
+  assert.equal(await page.getByText('Evaluation verwalten').count(), 0);
   await page.locator('.workspace-subnav').getByRole('link', { name: 'Allgemein', exact: true }).click();
   assert.equal((await page.locator('.workspace-subnav [aria-current=page]').textContent()).trim(), 'Allgemein');
   assert.deepEqual((await page.locator('.workspace-subnav a').allTextContents()).map(text => text.trim()), ['Allgemein', 'Kriterien']);
@@ -112,7 +111,8 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   assert.match(await page.locator('.evaluation-facts').innerText(), /Eine erhaltene Notiz/);
   assert.equal((await exportCase()).country, 'DE');
   assert.equal((await exportCase()).currency, 'CHF');
-  await page.locator('.evaluation-tools > summary').click(); await page.getByRole('link', { name: 'Freigaben', exact: true }).click();
+  assert.deepEqual(await page.locator('#evaluation-workspace > section:not([hidden]) h2').allTextContents(), ['Allgemein', 'Freigaben', 'Daten']);
+  assert.equal(await page.locator('#evaluation-data').getByRole('link', { name: 'Evaluation importieren', exact: true }).getAttribute('href'), '/#import-evaluation');
   await page.locator('#add-share').click();
   const share = page.locator('#share-editor-new');
   await share.getByLabel('E-Mail-Adresse').fill('not-confirmed@example.test');
@@ -132,16 +132,13 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
     for (const section of ['criteria', 'sharing', 'settings']) {
       await page.goto(`${origin}${path}?section=${section}`);
       assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${section} overflows at ${width}`);
-      await page.locator('.evaluation-tools > summary').click();
-      const menu = await page.locator('.evaluation-tools > div').boundingBox();
-      assert.ok(menu.x >= 0 && menu.x + menu.width <= width, `management menu overflows at ${width}`);
-      await page.locator('.evaluation-tools > summary').click();
       if ([390, 1440].includes(width)) await page.screenshot({ path: join(output, `phase2-${section}-${width}.png`), fullPage: true });
     }
   }
   await page.goto(`${origin}${path}#sharing`);
   await page.waitForURL(`**?section=sharing`);
-  assert.equal((await page.locator('.evaluation-tools [aria-current=page]').textContent()).trim(), 'Freigaben');
+  assert.equal((await page.locator('.workspace-subnav [aria-current=page]').textContent()).trim(), 'Allgemein');
+  assert.equal(await page.locator('#sharing').isVisible(), true);
   await reader.page.goto(`${origin}${path}`);
   await reader.page.locator('#add-group').click();
   await reader.page.locator('#new-group-editor').getByLabel('Gruppenname').fill('Nicht verlieren');

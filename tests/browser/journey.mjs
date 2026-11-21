@@ -281,7 +281,7 @@ try {
   record('Invitations do not share data; invited accounts cannot invite');
 
   await page.goto(`${origin}${casePath}`);
-  await page.locator('.evaluation-tools > summary').click(); await page.getByRole('link', { name: 'Freigaben', exact: true }).click();
+  await page.locator('.workflow-nav').getByRole('link', { name: 'Grundlagen', exact: true }).click(); await page.locator('.workspace-subnav').getByRole('link', { name: 'Allgemein', exact: true }).click();
   await page.locator('#add-share').click();
   const share = page.locator('.share-form'); await share.getByLabel('E-Mail-Adresse').fill(readerEmail);
   await mutate(page, () => share.getByRole('button', { name: 'Zugriff freigeben' }).click());
@@ -408,14 +408,14 @@ try {
   record('Passkey rename/removal and email recovery');
 
   await page.goto(`${origin}${casePath}`);
-  await page.locator('.evaluation-tools > summary').click(); await page.getByRole('link', { name: 'Freigaben', exact: true }).click();
+  await page.locator('.workflow-nav').getByRole('link', { name: 'Grundlagen', exact: true }).click(); await page.locator('.workspace-subnav').getByRole('link', { name: 'Allgemein', exact: true }).click();
   await mutate(page, () => page.locator('.share-row').getByRole('button', { name: 'Entziehen', exact: true }).click());
   assert.equal((await browserRequest(reader.page, casePath)).status(), 403);
   assert.equal((await browserRequest(reader.page, `${casePath}?handler=Export`)).status(), 403);
   record('Revocation takes effect for an existing authenticated session');
 
   const downloadReady = page.waitForEvent('download');
-  await page.locator('.evaluation-tools > summary').click(); await page.locator('.evaluation-tools').getByRole('link', { name: /Exportieren/ }).click();
+  await page.locator('#evaluation-data').getByRole('link', { name: 'Exportieren', exact: true }).click();
   const download = await downloadReady;
   const exportFile = join(output, 'evaluation.json'); await download.saveAs(exportFile);
   await page.goto(origin);

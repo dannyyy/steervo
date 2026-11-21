@@ -201,6 +201,8 @@ export async function checkCandidates({ page, reader, origin, output, post, brow
   assert.equal((await reader.page.locator('.workspace-subnav [aria-current=page]').textContent()).trim(), 'Allgemein');
   assert.equal(await reader.page.locator('#edit-evaluation, #evaluation-editor').count(), 0);
   assert.equal(await reader.page.getByRole('button', { name: 'Evaluation löschen', exact: true }).count(), 0);
+  assert.equal(await reader.page.locator('#add-share').count(), 0);
+  assert.equal(await reader.page.locator('#evaluation-data').getByRole('link', { name: 'Exportieren', exact: true }).count(), 1);
   assert.equal((await post(reader.page, casePath, { action: 'rename', name: 'Blocked', version: await reader.page.locator('#evaluation-workspace').getAttribute('data-version') })).status(), 403);
   await reader.page.goto(`${origin}${casePath}/compare?first=${firstId}&second=${secondId}`);
   assert.equal(await reader.page.locator('[data-editor-open]').count(), 0);

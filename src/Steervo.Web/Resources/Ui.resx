@@ -772,7 +772,7 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
 <data name="EditShareNamed" xml:space="preserve"><value>Berechtigung für {0} ändern</value></data>
 <data name="EditPermission" xml:space="preserve"><value>Berechtigung ändern</value></data>
 <data name="PermissionHelp" xml:space="preserve"><value>Leser können die Evaluation ansehen und exportieren. Bearbeiter können zusätzlich Inhalte ändern. Freigaben und das Löschen der Evaluation bleiben beim Besitzer.</value></data>
-<data name="EvaluationSettingsHelp" xml:space="preserve"><value>Name, Zweck, Land und Währung deiner Entscheidung. Daten und Freigaben bleiben beim Bearbeiten erhalten.</value></data>
+<data name="EvaluationSettingsHelp" xml:space="preserve"><value>Name, Zweck, Land und Währung deiner Entscheidung.</value></data>
 <data name="ExportHelp" xml:space="preserve"><value>Lade die Evaluation mit allen vorhandenen Versionen und Anhängen herunter. Ein Import erstellt daraus eine neue private Evaluation.</value></data>
 <data name="DeleteEvaluationNamed" xml:space="preserve"><value>Evaluation „{0}“ löschen?</value></data>
 <data name="EditorPageConflict" xml:space="preserve"><value>Dein Entwurf ist unverändert. Öffne den aktuellen Stand zum Vergleich. Erst mit «Stand geprüft – erneut speichern» wird dein Entwurf erneut gesendet.</value></data>
@@ -833,11 +833,12 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="FulfillmentOptional" xml:space="preserve"><value>Optional erhältlich</value></data>
   <data name="RequiredOptional" xml:space="preserve"><value>Diese Muss-Anforderungen sind optional erhältlich</value></data>
   <data name="RequiredOptionalHelp" xml:space="preserve"><value>Separat erhältlich, aber noch nicht enthalten. Diese Anforderungen zählen weder als erfüllt noch als verfehlt.</value></data>
-  <data name="EvaluationManage" xml:space="preserve"><value>Evaluation verwalten</value></data>
   <data name="WorkflowSetup" xml:space="preserve"><value>Grundlagen</value></data>
   <data name="WorkflowCars" xml:space="preserve"><value>Autos</value></data>
   <data name="WorkflowOffers" xml:space="preserve"><value>Offerten &amp; Kosten</value></data>
   <data name="General" xml:space="preserve"><value>Allgemein</value></data>
+  <data name="EvaluationData" xml:space="preserve"><value>Daten</value></data>
+  <data name="EvaluationDataHelp" xml:space="preserve"><value>Evaluation sichern, aus einer Exportdatei neu anlegen oder endgültig entfernen.</value></data>
   <data name="WorkflowResults" xml:space="preserve"><value>Auswertungen</value></data>
   <data name="WorkflowSections" xml:space="preserve"><value>Bereiche der Arbeitsphase</value></data>
   <data name="VehicleComparison" xml:space="preserve"><value>Fahrzeugvergleich</value></data>

@@ -8,12 +8,7 @@
 }
 <div class="evaluation-context">
     <div class="evaluation-breadcrumb"><a asp-page="/Index"><partial name="/Pages/Shared/_Icon.cshtml" model='"back"' />@T["AllEvaluations"]</a><span>@T[Model.Access.ToString()]</span></div>
-    <div class="page-heading"><div><h1>@e.Name</h1>@if (!string.IsNullOrEmpty(e.Purpose)) { <p class="muted">@e.Purpose</p> }</div><div class="evaluation-summary"><span>@T["CriterionCount", e.Criteria.Count] · @T[e.Candidates.Count == 1 ? "CandidateCountSingle" : "CandidateCount", e.Candidates.Count]</span>
-    <details class="evaluation-tools"><summary>@T["EvaluationManage"]</summary><div>
-        <a asp-page="/Evaluations/Details" asp-route-id="@e.Id" asp-route-section="sharing" aria-current="@(Model.Active == "sharing" ? "page" : null)">@T["Access"]</a>
-        <a asp-page="/Evaluations/Details" asp-page-handler="Export" asp-route-id="@e.Id" download>@T["ExportEvaluation"]</a>
-        <a asp-page="/Index" asp-fragment="import-evaluation">@T["ImportEvaluation"]</a>
-    </div></details></div></div>
+    <div class="page-heading"><div><h1>@e.Name</h1>@if (!string.IsNullOrEmpty(e.Purpose)) { <p class="muted">@e.Purpose</p> }</div><div class="evaluation-summary"><span>@T["CriterionCount", e.Criteria.Count] · @T[e.Candidates.Count == 1 ? "CandidateCountSingle" : "CandidateCount", e.Candidates.Count]</span></div></div>
 </div>
 <partial name="/Pages/Evaluations/_RegionalSettingsNotice.cshtml" model="Model" />
 <nav class="section-nav workflow-nav" aria-label="@T["EvaluationNavigation"]">
