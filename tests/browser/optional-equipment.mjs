@@ -50,7 +50,8 @@ export async function checkOptionalEquipment({ page, reader, readerEmail, origin
   await page.goto(`${origin}${casePath}/candidates`);
   const card = page.locator(`[data-candidate-id="${firstId}"]`);
   if (original.criteria.find(c => c.id === boolean).priority === 'Required') {
-    assert.match(await card.locator('.candidate-optional').textContent(), /optional erhältlich/);
+    assert.equal(await card.locator('.candidate-optional').count(), 0);
+    assert.ok((await card.locator('[data-summary="Optional"] .summary-popover').textContent()).includes(original.criteria.find(c => c.id === boolean).name));
   }
   for (const width of [320, 390, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 1000 });

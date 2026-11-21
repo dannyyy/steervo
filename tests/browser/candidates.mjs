@@ -99,8 +99,9 @@ export async function checkCandidates({ page, reader, origin, output, post, brow
   record('Editor switching protects unsaved notes; exclusion requires a reason and persists');
 
   await page.getByRole('link', { name: /Alle Autos/ }).click();
-  await page.locator('.candidate-card').locator('summary').click();
-  await page.getByRole('button', { name: 'Auto kopieren', exact: true }).click();
+  assert.equal(await page.locator('.candidate-actions, .candidate-open, .candidate-optional').count(), 0);
+  await page.locator('.candidate-card h3 a').first().click();
+  await page.locator('#copy-candidate').click();
   await page.getByLabel('Bezeichnung der Kopie').fill('Süd');
   await page.getByRole('dialog', { name: 'Auto kopieren', exact: true }).getByRole('button', { name: 'Auto kopieren', exact: true }).click();
   await page.getByRole('heading', { name: 'Beispiel Süd', exact: true }).waitFor();
@@ -165,16 +166,35 @@ export async function checkCandidates({ page, reader, origin, output, post, brow
   const cardIds = await page.locator('.candidate-card').evaluateAll(cards => cards.map(card => card.dataset.candidateId));
   assert.equal(await page.locator('.next-step').count(), 0);
   assert.equal(await page.locator(`[data-candidate-id="${firstId}"] .candidate-identity .candidate-status`).count(), 1);
-  assert.ok(await page.locator(`[data-candidate-id="${firstId}"] .fulfillment-counts li`).count() > 0);
-  assert.equal(await page.locator(`[data-candidate-id="${firstId}"] .fulfillment-bar rect`).count(), await page.locator(`[data-candidate-id="${firstId}"] .fulfillment-counts li`).count());
-  assert.equal((await page.locator('#compare-selected').innerText()).trim(), 'Vergleichen');
+  const firstCard = page.locator(`[data-candidate-id="${firstId}"]`);
+  assert.ok(await firstCard.locator('.fulfillment-counts > li').count() > 0);
+  assert.equal(await firstCard.locator('.fulfillment-bar rect').count(), await firstCard.locator('.fulfillment-counts > li').count());
+  // Each count names the criteria behind it, on hover and on keyboard focus.
+  const chip = firstCard.locator('.summary-chip').first();
+  const popover = firstCard.locator('.summary-popover').first();
+  assert.equal(await popover.isVisible(), false);
+  await chip.hover();
+  assert.equal(await popover.isVisible(), true);
+  assert.equal(await popover.locator('ol li').count(), Number((await chip.innerText()).match(/\d+/)[0]));
+  await page.mouse.move(5, 5);
+  assert.equal(await popover.isVisible(), false);
+  await chip.focus();
+  assert.equal(await popover.isVisible(), true);
+  const popoverBox = await popover.boundingBox();
+  assert.ok(popoverBox.x >= 0 && popoverBox.x + popoverBox.width <= 1440);
+  await page.screenshot({ path: join(output, '11-overview-popover.png') });
+  await chip.blur();
+  assert.equal(await page.getByText('Wähle bis zu 5 Autos').count(), 0);
+  assert.equal((await page.locator('#compare-selected').innerText()).trim(), 'Vergleichen (0/5)');
+  const sideOrder = await firstCard.locator('.candidate-side').evaluate(side => [...side.children].map(child => child.className));
+  assert.deepEqual(sideOrder, ['row-actions', 'candidate-compare']);
   for (const id of cardIds.slice(0, 5)) await page.locator(`#compare-${id}`).check();
-  assert.equal((await page.locator('#compare-selected').innerText()).trim(), 'Vergleichen (5)');
+  assert.equal((await page.locator('#compare-selected').innerText()).trim(), 'Vergleichen (5/5)');
   assert.equal(await page.locator(`#compare-${cardIds[5]}`).isDisabled(), true);
   // Reordering exchanges the list; the marked cars stay marked.
   await change(page, () => page.locator(`[data-candidate-id="${cardIds[7]}"]`).getByRole('button', { name: /nach oben$/ }).click());
   assert.equal(await page.locator('[data-compare-select]:checked').count(), 5);
-  assert.equal((await page.locator('#compare-selected').innerText()).trim(), 'Vergleichen (5)');
+  assert.equal((await page.locator('#compare-selected').innerText()).trim(), 'Vergleichen (5/5)');
   await page.locator(`#compare-${cardIds[4]}`).uncheck();
   assert.equal(await page.locator(`#compare-${cardIds[5]}`).isDisabled(), false);
   await page.locator(`#compare-${cardIds[4]}`).check();
@@ -245,10 +265,11 @@ export async function checkCandidates({ page, reader, origin, output, post, brow
   assert.equal(await reader.page.locator('.value-editor').count(), 0);
   assert.match(await reader.page.locator('#candidate-specifications [data-specification="PayloadKg"]').textContent(), /400 kg/);
   version = await reader.page.locator('#candidate-workspace').getAttribute('data-version');
-  for (const action of ['edit-candidate', 'classify-candidate', 'assess-candidate', 'clear-assessment']) {
+  assert.equal(await reader.page.locator('#copy-candidate, #remove-candidate').count(), 0);
+  for (const action of ['edit-candidate', 'classify-candidate', 'assess-candidate', 'clear-assessment', 'copy-candidate', 'remove-candidate']) {
     assert.equal((await post(reader.page, firstPath, { action, criterionId: boolean, booleanValue: 'true', version })).status(), 403);
   }
-  for (const action of ['add-candidate', 'copy-candidate', 'move-candidate', 'remove-candidate']) {
+  for (const action of ['add-candidate', 'move-candidate']) {
     assert.equal((await post(reader.page, `${casePath}/candidates`, { action, itemId: firstId, 'Input.Model': 'Blocked', version })).status(), 403);
   }
   await reader.page.goto(`${origin}${casePath}?section=settings`);

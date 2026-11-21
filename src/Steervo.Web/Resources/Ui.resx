@@ -220,7 +220,6 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="CandidateNotes" xml:space="preserve"><value>Notizen</value></data>
   <data name="CandidateLinks" xml:space="preserve"><value>Quellen und Links</value></data>
   <data name="CandidateLinksHelp" xml:space="preserve"><value>Eine vollständige http- oder https-Adresse pro Zeile, höchstens zehn Links.</value></data>
-  <data name="CompareSelectionHelp" xml:space="preserve"><value>Wähle bis zu {0} Autos aus und vergleiche sie nebeneinander.</value></data>
   <data name="CandidateNoCriteria" xml:space="preserve"><value>Noch keine Kriterien für Autos erfasst.</value></data>
   <data name="SummaryMet" xml:space="preserve"><value>{0} erfüllt</value></data>
   <data name="SummaryUnmet" xml:space="preserve"><value>{0} nicht erfüllt</value></data>
@@ -244,9 +243,6 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="CandidateUp" xml:space="preserve"><value>Auto {0} nach oben</value></data>
   <data name="CandidateDown" xml:space="preserve"><value>Auto {0} nach unten</value></data>
   <data name="RequiredNotMet" xml:space="preserve"><value>Muss nicht erfüllt</value></data>
-  <data name="AssessCandidate" xml:space="preserve"><value>Ausstattung prüfen</value></data>
-  <data name="ViewCandidate" xml:space="preserve"><value>Auto ansehen</value></data>
-  <data name="CandidateActions" xml:space="preserve"><value>Weitere Aktionen</value></data>
   <data name="CopyCandidateName" xml:space="preserve"><value>Bezeichnung der Kopie</value></data>
   <data name="CopyCandidateHelp" xml:space="preserve"><value>Stammdaten, Quellen, Bewertungen und fahrzeugspezifische Kostenpositionen werden kopiert. Die Kopie erhält eine eigene Einstufung. Prüfe die übernommenen Angaben.</value></data>
   <data name="CopyCandidate" xml:space="preserve"><value>Auto kopieren</value></data>

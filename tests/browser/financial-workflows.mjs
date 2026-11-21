@@ -56,6 +56,7 @@ export async function checkCostWorkflows(options) {
   await page.keyboard.press('Escape'); await page.locator('#cost-workspace').waitFor();
   assert.equal(new URL(page.url()).searchParams.get('pageNumber'), '2');
   await page.locator(`#cost-${costId}`).getByRole('link', { name: 'Bearbeiten', exact: true }).click();
+  await page.locator('#cost-page-editor[data-initialized=true]').waitFor();
   await page.locator('#Input_Notes').fill('Entwurf mit Zeitraum und Fahrzeugkontext');
   await page.route('**/costs/edit/**', route => route.request().method() === 'POST' ? route.abort('failed') : route.continue());
   await page.locator('#save-cost').click(); await page.locator('.editor-error').getByText(/nicht gespeichert/).waitFor();

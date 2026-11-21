@@ -12,6 +12,7 @@
 <div id="candidate-workspace" data-version="@e.Version" data-preserve-viewport hx-target="#candidate-workspace" hx-swap="outerHTML show:none focus-scroll:false" hx-sync="this:drop">
 <partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "candidates", c.Id, Model.ComparisonFirst, Model.ComparisonSecond, Model.ComparisonMore)' />
 @if (Model.Notice is not null && !Model.Failed) { <div class="notice workspace-notice success" role="status" tabindex="-1">@Model.Notice</div> }
+@if (Model.Failed && Model.FailedAction == "remove-candidate") { <div class="notice workspace-notice failure" role="alert" tabindex="-1">@Model.Notice</div> }
 <nav class="candidate-ribbon" aria-label="@T["CandidateSelection"]" id="candidate-ribbon" data-preserve-scroll>
     <a asp-page="Index" asp-route-id="@e.Id" class="candidate-index-link"><partial name="/Pages/Shared/_Icon.cshtml" model='"list"' /><span>@T["AllCandidates"]</span></a>
     @foreach (var candidate in e.Candidates.OrderBy(x => x.Position))
@@ -24,7 +25,7 @@
 <article class="vehicle-record">
     <header class="vehicle-introduction">
         <div><div class="vehicle-kicker"><span>@T["VehicleRecord"]</span><span class="candidate-status @c.Status.ToString().ToLowerInvariant()">@T["CandidateStatus" + c.Status]</span></div><h2>@c.DisplayName</h2>
-            <div class="vehicle-actions"><a href="@comparisonUrl" class="button primary"><partial name="/Pages/Shared/_Icon.cshtml" model='"compare"' />@T["CompareCandidate"]</a>@if (edit) { <button type="button" id="edit-candidate" class="button secondary" data-dialog-open="candidate-edit" aria-haspopup="dialog"><partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' />@T["EditCandidate"]</button> }</div>
+            <div class="vehicle-actions"><a href="@comparisonUrl" class="button primary"><partial name="/Pages/Shared/_Icon.cshtml" model='"compare"' />@T["CompareCandidate"]</a>@if (edit) { <button type="button" id="edit-candidate" class="button secondary" data-dialog-open="candidate-edit" aria-haspopup="dialog"><partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' />@T["EditCandidate"]</button><button type="button" id="copy-candidate" class="button secondary" data-dialog-open="candidate-copy" aria-haspopup="dialog">@T["CopyCandidate"]</button><form method="post" hx-post="@url" class="vehicle-remove" data-confirm-action="@T["RemoveCandidateNamed", c.DisplayName]" data-confirm-description="@T["RemoveCandidateConfirm"]"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="remove-candidate" /><button type="submit" id="remove-candidate" class="button secondary danger">@T["RemoveCandidate"]</button></form> }</div>
         </div>
         <dl class="vehicle-facts"><div><dt>@T["CandidateCondition"]</dt><dd>@T["Condition" + c.Condition]</dd></div><div><dt>@T["CandidateYear"]</dt><dd>@(c.Year?.ToString() ?? T["NotSpecified"].Value)</dd></div><div><dt>@T["CandidateMileage"]</dt><dd>@(c.Mileage is { } mileage ? mileage.ToString("N0") : T["NotSpecified"].Value)</dd></div></dl>
     </header>
@@ -66,6 +67,15 @@
         <div class="editor-heading"><div><p class="editor-context">@c.DisplayName</p><h2 id="candidate-classification-title">@T["CandidateClassification"]</h2></div><button type="button" class="icon-button" data-editor-close aria-label="@T["Close"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"close"' /></button></div>
         <div class="editor-error" role="alert" tabindex="-1" hidden="@(Model.FailedAction != "classify-candidate")">@(Model.FailedAction == "classify-candidate" ? Model.Notice : null)</div>
         <form method="post" hx-post="@url" hx-disabled-elt="find button[type='submit']" data-guard-draft data-submitted-values="@(Model.FailedAction == "classify-candidate" ? System.Text.Json.JsonSerializer.Serialize(Context.Request.Form.ToDictionary(x => x.Key, x => x.Value.ToString())) : null)"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="classify-candidate" /><label for="candidate-status">@T["CandidateStatus"]</label><select id="candidate-status" name="status">@foreach (var status in Enum.GetValues<CandidateStatus>()) { <option value="@status" selected="@(status == c.Status)">@T["CandidateStatus" + status]</option> }</select><label for="candidate-reason">@T["CandidateReason"]</label><textarea id="candidate-reason" name="reason" maxlength="2000" rows="4" aria-describedby="candidate-reason-help">@c.StatusReason</textarea><p id="candidate-reason-help" class="micro">@T["CandidateReasonHelp"]</p><partial name="/Pages/Shared/_EditorActions.cshtml" model='new EditorActions("save-classification")' /></form>
+    </dialog>
+}
+@if (edit)
+{
+    var copyFailed = Model.FailedAction == "copy-candidate";
+    <dialog id="candidate-copy" class="side-sheet" data-editor data-guard-draft data-opener="copy-candidate" data-open-on-load="@(copyFailed ? "true" : "false")" aria-labelledby="candidate-copy-title">
+        <div class="editor-heading"><div><p class="editor-context">@c.DisplayName</p><h2 id="candidate-copy-title">@T["CopyCandidate"]</h2></div><button type="button" class="icon-button" data-editor-close aria-label="@T["Close"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"close"' /></button></div>
+        <div class="editor-error" role="alert" tabindex="-1" hidden="@(!copyFailed)">@(copyFailed ? Model.Notice : null)</div>
+        <form method="post" hx-post="@url" hx-disabled-elt="find button[type=submit]" data-guard-draft data-submitted-values="@(copyFailed ? System.Text.Json.JsonSerializer.Serialize(new { copyName = Model.CopyName }) : null)"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="copy-candidate" /><label for="copy-name">@T["CopyCandidateName"]</label><input id="copy-name" name="copyName" value="@c.Model" required maxlength="160" /><p class="micro">@T["CopyCandidateHelp"]</p><partial name="/Pages/Shared/_EditorActions.cshtml" model='new EditorActions("copy-submit", T["CopyCandidate"].Value)' /></form>
     </dialog>
 }
 </div>

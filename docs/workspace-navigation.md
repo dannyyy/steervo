@@ -15,6 +15,6 @@ Längere beschreibende Offertwerte sind linksbündig ausgerichtet; Beträge beha
 
 ## Autos auswählen und vergleichen
 
-Die Autoübersicht zeigt je Auto die Einstufung unter dem Namen und eine farbige Zusammenfassung der Fahrzeugkriterien: erfüllt, nicht erfüllt, optional erhältlich, offen und persönlich bewertet. Verfehlte oder nur optional erhältliche Muss-Kriterien werden darunter namentlich genannt. Die Zusammenfassung zählt Zustände; sie ist keine Note und schliesst kein Auto aus.
+Die Autoübersicht zeigt je Auto die Einstufung unter dem Namen und eine farbige Zusammenfassung der Fahrzeugkriterien: erfüllt, nicht erfüllt, optional erhältlich, offen und persönlich bewertet. Jeder Zähler zeigt beim Überfahren oder Fokussieren die Kriterien dahinter mit ihrer Priorität. Verfehlte Muss-Kriterien werden zusätzlich direkt genannt. Kopieren und Entfernen eines Autos stehen in dessen Fahrzeugakte. Die Zusammenfassung zählt Zustände; sie ist keine Note und schliesst kein Auto aus.
 
 In der Übersicht lassen sich bis zu fünf Autos markieren und gemeinsam vergleichen. Im Fahrzeugvergleich kann ein weiteres Auto hinzugefügt oder ein Auto aus dem Vergleich entfernt werden; das Auto selbst bleibt dabei erhalten. Ohne Auswahl zeigt der Vergleich die ersten fünf Autos. Die Auswahl bleibt beim Öffnen einer Fahrzeugakte und bei der Rückkehr erhalten. Bei wenig Platz scrollt die Tabelle horizontal, die Kriterienspalte bleibt sichtbar.

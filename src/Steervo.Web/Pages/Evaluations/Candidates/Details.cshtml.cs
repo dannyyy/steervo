@@ -16,6 +16,7 @@ public sealed class DetailsModel(CandidateWorkspace workspace, ICurrentUser curr
     public bool Failed { get; private set; }
     public string? FailedAction { get; private set; }
     public AssessmentDraft? Draft { get; private set; }
+    public string? CopyName { get; private set; }
     public Guid? ComparisonFirst { get; private set; }
     public Guid? ComparisonSecond { get; private set; }
     public IReadOnlyList<Guid> ComparisonMore { get; private set; } = [];
@@ -27,7 +28,7 @@ public sealed class DetailsModel(CandidateWorkspace workspace, ICurrentUser curr
     }
     public async Task<IActionResult> OnPostAsync(Guid id, Guid candidateId, long version, string action, Guid criterionId,
         CandidateForm input, CandidateStatus status, string? reason, string? booleanValue, string? measurementValue, int? ratingValue,
-        AssessmentSource source, string? notes, Guid? first, Guid? second, Guid[]? more)
+        AssessmentSource source, string? notes, Guid? first, Guid? second, Guid[]? more, string? copyName)
     {
         try
         {
@@ -40,6 +41,14 @@ public sealed class DetailsModel(CandidateWorkspace workspace, ICurrentUser curr
                 case "assess-candidate":
                     await workspace.AssessAsync(id, version, candidateId, criterionId, AssessmentForm.ToInput(booleanValue, measurementValue, ratingValue, source, notes)); break;
                 case "clear-assessment": await workspace.ClearAssessmentAsync(id, version, candidateId, criterionId); break;
+                case "copy-candidate":
+                    var copyId = await workspace.CopyAsync(id, version, candidateId, copyName ?? "");
+                    if (Request.Headers.ContainsKey("HX-Request")) { Response.Headers["HX-Redirect"] = Url.Page("Details", new { id, candidateId = copyId }); return new EmptyResult(); }
+                    return RedirectToPage("Details", new { id, candidateId = copyId });
+                case "remove-candidate":
+                    await workspace.RemoveAsync(id, version, candidateId);
+                    if (Request.Headers.ContainsKey("HX-Request")) { Response.Headers["HX-Redirect"] = Url.Page("Index", new { id }); return new EmptyResult(); }
+                    return RedirectToPage("Index", new { id });
                 default: throw new RuleException("InvalidValue");
             }
             Notice = text["Saved"];
@@ -47,7 +56,7 @@ public sealed class DetailsModel(CandidateWorkspace workspace, ICurrentUser curr
         catch (RuleException error)
         {
             if (error.Message is "Forbidden" or "NotFound") return StatusCode(error.Message == "Forbidden" ? 403 : 404);
-            Failed = true; FailedAction = action; Notice = text[error.Message];
+            Failed = true; FailedAction = action; Notice = text[error.Message]; CopyName = copyName;
             if (action is "assess-candidate" or "clear-assessment")
                 Draft = new(candidateId, criterionId, Request.Form["booleanValue"], measurementValue,
                     Request.Form["ratingValue"], Request.Form["source"], notes, Notice);

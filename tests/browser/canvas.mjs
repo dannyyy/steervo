@@ -34,11 +34,12 @@ export async function checkCanvas({ page, origin, casePath, firstId, secondId, b
   await page.locator('#add-candidate').click();
   assert.equal(await creation.getByLabel('Modell / Bezeichnung').inputValue(), '');
   await page.keyboard.press('Escape');
-  const card = page.locator('.candidate-card').first();
-  await card.locator('.candidate-actions > summary').click();
-  await card.getByRole('button', { name: 'Auto entfernen', exact: true }).click();
+  // Removing a car lives in its record and asks first; cancelling keeps the car.
+  await page.locator('.candidate-card h3 a').first().click();
+  await page.getByRole('button', { name: 'Auto entfernen', exact: true }).click();
   assert.equal(await confirmation.locator('[data-confirm-cancel]').evaluate(button => button === document.activeElement), true);
   await page.keyboard.press('Escape');
+  await page.getByRole('link', { name: /Alle Autos/ }).click();
   assert.equal(await page.locator('.candidate-card').count(), count);
   record('Vehicle creation protects drafts and restores focus; cancelling removal leaves the collection unchanged');
   await page.goto(origin + comparePath);

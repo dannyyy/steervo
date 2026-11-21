@@ -57,10 +57,11 @@ function updateCompareSelection(restore = false) {
   if (restore) boxes.forEach(box => { box.checked = comparedCars.has(box.value); });
   comparedCars.clear();
   boxes.filter(box => box.checked).forEach(box => comparedCars.add(box.value));
-  const full = comparedCars.size >= Number(form.dataset.compareMaximum);
+  const maximum = Number(form.dataset.compareMaximum);
+  const full = comparedCars.size >= maximum;
   boxes.forEach(box => { box.disabled = full && !box.checked; });
   const button = form.querySelector('[data-compare-label]');
-  button.querySelector('span').textContent = comparedCars.size ? `${button.dataset.compareLabel} (${comparedCars.size})` : button.dataset.compareLabel;
+  button.querySelector('span').textContent = `${button.dataset.compareLabel} (${comparedCars.size}/${maximum})`;
 }
 document.addEventListener('change', event => { if (event.target.matches('[data-compare-select]')) updateCompareSelection(); });
 document.addEventListener('htmx:afterSwap', () => updateCompareSelection(true));

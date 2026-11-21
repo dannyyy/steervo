@@ -137,7 +137,7 @@ export async function checkCosts({ page, reader, readerEmail, origin, output, po
   record('Cost reads and writes enforce roles, revoked access, antiforgery and concurrent-edit protection');
 
   await page.goto(`${origin}${casePath}/candidates`); version = await page.locator('#candidate-workspace').getAttribute('data-version');
-  assert.equal((await post(page, `${casePath}/candidates`, { action: 'copy-candidate', itemId: candidateId, copyName: 'Kostenkopie', version })).status(), 0);
+  assert.equal((await post(page, `${casePath}/candidates/${candidateId}`, { action: 'copy-candidate', copyName: 'Kostenkopie', version })).status(), 0);
   const withCopy = await exportCase(); const copyId = withCopy.candidates.find(c => c.model === 'Kostenkopie').id;
   assert.equal(withCopy.costs.filter(c => c.input.candidateId === copyId).length, 6); assert.equal(withCopy.costs.length, 14);
   await page.goto(origin);
@@ -149,8 +149,12 @@ export async function checkCosts({ page, reader, readerEmail, origin, output, po
   assert.deepEqual(imported.costPlanning, withCopy.costPlanning); assert.equal(imported.costs.length, 14);
   assert.ok(imported.costs.every(c => !withCopy.costs.some(o => o.id === c.id)));
   assert.ok(imported.costs.filter(c => c.input.candidateId).every(c => imported.candidates.some(car => car.id === c.input.candidateId)));
-  await page.goto(`${origin}${casePath}/candidates`); version = await page.locator('#candidate-workspace').getAttribute('data-version');
-  assert.equal((await post(page, `${casePath}/candidates`, { action: 'remove-candidate', itemId: candidateId, version })).status(), 200);
+  // Removing in the car record confirms first and returns to the overview.
+  await page.goto(`${origin}${casePath}/candidates/${candidateId}`);
+  await page.locator('#remove-candidate').click();
+  await page.locator('#action-confirmation [data-confirm-accept]').click();
+  await page.waitForURL(url => url.pathname === `${casePath}/candidates`);
+  assert.equal(await page.locator(`[data-candidate-id="${candidateId}"]`).count(), 0);
   const remaining = await exportCase(); assert.equal(remaining.costs.length, 8); assert.equal(remaining.costs.filter(c => !c.input.candidateId).length, 2);
   await page.goto(`${origin}${costPath}?candidateId=${copyId}`);
   assert.equal(await page.locator('[data-cost-net]').getAttribute('data-cost-net'), '995');
