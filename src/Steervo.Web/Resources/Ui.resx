@@ -584,7 +584,7 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="InvalidCost" xml:space="preserve"><value>Bitte prüfe Betrag, Zahlungsrhythmus und Zeitraum. Beträge haben höchstens zwei Nachkommastellen; der letzte Monat darf nicht vor dem ersten liegen.</value></data>
   <data name="InvalidCostPlanning" xml:space="preserve"><value>Wähle einen gültigen Startmonat und eine Dauer zwischen 1 und 1’200 Monaten.</value></data>
   <data name="CostPlanningRequired" xml:space="preserve"><value>Für diese Evaluation ist noch kein Planungszeitraum festgelegt.</value></data>
-  <data name="CostCurrencyRequired" xml:space="preserve"><value>Bitte lege zuerst die Währung in den Evaluationseigenschaften fest.</value></data>
+  <data name="CostCurrencyRequired" xml:space="preserve"><value>Bitte lege zuerst die Währung unter «Grundlagen → Allgemein» fest.</value></data>
   <data name="TooManyCosts" xml:space="preserve"><value>Eine Evaluation kann höchstens 1’000 Kostenpositionen enthalten.</value></data>
   <data name="CostRemove" xml:space="preserve"><value>Kostenposition löschen</value></data>
   <data name="Calculations" xml:space="preserve"><value>Kostenvergleich</value></data>
@@ -835,7 +835,9 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="RequiredOptionalHelp" xml:space="preserve"><value>Separat erhältlich, aber noch nicht enthalten. Diese Anforderungen zählen weder als erfüllt noch als verfehlt.</value></data>
   <data name="EvaluationManage" xml:space="preserve"><value>Evaluation verwalten</value></data>
   <data name="WorkflowSetup" xml:space="preserve"><value>Grundlagen</value></data>
-  <data name="WorkflowWorkspace" xml:space="preserve"><value>Autos &amp; Offerten</value></data>
+  <data name="WorkflowCars" xml:space="preserve"><value>Autos</value></data>
+  <data name="WorkflowOffers" xml:space="preserve"><value>Offerten &amp; Kosten</value></data>
+  <data name="General" xml:space="preserve"><value>Allgemein</value></data>
   <data name="WorkflowResults" xml:space="preserve"><value>Auswertungen</value></data>
   <data name="WorkflowSections" xml:space="preserve"><value>Bereiche der Arbeitsphase</value></data>
   <data name="VehicleComparison" xml:space="preserve"><value>Fahrzeugvergleich</value></data>
@@ -850,8 +852,8 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="EvaluationCountryHelp" xml:space="preserve"><value>Das Land, für das du das Auto evaluierst. Es bestimmt den Markt für länderspezifische Funktionen.</value></data>
   <data name="EvaluationCurrencyHelp" xml:space="preserve"><value>Drei Buchstaben, z. B. CHF oder EUR. Gilt für alle Beträge. Änderbar, solange keine Offerten, Kostenpositionen oder Szenarien erfasst sind.</value></data>
   <data name="EvaluationCurrencyLocked" xml:space="preserve"><value>Die Währung ist durch bestehende Offerten, Kostenpositionen oder Szenarien festgelegt. Beträge werden nicht umgerechnet.</value></data>
-  <data name="RegionalSettingsMissing" xml:space="preserve"><value>Bitte ergänze Land und Währung in den Evaluationseigenschaften. Bestehende Angaben und Beträge bleiben erhalten.</value></data>
-  <data name="CompleteRegionalSettings" xml:space="preserve"><value>Evaluationseigenschaften ergänzen</value></data>
+  <data name="RegionalSettingsMissing" xml:space="preserve"><value>Bitte ergänze Land und Währung unter «Grundlagen → Allgemein». Bestehende Angaben und Beträge bleiben erhalten.</value></data>
+  <data name="CompleteRegionalSettings" xml:space="preserve"><value>Land und Währung ergänzen</value></data>
   <data name="RegionalSettingsReaderHelp" xml:space="preserve"><value>Ein Besitzer oder Bearbeiter kann die fehlenden Angaben ergänzen.</value></data>
   <data name="OfferAttachmentTitle" xml:space="preserve"><value>PDF anhängen</value></data>
   <data name="OfferAttachmentFile" xml:space="preserve"><value>PDF-Datei auswählen</value></data>

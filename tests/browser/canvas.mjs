@@ -134,7 +134,7 @@ export async function checkCanvas({ page, origin, casePath, firstId, secondId, b
   assert.equal(await note(boolean).inputValue(), 'Lokaler Entwurf während einer gleichzeitigen Änderung.');
   assert.equal((await exportData()).assessments.find(value => value.candidateId === secondId && value.criterionId === boolean).booleanValue, false);
   await editor(boolean).getByRole('button', { name: 'Aktuellen Stand ansehen' }).click();
-  await page.locator('.section-nav').getByRole('link', { name: 'Autos & Offerten', exact: true }).click();
+  await page.locator('.section-nav').getByRole('link', { name: 'Autos', exact: true }).click();
   await confirmation.getByRole('button', { name: 'Weiterbearbeiten' }).click();
   assert.equal(new URL(page.url()).pathname, `${casePath}/compare`);
   await opener(boolean).click();

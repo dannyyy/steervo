@@ -91,8 +91,12 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   await page.getByRole('button', { name: 'Änderungen verwerfen', exact: true }).click();
   record('A failed group removal preserves the adjacent rename draft and does not remove criteria');
 
-  await page.locator('.evaluation-tools > summary').click(); await page.getByRole('link', { name: 'Evaluation bearbeiten', exact: true }).click();
-  assert.equal((await page.locator('.evaluation-tools [aria-current=page]').textContent()).trim(), 'Evaluation bearbeiten');
+  await page.locator('.evaluation-tools > summary').click();
+  assert.equal(await page.locator('.evaluation-tools').getByRole('link', { name: 'Evaluation bearbeiten', exact: true }).count(), 0);
+  await page.locator('.evaluation-tools > summary').click();
+  await page.locator('.workspace-subnav').getByRole('link', { name: 'Allgemein', exact: true }).click();
+  assert.equal((await page.locator('.workspace-subnav [aria-current=page]').textContent()).trim(), 'Allgemein');
+  assert.equal((await page.locator('.workflow-nav a.active').textContent()).trim(), 'Grundlagen');
   await page.locator('#edit-evaluation').click();
   await page.locator('#case-name').fill('   ');
   await page.locator('#case-purpose').fill('Eine erhaltene Notiz zur Entscheidung.');
@@ -170,7 +174,7 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   assert.equal(ungrouped.criteria[0].groupId, null);
   record('Criterion deletion targets only the confirmed criterion; dissolving a group retains its remaining criteria');
 
-  await page.locator('.evaluation-tools > summary').click(); await page.getByRole('link', { name: 'Evaluation bearbeiten', exact: true }).click();
+  await page.locator('.workspace-subnav').getByRole('link', { name: 'Allgemein', exact: true }).click();
   await page.getByRole('button', { name: 'Evaluation löschen', exact: true }).click();
   const confirmation = page.locator('#action-confirmation');
   assert.match(await confirmation.innerText(), new RegExp(name));

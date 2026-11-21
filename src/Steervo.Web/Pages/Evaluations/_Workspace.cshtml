@@ -70,5 +70,5 @@
     <dialog id="new-criterion-editor" class="side-sheet" data-editor data-opener="add-criterion" data-open-on-load="@(Model.FailedAction == "add-criterion" ? "true" : "false")" aria-labelledby="new-criterion-title"><partial name="_CriterionEditor" model="new Steervo.Web.Pages.Evaluations.CriterionEditor(Model, null)" /></dialog>
 }
 <partial name="_Sharing" model="Model" />
-@if (edit) { <partial name="_EvaluationSettings" model="Model" /> }
+<partial name="_EvaluationSettings" model="Model" />
 </div>

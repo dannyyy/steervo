@@ -22,7 +22,7 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
     await page.waitForFunction(old => document.querySelector('#offer-workspace')?.dataset.version !== old, version);
     await page.waitForFunction(() => !document.querySelector('.htmx-settling, .htmx-request'));
   }
-  await page.getByRole('link', { name: 'Autos & Offerten', exact: true }).click(); await page.getByRole('link', { name: 'Offerten', exact: true }).click();
+  await page.getByRole('link', { name: 'Offerten & Kosten', exact: true }).click(); await page.locator('.workspace-subnav').getByRole('link', { name: 'Offerten', exact: true }).click();
   await page.getByText('Erfasse zuerst ein Auto, damit du ihm Offerten zuordnen kannst.', { exact: false }).waitFor();
   await page.goto(`${origin}${casePath}/candidates`);
   let version = await page.locator('#candidate-workspace').getAttribute('data-version');

@@ -25,7 +25,7 @@ export async function checkCandidates({ page, reader, origin, output, post, brow
   };
   const classify = async target => { if (!await target.locator('#candidate-classification').isVisible()) await target.locator('#edit-classification').click(); };
   const save = (target, id) => assessment(target, id).getByRole('button', { name: /speichern$/ });
-  await page.getByRole('link', { name: 'Autos & Offerten', exact: true }).click();
+  await page.locator('.workflow-nav').getByRole('link', { name: 'Autos', exact: true }).click();
   assert.equal(await page.locator('.candidate-card').count(), 0);
   await page.getByRole('button', { name: 'Auto hinzufügen', exact: false }).click();
   const dialog = page.getByRole('dialog', { name: 'Auto hinzufügen', exact: true });
@@ -196,6 +196,12 @@ export async function checkCandidates({ page, reader, origin, output, post, brow
   for (const action of ['add-candidate', 'copy-candidate', 'move-candidate', 'remove-candidate']) {
     assert.equal((await post(reader.page, `${casePath}/candidates`, { action, itemId: firstId, 'Input.Model': 'Blocked', version })).status(), 403);
   }
+  await reader.page.goto(`${origin}${casePath}?section=settings`);
+  await reader.page.locator('#settings-title').waitFor({ state: 'visible' });
+  assert.equal((await reader.page.locator('.workspace-subnav [aria-current=page]').textContent()).trim(), 'Allgemein');
+  assert.equal(await reader.page.locator('#edit-evaluation, #evaluation-editor').count(), 0);
+  assert.equal(await reader.page.getByRole('button', { name: 'Evaluation löschen', exact: true }).count(), 0);
+  assert.equal((await post(reader.page, casePath, { action: 'rename', name: 'Blocked', version: await reader.page.locator('#evaluation-workspace').getAttribute('data-version') })).status(), 403);
   await reader.page.goto(`${origin}${casePath}/compare?first=${firstId}&second=${secondId}`);
   assert.equal(await reader.page.locator('[data-editor-open]').count(), 0);
   assert.equal((await post(reader.page, `${casePath}/compare?first=${firstId}&second=${secondId}`, { action: 'assess-candidate', candidateId: firstId, criterionId: boolean, booleanValue: 'true', version })).status(), 403);
