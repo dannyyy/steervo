@@ -18,14 +18,16 @@ public sealed class DetailsModel(CandidateWorkspace workspace, ICurrentUser curr
     public AssessmentDraft? Draft { get; private set; }
     public Guid? ComparisonFirst { get; private set; }
     public Guid? ComparisonSecond { get; private set; }
-    public async Task<IActionResult> OnGetAsync(Guid id, Guid candidateId, Guid? first, Guid? second)
+    public IReadOnlyList<Guid> ComparisonMore { get; private set; } = [];
+    public string ComparisonQuery => $"first={ComparisonFirst}&second={ComparisonSecond}{ComparisonSelection.More(ComparisonMore)}";
+    public async Task<IActionResult> OnGetAsync(Guid id, Guid candidateId, Guid? first, Guid? second, Guid[]? more)
     {
-        try { await LoadAsync(id, candidateId, first, second); return Page(); }
+        try { await LoadAsync(id, candidateId, first, second, more); return Page(); }
         catch (RuleException error) { return StatusCode(error.Message == "Forbidden" ? 403 : 404); }
     }
     public async Task<IActionResult> OnPostAsync(Guid id, Guid candidateId, long version, string action, Guid criterionId,
         CandidateForm input, CandidateStatus status, string? reason, string? booleanValue, string? measurementValue, int? ratingValue,
-        AssessmentSource source, string? notes, Guid? first, Guid? second)
+        AssessmentSource source, string? notes, Guid? first, Guid? second, Guid[]? more)
     {
         try
         {
@@ -51,15 +53,16 @@ public sealed class DetailsModel(CandidateWorkspace workspace, ICurrentUser curr
                     Request.Form["ratingValue"], Request.Form["source"], notes, Notice);
             Response.StatusCode = error.Message == "Conflict" ? 409 : 422;
         }
-        await LoadAsync(id, candidateId, first, second);
+        await LoadAsync(id, candidateId, first, second, more);
         return Request.Headers.ContainsKey("HX-Request") ? Partial("_CandidateDetails", this) : Page();
     }
-    private async Task LoadAsync(Guid id, Guid candidateId, Guid? first, Guid? second)
+    private async Task LoadAsync(Guid id, Guid candidateId, Guid? first, Guid? second, Guid[]? more)
     {
         Evaluation = await workspace.ReadAsync(id);
         Candidate = Evaluation.FindCandidate(candidateId);
         ComparisonFirst = Evaluation.Candidates.Any(x => x.Id == first) ? first : candidateId;
         ComparisonSecond = Evaluation.Candidates.Any(x => x.Id == second && x.Id != ComparisonFirst) ? second
             : Request.Query.ContainsKey("second") ? null : Evaluation.Candidates.OrderBy(x => x.Position).FirstOrDefault(x => x.Id != ComparisonFirst)?.Id;
+        ComparisonMore = ComparisonSelection.Further(Evaluation, ComparisonFirst, ComparisonSecond, more);
     }
 }

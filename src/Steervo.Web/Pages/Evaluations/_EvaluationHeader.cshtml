@@ -1,8 +1,9 @@
 @model Steervo.Web.Pages.Evaluations.EvaluationHeader
 @{
     var e = Model.Evaluation;
-    var candidatesUrl = Model.CandidateId.HasValue ? $"/evaluations/{e.Id}/candidates/{Model.CandidateId}?first={Model.First}&second={Model.Second}" : $"/evaluations/{e.Id}/candidates";
-    var comparisonUrl = Model.First.HasValue ? $"/evaluations/{e.Id}/compare?first={Model.First}&second={Model.Second}" : $"/evaluations/{e.Id}/compare";
+    var more = Steervo.Web.Pages.Evaluations.Candidates.ComparisonSelection.More(Model.More);
+    var candidatesUrl = Model.CandidateId.HasValue ? $"/evaluations/{e.Id}/candidates/{Model.CandidateId}?first={Model.First}&second={Model.Second}{more}" : $"/evaluations/{e.Id}/candidates";
+    var comparisonUrl = Model.First.HasValue ? $"/evaluations/{e.Id}/compare?first={Model.First}&second={Model.Second}{more}" : $"/evaluations/{e.Id}/compare";
     var offersUrl = Url.Page("/Evaluations/Offers/Index", new { id = e.Id, candidateId = Model.CandidateId });
     var group = Model.Active switch { "criteria" or "settings" => "setup", "candidates" => "cars", "offers" or "costs" => "offers", "comparison" or "scenarios" => "results", _ => "management" };
 }

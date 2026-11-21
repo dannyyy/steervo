@@ -137,8 +137,8 @@ export async function checkCandidates({ page, reader, origin, output, post, brow
   await comparisonEditor.getByLabel('Deine Angabe', { exact: true }).selectOption('true');
   await change(page, () => comparisonEditor.getByRole('button', { name: /speichern$/ }).click());
   assert.equal(await secondCell.locator('.comparison-value').textContent(), 'Ja');
-  assert.equal(await page.getByLabel('Erstes Auto', { exact: true }).inputValue(), firstId);
-  assert.equal(await page.getByLabel('Zweites Auto', { exact: true }).inputValue(), secondId);
+  const columns = () => page.locator('[data-comparison-column]').evaluateAll(cells => cells.map(cell => cell.dataset.comparisonColumn));
+  assert.deepEqual(await columns(), [firstId, secondId]);
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: join(output, '11-comparison-desktop.png'), fullPage: true });
   record('Candidate copies have independent assessments; comparison edits preserve the selected pair');
@@ -158,9 +158,64 @@ export async function checkCandidates({ page, reader, origin, output, post, brow
   const moving = page.locator(`[data-candidate-id="${secondId}"]`);
   await change(page, () => moving.getByRole('button', { name: /nach oben$/ }).click());
   assert.equal(await page.locator('.candidate-card').first().getAttribute('data-candidate-id'), secondId);
+
+  // Up to five cars are marked in the overview and compared side by side.
+  await page.setViewportSize({ width: 1440, height: 1050 });
+  await page.goto(`${origin}${casePath}/candidates`);
+  const cardIds = await page.locator('.candidate-card').evaluateAll(cards => cards.map(card => card.dataset.candidateId));
+  assert.equal(await page.locator('.next-step').count(), 0);
+  assert.equal(await page.locator(`[data-candidate-id="${firstId}"] .candidate-identity .candidate-status`).count(), 1);
+  assert.ok(await page.locator(`[data-candidate-id="${firstId}"] .fulfillment-counts li`).count() > 0);
+  assert.equal(await page.locator(`[data-candidate-id="${firstId}"] .fulfillment-bar rect`).count(), await page.locator(`[data-candidate-id="${firstId}"] .fulfillment-counts li`).count());
+  assert.equal((await page.locator('#compare-selected').innerText()).trim(), 'Vergleichen');
+  for (const id of cardIds.slice(0, 5)) await page.locator(`#compare-${id}`).check();
+  assert.equal((await page.locator('#compare-selected').innerText()).trim(), 'Vergleichen (5)');
+  assert.equal(await page.locator(`#compare-${cardIds[5]}`).isDisabled(), true);
+  // Reordering exchanges the list; the marked cars stay marked.
+  await change(page, () => page.locator(`[data-candidate-id="${cardIds[7]}"]`).getByRole('button', { name: /nach oben$/ }).click());
+  assert.equal(await page.locator('[data-compare-select]:checked').count(), 5);
+  assert.equal((await page.locator('#compare-selected').innerText()).trim(), 'Vergleichen (5)');
+  await page.locator(`#compare-${cardIds[4]}`).uncheck();
+  assert.equal(await page.locator(`#compare-${cardIds[5]}`).isDisabled(), false);
+  await page.locator(`#compare-${cardIds[4]}`).check();
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.screenshot({ path: join(output, '11-overview-selection.png'), fullPage: true });
+  await page.locator('#compare-selected').click();
+  await page.waitForURL(/\/compare\?/);
+  assert.deepEqual(await columns(), cardIds.slice(0, 5));
+  assert.equal(await page.locator('#compare-add').count(), 0);
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+  const columnWidths = await page.locator('[data-comparison-column]').evaluateAll(cells => cells.map(cell => cell.getBoundingClientRect().width));
+  assert.ok(Math.min(...columnWidths) >= 180, `Five compared cars stay readable: ${columnWidths}`);
+  assert.equal(await page.locator('#vehicle-comparison-scroll').evaluate(element => element.scrollWidth <= element.clientWidth + 1), true);
+  await page.screenshot({ path: join(output, '11-comparison-five.png'), fullPage: true });
+  await page.goto(`${origin}${casePath}/compare?first=${cardIds[0]}&second=${cardIds[1]}${cardIds.slice(2, 6).map(id => `&more=${id}`).join('')}`);
+  assert.equal(await page.locator('[data-comparison-limited]').count(), 1);
+  assert.deepEqual(await columns(), cardIds.slice(0, 5));
+  await page.locator(`[data-comparison-column="${cardIds[1]}"] .comparison-remove`).click();
+  assert.deepEqual(await columns(), [cardIds[0], cardIds[2], cardIds[3], cardIds[4]]);
+  assert.equal(await page.locator('[data-comparison-limited]').count(), 0);
+  assert.equal(await page.locator('#compare-add option').count(), 4);
+  await page.locator('#compare-add').selectOption(cardIds[7]); await page.locator('#compare-add-submit').click();
+  const chosen = [cardIds[0], cardIds[2], cardIds[3], cardIds[4], cardIds[7]];
+  assert.deepEqual(await columns(), chosen);
+  // The whole selection survives opening a car and returning to the comparison.
+  await page.locator(`[data-comparison-column="${cardIds[7]}"] .comparison-candidate-link`).click();
+  await page.locator('.section-nav').getByRole('link', { name: 'Auswertungen', exact: true }).click();
+  assert.deepEqual(await columns(), chosen);
+  await page.goto(`${origin}${casePath}/compare?first=${cardIds[0]}&second=`);
+  assert.deepEqual(await columns(), [cardIds[0]]);
+  assert.equal(await page.locator('.comparison-remove').count(), 0);
+  await page.goto(`${origin}${casePath}/compare?first=${cardIds[0]}&second=${cardIds[0]}&more=${cardIds[0]}&more=00000000-0000-0000-0000-000000000001`);
+  assert.deepEqual(await columns(), [cardIds[0]]);
+  assert.equal((await browserRequest(page, `${casePath}/compare?first=00000000-0000-0000-0000-000000000001`)).status(), 404);
+  await page.goto(`${origin}${casePath}/compare`);
+  assert.equal((await columns()).length, 5);
+  record('Up to five cars are selected in the overview, added to or removed from the comparison, and kept across the car record');
+
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`${origin}${casePath}/compare?first=${firstId}&second=${secondId}`);
-  assert.equal(await page.locator('#compare-first option').count(), 8);
+  assert.equal(await page.locator('#compare-add option').count(), 6);
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: join(output, '12-comparison-mobile.png'), fullPage: true });

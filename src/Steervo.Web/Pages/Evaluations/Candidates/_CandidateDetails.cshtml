@@ -2,15 +2,15 @@
 @using Steervo.Web.Pages.Shared
 @{
     var e = Model.Evaluation; var c = Model.Candidate; var edit = Model.Access >= AccessLevel.Editor;
-    var url = $"/evaluations/{e.Id}/candidates/{c.Id}?first={Model.ComparisonFirst}&second={Model.ComparisonSecond}";
-    var comparisonUrl = $"/evaluations/{e.Id}/compare?first={Model.ComparisonFirst}&second={Model.ComparisonSecond}";
+    var url = $"/evaluations/{e.Id}/candidates/{c.Id}?{Model.ComparisonQuery}";
+    var comparisonUrl = $"/evaluations/{e.Id}/compare?{Model.ComparisonQuery}";
     var vehicleCriteria = e.Criteria.Where(x => x.Scope == CriterionScope.Vehicle).ToList();
     var failures = vehicleCriteria.Where(x => x.Priority == Priority.Required && e.ResultFor(c.Id, x.Id) == Fulfillment.Unmet).ToList();
     var optional = vehicleCriteria.Where(x => x.Priority == Priority.Required && e.ResultFor(c.Id, x.Id) == Fulfillment.Optional).ToList();
     var open = vehicleCriteria.Count(x => e.ResultFor(c.Id, x.Id) == Fulfillment.Unknown);
 }
 <div id="candidate-workspace" data-version="@e.Version" data-preserve-viewport hx-target="#candidate-workspace" hx-swap="outerHTML show:none focus-scroll:false" hx-sync="this:drop">
-<partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "candidates", c.Id, Model.ComparisonFirst, Model.ComparisonSecond)' />
+<partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "candidates", c.Id, Model.ComparisonFirst, Model.ComparisonSecond, Model.ComparisonMore)' />
 @if (Model.Notice is not null && !Model.Failed) { <div class="notice workspace-notice success" role="status" tabindex="-1">@Model.Notice</div> }
 <nav class="candidate-ribbon" aria-label="@T["CandidateSelection"]" id="candidate-ribbon" data-preserve-scroll>
     <a asp-page="Index" asp-route-id="@e.Id" class="candidate-index-link"><partial name="/Pages/Shared/_Icon.cshtml" model='"list"' /><span>@T["AllCandidates"]</span></a>
@@ -18,7 +18,7 @@
     {
         var first = candidate.Id == Model.ComparisonFirst || candidate.Id == Model.ComparisonSecond ? Model.ComparisonFirst : candidate.Id;
         var second = candidate.Id == Model.ComparisonFirst || candidate.Id == Model.ComparisonSecond ? Model.ComparisonSecond : Model.ComparisonFirst;
-        <a href="/evaluations/@e.Id/candidates/@candidate.Id?first=@first&second=@second" aria-current="@(candidate.Id == c.Id ? "page" : null)"><strong>@candidate.DisplayName</strong><span>@T["CandidateStatus" + candidate.Status]</span></a>
+        <a href="/evaluations/@e.Id/candidates/@candidate.Id?first=@first&second=@second@(Steervo.Web.Pages.Evaluations.Candidates.ComparisonSelection.More(Model.ComparisonMore))" aria-current="@(candidate.Id == c.Id ? "page" : null)"><strong>@candidate.DisplayName</strong><span>@T["CandidateStatus" + candidate.Status]</span></a>
     }
 </nav>
 <article class="vehicle-record">

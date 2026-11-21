@@ -48,3 +48,21 @@ function requestPending(form, pending) {
 document.addEventListener('htmx:beforeRequest', event => requestPending(event.detail.elt.closest('form'), true));
 document.addEventListener('htmx:afterRequest', event => requestPending(event.detail.elt.closest('form'), false));
 document.addEventListener('form:pending', event => requestPending(event.target.closest('form'), event.detail));
+// Up to five cars can be marked in the overview and opened side by side.
+const comparedCars = new Set();
+function updateCompareSelection(restore = false) {
+  const form = document.querySelector('[data-compare-form]');
+  if (!form) return;
+  const boxes = [...document.querySelectorAll('[data-compare-select]')];
+  if (restore) boxes.forEach(box => { box.checked = comparedCars.has(box.value); });
+  comparedCars.clear();
+  boxes.filter(box => box.checked).forEach(box => comparedCars.add(box.value));
+  const full = comparedCars.size >= Number(form.dataset.compareMaximum);
+  boxes.forEach(box => { box.disabled = full && !box.checked; });
+  const button = form.querySelector('[data-compare-label]');
+  button.querySelector('span').textContent = comparedCars.size ? `${button.dataset.compareLabel} (${comparedCars.size})` : button.dataset.compareLabel;
+}
+document.addEventListener('change', event => { if (event.target.matches('[data-compare-select]')) updateCompareSelection(); });
+document.addEventListener('htmx:afterSwap', () => updateCompareSelection(true));
+window.addEventListener('pageshow', () => updateCompareSelection());
+updateCompareSelection();

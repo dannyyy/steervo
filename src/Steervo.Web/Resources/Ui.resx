@@ -205,7 +205,6 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="Candidates" xml:space="preserve"><value>Autos</value></data>
   <data name="CompareCandidates" xml:space="preserve"><value>Vergleichen</value></data>
   <data name="CandidatesTitle" xml:space="preserve"><value>Welche Autos kommen in Frage?</value></data>
-  <data name="CandidatesHelp" xml:space="preserve"><value>Sammle deine Kandidaten. Ausstattung und offene Fragen hältst du bei jedem Auto fest.</value></data>
   <data name="AddCandidate" xml:space="preserve"><value>Auto hinzufügen</value></data>
   <data name="EmptyCandidatesTitle" xml:space="preserve"><value>Deine Auswahl beginnt hier.</value></data>
   <data name="EmptyCandidatesHelp" xml:space="preserve"><value>Ein Modell reicht für den Anfang. Ausführung, Zustand und weitere Angaben kannst du ergänzen, sobald du sie kennst.</value></data>
@@ -221,6 +220,22 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="CandidateNotes" xml:space="preserve"><value>Notizen</value></data>
   <data name="CandidateLinks" xml:space="preserve"><value>Quellen und Links</value></data>
   <data name="CandidateLinksHelp" xml:space="preserve"><value>Eine vollständige http- oder https-Adresse pro Zeile, höchstens zehn Links.</value></data>
+  <data name="CompareSelectionHelp" xml:space="preserve"><value>Wähle bis zu {0} Autos aus und vergleiche sie nebeneinander.</value></data>
+  <data name="CandidateNoCriteria" xml:space="preserve"><value>Noch keine Kriterien für Autos erfasst.</value></data>
+  <data name="SummaryMet" xml:space="preserve"><value>{0} erfüllt</value></data>
+  <data name="SummaryUnmet" xml:space="preserve"><value>{0} nicht erfüllt</value></data>
+  <data name="SummaryOptional" xml:space="preserve"><value>{0} optional</value></data>
+  <data name="SummaryUnknown" xml:space="preserve"><value>{0} offen</value></data>
+  <data name="SummaryRated" xml:space="preserve"><value>{0} persönlich bewertet</value></data>
+  <data name="FulfillmentRatedShort" xml:space="preserve"><value>Persönlich</value></data>
+  <data name="ComparisonAdd" xml:space="preserve"><value>Auto hinzufügen</value></data>
+  <data name="ComparisonAddLabel" xml:space="preserve"><value>Auto zum Vergleich hinzufügen</value></data>
+  <data name="ComparisonRemove" xml:space="preserve"><value>{0} aus dem Vergleich entfernen</value></data>
+  <data name="ComparisonFull" xml:space="preserve"><value>Maximal {0} Autos. Entferne eines, um ein anderes hinzuzufügen.</value></data>
+  <data name="ComparisonLimited" xml:space="preserve"><value>Es werden höchstens {0} Autos verglichen. Angezeigt werden die ersten {0} der Auswahl.</value></data>
+  <data name="SelectCandidate" xml:space="preserve"><value>Auto auswählen</value></data>
+  <data name="ShowComparison" xml:space="preserve"><value>Vergleich anzeigen</value></data>
+  <data name="NoAutomaticExclusion" xml:space="preserve"><value>Ein verfehltes Muss führt nicht automatisch zum Ausschluss. Du entscheidest, welche Abstriche für dich in Frage kommen.</value></data>
   <data name="CandidateStatusWatching" xml:space="preserve"><value>Beobachtet</value></data>
   <data name="CandidateStatusAlternative" xml:space="preserve"><value>Alternative</value></data>
   <data name="CandidateStatusFavorite" xml:space="preserve"><value>Favorit</value></data>
@@ -228,9 +243,7 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="CandidateStatusExcluded" xml:space="preserve"><value>Ausgeschieden</value></data>
   <data name="CandidateUp" xml:space="preserve"><value>Auto {0} nach oben</value></data>
   <data name="CandidateDown" xml:space="preserve"><value>Auto {0} nach unten</value></data>
-  <data name="RequiredNotMet" xml:space="preserve"><value>Diese Muss-Anforderungen werden verfehlt</value></data>
-  <data name="CandidateNeedsAssessment" xml:space="preserve"><value>Halte fest, was du bereits weisst. Offene Fragen bleiben als unbekannt sichtbar.</value></data>
-  <data name="CandidateReadyToReview" xml:space="preserve"><value>Prüfe deine Einschätzungen im direkten Vergleich.</value></data>
+  <data name="RequiredNotMet" xml:space="preserve"><value>Muss nicht erfüllt</value></data>
   <data name="AssessCandidate" xml:space="preserve"><value>Ausstattung prüfen</value></data>
   <data name="ViewCandidate" xml:space="preserve"><value>Auto ansehen</value></data>
   <data name="CandidateActions" xml:space="preserve"><value>Weitere Aktionen</value></data>
@@ -239,8 +252,6 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="CopyCandidate" xml:space="preserve"><value>Auto kopieren</value></data>
   <data name="RemoveCandidate" xml:space="preserve"><value>Auto entfernen</value></data>
   <data name="RemoveCandidateConfirm" xml:space="preserve"><value>Dieses Auto mit seinen Bewertungen, Kostenpositionen und allen Offerten samt Versionshistorie und Dokumenten unwiderruflich entfernen?</value></data>
-  <data name="CompareNextTitle" xml:space="preserve"><value>Lege zwei Kandidaten nebeneinander.</value></data>
-  <data name="CompareNextHelp" xml:space="preserve"><value>Sieh die Unterschiede bei deinen Anforderungen und halte neue Erkenntnisse direkt fest.</value></data>
   <data name="NewCandidateHelp" xml:space="preserve"><value>Erfasse ein Modell oder eine konkrete Ausführung. Unbekannte Angaben dürfen offen bleiben.</value></data>
   <data name="CreateCandidate" xml:space="preserve"><value>Auto anlegen</value></data>
   <data name="AssessmentValue" xml:space="preserve"><value>Deine Angabe</value></data>
@@ -266,7 +277,6 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="ClearAssessmentConfirm" xml:space="preserve"><value>Wert, Grundlage und Notiz dieser Bewertung entfernen? Das Kriterium bleibt bestehen und wird wieder als unbekannt angezeigt.</value></data>
   <data name="AllCandidates" xml:space="preserve"><value>Alle Autos</value></data>
   <data name="CompareCandidate" xml:space="preserve"><value>Im Vergleich ansehen</value></data>
-  <data name="NoAutomaticExclusion" xml:space="preserve"><value>Ein verfehltes Muss führt nicht automatisch zum Ausschluss. Du entscheidest, welche Abstriche für dich in Frage kommen.</value></data>
   <data name="AssessCandidateTitle" xml:space="preserve"><value>Was weisst du über dieses Auto?</value></data>
   <data name="AssessCandidateHelp" xml:space="preserve"><value>Trage bestätigte Angaben und deine Erfahrungen ein. Ein leeres Feld bedeutet unbekannt, nicht nein oder null.</value></data>
   <data name="NoVehicleCriteria" xml:space="preserve"><value>Zuerst festhalten, worauf es ankommt.</value></data>
@@ -283,18 +293,11 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="NoCandidateNotes" xml:space="preserve"><value>Noch keine Notizen erfasst.</value></data>
   <data name="EditCandidate" xml:space="preserve"><value>Stammdaten bearbeiten</value></data>
   <data name="SaveCandidate" xml:space="preserve"><value>Stammdaten speichern</value></data>
-  <data name="ComparisonTitle" xml:space="preserve"><value>Was spricht für welches Auto?</value></data>
-  <data name="ComparisonHelp" xml:space="preserve"><value>Vergleiche zwei Kandidaten anhand deiner Anforderungen. Unbekanntes bleibt sichtbar, und deine Einschätzung lässt sich direkt bearbeiten.</value></data>
   <data name="NoComparisonCandidates" xml:space="preserve"><value>Noch keine Autos zum Vergleichen.</value></data>
   <data name="NoComparisonCandidatesHelp" xml:space="preserve"><value>Erfasse zuerst Kandidaten und prüfe ihre Ausstattung.</value></data>
-  <data name="FirstCandidate" xml:space="preserve"><value>Erstes Auto</value></data>
-  <data name="SecondCandidate" xml:space="preserve"><value>Zweites Auto</value></data>
-  <data name="SelectCandidate" xml:space="preserve"><value>Auto auswählen</value></data>
-  <data name="ShowComparison" xml:space="preserve"><value>Vergleich anzeigen</value></data>
-  <data name="OneCandidateComparison" xml:space="preserve"><value>Für einen direkten Vergleich ein weiteres Auto hinzufügen oder ein anderes zweites Auto auswählen.</value></data>
+  <data name="OneCandidateComparison" xml:space="preserve"><value>Füge ein weiteres Auto hinzu, um zu vergleichen.</value></data>
   <data name="CriterionForCandidate" xml:space="preserve"><value>{0} bei {1}</value></data>
   <data name="EditAssessment" xml:space="preserve"><value>Bewertung bearbeiten</value></data>
-  <data name="SelectDifferentCandidates" xml:space="preserve"><value>Wähle zwei unterschiedliche Autos für den Vergleich.</value></data>
   <data name="InvalidCandidateLinks" xml:space="preserve"><value>Bitte nur vollständige http- oder https-Adressen ohne Zugangsdaten angeben (höchstens zehn Links).</value></data>
   <data name="CandidateReasonRequired" xml:space="preserve"><value>Bitte begründe, warum du dieses Auto zurückstellst oder ausscheiden lässt.</value></data>
   <data name="VehicleCriteriaOnly" xml:space="preserve"><value>Hier können nur Kriterien mit dem Bezug Fahrzeug bewertet werden.</value></data>
@@ -754,7 +757,7 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="EditClassification" xml:space="preserve"><value>Einordnung bearbeiten</value></data>
   <data name="EditAssessmentFor" xml:space="preserve"><value>{0} für {1} bearbeiten</value></data>
   <data name="AssessmentUnknownHelp" xml:space="preserve"><value>Ein leeres Feld bleibt offen. Nein und null sind erfasste Angaben.</value></data>
-  <data name="ComparisonScrollHint" xml:space="preserve"><value>Weitere Spalte: horizontal scrollen oder mit den Pfeiltasten wechseln.</value></data>
+  <data name="ComparisonScrollHint" xml:space="preserve"><value>Weitere Spalten: horizontal scrollen oder mit den Pfeiltasten wechseln.</value></data>
   <data name="DiscardDraftTitle" xml:space="preserve"><value>Ungespeicherte Änderungen verwerfen?</value></data>
   <data name="DiscardDraftDescription" xml:space="preserve"><value>Deine Eingaben sind noch nicht gespeichert. Du kannst weiterarbeiten oder sie verwerfen.</value></data>
   <data name="DiscardDraft" xml:space="preserve"><value>Änderungen verwerfen</value></data>
@@ -831,7 +834,7 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="BooleanOptional" xml:space="preserve"><value>Optional</value></data>
   <data name="BooleanOptionalHelp" xml:space="preserve"><value>Optional bedeutet: separat erhältlich, aber noch nicht enthalten, etwa beim Hersteller oder einem Drittanbieter. Bezugsquelle und Details kannst du in der Notiz festhalten.</value></data>
   <data name="FulfillmentOptional" xml:space="preserve"><value>Optional erhältlich</value></data>
-  <data name="RequiredOptional" xml:space="preserve"><value>Diese Muss-Anforderungen sind optional erhältlich</value></data>
+  <data name="RequiredOptional" xml:space="preserve"><value>Muss nur optional erhältlich</value></data>
   <data name="RequiredOptionalHelp" xml:space="preserve"><value>Separat erhältlich, aber noch nicht enthalten. Diese Anforderungen zählen weder als erfüllt noch als verfehlt.</value></data>
   <data name="WorkflowSetup" xml:space="preserve"><value>Grundlagen</value></data>
   <data name="WorkflowCars" xml:space="preserve"><value>Autos</value></data>

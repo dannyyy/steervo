@@ -49,8 +49,7 @@ export async function checkCanvas({ page, origin, casePath, firstId, secondId, b
   assert.equal(new URL(page.url()).searchParams.get('first'), firstId);
   assert.equal(new URL(page.url()).searchParams.get('second'), secondId);
   await page.locator('.section-nav').getByRole('link', { name: 'Auswertungen', exact: true }).click();
-  assert.equal(await page.locator('#compare-first').inputValue(), firstId);
-  assert.equal(await page.locator('#compare-second').inputValue(), secondId);
+  assert.deepEqual(await page.locator('[data-comparison-column]').evaluateAll(cells => cells.map(cell => cell.dataset.comparisonColumn)), [firstId, secondId]);
 
   // Unchanged Escape closes directly; changed Escape offers a safe continuation.
   await opener(boolean).click();
