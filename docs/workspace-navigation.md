@@ -2,7 +2,7 @@
 
 Die Evaluation gliedert sich in vier Arbeitsbereiche:
 
-- Grundlagen: «Allgemein» mit Eigenschaften, Freigaben und Daten der Evaluation sowie die Kriterien. Die Evaluation öffnet sich weiterhin bei den Kriterien.
+- Grundlagen: «Allgemein» mit Eigenschaften, Freigaben und Daten der Evaluation sowie die Kriterien. Eine Evaluation öffnet sich auf «Allgemein».
 - Autos: Fahrzeugakten.
 - Offerten & Kosten: Angebote und zusätzliche Kostenpositionen.
 - Auswertungen: Fahrzeugvergleich und Kostenvergleich mit gespeicherten Rechenannahmen.

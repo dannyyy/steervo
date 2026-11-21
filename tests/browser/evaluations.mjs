@@ -18,6 +18,11 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   await creation.getByRole('button', { name: 'Evaluation anlegen', exact: true }).click();
   await page.waitForURL(/\/evaluations\//);
   const path = new URL(page.url()).pathname;
+  // A new evaluation opens on its general page; the criteria are one tab further.
+  assert.equal((await page.locator('.workspace-subnav [aria-current=page]').textContent()).trim(), 'Allgemein');
+  assert.equal(await page.locator('.criteria-main').isVisible(), false);
+  await page.locator('.workspace-subnav').getByRole('link', { name: 'Kriterien', exact: true }).click();
+  assert.equal(new URL(page.url()).searchParams.get('section'), 'criteria');
   const version = () => page.locator('#evaluation-workspace').getAttribute('data-version');
   const submit = async (button, status) => {
     const response = page.waitForResponse(r => new URL(r.url()).pathname === path && r.request().method() === 'POST');
@@ -112,6 +117,8 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   assert.equal((await exportCase()).country, 'DE');
   assert.equal((await exportCase()).currency, 'CHF');
   assert.deepEqual(await page.locator('#evaluation-workspace > section:not([hidden]) h2').allTextContents(), ['Allgemein', 'Freigaben', 'Daten']);
+  assert.deepEqual(await page.locator('#evaluation-data h3').allTextContents(), ['Importieren', 'Exportieren', 'Löschen']);
+  assert.deepEqual((await page.locator('#evaluation-data .button').allTextContents()).map(text => text.trim()), ['Importieren', 'Exportieren', 'Löschen']);
   assert.equal(await page.locator('#evaluation-data').getByRole('link', { name: 'Evaluation importieren', exact: true }).getAttribute('href'), '/#import-evaluation');
   await page.locator('#add-share').click();
   const share = page.locator('#share-editor-new');
@@ -139,7 +146,7 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   await page.waitForURL(`**?section=sharing`);
   assert.equal((await page.locator('.workspace-subnav [aria-current=page]').textContent()).trim(), 'Allgemein');
   assert.equal(await page.locator('#sharing').isVisible(), true);
-  await reader.page.goto(`${origin}${path}`);
+  await reader.page.goto(`${origin}${path}?section=criteria`);
   await reader.page.locator('#add-group').click();
   await reader.page.locator('#new-group-editor').getByLabel('Gruppenname').fill('Nicht verlieren');
   await mutate(page, () => page.locator('.share-row').getByRole('button', { name: 'Entziehen', exact: true }).click());
@@ -154,6 +161,7 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   record('Desktop/mobile sections fit the viewport; old links work and real permission revocation protects the draft');
 
   await page.getByRole('link', { name: 'Grundlagen', exact: true }).click();
+  await page.locator('.workspace-subnav').getByRole('link', { name: 'Kriterien', exact: true }).click();
   await page.locator(`#edit-criterion-${id}`).click();
   await editor.getByRole('button', { name: 'Kriterium löschen', exact: true }).click();
   assert.match(await page.locator('#confirmation-title').innerText(), /Lokaler Entwurf bleibt erhalten/);

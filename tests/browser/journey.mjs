@@ -209,7 +209,7 @@ try {
   assert.equal(await creation.isVisible(), true);
   await creation.getByRole('button', { name: 'Schliessen', exact: true }).click();
   assert.equal(await page.locator('.case-card').count(), 1);
-  await page.goto(`${origin}${casePath}`);
+  await page.goto(`${origin}${casePath}?section=criteria`);
   record('Evaluation creation opens a focused modal, preserves invalid drafts and works on desktop/mobile');
   const groupEditor = page.locator('#new-group-editor');
   for (const name of ['Alltag', 'Komfort']) {
@@ -285,7 +285,7 @@ try {
   await page.locator('#add-share').click();
   const share = page.locator('.share-form'); await share.getByLabel('E-Mail-Adresse').fill(readerEmail);
   await mutate(page, () => share.getByRole('button', { name: 'Zugriff freigeben' }).click());
-  await reader.page.goto(`${origin}${casePath}`);
+  await reader.page.goto(`${origin}${casePath}?section=criteria`);
   assert.equal(await reader.page.locator('input[value="add-criterion"]').count(), 0);
   assert.equal(await reader.page.locator('[data-drag-handle]').count(), 0);
   let version = await reader.page.locator('#evaluation-workspace').getAttribute('data-version');
@@ -379,7 +379,7 @@ try {
   await stopServer();
   if (process.env.STEERVO_E2E_DATABASE_CONTAINER) execFileSync('docker', ['restart', process.env.STEERVO_E2E_DATABASE_CONTAINER], { stdio: 'pipe' });
   await startServer();
-  await page.goto(`${origin}${casePath}`);
+  await page.goto(`${origin}${casePath}?section=criteria`);
   assert.equal(await page.locator('.criterion').count(), 3);
   assert.equal(await original.getAttribute('data-criterion-id'), criterionId);
   const persistedCandidates = JSON.parse(await (await browserRequest(page, `${casePath}?handler=Export`)).text());

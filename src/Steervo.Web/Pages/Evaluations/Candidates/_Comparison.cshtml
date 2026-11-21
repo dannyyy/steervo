@@ -53,7 +53,7 @@ else
         }
         </div>
     }
-    <div class="comparison-explanation"><p>@T["NoAutomaticExclusion"]</p><p>@T["RatingIsSubjective"]</p><a asp-page="/Evaluations/Details" asp-route-id="@e.Id">@T["EditCriteria"]</a></div>
+    <div class="comparison-explanation"><p>@T["NoAutomaticExclusion"]</p><p>@T["RatingIsSubjective"]</p><a asp-page="/Evaluations/Details" asp-route-id="@e.Id" asp-route-section="criteria">@T["EditCriteria"]</a></div>
     @if (e.Criteria.Any(x => x.Scope == CriterionScope.Offer)) { <p class="micro"><a asp-page="/Evaluations/Offers/Index" asp-route-id="@e.Id">@T["OfferCriteriaSeparateLink"]</a></p> }
 }
 </section>

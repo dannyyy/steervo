@@ -35,7 +35,7 @@
                 <div class="record-section-heading"><h3>@T["VehicleRequirements"]</h3><span>@T["OpenAssessmentCount", open, vehicleCriteria.Count]</span></div>
                 @if (failures.Count > 0) { <div class="candidate-warning"><strong>@T["RequiredNotMet"]</strong><p>@string.Join(" · ", failures.Select(x => x.Name))</p><p class="micro">@T["NoAutomaticExclusion"]</p></div> }
                 @if (optional.Count > 0) { <div class="candidate-optional"><strong>@T["RequiredOptional"]</strong><p>@string.Join(" · ", optional.Select(x => x.Name))</p><p class="micro">@T["RequiredOptionalHelp"]</p></div> }
-                @if (vehicleCriteria.Count == 0) { <div class="empty-state"><h3>@T["NoVehicleCriteria"]</h3><p>@T["NoVehicleCriteriaHelp"]</p><a asp-page="/Evaluations/Details" asp-route-id="@e.Id" class="button secondary">@T["EditCriteria"]</a></div> }
+                @if (vehicleCriteria.Count == 0) { <div class="empty-state"><h3>@T["NoVehicleCriteria"]</h3><p>@T["NoVehicleCriteriaHelp"]</p><a asp-page="/Evaluations/Details" asp-route-id="@e.Id" asp-route-section="criteria" class="button secondary">@T["EditCriteria"]</a></div> }
                 @foreach (var group in e.Groups.OrderBy(x => x.Position).Cast<CriterionGroup?>().Append(null))
                 {
                     var criteria = vehicleCriteria.Where(x => x.GroupId == group?.Id).OrderBy(x => x.Position).ToList();

@@ -22,7 +22,7 @@ else {
 <nav class="workspace-subnav" aria-label="@T["WorkflowSections"]">
 @if (group == "setup") {
     <a asp-page="/Evaluations/Details" asp-route-id="@e.Id" asp-route-section="settings" aria-current="@(Model.Active == "settings" ? "page" : null)">@T["General"]</a>
-    <a asp-page="/Evaluations/Details" asp-route-id="@e.Id" aria-current="@(Model.Active == "criteria" ? "page" : null)">@T["Criteria"]</a>
+    <a asp-page="/Evaluations/Details" asp-route-id="@e.Id" asp-route-section="criteria" aria-current="@(Model.Active == "criteria" ? "page" : null)">@T["Criteria"]</a>
 } else if (group == "offers") {
     <a href="@offersUrl" aria-current="@(Model.Active == "offers" ? "page" : null)">@T["Offers"]</a>
     <a asp-page="/Evaluations/Costs/Index" asp-route-id="@e.Id" asp-route-candidateId="@Model.CandidateId" aria-current="@(Model.Active == "costs" ? "page" : null)">@T["Costs"]</a>

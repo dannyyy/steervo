@@ -93,7 +93,7 @@
 <data name="GroupHelp" xml:space="preserve"><value>Eine Gruppe ordnet deine Kriterien. Sie hat keine eigene Priorität oder Bewertung.</value></data>
 <data name="GoodToKnow" xml:space="preserve"><value>GUT ZU WISSEN</value></data>
 <data name="Together" xml:space="preserve"><value>GEZIELT ZUSAMMENARBEITEN</value></data>
-<data name="SharingHelp" xml:space="preserve"><value>Gib diese Evaluation für ein bereits bestätigtes Konto frei. Eine Einladung allein teilt keine Daten. Eine erneute Freigabe aktualisiert die Rolle.</value></data>
+<data name="SharingHelp" xml:space="preserve"><value>Gib anderen Konten Lese- oder Bearbeitungsrechte. Das Konto muss bereits bestätigt sein.</value></data>
 <data name="NoShares" xml:space="preserve"><value>Diese Evaluation ist privat. Es gibt noch keine Freigaben.</value></data>
 <data name="Revoke" xml:space="preserve"><value>Entziehen</value></data>
 <data name="Permission" xml:space="preserve"><value>Berechtigung</value></data>
@@ -772,8 +772,8 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
 <data name="EditShareNamed" xml:space="preserve"><value>Berechtigung für {0} ändern</value></data>
 <data name="EditPermission" xml:space="preserve"><value>Berechtigung ändern</value></data>
 <data name="PermissionHelp" xml:space="preserve"><value>Leser können die Evaluation ansehen und exportieren. Bearbeiter können zusätzlich Inhalte ändern. Freigaben und das Löschen der Evaluation bleiben beim Besitzer.</value></data>
-<data name="EvaluationSettingsHelp" xml:space="preserve"><value>Name, Zweck, Land und Währung deiner Entscheidung.</value></data>
-<data name="ExportHelp" xml:space="preserve"><value>Lade die Evaluation mit allen vorhandenen Versionen und Anhängen herunter. Ein Import erstellt daraus eine neue private Evaluation.</value></data>
+<data name="EvaluationSettingsHelp" xml:space="preserve"><value>Name, Zweck, Land und Währung der Evaluation.</value></data>
+<data name="ExportHelp" xml:space="preserve"><value>Lädt die Evaluation als Datei herunter, mit allen Versionen und Anhängen.</value></data>
 <data name="DeleteEvaluationNamed" xml:space="preserve"><value>Evaluation „{0}“ löschen?</value></data>
 <data name="EditorPageConflict" xml:space="preserve"><value>Dein Entwurf ist unverändert. Öffne den aktuellen Stand zum Vergleich. Erst mit «Stand geprüft – erneut speichern» wird dein Entwurf erneut gesendet.</value></data>
 <data name="EditorRetryCurrent" xml:space="preserve"><value>Stand geprüft – erneut speichern</value></data>
@@ -838,7 +838,10 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="WorkflowOffers" xml:space="preserve"><value>Offerten &amp; Kosten</value></data>
   <data name="General" xml:space="preserve"><value>Allgemein</value></data>
   <data name="EvaluationData" xml:space="preserve"><value>Daten</value></data>
-  <data name="EvaluationDataHelp" xml:space="preserve"><value>Evaluation sichern, aus einer Exportdatei neu anlegen oder endgültig entfernen.</value></data>
+  <data name="ImportAction" xml:space="preserve"><value>Importieren</value></data>
+  <data name="ImportDataHelp" xml:space="preserve"><value>Legt aus einer Exportdatei eine neue, private Evaluation an. Diese Evaluation bleibt unverändert.</value></data>
+  <data name="DeleteAction" xml:space="preserve"><value>Löschen</value></data>
+  <data name="DeleteDataHelp" xml:space="preserve"><value>Entfernt die Evaluation endgültig, mit allen Autos, Kriterien, Offerten, Dokumenten, Kosten und Freigaben.</value></data>
   <data name="WorkflowResults" xml:space="preserve"><value>Auswertungen</value></data>
   <data name="WorkflowSections" xml:space="preserve"><value>Bereiche der Arbeitsphase</value></data>
   <data name="VehicleComparison" xml:space="preserve"><value>Fahrzeugvergleich</value></data>

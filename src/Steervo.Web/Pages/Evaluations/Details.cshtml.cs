@@ -14,7 +14,8 @@ public sealed class DetailsModel(EvaluationWorkspace workspace, EvaluationArchiv
     public IReadOnlyDictionary<string, string> ShareNames { get; private set; } = new Dictionary<string, string>();
     public string? Notice { get; private set; }
     public bool Failed { get; private set; }
-    [BindProperty(SupportsGet = true)] public string Section { get; set; } = "criteria";
+    [BindProperty(SupportsGet = true, Name = "section")] public string? RequestedSection { get; set; }
+    public string Section { get; private set; } = "settings";
     public string? FailedAction { get; private set; }
     public Guid FailedItemId { get; private set; }
     public string? SubmittedValues { get; private set; }
@@ -83,7 +84,8 @@ public sealed class DetailsModel(EvaluationWorkspace workspace, EvaluationArchiv
     private async Task LoadAsync(Guid id)
     {
         Evaluation = await workspace.ReadAsync(id);
-        Section = Section is "sharing" or "settings" ? "settings" : "criteria";
+        // The evaluation opens on its general page; criteria forms post without a section and stay on the criteria.
+        Section = RequestedSection switch { "sharing" or "settings" => "settings", "criteria" => "criteria", _ => HttpMethods.IsPost(Request.Method) ? "criteria" : "settings" };
         ShareNames = Access == AccessLevel.Owner ? await accounts.NamesAsync(Evaluation.Shares.Select(x => x.UserId)) : new Dictionary<string, string>();
     }
 }

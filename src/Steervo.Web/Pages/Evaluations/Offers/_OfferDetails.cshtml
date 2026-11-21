@@ -42,7 +42,7 @@ else { <p class="micro">@T["OfferNoOpenFields"]</p> }
     if (criteria.Count == 0) { continue; }
     <section class="assessment-group"><h4>@(group?.Name ?? T["Ungrouped"].Value)</h4>@foreach (var criterion in criteria) { <partial name="_OfferAssessment" model="new OfferAssessmentRow(e, offer, criterion, Model.Access, Model.Draft, Model.ReturnContext)" /> }</section>
 }
-@if (!e.Criteria.Any(criterion => criterion.Scope == CriterionScope.Offer)) { <p class="muted">@T["OfferNoCriteria"] <a asp-page="/Evaluations/Details" asp-route-id="@e.Id">@T["EditCriteria"] →</a></p> }
+@if (!e.Criteria.Any(criterion => criterion.Scope == CriterionScope.Offer)) { <p class="muted">@T["OfferNoCriteria"] <a asp-page="/Evaluations/Details" asp-route-id="@e.Id" asp-route-section="criteria">@T["EditCriteria"] →</a></p> }
 </section>
 }
 <partial name="_OfferDocuments" model="Model" />

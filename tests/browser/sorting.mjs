@@ -11,6 +11,7 @@ export async function checkSorting({ page, owner, origin, output, post, mutate, 
   await page.getByRole('dialog', { name: 'Neue Evaluation', exact: true }).getByRole('button', { name: 'Evaluation anlegen' }).click();
   await page.waitForURL(/\/evaluations\//);
   const path = new URL(page.url()).pathname;
+  await page.goto(`${origin}${path}?section=criteria`);
   let version = await page.locator('#evaluation-workspace').getAttribute('data-version');
   async function seed(values) {
     const response = await post(page, path, { ...values, version });
@@ -143,7 +144,7 @@ export async function checkSorting({ page, owner, origin, output, post, mutate, 
   touch.setDefaultTimeout(10_000);
   const touchErrors = [];
   touch.on('pageerror', error => touchErrors.push(error.message));
-  await touch.goto(`${origin}${path}`);
+  await touch.goto(`${origin}${path}?section=criteria`);
   assert.ok(await touch.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
   const touchSource = touch.getByRole('button', { name: 'Kriterium Standardschlüssel verschieben', exact: true });
   await touchSource.evaluate(element => window.scrollBy(0, element.getBoundingClientRect().top - 250));
