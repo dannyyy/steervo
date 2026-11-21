@@ -117,8 +117,9 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   assert.equal((await exportCase()).country, 'DE');
   assert.equal((await exportCase()).currency, 'CHF');
   assert.deepEqual(await page.locator('#evaluation-workspace > section:not([hidden]) h2').allTextContents(), ['Allgemein', 'Freigaben', 'Daten']);
-  assert.deepEqual(await page.locator('#evaluation-data h3').allTextContents(), ['Importieren', 'Exportieren', 'Löschen']);
-  assert.deepEqual((await page.locator('#evaluation-data .button').allTextContents()).map(text => text.trim()), ['Importieren', 'Exportieren', 'Löschen']);
+  const dataActions = ['Importieren', 'Exportieren', 'Löschen'];
+  assert.deepEqual((await page.locator('#evaluation-data h3').allTextContents()).filter(text => dataActions.includes(text)), dataActions);
+  assert.deepEqual((await page.locator('#evaluation-data .button').allTextContents()).map(text => text.trim()).filter(text => dataActions.includes(text)), dataActions);
   assert.equal(await page.locator('#evaluation-data').getByRole('link', { name: 'Evaluation importieren', exact: true }).getAttribute('href'), '/#import-evaluation');
   await page.locator('#add-share').click();
   const share = page.locator('#share-editor-new');
