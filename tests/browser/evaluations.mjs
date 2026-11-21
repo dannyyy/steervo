@@ -96,6 +96,7 @@ export async function checkEvaluations({ page, reader, readerEmail, origin, outp
   await page.locator('.evaluation-tools > summary').click();
   await page.locator('.workspace-subnav').getByRole('link', { name: 'Allgemein', exact: true }).click();
   assert.equal((await page.locator('.workspace-subnav [aria-current=page]').textContent()).trim(), 'Allgemein');
+  assert.deepEqual((await page.locator('.workspace-subnav a').allTextContents()).map(text => text.trim()), ['Allgemein', 'Kriterien']);
   assert.equal((await page.locator('.workflow-nav a.active').textContent()).trim(), 'Grundlagen');
   await page.locator('#edit-evaluation').click();
   await page.locator('#case-name').fill('   ');
