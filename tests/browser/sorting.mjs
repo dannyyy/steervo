@@ -116,11 +116,25 @@ export async function checkSorting({ page, owner, origin, output, post, mutate, 
   await mutate(page, () => groupUp.click());
   await assertViewport(groupBefore);
   await mutate(page, () => page.getByRole('button', { name: 'Gruppe Alltag nach unten', exact: true }).click());
-  await drag(row('NFC Karte').locator('[data-drag-handle]'), group('').locator('.criterion-list'));
+  // The ungrouped section exists only while it contains a criterion; empty named groups stay visible.
+  assert.equal(await group('').count(), 0);
+  assert.equal(await page.getByText('Keine Note für deine Entscheidung.').count(), 0);
+  version = await page.locator('#evaluation-workspace').getAttribute('data-version');
+  await seed({ action: 'place-criterion', itemId: nfcId, groupId: '', position: '0' });
+  await page.reload();
   assert.deepEqual(await order(''), ['NFC Karte']);
+  assert.deepEqual(await order(groupIds[2]), []);
+  assert.equal(await group(groupIds[2]).locator('.group-empty').count(), 1);
+  await drag(row('Standardschlüssel').locator('[data-drag-handle]'), group('').locator('.criterion-list'));
+  assert.deepEqual((await order('')).sort(), ['NFC Karte', 'Standardschlüssel']);
+  await drag(row('Standardschlüssel').locator('[data-drag-handle]'), row('UWB Smart Key'));
+  assert.deepEqual(await order(groupIds[0]), ['Standardschlüssel', 'UWB Smart Key', 'App Key (Bluetooth)', 'Notschlüssel']);
   await drag(row('NFC Karte').locator('[data-drag-handle]'), group(groupIds[2]).locator('.criterion-list'));
   assert.deepEqual(await order(groupIds[2]), ['NFC Karte']);
-  record('Group arrows preserve the viewport; drag sorting, empty groups and ungrouped drops persist');
+  assert.equal(await group('').count(), 0);
+  await page.reload();
+  assert.equal(await group('').count(), 0);
+  record('Group arrows preserve the viewport; drag sorting and empty groups persist; the ungrouped section appears only with criteria');
 
   // Exercise real touch input, not synthetic drag events.
   const touchContext = await owner.context.browser().newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, ignoreHTTPSErrors: origin.startsWith('https:') });

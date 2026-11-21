@@ -92,9 +92,6 @@
 <data name="AddGroup" xml:space="preserve"><value>Gruppe hinzufügen</value></data>
 <data name="GroupHelp" xml:space="preserve"><value>Eine Gruppe ordnet deine Kriterien. Sie hat keine eigene Priorität oder Bewertung.</value></data>
 <data name="GoodToKnow" xml:space="preserve"><value>GUT ZU WISSEN</value></data>
-<data name="NoScore" xml:space="preserve"><value>Keine Note für deine Entscheidung.</value></data>
-<data name="NoScoreHelp" xml:space="preserve"><value>Muss, stark gewünscht oder optional: Du bestimmst, welches Gewicht eine Anforderung für dich hat. Eine Gesamtnote gibt es nicht.</value></data>
-<data name="UnknownHelp" xml:space="preserve"><value>Nicht bekannt ist nicht dasselbe wie nicht erfüllt. Fehlende Bewertungen bleiben ausdrücklich unbekannt.</value></data>
 <data name="Together" xml:space="preserve"><value>GEZIELT ZUSAMMENARBEITEN</value></data>
 <data name="SharingHelp" xml:space="preserve"><value>Gib diese Evaluation für ein bereits bestätigtes Konto frei. Eine Einladung allein teilt keine Daten. Eine erneute Freigabe aktualisiert die Rolle.</value></data>
 <data name="NoShares" xml:space="preserve"><value>Diese Evaluation ist privat. Es gibt noch keine Freigaben.</value></data>

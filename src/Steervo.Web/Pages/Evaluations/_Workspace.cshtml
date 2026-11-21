@@ -22,7 +22,7 @@
     @foreach (var group in e.Groups.OrderBy(x => x.Position).Cast<CriterionGroup?>().Append(null))
     {
         var criteria = e.Criteria.Where(c => c.GroupId == group?.Id).OrderBy(c => c.Position).ToList();
-        if (group is null && criteria.Count == 0 && (!edit || e.Groups.Count == 0)) { continue; }
+        if (group is null && criteria.Count == 0) { continue; }
         <section class="criterion-group" id="criterion-group-@group?.Id" data-group-id="@group?.Id" data-sort-kind="@(edit && group is not null ? "group" : null)">
             <div class="group-heading"><div class="group-title">
             @if (edit && group is not null) { <button type="button" id="drag-group-@group.Id" class="drag-handle" data-drag-handle aria-label="@T["MoveGroup", group.Name]" aria-describedby="sorting-help"><partial name="_DragGrip" /></button> }
@@ -64,7 +64,6 @@
             </div>
         </section>
     }
-    <details class="workspace-help"><summary>@T["NoScore"]</summary><p>@T["NoScoreHelp"]</p><p>@T["UnknownHelp"]</p></details>
 </section>
 @if (edit)
 {
