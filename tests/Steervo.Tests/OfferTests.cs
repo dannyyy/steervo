@@ -143,6 +143,30 @@ public sealed class OfferTests
         Assert.True(known.Known); Assert.Equal(50000, known.Total); Assert.False(known.VehicleOpen);
     }
     [Fact]
+    public void The_instalment_check_tells_whether_price_down_payment_residual_and_rate_fit()
+    {
+        OfferLineInput[] lines = [new("Vehicle", OfferLineKind.Vehicle, OfferPriceKind.Amount, 57480), new("Bonus", OfferLineKind.Discount, OfferPriceKind.Amount, 4000)];
+        var terms = new OfferTerms { Name = "Lease", Kind = OfferKind.Leasing, TermMonths = 36, AnnualInterestPercent = 0, MonthlyPayment = 667, DownPayment = 250, ResidualPayment = 29205 };
+        var check = InstalmentCheck.From(terms, OfferPricing.From(lines))!;
+        Assert.Equal(667.36m, check.Expected); Assert.True(check.Consistent);
+        // The bonus counted as the customer's own down payment no longer fits: 4'000 would be deducted twice.
+        var twice = InstalmentCheck.From(terms with { DownPayment = 4250 }, OfferPricing.From(lines))!;
+        Assert.False(twice.Consistent); Assert.Equal(556.25m, twice.Expected); Assert.Equal(110.75m, twice.Difference);
+        // Interest: instalments at the start or the end of the month are both accepted, nothing else.
+        var loan = new OfferTerms { Name = "Loan", Kind = OfferKind.Financing, TermMonths = 48, AnnualInterestPercent = 3.9m, DownPayment = 5000, ResidualPayment = 10000 };
+        OfferLineInput[] car = [new("Vehicle", OfferLineKind.Vehicle, OfferPriceKind.Amount, 45000)];
+        var end = InstalmentCheck.Payment(40000, 10000, 48, 3.9m); var start = InstalmentCheck.Payment(40000, 10000, 48, 3.9m, inAdvance: true);
+        Assert.InRange(end, 705, 712); Assert.True(start < end);
+        Assert.True(InstalmentCheck.From(loan with { MonthlyPayment = end }, OfferPricing.From(car))!.Consistent);
+        Assert.True(InstalmentCheck.From(loan with { MonthlyPayment = start }, OfferPricing.From(car))!.Consistent);
+        Assert.False(InstalmentCheck.From(loan with { MonthlyPayment = end + 20 }, OfferPricing.From(car))!.Consistent);
+        // Without every figure, for a cash purchase or without a vehicle price there is nothing to check.
+        Assert.Null(InstalmentCheck.From(terms with { AnnualInterestPercent = null }, OfferPricing.From(lines)));
+        Assert.Null(InstalmentCheck.From(terms with { ResidualPayment = null }, OfferPricing.From(lines)));
+        Assert.Null(InstalmentCheck.From(terms with { Kind = OfferKind.Purchase }, OfferPricing.From(lines)));
+        Assert.Null(InstalmentCheck.From(terms, OfferPricing.From([new("Vehicle", OfferLineKind.Vehicle)])));
+    }
+    [Fact]
     public void An_offer_names_seller_lender_and_intermediary_separately()
     {
         var evaluation = new Evaluation("owner", "Roles", null); var candidate = evaluation.AddCandidate(new("Car"));

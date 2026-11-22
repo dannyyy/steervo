@@ -2,6 +2,7 @@
 
 ## Unveröffentlicht
 
+- Raten-Kontrolle: Leasing- und Finanzierungsofferten zeigen, ob die erfasste Rate aus Preis, Anzahlung, Restwert, Laufzeit und Zins folgt, und nennen sonst die Differenz.
 - Gratisleistungen einer Offerte mit Kostenbereich und Laufzeit decken im Kostenvergleich die passenden Zusatzkosten für diese Monate; das Szenario nennt die gedeckten Bereiche, eine eigene Anpassung hat Vorrang.
 - Kriterien sind in Fahrzeugkriterien und Offertenkriterien gegliedert; Gruppen sind sichtbar abgesetzt, sortiert wird innerhalb eines Abschnitts. Der dauerhaft sichtbare Sortierhinweis entfällt.
 - Die Aktionen einer Offerte stehen wie beim Auto unter dem Titel, mit der Hauptaktion zuerst und dem Löschen zuletzt.

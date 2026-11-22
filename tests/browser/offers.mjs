@@ -149,6 +149,8 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   assert.match(await price('Total'), /27\.575,00 EUR/); assert.match(await price('Financed'), /27\.300,00 EUR/); assert.match(await price('DueAtHandover'), /275,00 EUR/);
   assert.match(await price('BenefitValue'), /900,00 EUR/); assert.match(await price('Concession'), /1\.400,00 EUR\s+· 5 %/);
   assert.match(await page.locator('[data-offer-open-lines]').textContent(), /Positionen ohne Preis: 1/);
+  // The instalment does not follow from price, residual, term and interest here, and the offer says so.
+  assert.equal(await page.locator('[data-offer-instalment-check]').getAttribute('data-offer-instalment-check'), 'differs');
   assert.match(await page.locator('[data-offer-difference]').textContent(), /27\.000,00 EUR.*575,00 EUR/);
   assert.equal(await page.locator('.offer-positions [data-offer-line-handover]').count(), 1);
   assert.match(await page.locator('.offer-positions [data-offer-line-kind="Discount"]').textContent(), /−500,00 EUR/);

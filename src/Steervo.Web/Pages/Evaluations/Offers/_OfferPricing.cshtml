@@ -13,3 +13,8 @@
 </dl>
 @if (pricing.Open > 0) { <p class="offer-review notice" data-offer-open-lines>@T["OfferPriceOpenLines", pricing.Open]</p> }
 @if (difference is { } gap) { <p class="offer-review notice" data-offer-difference>@T["OfferPriceDifference", $"{revision.Terms.StatedTotal:N2} {Model.Currency}", $"{OfferPrices.Format(gap)} {Model.Currency}"]</p> }
+@if (revision.InstalmentCheck is { } instalment)
+{
+    if (instalment.Consistent) { <p class="micro" data-offer-instalment-check="ok">@T["OfferInstalmentCheckOk", $"{OfferPrices.Format(instalment.Expected)} {Model.Currency}"]</p> }
+    else { <p class="offer-review notice" data-offer-instalment-check="differs">@T["OfferInstalmentCheckDiffers", $"{OfferPrices.Format(instalment.Expected)} {Model.Currency}", $"{OfferPrices.Format(instalment.Stated)} {Model.Currency}", $"{OfferPrices.Format(instalment.Difference)} {Model.Currency}"]</p> }
+}

@@ -880,6 +880,8 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="OfferPriceBenefitValue" xml:space="preserve"><value>Wert der Gratisleistungen</value></data>
   <data name="OfferPriceConcession" xml:space="preserve"><value>Entgegenkommen</value></data>
   <data name="OfferPriceOpenLines" xml:space="preserve"><value>Positionen ohne Preis: {0}. Sie fehlen in der Summe.</value></data>
+  <data name="OfferInstalmentCheckOk" xml:space="preserve"><value>Raten-Kontrolle: Preis, Anzahlung, Restwert, Laufzeit und Zins ergeben die erfasste Rate ({0}).</value></data>
+  <data name="OfferInstalmentCheckDiffers" xml:space="preserve"><value>Raten-Kontrolle: Aus Preis, Anzahlung, Restwert, Laufzeit und Zins ergibt sich eine Rate von {0}, erfasst sind {1} (Differenz {2} pro Monat). Prüfe Rabatte, Anzahlung, Restwert und Zins.</value></data>
   <data name="OfferPriceDifference" xml:space="preserve"><value>Total laut Offerte: {0}. Die Positionen weichen um {1} ab.</value></data>
   <data name="RemoveOffer" xml:space="preserve"><value>Offerte löschen</value></data>
   <data name="RemoveOfferNamed" xml:space="preserve"><value>«{0}» löschen</value></data>

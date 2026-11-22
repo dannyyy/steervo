@@ -94,6 +94,36 @@ public sealed record OfferLineInput(string Name, OfferLineKind Kind = OfferLineK
 }
 
 // Sums the lines of one offer version. Discounts are stored as positive amounts and subtracted.
+/// <summary>
+/// Tells whether the instalment of a lease or loan follows from its price, down payment, residual, term and interest.
+/// A mismatch usually means a discount, a down payment or the residual was captured differently from the document.
+/// </summary>
+public sealed record InstalmentCheck(decimal Expected, decimal Stated)
+{
+    public decimal Difference => Stated - Expected;
+    public bool Consistent => Math.Abs(Difference) <= Math.Max(1m, Expected * 0.005m);
+
+    /// <summary>Annuity for a financed amount with a remaining value at the end; instalments at month end unless <paramref name="inAdvance"/>.</summary>
+    public static decimal Payment(decimal principal, decimal residual, int months, decimal annualPercent, bool inAdvance = false)
+    {
+        if (annualPercent == 0) return decimal.Round((principal - residual) / months, 2, MidpointRounding.AwayFromZero);
+        var rate = (double)annualPercent / 1200d; var growth = Math.Pow(1 + rate, months);
+        var payment = ((double)principal - (double)residual / growth) * rate / (1 - 1 / growth);
+        return decimal.Round((decimal)(inAdvance ? payment / (1 + rate) : payment), 2, MidpointRounding.AwayFromZero);
+    }
+
+    public static InstalmentCheck? From(OfferTerms terms, OfferPricing pricing)
+    {
+        if (terms.Kind is not (OfferKind.Leasing or OfferKind.Financing) || !pricing.Known || terms.TermMonths is not { } months
+            || terms.MonthlyPayment is not { } stated || terms.AnnualInterestPercent is not { } interest || terms.DownPayment is not { } down
+            || (terms.Kind == OfferKind.Leasing && !terms.ResidualPayment.HasValue)) return null;
+        var principal = pricing.Financed - down; var residual = terms.ResidualPayment ?? 0;
+        if (principal <= 0 || residual < 0 || residual >= principal) return null;
+        // Lenders quote instalments at the start or the end of the month; the nearer reading is the one meant.
+        var end = Payment(principal, residual, months, interest); var start = Payment(principal, residual, months, interest, inAdvance: true);
+        return new(Math.Abs(stated - start) < Math.Abs(stated - end) ? start : end, stated);
+    }
+}
 public sealed record OfferPricing(decimal Vehicle, decimal Extras, decimal Discounts, decimal BenefitValue, decimal Financed, int Priced, int Open, bool VehicleOpen = false)
 {
     // Extras alone are not a price for the car: without the vehicle's own price the total stays open.

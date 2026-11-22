@@ -39,6 +39,7 @@ public sealed class OfferRevision
     public OfferTerms Terms { get; private set; } = new();
     public IReadOnlyList<OfferLine> Lines => lines.AsReadOnly();
     public OfferPricing Pricing => OfferPricing.From(lines.Select(line => line.ToInput()));
+    public InstalmentCheck? InstalmentCheck => InstalmentCheck.From(Terms, Pricing);
     public IEnumerable<string> MissingFields()
     {
         var missing = Terms.MissingFields().ToList();
