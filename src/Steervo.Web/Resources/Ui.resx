@@ -386,7 +386,7 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="OfferCommitmentRequested" xml:space="preserve"><value>Angefragt</value></data>
   <data name="OfferCommitmentNonBinding" xml:space="preserve"><value>Unverbindlich</value></data>
   <data name="OfferCommitmentBinding" xml:space="preserve"><value>Verbindlich</value></data>
-  <data name="OfferGroupHeader" xml:space="preserve"><value>Anbieter &amp; Fahrzeug</value></data>
+  <data name="OfferGroupHeader" xml:space="preserve"><value>Beteiligte &amp; Fahrzeug</value></data>
   <data name="OfferGroupDelivery" xml:space="preserve"><value>Termine &amp; Lieferung</value></data>
   <data name="OfferGroupPrice" xml:space="preserve"><value>Preisaufstellung</value></data>
   <data name="OfferGroupContract" xml:space="preserve"><value>Leasing / Finanzierung</value></data>
@@ -465,8 +465,11 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="OfferAssessmentFor" xml:space="preserve"><value>{0} – {1}</value></data>
   <data name="OfferDuplicateRevision" xml:space="preserve"><value>Versionen müssen lückenlos bei 1 beginnen.</value></data>
   <data name="OfferName" xml:space="preserve"><value>Bezeichnung</value></data>
-  <data name="OfferProvider" xml:space="preserve"><value>Anbieter / Händler</value></data>
-  <data name="OfferLender" xml:space="preserve"><value>Leasinggeber / Kreditgeber</value></data>
+  <data name="OfferProvider" xml:space="preserve"><value>Verkäufer (Händler / Hersteller)</value></data>
+  <data name="OfferIntermediary" xml:space="preserve"><value>Vermittler</value></data>
+  <data name="OfferFinancedBy" xml:space="preserve"><value>Finanzierung {0}</value></data>
+  <data name="OfferArrangedBy" xml:space="preserve"><value>via {0}</value></data>
+  <data name="OfferLender" xml:space="preserve"><value>Finanzierung (Leasinggeber / Bank)</value></data>
   <data name="OfferVehicleDescription" xml:space="preserve"><value>Angebotenes Fahrzeug / Ausführung</value></data>
   <data name="OfferIssuedOn" xml:space="preserve"><value>Offertdatum</value></data>
   <data name="OfferValidUntil" xml:space="preserve"><value>Gültig bis</value></data>

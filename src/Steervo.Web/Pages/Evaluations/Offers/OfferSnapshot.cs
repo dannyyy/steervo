@@ -14,6 +14,18 @@ public sealed record OfferAssessmentRow(Evaluation Evaluation, Offer Offer, Crit
     public string PostUrl => $"/evaluations/{Evaluation.Id}/offers/{Offer.Id}{ReturnContext}";
     public bool HasDraft => Draft?.SubjectId == Offer.Id && Draft.CriterionId == Criterion.Id;
 }
+/// <summary>Names who sells, who finances and who arranged an offer in one line.</summary>
+public static class OfferParties
+{
+    public static string? Summary(OfferTerms terms, Microsoft.Extensions.Localization.IStringLocalizer text)
+    {
+        var parts = new List<string>();
+        if (!string.IsNullOrEmpty(terms.Provider)) parts.Add(terms.Provider);
+        if (!string.IsNullOrEmpty(terms.Lender) && terms.Lender != terms.Provider) parts.Add(text["OfferFinancedBy", terms.Lender]);
+        if (!string.IsNullOrEmpty(terms.Intermediary) && terms.Intermediary != terms.Provider) parts.Add(text["OfferArrangedBy", terms.Intermediary]);
+        return parts.Count == 0 ? null : string.Join(" · ", parts);
+    }
+}
 public static class OfferPrices
 {
     public static readonly string[] Keys = ["Vehicle", "Extras", "Discounts", "Total", "Financed", "DueAtHandover", "BenefitValue", "Concession"];

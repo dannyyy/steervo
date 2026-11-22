@@ -12,6 +12,7 @@ public static class OfferFields
         new(nameof(OfferTerms.Name), "Header", "text", 160, terms => terms.Name, terms => terms.Name),
         new(nameof(OfferTerms.Provider), "Header", "text", 200, terms => terms.Provider, terms => terms.Provider),
         new(nameof(OfferTerms.Lender), "Header", "text", 200, terms => terms.Lender, terms => terms.Lender),
+        new(nameof(OfferTerms.Intermediary), "Header", "text", 200, terms => terms.Intermediary, terms => terms.Intermediary),
         new(nameof(OfferTerms.VehicleDescription), "Header", "text", 400, terms => terms.VehicleDescription, terms => terms.VehicleDescription),
         new(nameof(OfferTerms.IssuedOn), "Delivery", "date", 0, terms => terms.IssuedOn?.ToString("dd.MM.yyyy"), terms => terms.IssuedOn),
         new(nameof(OfferTerms.ValidUntil), "Delivery", "date", 0, terms => terms.ValidUntil?.ToString("dd.MM.yyyy"), terms => terms.ValidUntil),

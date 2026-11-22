@@ -12,6 +12,8 @@ public sealed record OfferTerms
     public string Name { get; init; } = "";
     public string? Provider { get; init; }
     public string? Lender { get; init; }
+    /// <summary>A broker or platform that arranges the financing without selling or financing the car itself.</summary>
+    public string? Intermediary { get; init; }
     public string? VehicleDescription { get; init; }
     public OfferKind Kind { get; init; }
     public OfferCommitment Commitment { get; init; }
@@ -41,7 +43,7 @@ public sealed record OfferTerms
             if (amount is < 0 or > 1_000_000_000_000m) throw new RuleException("InvalidOfferTerms");
         return this with
         {
-            Name = Rules.Text(Name), Provider = Rules.OptionalText(Provider, 200), Lender = Rules.OptionalText(Lender, 200),
+            Name = Rules.Text(Name), Provider = Rules.OptionalText(Provider, 200), Lender = Rules.OptionalText(Lender, 200), Intermediary = Rules.OptionalText(Intermediary, 200),
             VehicleDescription = Rules.OptionalText(VehicleDescription, 400), DeliveryNotes = Rules.OptionalText(DeliveryNotes, 1000),
             Notes = Rules.OptionalText(Notes, 4000)
         };
@@ -92,9 +94,10 @@ public sealed record OfferLineInput(string Name, OfferLineKind Kind = OfferLineK
 }
 
 // Sums the lines of one offer version. Discounts are stored as positive amounts and subtracted.
-public sealed record OfferPricing(decimal Vehicle, decimal Extras, decimal Discounts, decimal BenefitValue, decimal Financed, int Priced, int Open)
+public sealed record OfferPricing(decimal Vehicle, decimal Extras, decimal Discounts, decimal BenefitValue, decimal Financed, int Priced, int Open, bool VehicleOpen = false)
 {
-    public bool Known => Priced > 0;
+    // Extras alone are not a price for the car: without the vehicle's own price the total stays open.
+    public bool Known => Priced > 0 && !VehicleOpen;
     public decimal BeforeDiscounts => Vehicle + Extras;
     public decimal Total => BeforeDiscounts - Discounts;
     public decimal DueAtHandover => Total - Financed;
@@ -104,10 +107,10 @@ public sealed record OfferPricing(decimal Vehicle, decimal Extras, decimal Disco
 
     public static OfferPricing From(IEnumerable<OfferLineInput> lines)
     {
-        decimal vehicle = 0, extras = 0, discounts = 0, benefit = 0, financed = 0; int priced = 0, open = 0;
+        decimal vehicle = 0, extras = 0, discounts = 0, benefit = 0, financed = 0; int priced = 0, open = 0; var vehicleOpen = false;
         foreach (var line in lines)
         {
-            if (line.PriceKind == OfferPriceKind.Unknown) { open++; continue; }
+            if (line.PriceKind == OfferPriceKind.Unknown) { open++; vehicleOpen |= line.Kind == OfferLineKind.Vehicle; continue; }
             if (line.PriceKind == OfferPriceKind.Included) { benefit += line.Value ?? 0; continue; }
             var amount = line.Amount ?? 0; priced++;
             if (line.Kind == OfferLineKind.Discount) discounts += amount;
@@ -115,6 +118,6 @@ public sealed record OfferPricing(decimal Vehicle, decimal Extras, decimal Disco
             else vehicle += amount;
             if (line.Financed) financed += line.Kind == OfferLineKind.Discount ? -amount : amount;
         }
-        return new(vehicle, extras, discounts, benefit, financed, priced, open);
+        return new(vehicle, extras, discounts, benefit, financed, priced, open, vehicleOpen);
     }
 }

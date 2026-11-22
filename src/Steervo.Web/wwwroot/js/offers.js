@@ -25,9 +25,10 @@
     if (!totals) return;
     const kind = form.querySelector('#offer-kind').value;
     const contract = kind === 'Leasing' || kind === 'Financing';
-    let before = 0, discounts = 0, benefit = 0, financed = 0, priced = 0;
+    let before = 0, discounts = 0, benefit = 0, financed = 0, priced = 0, vehicleOpen = false;
     for (const line of form.querySelectorAll('[data-offer-line]')) {
       const price = line.querySelector('[data-line-price]').value;
+      if (price === 'Unknown' && line.querySelector('[data-line-kind]').value === 'Vehicle') vehicleOpen = true;
       if (price === 'Included') { benefit += Number(line.querySelector('[data-line-value] input').value) || 0; continue; }
       const amount = Number(line.querySelector('[data-line-amount-input]').value);
       if (price !== 'Amount' || !Number.isFinite(amount) || line.querySelector('[data-line-amount-input]').value === '') continue;
@@ -40,7 +41,8 @@
     const money = value => (value < 0 ? '−' : '') + new Intl.NumberFormat(document.documentElement.lang || 'de', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Math.abs(value)) + ' ' + currency;
     const total = before - discounts, concession = discounts + benefit;
     const set = (name, text) => { totals.querySelector(`[data-total="${name}"]`).textContent = text; };
-    totals.hidden = priced === 0 && concession === 0;
+    // Without the vehicle's own price the sum of the other positions is not a total.
+    totals.hidden = vehicleOpen || (priced === 0 && concession === 0);
     set('total', priced ? money(total) : '');
     set('financed', money(financed)); set('handover', money(total - financed));
     set('concession', money(concession) + (before > 0 && concession > 0 ? ' · ' + (Math.round(concession * 1000 / before) / 10) + ' %' : ''));

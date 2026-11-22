@@ -915,6 +915,10 @@ namespace Steervo.Infrastructure.Migrations
                             b1.Property<int?>("IncludedKilometresPerYear")
                                 .HasColumnType("integer");
 
+                            b1.Property<string>("Intermediary")
+                                .HasMaxLength(200)
+                                .HasColumnType("character varying(200)");
+
                             b1.Property<DateOnly?>("IssuedOn")
                                 .HasColumnType("date");
 

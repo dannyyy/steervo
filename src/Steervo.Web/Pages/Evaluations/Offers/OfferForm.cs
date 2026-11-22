@@ -14,6 +14,7 @@ public sealed class OfferForm
     public string? Name { get; set; }
     public string? Provider { get; set; }
     public string? Lender { get; set; }
+    public string? Intermediary { get; set; }
     public string? VehicleDescription { get; set; }
     public string? IssuedOn { get; set; }
     public string? ValidUntil { get; set; }
@@ -35,6 +36,7 @@ public sealed class OfferForm
         Name = Name ?? "",
         Provider = Provider,
         Lender = Lender,
+        Intermediary = Intermediary,
         VehicleDescription = VehicleDescription,
         IssuedOn = ParseDate(IssuedOn),
         ValidUntil = ParseDate(ValidUntil),
@@ -62,6 +64,7 @@ public sealed class OfferForm
             Name = terms.Name,
             Provider = terms.Provider,
             Lender = terms.Lender,
+            Intermediary = terms.Intermediary,
             VehicleDescription = terms.VehicleDescription,
             IssuedOn = terms.IssuedOn?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
             ValidUntil = terms.ValidUntil?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
@@ -84,6 +87,7 @@ public sealed class OfferForm
         nameof(OfferTerms.Name) => Name,
         nameof(OfferTerms.Provider) => Provider,
         nameof(OfferTerms.Lender) => Lender,
+        nameof(OfferTerms.Intermediary) => Intermediary,
         nameof(OfferTerms.VehicleDescription) => VehicleDescription,
         nameof(OfferTerms.IssuedOn) => IssuedOn,
         nameof(OfferTerms.ValidUntil) => ValidUntil,

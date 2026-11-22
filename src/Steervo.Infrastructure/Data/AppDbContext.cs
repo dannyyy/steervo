@@ -90,7 +90,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : Ident
             b.HasKey(x => x.Id); b.Property(x => x.Id).ValueGeneratedNever(); b.HasAlternateKey(x => new { x.EvaluationId, x.OfferId, x.Number });
             b.Property(x => x.ChangeNote).HasMaxLength(2000); b.Ignore(x => x.Pricing);
             b.ComplexProperty(x => x.Terms, terms => {
-                terms.Property(x => x.Name).HasMaxLength(160); terms.Property(x => x.Provider).HasMaxLength(200); terms.Property(x => x.Lender).HasMaxLength(200);
+                terms.Property(x => x.Name).HasMaxLength(160); terms.Property(x => x.Provider).HasMaxLength(200); terms.Property(x => x.Lender).HasMaxLength(200); terms.Property(x => x.Intermediary).HasMaxLength(200);
                 terms.Property(x => x.VehicleDescription).HasMaxLength(400); terms.Property(x => x.DeliveryNotes).HasMaxLength(1000); terms.Property(x => x.Notes).HasMaxLength(4000);
                 terms.Property(x => x.Kind).HasConversion<string>(); terms.Property(x => x.Commitment).HasConversion<string>();
             });

@@ -79,6 +79,7 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   assert.equal(await page.locator('#offer-currency').isEditable(), false);
   await page.locator('#offer-Provider').fill('Anbieter Nord');
   await page.locator('#offer-Lender').fill('Finanzierungspartner');
+  await page.locator('#offer-Intermediary').fill('Vermittlungsplattform');
   await page.locator('#offer-kind').selectOption('Leasing');
   await page.locator('#offer-commitment').selectOption('NonBinding');
   for (const [name, value] of Object.entries({ TermMonths: '24', AnnualInterestPercent: '2.75', MonthlyPayment: '640', DownPayment: '0', ResidualPayment: '14500', IncludedKilometresPerYear: '12000', ExcessKilometrePrice: '0.18', UnusedKilometreCredit: '0', IssuedOn: '2026-10-01', ValidUntil: '2026-09-01', DeliveryNotes: 'Nach Absprache' }))
@@ -141,6 +142,8 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   await page.locator('#offer-StatedTotal').fill('27000');
   await page.locator('#save-offer').click();
   await page.locator('#offer-workspace[data-revision="2"]').waitFor();
+  // Seller, lender and intermediary are separate roles and read as one line.
+  assert.equal((await page.locator('.offer-provider').innerText()).trim(), 'Anbieter Nord · Finanzierung Finanzierungspartner · via Vermittlungsplattform');
   const price = key => page.locator(`.offer-positions [data-offer-price="${key}"] dd`).textContent();
   assert.match(await price('Vehicle'), /27\.800,00 EUR/); assert.match(await price('Extras'), /275,00 EUR/); assert.match(await price('Discounts'), /−500,00 EUR/);
   assert.match(await price('Total'), /27\.575,00 EUR/); assert.match(await price('Financed'), /27\.300,00 EUR/); assert.match(await price('DueAtHandover'), /275,00 EUR/);

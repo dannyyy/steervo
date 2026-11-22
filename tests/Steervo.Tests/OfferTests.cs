@@ -133,6 +133,25 @@ public sealed class OfferTests
         Assert.False(OfferPricing.From([new("Open")]).Known); Assert.Null(OfferPricing.From([new("Open")]).Difference(10));
     }
     [Fact]
+    public void A_price_list_without_the_vehicle_price_has_no_total()
+    {
+        OfferLineInput[] extras = [new("Vehicle", OfferLineKind.Vehicle), new("Paint", OfferLineKind.Accessory, OfferPriceKind.Amount, 1300), new("Fee", OfferLineKind.Fee, OfferPriceKind.Amount, 990)];
+        var pricing = OfferPricing.From(extras);
+        Assert.True(pricing.VehicleOpen); Assert.False(pricing.Known); Assert.Null(pricing.Difference(50000)); Assert.Equal(1, pricing.Open);
+        // An open accessory still leaves a total; only the missing vehicle price withholds it.
+        var known = OfferPricing.From([new("Vehicle", OfferLineKind.Vehicle, OfferPriceKind.Amount, 50000), new("Paint", OfferLineKind.Accessory)]);
+        Assert.True(known.Known); Assert.Equal(50000, known.Total); Assert.False(known.VehicleOpen);
+    }
+    [Fact]
+    public void An_offer_names_seller_lender_and_intermediary_separately()
+    {
+        var evaluation = new Evaluation("owner", "Roles", null); var candidate = evaluation.AddCandidate(new("Car"));
+        var id = evaluation.AddOffer(candidate, new() { Name = "Lease", Provider = " Dealer ", Lender = "Bank", Intermediary = " Broker " }, [], "CHF");
+        var terms = evaluation.FindOffer(id).Latest.Terms;
+        Assert.Equal(("Dealer", "Bank", "Broker"), (terms.Provider, terms.Lender, terms.Intermediary));
+        Assert.Throws<RuleException>(() => evaluation.AddOffer(candidate, new() { Name = "Long", Intermediary = new string('x', 201) }, [], "CHF"));
+    }
+    [Fact]
     public void A_line_fulfils_a_linked_requirement_until_an_own_answer_or_a_removed_criterion_replaces_it()
     {
         var (evaluation, candidate) = Create();
