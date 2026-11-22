@@ -29,6 +29,8 @@ Kostenbearbeitung erhält Fahrzeugbezug, Monats-/Jahresansicht und Seite der Zah
 | Person zur Installation einladen | Gemeinsame seitliche Bearbeitungsfläche | Einladung und Evaluationsfreigabe bleiben getrennte Aufgaben |
 | Dauerhaftes Entfernen, Zurücksetzen mit Datenverlust, Entwurf verwerfen | Kompakter Bestätigungsdialog | Objekt und tatsächliche Folgen müssen bewusst bestätigt werden |
 | Archivieren / Wiederherstellen | Aktion am Objekt mit klarer Rückmeldung | Reversibles Verhalten von dauerhaftem Löschen unterscheiden |
+| Aktionen einer Akte (Auto, Offerte) | Eine Reihe unter Titel und Kennzeichen: Hauptaktion zuerst, weitere Aktionen danach, Löschen zuletzt | Jede Akte wird gleich bedient; die folgenreichste Aktion steht nie neben der Hauptaktion |
+| Hinzufügen in einer Liste (Kriterien, Autos, Offerten) | Schaltflächen rechts in der Listenüberschrift | Listen und Akten bleiben unterscheidbar |
 | Nur lesen, Quellen prüfen, historische Version ansehen | Lesedarstellung beziehungsweise aufklappbare Details | Ein Lesevorgang öffnet kein scheinbar bearbeitbares Formular |
 
 „Einheitlich“ bedeutet dieselbe Aufgabenlogik, Beschriftung und Rückmeldung. Es bedeutet nicht, jedes Formular in einen Dialog zu verwandeln. Das vorhandene native `<dialog>` kann die gemeinsame seitliche oder kompakte Darstellung tragen; kein neues UI-Framework ist dafür nötig.

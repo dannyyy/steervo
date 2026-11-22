@@ -2,6 +2,9 @@
 
 ## Unveröffentlicht
 
+- Kriterien sind in Fahrzeugkriterien und Offertenkriterien gegliedert; Gruppen sind sichtbar abgesetzt, sortiert wird innerhalb eines Abschnitts. Der dauerhaft sichtbare Sortierhinweis entfällt.
+- Die Aktionen einer Offerte stehen wie beim Auto unter dem Titel, mit der Hauptaktion zuerst und dem Löschen zuletzt.
+- Zahlen und Beträge folgen der deutschsprachigen Region des Browsers, etwa 27'300.00 für die Schweiz.
 - Offerten unterscheiden Verkäufer, Finanzierung und Vermittler; Übersicht und Akte nennen die Beteiligten in einer Zeile.
 - Ohne Preis für das Fahrzeug selbst bleibt der Gesamtpreis einer Offerte offen, statt nur die übrigen Positionen zu summieren.
 - Offerten rechnen: Jede Offerte hat eine Preisaufstellung aus Fahrzeug, Ausstattung, Zubehör, Gebühren, Rabatten und Sonderkonditionen. Der Gesamtpreis ist die Summe der Positionen; ein Häkchen je Position trennt den Betrag im Leasing bzw. in der Finanzierung von der Zahlung bei Übernahme. Rabatte und der Wert von Gratisleistungen ergeben das Entgegenkommen in Betrag und Prozent. Das Total laut Offerte dient als Kontrolle. Eine Position kann eine Ja/Nein-Anforderung an die Offerte erfüllen. Der Kostenvergleich übernimmt Kaufpreis und Anfangskosten aus der Offerte.

@@ -5,6 +5,8 @@ Die Evaluation gliedert sich in vier Arbeitsbereiche:
 - Grundlagen: «Allgemein» mit Eigenschaften, Freigaben und Daten der Evaluation sowie die Kriterien. Eine Evaluation öffnet sich auf «Allgemein».
 - Autos: Fahrzeugakten.
 - Offerten & Kosten: Angebote und zusätzliche Kostenpositionen.
+
+Unter Grundlagen → Kriterien stehen Fahrzeugkriterien und Offertenkriterien in zwei Abschnitten; sortiert wird innerhalb eines Abschnitts. Die Aktionen einer Offerte stehen wie beim Auto unter dem Titel: Neue Version erfassen, Offerten vergleichen, Offerte löschen.
 - Auswertungen: Fahrzeugvergleich und Kostenvergleich mit gespeicherten Rechenannahmen.
 
 «Grundlagen → Allgemein» ist der einzige Ort für Eigenschaften, Freigaben, Export, den Einstieg zum Import und das Löschen der Evaluation, in dieser Reihenfolge. Ein separates Verwaltungsmenü gibt es nicht. Personen mit Leserecht sehen die Seite ohne Bearbeitungsaktionen. Direkte Seitenadressen und ältere Verweise bleiben gültig. Der Import legt weiterhin eine neue private Evaluation an.
