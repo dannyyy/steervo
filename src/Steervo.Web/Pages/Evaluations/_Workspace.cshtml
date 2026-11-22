@@ -15,7 +15,7 @@
     @if (edit)
     {
         <partial name="_GroupEditor" model='new Steervo.Web.Pages.Evaluations.GroupEditor(Model, null)' />
-        <p id="sorting-help" class="sorting-help">@T["SortingHelp"]</p>
+        <p id="sorting-help" class="visually-hidden">@T["SortingHelp"]</p>
         <form id="reorder-form" method="post" hx-post="/evaluations/@e.Id" data-sort hidden><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" /><input type="hidden" name="itemId" /><input type="hidden" name="groupId" /><input type="hidden" name="position" /></form>
     }
     @if (e.Criteria.Count == 0 && e.Groups.Count == 0) { <div class="canvas-empty"><partial name="/Pages/Shared/_Icon.cshtml" model='"list"' /><h3>@T["EmptyCriteriaTitle"]</h3><p>@T["EmptyCriteria"]</p></div> }

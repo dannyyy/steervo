@@ -231,6 +231,11 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   await page.goto(`${origin}${casePath}/offers/compare?first=${firstId}&second=${secondId}`);
   const comparedTotal = page.locator('[data-offer-comparison-price="Total"]');
   assert.equal((await comparedTotal.locator(`[data-offer-cell="${firstId}"]`).textContent()).trim(), '27.300,00');
+  // Numbers follow a German-language browser region; other languages keep the default format.
+  const swiss = await (await page.request.get(page.url(), { headers: { 'Accept-Language': 'de-CH,de;q=0.9' } })).text();
+  assert.match(swiss, /<html lang="de-CH">/); assert.match(swiss, /27(’|&#x2019;|'|&#x27;)300\.00/); assert.doesNotMatch(swiss, /27\.300,00/);
+  const french = await (await page.request.get(page.url(), { headers: { 'Accept-Language': 'fr-CH' } })).text();
+  assert.match(french, /<html lang="de">/); assert.match(french, /27\.300,00/);
   assert.equal((await comparedTotal.locator(`[data-offer-cell="${secondId}"]`).textContent()).trim(), 'Offen');
   assert.match(await page.locator(`[data-offer-comparison-price="Concession"] [data-offer-cell="${firstId}"]`).textContent(), /1\.400,00\s+· 5 %/);
   const monthly = page.locator('[data-offer-comparison-field="MonthlyPayment"]');

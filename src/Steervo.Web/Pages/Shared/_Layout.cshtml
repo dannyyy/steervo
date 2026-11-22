@@ -2,7 +2,7 @@
 @inject Steervo.Application.Evaluations.ICurrentUser Current
 @{ var accountPage = Context.Request.Path.StartsWithSegments("/Account"); var evaluationPage = Context.Request.Path == "/" || Context.Request.Path.StartsWithSegments("/evaluations"); var errorPage = Context.Request.Path.StartsWithSegments("/Error"); }
 <!doctype html>
-<html lang="de">
+<html lang="@System.Globalization.CultureInfo.CurrentCulture.Name">
 <head>
     <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="htmx-config" content='{"allowEval":false,"includeIndicatorStyles":false,"selfRequestsOnly":true}' />

@@ -116,8 +116,10 @@ app.Use(async (context, next) => {
     context.Response.Headers.Pragma = "no-cache";
     await next();
 });
+// Texts are German; numbers and dates follow the German-language region the browser asks for.
 app.UseRequestLocalization(new RequestLocalizationOptions {
-    DefaultRequestCulture = new RequestCulture("de"), SupportedCultures = [new CultureInfo("de")], SupportedUICultures = [new CultureInfo("de")]
+    DefaultRequestCulture = new RequestCulture("de"), SupportedUICultures = [new CultureInfo("de")],
+    SupportedCultures = [.. new[] { "de", "de-DE", "de-CH", "de-AT", "de-LI", "de-LU" }.Select(name => new CultureInfo(name))]
 });
 app.UseStaticFiles();
 // Full browser pages get a useful error view; fragments and form responses keep their status and body.
