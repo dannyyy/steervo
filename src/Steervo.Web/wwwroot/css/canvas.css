@@ -412,8 +412,9 @@ body:has(dialog[open]) { overflow: hidden; }
 .scope-heading h3 { font-size: 18px; font-weight: 590; color: var(--ink); }
 .criteria-main .criterion-group { margin: 0 0 24px; }
 .criteria-scope .criterion-group:last-child { margin-bottom: 12px; }
-@media (max-width: 700px) { .criteria-scope { padding: 16px 14px 2px; } }
-.criteria-main .group-heading { padding: 10px 0; border-bottom: 1px solid var(--line); }
+@media (max-width: 700px) { .criteria-scope { padding: 16px 14px 2px; } .criteria-main .group-heading { padding: 4px 8px; } .criteria-main .criterion-list { margin: 0 8px 0 12px; } }
+.criteria-main .group-heading { padding: 6px 12px; border: 0; border-radius: 8px; background: var(--group-surface); }
+.criteria-main .criterion-list { margin: 0 12px 0 28px; }
 .criteria-main .group-heading h3 { font-size: 14px; font-weight: 550; }
 .criteria-main .group-count { background: var(--neutral-surface); }
 .criteria-main .criterion-list { border: 0; border-radius: 0; }
