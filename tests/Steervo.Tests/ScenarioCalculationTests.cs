@@ -86,6 +86,29 @@ public sealed class ScenarioCalculationTests
         e.RemoveCost(insurance); Assert.DoesNotContain(e.FindScenario(cash).CostAdjustments, a => a.CostId == insurance);
     }
     [Fact]
+    public void Free_benefits_of_the_offer_cover_matching_costs_for_their_duration()
+    {
+        var (e, car, offer) = Setup();
+        var service = e.AddCost(new("Service", CostCategory.Service, CostFrequency.Monthly, 10));
+        e.AddCost(new("Tyres", CostCategory.Tires, CostFrequency.Monthly, 5));
+        e.AddCost(new("Service refund", CostCategory.Service, CostFrequency.Once, 30, Direction: CostDirection.Income));
+        var plain = Add(e, offer, Purchase); e.SetResidual(plain, new(12, null, 400, null));
+        var before = ScenarioCalculation.Calculate(e, plain, 12).ExpectedCost!.Value;
+        Assert.Empty(ScenarioCalculation.CoveredCosts(e, e.FindScenario(plain)));
+        // A new offer version includes six months of service; only scenarios on that version benefit.
+        e.ReviseOffer(offer, e.FindOffer(offer).Latest.Terms, [new("Service pack", OfferLineKind.Benefit, OfferPriceKind.Included, Effect: OfferBenefitEffect.CostSaving, CostCategory: CostCategory.Service, DurationMonths: 6),
+            new("Open ended", OfferLineKind.Benefit, OfferPriceKind.Included, Effect: OfferBenefitEffect.CostSaving, CostCategory: CostCategory.Tires),
+            new("Priority", OfferLineKind.Benefit, OfferPriceKind.Included, Effect: OfferBenefitEffect.Right, DurationMonths: 12)], "Service included");
+        var withPack = e.AddScenario(new("With pack", offer, 2, Purchase)); e.SetResidual(withPack, new(12, null, 400, null));
+        Assert.Equal(before, ScenarioCalculation.Calculate(e, plain, 12).ExpectedCost);
+        Assert.Equal(before - 60, ScenarioCalculation.Calculate(e, withPack, 12).ExpectedCost);
+        Assert.Equal([new CoveredCost("Service pack", CostCategory.Service, 6)], ScenarioCalculation.CoveredCosts(e, e.FindScenario(withPack)));
+        // An explicit adjustment of the scenario takes precedence over the automatic cover for that cost.
+        e.SetCostAdjustment(withPack, new(service, 4, 1, 3));
+        Assert.Equal(before - 3 * 6, ScenarioCalculation.Calculate(e, withPack, 12).ExpectedCost);
+        Assert.Equal(10, e.FindCost(service).Amount);
+    }
+    [Fact]
     public void Mileage_prices_are_required_only_for_the_applicable_settlement()
     {
         var (e, _, offer) = Setup(); var lease = Add(e, offer, Lease with { ExcessKilometrePrice = null });

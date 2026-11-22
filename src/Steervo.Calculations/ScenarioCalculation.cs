@@ -8,6 +8,7 @@ public sealed record ScenarioMonth(int Month, decimal StartExpenses, decimal Sta
 {
     public decimal NetPayments => StartExpenses + EndExpenses - StartIncome - EndIncome;
 }
+public sealed record CoveredCost(string Name, CostCategory Category, int Months);
 public sealed record CalculationComponent(string Code, string? Name, decimal NetPayments, decimal FuturePayments, bool Complete = true)
 {
     public decimal OpportunityCost => FuturePayments - NetPayments;
@@ -36,6 +37,11 @@ public static class ScenarioCalculation
                 [new("CalculationOverflow")], [], []);
         }
     }
+    /// <summary>Free benefits of the scenario's offer version that cover a cost category for a stated number of months.</summary>
+    public static IReadOnlyList<CoveredCost> CoveredCosts(Evaluation evaluation, Scenario scenario) =>
+        evaluation.FindOffer(scenario.OfferId).Revisions.Single(r => r.Number == scenario.RevisionNumber).Lines.OrderBy(l => l.Position)
+            .Where(l => l is { Kind: OfferLineKind.Benefit, PriceKind: OfferPriceKind.Included, Effect: OfferBenefitEffect.CostSaving, CostCategory: not null, DurationMonths: > 0 })
+            .Select(l => new CoveredCost(l.Name, l.CostCategory!.Value, l.DurationMonths!.Value)).ToArray();
     private static ScenarioResult Project(Evaluation evaluation, Scenario scenario, int horizon)
     {
         var terms = scenario.Terms; var issues = new List<CalculationIssue>();
@@ -120,6 +126,7 @@ public static class ScenarioCalculation
         var candidateId = evaluation.FindOffer(scenario.OfferId).CandidateId;
         var costs = evaluation.Costs.Where(c => c.CandidateId is null || c.CandidateId == candidateId).ToArray();
         var adjustments = scenario.CostAdjustments.ToDictionary(a => a.CostId);
+        var covered = CoveredCosts(evaluation, scenario).GroupBy(c => c.Category).ToDictionary(g => g.Key, g => g.Max(c => c.Months));
         foreach (var cost in costs)
         {
             for (var month = cost.StartMonth; month <= Math.Min(horizon, cost.EndMonth ?? horizon); month++)
@@ -129,6 +136,8 @@ public static class ScenarioCalculation
                 if (cost.Frequency == CostFrequency.Yearly && (month - cost.StartMonth) % 12 != 0) continue;
                 var amount = cost.Amount;
                 if (adjustments.TryGetValue(cost.Id, out var adjustment) && month >= adjustment.StartMonth && month <= (adjustment.EndMonth ?? horizon)) amount = adjustment.Amount;
+                // What the offer includes for free costs nothing while it lasts; an explicit adjustment of this scenario wins.
+                else if (adjustment is null && cost.Direction == CostDirection.Expense && covered.TryGetValue(cost.Category, out var months) && month <= months) amount = 0;
                 if (!amount.HasValue) Issue("ScenarioMissingCost", cost.Name);
                 Pay(month, (amount ?? 0) * (cost.Direction == CostDirection.Expense ? 1 : -1), "CalculationAdditionalCost", cost.Name, key: cost.Id.ToString(), known: amount.HasValue);
             }

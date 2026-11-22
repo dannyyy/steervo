@@ -20,7 +20,14 @@ export async function checkScenarios({ page, reader, readerEmail, origin, output
   assert.equal((await post(page, `${casePath}/candidates`, { action: 'add-candidate', 'Input.Model': 'Rechenauto', version: v })).status(), 0);
   const car = (await exportCase()).candidates[0].id;
   await page.goto(`${origin}${casePath}/offers/edit?candidateId=${car}`); assert.equal(await page.locator('#offer-currency').inputValue(), 'EUR');
-  await page.locator('#offer-Name').fill('Rechenofferte'); await page.getByRole('button', { name: /Offerte anlegen/ }).click(); await page.locator('#offer-workspace').waitFor();
+  await page.locator('#offer-Name').fill('Rechenofferte');
+  // A free benefit with a duration: the cost comparison names it as covered (no service cost exists here, so sums stay as they are).
+  await page.getByRole('button', { name: /Position hinzufügen/ }).click();
+  const pack = page.locator('[data-offer-line]').last();
+  await pack.getByLabel('Bezeichnung der Position', { exact: true }).fill('Servicepaket'); await pack.getByLabel('Art', { exact: true }).selectOption('Benefit');
+  await pack.getByLabel('Preisangabe', { exact: true }).selectOption('Included'); await pack.getByLabel('Wirkung', { exact: true }).selectOption('CostSaving');
+  await pack.getByLabel('Kostenbereich').selectOption('Service'); await pack.getByLabel('Dauer in Monaten').fill('6');
+  await page.getByRole('button', { name: /Offerte anlegen/ }).click(); await page.locator('#offer-workspace').waitFor();
   const offer = (await exportCase()).offers[0].id;
   await page.goto(`${origin}${casePath}/costs`); await page.getByLabel('Beginn der Planung').fill('2027-10'); await page.getByLabel('Dauer in Monaten').fill('12');
   await save(() => page.getByRole('button', { name: 'Zeitraum speichern' }).click()); await page.locator('#cost-workspace').waitFor();
@@ -46,6 +53,7 @@ export async function checkScenarios({ page, reader, readerEmail, origin, output
   }
   function amount(target = page) { return target.locator('[data-effective-cost]').first().getAttribute('data-effective-cost'); }
   const cash = await create('Barkauf', 'Purchase', { PurchasePrice: '1000', InitialFees: '20', AnnualKilometres: '1000' });
+  assert.match(await page.locator('[data-covered-costs]').innerText(), /Servicepaket: Service, 6 Monate/);
   assert.equal(await page.locator('[data-result-complete]').getAttribute('data-result-complete'), 'false');
   await residual(cash, 12, '300', '400', '500'); assert.equal(await amount(), '920');
   await page.goto(`${origin}${path}/${cash}?month=6`); assert.equal(await amount(), ''); await page.getByText('Erwarteter Fahrzeugwert genau für Monat 6.', { exact: true }).waitFor();

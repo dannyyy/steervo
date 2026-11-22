@@ -685,6 +685,8 @@ Dein Arbeitsbereich ist zunächst leer. Evaluationen werden separat für dich fr
   <data name="ResidualSaveHelp" xml:space="preserve"><value>Ein vorhandener Stichtag für denselben Monat wird aktualisiert. Nicht ausgefüllte Werte bleiben offen.</value></data>
   <data name="ResidualDelete" xml:space="preserve"><value>Stichtag löschen</value></data>
   <data name="ResidualDeleteConfirm" xml:space="preserve"><value>Diesen Restwert-Stichtag löschen?</value></data>
+  <data name="ScenarioCoveredCosts" xml:space="preserve"><value>Durch die Offerte gedeckt: Kostenpositionen dieser Bereiche zählen in diesem Zeitraum mit 0. Eine eigene Anpassung unten hat Vorrang.</value></data>
+  <data name="ScenarioCoveredCost" xml:space="preserve"><value>{0}: {1}, {2} Monate</value></data>
   <data name="ScenarioAdjustments" xml:space="preserve"><value>Kosten für dieses Szenario anpassen</value></data>
   <data name="ScenarioAdjustmentsHelp" xml:space="preserve"><value>Ersetze den Betrag einer vorhandenen Kostenposition für einen Zeitraum. 0 bildet eine Gratisleistung ab, leer bedeutet unbekannt. Zahlungsrhythmus und Ausgaben-/Einnahmenart bleiben gleich; ausserhalb des Zeitraums gilt der ursprüngliche Betrag.</value></data>
   <data name="AdjustmentCost" xml:space="preserve"><value>Kostenposition</value></data>
