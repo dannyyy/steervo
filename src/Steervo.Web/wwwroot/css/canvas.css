@@ -405,7 +405,14 @@ body:has(dialog[open]) { overflow: hidden; }
 .surface-heading p { margin-top: 6px; font-size: 13px; max-width: 65ch; }
 .surface-actions { display: flex; flex-wrap: wrap; gap: 9px; flex-shrink: 0; }
 .criteria-main .sorting-help { margin: 0 0 24px; font-size: 11px; max-width: none; }
+.criteria-scope { margin: 0 0 32px; padding: 20px 24px 4px; border: 1px solid var(--line); border-radius: 12px; }
+.criteria-scope:last-of-type { margin-bottom: 0; }
+.scope-heading { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; color: var(--accent); }
+.scope-heading svg { width: 20px; height: 20px; flex: none; }
+.scope-heading h3 { font-size: 18px; font-weight: 590; color: var(--ink); }
 .criteria-main .criterion-group { margin: 0 0 24px; }
+.criteria-scope .criterion-group:last-child { margin-bottom: 12px; }
+@media (max-width: 700px) { .criteria-scope { padding: 16px 14px 2px; } }
 .criteria-main .group-heading { padding: 10px 0; border-bottom: 1px solid var(--line); }
 .criteria-main .group-heading h3 { font-size: 14px; font-weight: 550; }
 .criteria-main .group-count { background: var(--neutral-surface); }

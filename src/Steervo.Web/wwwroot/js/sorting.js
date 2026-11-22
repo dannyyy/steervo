@@ -75,33 +75,46 @@
     form.requestSubmit();
   }
 
+  // Lists show one kind of criterion at a time, so the target is derived from the stored positions of the neighbours.
+  function targetPosition(item, sameList, next, previous, count) {
+    const own = Number(item.dataset.position);
+    const before = other => sameList && own < Number(other.dataset.position) ? 1 : 0;
+    if (next) return Number(next.dataset.position) - before(next);
+    if (previous) return Number(previous.dataset.position) + 1 - before(previous);
+    return sameList ? own : count;
+  }
+
   function locateDestination() {
     const { item, kind, x, y, marker } = drag;
     const hit = document.elementFromPoint(x, y);
+    const scope = item.closest('.criteria-scope');
     let container;
     let siblings;
     if (kind === 'criterion') {
       const group = hit?.closest('.criterion-group');
       container = group?.querySelector('.criterion-list');
+      // Criteria stay among their own kind; a group without criteria accepts both.
+      if (container && group.closest('.criteria-scope') !== scope && container.dataset.count !== '0') container = null;
       siblings = container ? [...container.children].filter(child => child.matches('.criterion') && child !== item) : [];
     } else {
-      container = hit?.closest('.criteria-main');
+      container = hit?.closest('.criteria-scope') === scope ? scope : null;
       siblings = container ? [...container.querySelectorAll(':scope > [data-sort-kind="group"]')].filter(child => child !== item) : [];
     }
     marker.hidden = !container;
     drag.destination = null;
     if (!container) return;
-    let position = siblings.findIndex(sibling => {
+    let index = siblings.findIndex(sibling => {
       const bounds = sibling.getBoundingClientRect();
       return y < bounds.top + bounds.height / 2;
     });
-    if (position === -1) position = siblings.length;
-    const next = siblings[position];
-    const previous = siblings[position - 1];
+    if (index === -1) index = siblings.length;
+    const next = siblings[index];
+    const previous = siblings[index - 1];
     const bounds = container.getBoundingClientRect();
     const top = next ? next.getBoundingClientRect().top : previous ? previous.getBoundingClientRect().bottom : bounds.top + bounds.height / 2;
     Object.assign(marker.style, { left: `${bounds.left}px`, width: `${bounds.width}px`, top: `${top - 1}px` });
-    drag.destination = { groupId: kind === 'criterion' ? container.closest('.criterion-group').dataset.groupId : '', position };
+    const groupId = kind === 'criterion' ? container.closest('.criterion-group').dataset.groupId : '';
+    drag.destination = { groupId, position: targetPosition(item, groupId === drag.groupId, next, previous, Number(container.dataset.count || 0)) };
   }
 
   function autoScroll(time) {
@@ -120,9 +133,8 @@
     if (!handle || event.button !== 0 || !event.isPrimary || busy() || drag) return;
     const item = handle.closest('[data-sort-kind]');
     const kind = item.dataset.sortKind;
-    const siblings = kind === 'criterion' ? [...item.parentElement.querySelectorAll(':scope > .criterion')] : [...item.parentElement.querySelectorAll(':scope > [data-sort-kind="group"]')];
     drag = { handle, item, kind, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, x: event.clientX, y: event.clientY,
-      groupId: kind === 'criterion' ? item.closest('.criterion-group').dataset.groupId : '', position: siblings.indexOf(item) };
+      groupId: kind === 'criterion' ? item.closest('.criterion-group').dataset.groupId : '', position: Number(item.dataset.position) };
     handle.focus({ preventScroll: true });
     handle.setPointerCapture(event.pointerId);
     event.preventDefault();
@@ -156,7 +168,7 @@
     const item = handle.closest('[data-sort-kind]');
     const direction = event.key === 'ArrowUp' ? '-1' : '1';
     const form = [...item.querySelectorAll('form[data-sort]')].find(candidate =>
-      candidate.elements.action.value === `move-${item.dataset.sortKind}` && candidate.elements.direction.value === direction);
+      candidate.elements.action.value === `place-${item.dataset.sortKind}` && candidate.dataset.direction === direction);
     if (form && !form.querySelector('button').disabled) { form.dataset.focusId = handle.id; form.requestSubmit(); }
   });
 })();

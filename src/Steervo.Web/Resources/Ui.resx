@@ -115,6 +115,8 @@
 <data name="Required" xml:space="preserve"><value>Muss</value></data>
 <data name="Preferred" xml:space="preserve"><value>Stark gewünscht</value></data>
 <data name="Optional" xml:space="preserve"><value>Optional</value></data>
+<data name="CriteriaScopeVehicle" xml:space="preserve"><value>Fahrzeugkriterien</value></data>
+<data name="CriteriaScopeOffer" xml:space="preserve"><value>Offertenkriterien</value></data>
 <data name="Vehicle" xml:space="preserve"><value>Fahrzeug</value></data>
 <data name="Offer" xml:space="preserve"><value>Offerte</value></data>
 <data name="AtLeast" xml:space="preserve"><value>Mindestens (≥)</value></data>

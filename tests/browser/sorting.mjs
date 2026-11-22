@@ -137,6 +137,38 @@ export async function checkSorting({ page, owner, origin, output, post, mutate, 
   assert.equal(await group('').count(), 0);
   record('Group arrows preserve the viewport; drag sorting and empty groups persist; the ungrouped section appears only with criteria');
 
+  // Vehicle and offer criteria are listed in separate sections; sorting stays within one kind.
+  version = await page.locator('#evaluation-workspace').getAttribute('data-version');
+  for (const name of ['Gratis Service', 'Winterräder']) await seed({ action: 'add-criterion', name, type: 'Boolean', priority: 'Preferred', scope: 'Offer', groupId: groupIds[0] });
+  await page.reload();
+  const scope = name => page.locator(`.criteria-scope[data-criteria-scope="${name}"]`);
+  const scoped = (name, id) => scope(name).locator(`.criterion-group[data-group-id="${id}"] .criterion h4`).allTextContents();
+  assert.deepEqual(await page.locator('.scope-heading h3').allTextContents(), ['Fahrzeugkriterien', 'Offertenkriterien']);
+  assert.deepEqual(await scoped('Vehicle', groupIds[0]), ['Standardschlüssel', 'UWB Smart Key', 'App Key (Bluetooth)', 'Notschlüssel']);
+  assert.deepEqual(await scoped('Offer', groupIds[0]), ['Gratis Service', 'Winterräder']);
+  assert.equal(await scope('Offer').locator('.criterion-group').count(), 1);
+  assert.equal(await page.locator('.criterion-copy p').filter({ hasText: /Offerte|Fahrzeug/ }).count(), 0);
+  assert.equal(await page.locator('[id]').evaluateAll(nodes => nodes.length - new Set(nodes.map(node => node.id)).size), 0);
+  assert.equal(await page.getByRole('button', { name: 'Kriterium Gratis Service nach oben', exact: true }).isDisabled(), true);
+  await mutate(page, () => page.getByRole('button', { name: 'Kriterium Winterräder nach oben', exact: true }).click());
+  assert.deepEqual(await scoped('Offer', groupIds[0]), ['Winterräder', 'Gratis Service']);
+  assert.deepEqual(await scoped('Vehicle', groupIds[0]), ['Standardschlüssel', 'UWB Smart Key', 'App Key (Bluetooth)', 'Notschlüssel']);
+  // A criterion cannot be dropped among criteria of the other kind.
+  await row('Notschlüssel').scrollIntoViewIfNeeded();
+  const foreignHandle = await row('Notschlüssel').locator('[data-drag-handle]').boundingBox();
+  const foreignTarget = await row('Winterräder').boundingBox();
+  await page.mouse.move(foreignHandle.x + foreignHandle.width / 2, foreignHandle.y + foreignHandle.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(foreignTarget.x + 80, foreignTarget.y + 4, { steps: 8 });
+  assert.equal(await page.locator('.sorting-marker').isHidden(), true);
+  await page.mouse.up();
+  assert.deepEqual(await scoped('Offer', groupIds[0]), ['Winterräder', 'Gratis Service']);
+  assert.deepEqual(await scoped('Vehicle', groupIds[0]), ['Standardschlüssel', 'UWB Smart Key', 'App Key (Bluetooth)', 'Notschlüssel']);
+  await page.screenshot({ path: join(output, 'criteria-sections.png'), fullPage: true });
+  version = await page.locator('#evaluation-workspace').getAttribute('data-version');
+  for (const name of ['Gratis Service', 'Winterräder']) await seed({ action: 'remove-criterion', itemId: await row(name).getAttribute('data-criterion-id') });
+  record('Vehicle and offer criteria form separate sections; arrows and dragging stay within one kind');
+
   // Exercise real touch input, not synthetic drag events.
   const touchContext = await owner.context.browser().newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, ignoreHTTPSErrors: origin.startsWith('https:') });
   await touchContext.addCookies(await owner.context.cookies());
@@ -145,6 +177,7 @@ export async function checkSorting({ page, owner, origin, output, post, mutate, 
   const touchErrors = [];
   touch.on('pageerror', error => touchErrors.push(error.message));
   await touch.goto(`${origin}${path}?section=criteria`);
+  assert.deepEqual(await touch.locator('.scope-heading h3').allTextContents(), ['Fahrzeugkriterien']);
   assert.ok(await touch.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
   const touchSource = touch.getByRole('button', { name: 'Kriterium Standardschlüssel verschieben', exact: true });
   await touchSource.evaluate(element => window.scrollBy(0, element.getBoundingClientRect().top - 250));
