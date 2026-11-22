@@ -70,6 +70,9 @@ export async function checkOffers({ page, reader, readerEmail, origin, output, p
   record('Evaluation properties lock the currency after the first offer and reject forged changes atomically');
 
 
+  // The record actions follow the car record: below the title, main action first, deletion last.
+  assert.deepEqual((await page.locator('.offer-introduction .vehicle-actions').locator('a, button').allTextContents()).map(text => text.trim()), ['Neue Version erfassen', 'Offerten vergleichen', 'Offerte löschen']);
+  assert.equal(await page.locator('.offer-introduction').evaluate(node => node.querySelector('.vehicle-actions').getBoundingClientRect().top > node.querySelector('h2').getBoundingClientRect().bottom), true);
   await page.getByRole('link', { name: 'Neue Version erfassen', exact: true }).click();
   assert.equal(await page.locator('#offer-currency').inputValue(), 'EUR');
   assert.equal(await page.locator('#offer-currency').isEditable(), false);
