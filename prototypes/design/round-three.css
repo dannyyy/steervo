@@ -1,9 +1,11 @@
+/* --- Webfont --- */
 @font-face {
   font-family: Geist;
   src: url("assets/geist.woff2") format("woff2");
   font-weight: 100 900;
   font-display: swap;
 }
+/* --- Design tokens --- */
 :root {
   font-family:
     Geist,
@@ -33,6 +35,8 @@
   color: var(--ink);
   background: var(--canvas);
 }
+/* --- Palette variants --- */
+/* Set on <html> as data-palette by the palette switch in the review bar. */
 :root[data-palette="petrol"] {
   --accent: #28665f;
   --accent-hover: #1c514b;
@@ -45,6 +49,7 @@
   --soft: #f0eaf0;
   --focus: #71556f;
 }
+/* --- Base elements --- */
 * {
   box-sizing: border-box;
   scrollbar-width: thin;
@@ -118,6 +123,7 @@ input,
 textarea {
   caret-color: var(--accent);
 }
+/* --- Icons --- */
 svg.icon {
   width: 19px;
   height: 19px;
@@ -132,6 +138,7 @@ button .icon {
   width: 17px;
   height: 17px;
 }
+/* --- Utilities --- */
 [hidden] {
   display: none !important;
 }
@@ -167,6 +174,7 @@ button .icon {
   text-underline-offset: 4px;
   color: inherit;
 }
+/* --- Brand --- */
 .brand {
   display: flex;
   align-items: center;
@@ -183,6 +191,7 @@ button .icon {
 .brand-dot {
   color: var(--accent);
 }
+/* --- Buttons --- */
 .button {
   display: inline-flex;
   align-items: center;
@@ -229,6 +238,7 @@ button .icon {
   background: var(--soft);
   color: var(--accent);
 }
+/* --- Avatar --- */
 .avatar {
   display: grid;
   place-items: center;
@@ -241,6 +251,7 @@ button .icon {
   font-size: 11px;
   font-weight: 600;
 }
+/* --- Status labels and pills --- */
 .status {
   display: inline-flex;
   align-items: center;
@@ -285,6 +296,7 @@ button .icon {
 .pill.required {
   color: var(--ink);
 }
+/* --- Action rows and empty states --- */
 .row-actions {
   display: flex;
   gap: 8px;
@@ -297,6 +309,7 @@ button .icon {
   margin: 9px 0 15px;
   color: var(--muted);
 }
+/* --- Review bar and note --- */
 /* The review controls are deliberately separate from the product. */
 .review-bar {
   display: flex;
@@ -329,6 +342,7 @@ button .icon {
   color: var(--ink);
   box-shadow: 0 2px 4px #29362e08;
 }
+/* --- Palette switch --- */
 .palette-switch {
   display: flex;
   align-items: center;
@@ -368,6 +382,7 @@ button .icon {
   margin-left: 12px;
   font-size: 11px;
 }
+/* --- Review note --- */
 .review-note {
   display: flex;
   justify-content: space-between;
@@ -380,7 +395,9 @@ button .icon {
 .review-note strong {
   color: var(--ink);
 }
+/* --- A · Workspace: shell and sidebar --- */
 /* One quiet shell; two ways of arranging the same work. */
+/* Fills the viewport below the 53px review bar. */
 .product {
   min-height: calc(100vh - 53px);
   background: var(--canvas);
@@ -391,6 +408,7 @@ button .icon {
   padding: 12px;
   gap: 12px;
 }
+/* 53px review bar + 2 × 12px workspace padding. */
 .sidebar {
   display: flex;
   flex-direction: column;
@@ -466,6 +484,7 @@ button .icon {
   color: var(--muted);
   margin-top: 3px;
 }
+/* --- Work area and context bar --- */
 .work-area {
   min-width: 0;
 }
@@ -496,6 +515,7 @@ button .icon {
   max-width: 1550px;
   margin: 0 auto;
 }
+/* --- Shortlist and candidate chips --- */
 .shortlist {
   display: flex;
   align-items: center;
@@ -559,6 +579,7 @@ button .icon {
   flex-shrink: 0;
   background: transparent;
 }
+/* --- Record: vehicle stage --- */
 .record {
   display: grid;
   grid-template-columns: minmax(270px, 0.78fr) minmax(430px, 1.4fr);
@@ -645,6 +666,7 @@ button .icon {
   flex: 1;
   padding: 9px 11px;
 }
+/* --- Vehicle note --- */
 .vehicle-note {
   margin-top: 26px;
   padding-top: 17px;
@@ -667,6 +689,7 @@ button .icon {
   margin-top: 7px;
   max-width: 65ch;
 }
+/* --- Record content: tabs, toolbar and filters --- */
 .record-content {
   min-width: 0;
 }
@@ -732,6 +755,7 @@ button .icon {
 .filter-button:hover {
   color: var(--accent);
 }
+/* --- Assessment list --- */
 .assessment-heading {
   display: flex;
   align-items: center;
@@ -742,6 +766,7 @@ button .icon {
 .assessment-heading strong {
   font-weight: 500;
 }
+/* Columns: criterion, value, status label, edit icon. */
 .assessment-row {
   display: grid;
   grid-template-columns: minmax(130px, 1.15fr) minmax(94px, 0.7fr) auto 14px;
@@ -792,6 +817,7 @@ button .icon {
   font-size: 9px;
   padding: 4px 6px;
 }
+/* !important: the icon sits in the row button, and button .icon is more specific. */
 .edit-hint {
   color: var(--muted);
   width: 13px !important;
@@ -816,6 +842,7 @@ button .icon {
   height: 14px;
   color: var(--positive);
 }
+/* --- Record notes and details --- */
 .decision-note {
   font-size: 11px;
   color: var(--muted);
@@ -865,6 +892,7 @@ button .icon {
   color: var(--muted);
   max-width: 65ch;
 }
+/* --- Offers --- */
 .offer-heading {
   display: flex;
   align-items: center;
@@ -913,6 +941,7 @@ button .icon {
 .offer-detail p + p {
   margin-top: 10px;
 }
+/* --- Records outside the capture layout (offers, criteria) --- */
 .finance-record,
 .work-area main > .record,
 .dossier-main > .record {
@@ -927,6 +956,7 @@ button .icon {
   margin: 14px 0 25px;
   max-width: 70ch;
 }
+/* --- Empty vehicle image --- */
 .image-empty {
   display: flex;
   align-items: center;
@@ -936,9 +966,11 @@ button .icon {
   background: var(--soft);
   font-size: 12px;
 }
+/* Thumbnails keep only the car icon; the placeholder text does not fit. */
 .thumbnail.image-empty span {
   display: none;
 }
+/* --- B · Canvas: top navigation --- */
 /* Canvas opens the same record horizontally, then brings the reading together. */
 .top-navigation {
   display: flex;
@@ -975,6 +1007,7 @@ button .icon {
 .top-navigation .avatar {
   margin-left: auto;
 }
+/* --- B · Canvas: layout --- */
 .dossier-main-wrap {
   max-width: 1300px;
   margin: 0 auto;
@@ -986,10 +1019,12 @@ button .icon {
 .dossier-main {
   padding: 0 32px 34px;
 }
+/* --- B · Canvas: vehicle stage --- */
 .dossier .record {
   display: block;
   padding: 30px 34px;
 }
+/* Title, facts and actions stack on the left; the image spans all three rows on the right. */
 .dossier .vehicle-stage {
   display: grid;
   grid-template-columns: 0.95fr 1.05fr;
@@ -1044,6 +1079,7 @@ button .icon {
   padding: 10px 18px;
   font-size: 13px;
 }
+/* --- B · Canvas: tabs and side column --- */
 .dossier .tabs {
   margin: 0;
   gap: 30px;
@@ -1086,6 +1122,7 @@ button .icon {
 .dossier .assessment-summary {
   margin-top: 22px;
 }
+/* --- Comparison: heading and tools --- */
 /* A comparison uses the same typography, status language and editing. */
 .comparison-heading {
   display: flex;
@@ -1126,6 +1163,7 @@ button .icon {
   color: var(--accent);
   font-weight: 600;
 }
+/* --- Comparison table --- */
 .comparison-scroll {
   overflow-x: auto;
   border-radius: 16px;
@@ -1151,6 +1189,7 @@ button .icon {
   padding: 23px 24px;
   vertical-align: top;
 }
+/* --- Comparison column heading: photo and candidate --- */
 .compare-visual {
   position: relative;
   overflow: hidden;
@@ -1165,6 +1204,7 @@ button .icon {
   object-position: center 66%;
   border-radius: 10px;
 }
+/* Show these two photos whole instead of cropping them in the short frame. */
 .compare-image[src$="id7.jpg"] {
   object-fit: contain;
   background: #fff;
@@ -1207,6 +1247,7 @@ button .icon {
   font-weight: 400;
   margin-top: 6px;
 }
+/* !important beats the vertical-align: top of .comparison-table thead th. */
 .comparison-label {
   vertical-align: bottom !important;
   color: var(--muted);
@@ -1221,6 +1262,7 @@ button .icon {
   font-weight: 550;
   margin-bottom: 9px;
 }
+/* --- Comparison rows and cells --- */
 .comparison-table .group-label th {
   background: #f8f9f7;
   color: var(--muted);
@@ -1280,11 +1322,13 @@ button .icon {
   padding: 20px 24px;
   font-size: 14px;
 }
+/* One full-width cell when a filter has no matches; !important beats the left alignment of .comparison-table td. */
 .compare-empty {
   padding: 35px !important;
   color: var(--muted);
   text-align: center !important;
 }
+/* --- Comparison swipe hint and footer --- */
 .comparison-scroll-hint {
   display: none;
 }
@@ -1305,6 +1349,7 @@ button .icon {
   font-size: 12px;
   flex-shrink: 0;
 }
+/* --- Forms and editors --- */
 /* Editing is a single pattern across both layouts. */
 .field {
   display: grid;
@@ -1343,6 +1388,7 @@ button .icon {
   grid-template-columns: 1fr 1fr;
   gap: 15px;
 }
+/* --- Inline editor --- */
 .inline-editor {
   background: var(--soft);
   padding: 24px;
@@ -1383,6 +1429,7 @@ button .icon {
   padding-top: 15px;
   border-top: 1px solid #cbd2ce;
 }
+/* --- Editor panel --- */
 .editor-panel {
   position: fixed;
   right: 0;
@@ -1406,9 +1453,11 @@ button .icon {
   background: #25332d55;
   z-index: 20;
 }
+/* Set on body while the editor panel is open, so the page behind it does not scroll. */
 .editing {
   overflow: hidden;
 }
+/* --- Toast --- */
 .toast {
   position: fixed;
   bottom: 24px;
@@ -1425,6 +1474,7 @@ button .icon {
   font-size: 12px;
   box-shadow: 0 8px 28px #15261d25;
 }
+/* --- Proposal gallery --- */
 /* The proposal gallery shares the palette, without prescribing a final colour. */
 .gallery {
   max-width: 1380px;
@@ -1500,6 +1550,7 @@ button .icon {
   background: var(--canvas);
   border-radius: 9px;
 }
+/* Draws the embedded concept (?concept=…&embed=1) at 1440 × 960 and scales it to the card: 960px × 0.376 ≈ the 361px preview height. */
 .direction-preview iframe {
   position: absolute;
   width: 1440px;
@@ -1537,6 +1588,7 @@ button .icon {
   color: var(--muted);
   margin-top: 14px;
 }
+/* --- Responsive: from 1600px --- */
 @media (min-width: 1600px) {
   .workspace .record {
     grid-template-columns: minmax(330px, 0.8fr) minmax(480px, 1.35fr);
@@ -1560,7 +1612,9 @@ button .icon {
     font-size: 11px;
   }
 }
+/* --- Responsive: up to 1200px --- */
 @media (max-width: 1200px) {
+  /* --- A · Sidebar --- */
   .product.workspace {
     grid-template-columns: 176px minmax(0, 1fr);
   }
@@ -1589,6 +1643,7 @@ button .icon {
     font-size: 12px;
     padding: 11px 10px;
   }
+  /* --- Work area and shortlist --- */
   .context-bar {
     padding-left: 18px;
     padding-right: 18px;
@@ -1597,6 +1652,7 @@ button .icon {
     padding-left: 18px;
     padding-right: 18px;
   }
+  /* --- Record --- */
   .record {
     grid-template-columns: minmax(235px, 0.75fr) minmax(390px, 1.3fr);
     padding: 23px;
@@ -1645,6 +1701,8 @@ button .icon {
   .tabs button {
     font-size: 12px;
   }
+  /* --- Assessment list --- */
+  /* The status column is dropped; the row class (bad, open) colours the value instead. */
   .assessment-row {
     grid-template-columns: minmax(125px, 1.15fr) minmax(80px, 0.7fr) 14px;
     gap: 12px;
@@ -1670,6 +1728,7 @@ button .icon {
   .assessment-summary {
     font-size: 9px;
   }
+  /* --- B · Canvas --- */
   .dossier-content {
     grid-template-columns: minmax(0, 1fr) 220px;
     gap: 35px;
@@ -1686,9 +1745,11 @@ button .icon {
   .dossier .assessment-row {
     grid-template-columns: minmax(150px, 1.2fr) minmax(94px, 0.8fr) auto 14px;
   }
+  /* Canvas keeps the status column. */
   .dossier .assessment-row > .status {
     display: inline-flex;
   }
+  /* --- Gallery --- */
   .gallery {
     padding: 30px;
   }
@@ -1702,13 +1763,16 @@ button .icon {
     transform: scale(0.294);
   }
 }
+/* --- Responsive: up to 980px --- */
 @media (max-width: 980px) {
+  /* --- Review bar --- */
   .demo-label {
     display: none;
   }
   .review-bar {
     gap: 18px;
   }
+  /* --- A · Sidebar becomes an icon rail --- */
   .product.workspace {
     grid-template-columns: 74px minmax(0, 1fr);
     gap: 6px;
@@ -1739,6 +1803,7 @@ button .icon {
   .sidebar-bottom > span:last-child {
     display: none;
   }
+  /* --- Context bar and record --- */
   .context-bar {
     padding-top: 22px;
     min-height: 107px;
@@ -1753,6 +1818,7 @@ button .icon {
     display: block;
     padding: 26px;
   }
+  /* Title, facts and actions on the left; the image spans the first three rows on the right. */
   .vehicle-stage {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1795,6 +1861,7 @@ button .icon {
   .vehicle-note p {
     max-width: 70ch;
   }
+  /* --- Tabs and assessment list --- */
   .tabs {
     margin: 0;
     gap: 25px;
@@ -1811,6 +1878,7 @@ button .icon {
   .assessment-summary {
     font-size: 11px;
   }
+  /* --- B · Canvas --- */
   .top-navigation {
     padding: 0 28px;
     gap: 35px;
@@ -1856,6 +1924,7 @@ button .icon {
   .dossier .vehicle-title h1 {
     font-size: 31px;
   }
+  /* --- Comparison --- */
   .comparison-heading h1 {
     font-size: 28px;
   }
@@ -1885,6 +1954,7 @@ button .icon {
   .cell-edit {
     padding: 16px 18px;
   }
+  /* --- Gallery --- */
   .gallery-heading {
     display: block;
   }
@@ -1899,7 +1969,10 @@ button .icon {
     transform: scale(0.227);
   }
 }
+/* --- Responsive: up to 700px --- */
 @media (max-width: 700px) {
+  /* --- Review bar and palette switch --- */
+  /* Wraps into two rows; the palette switch takes the second one. */
   .review-bar {
     padding: 7px 12px;
     gap: 9px;
@@ -1932,6 +2005,7 @@ button .icon {
     padding: 4px 7px;
     min-height: 27px;
   }
+  /* --- Review note --- */
   .review-note {
     display: block;
     padding: 18px;
@@ -1942,6 +2016,7 @@ button .icon {
     margin: 7px 0 11px;
     line-height: 1.8;
   }
+  /* --- A · Sidebar becomes a top bar --- */
   .product.workspace {
     display: block;
     padding: 0;
@@ -1987,6 +2062,7 @@ button .icon {
   .sidebar-bottom {
     display: none;
   }
+  /* --- Context bar and shortlist --- */
   .context-bar {
     min-height: 104px;
     padding: 24px 20px 21px;
@@ -2023,6 +2099,7 @@ button .icon {
     width: 39px;
     height: 29px;
   }
+  /* Icon-only add button: font-size 0 hides the label text next to the icon. */
   .shortlist > .button {
     font-size: 0;
     padding: 9px;
@@ -2035,6 +2112,7 @@ button .icon {
     width: 18px;
     height: 18px;
   }
+  /* --- Record: stage stacks vertically --- */
   .record {
     padding: 19px;
     border-radius: 14px;
@@ -2109,6 +2187,7 @@ button .icon {
   .vehicle-note h3 {
     font-size: 13px;
   }
+  /* --- Tabs, toolbar and filters --- */
   .tabs {
     gap: 19px;
     margin: 0;
@@ -2142,6 +2221,7 @@ button .icon {
     min-height: 28px;
     padding: 5px 6px;
   }
+  /* --- Assessment list --- */
   .assessment-heading {
     font-size: 10px;
     padding: 10px 0 8px;
@@ -2192,6 +2272,7 @@ button .icon {
     font-size: 10px;
     margin: 18px 8px 0;
   }
+  /* --- B · Canvas: top navigation wraps, nav on its own row --- */
   .top-navigation {
     flex-wrap: wrap;
     gap: 14px;
@@ -2224,6 +2305,7 @@ button .icon {
     height: 31px;
     font-size: 10px;
   }
+  /* --- B · Canvas: record and side column --- */
   .dossier .context-bar {
     padding: 24px 20px 21px;
     min-height: 104px;
@@ -2294,6 +2376,7 @@ button .icon {
   .aside-section p {
     font-size: 12px;
   }
+  /* --- Comparison --- */
   .comparison-heading {
     display: block;
     margin: 4px 4px 23px;
@@ -2331,6 +2414,7 @@ button .icon {
   .comparison-scroll {
     border-radius: 12px;
   }
+  /* 134px label column + one candidate column fill the visible width; swipe for the second. */
   .comparison-table {
     width: calc(200% - 134px);
     min-width: 0;
@@ -2423,6 +2507,7 @@ button .icon {
     padding: 17px 12px;
     font-size: 12px;
   }
+  /* --- Inline editor, fields and editor panel --- */
   .inline-editor {
     padding: 19px 14px;
     margin: 12px -4px 18px;
@@ -2464,6 +2549,7 @@ button .icon {
     border-radius: 0;
     padding: 27px 21px;
   }
+  /* --- Toast --- */
   .toast {
     font-size: 11px;
     max-width: calc(100% - 28px);
@@ -2471,6 +2557,7 @@ button .icon {
     bottom: 18px;
     line-height: 1.7;
   }
+  /* --- Offers and records outside the capture layout --- */
   .offer-heading {
     display: block;
   }
@@ -2506,12 +2593,14 @@ button .icon {
     font-size: 12px;
     line-height: 1.8;
   }
+  /* !important overrides the inline grid-template-columns that design.js sets on the criteria rows. */
   .work-area main > .record .assessment-row,
   .dossier-main > .record .assessment-row {
     grid-template-columns: minmax(100px, 1fr) minmax(80px, 1fr) 55px !important;
     font-size: 11px;
     gap: 8px;
   }
+  /* --- Gallery --- */
   .gallery {
     padding: 27px 20px;
   }
@@ -2574,6 +2663,7 @@ button .icon {
     font-size: 10px;
   }
 }
+/* --- Inline editor entrance --- */
 @media (prefers-reduced-motion: no-preference) {
   .inline-editor {
     animation: edit-open 0.24s cubic-bezier(0.16, 1, 0.3, 1);
@@ -2589,6 +2679,7 @@ button .icon {
     }
   }
 }
+/* --- Reduced motion --- */
 @media (prefers-reduced-motion: reduce) {
   *,
   *:before,
@@ -2617,9 +2708,13 @@ button .icon {
 .aside-section p {
   font-size: 13px;
 }
+/* --- Phone status text --- */
+/* Hidden by default; shown where the status column is dropped. */
 .assessment-value .mobile-state {
   display: none;
 }
+/* --- Context bar outside the capture view --- */
+/* data-view on .product names the current view; the other views get a compact heading. */
 .product:not([data-view="capture"]) .context-bar {
   min-height: 76px;
   padding-top: 22px;
@@ -2632,7 +2727,9 @@ button .icon {
 .product:not([data-view="capture"]) .context-bar p {
   display: none;
 }
+/* --- Workspace status text from 981px to 1200px --- */
 @media (min-width: 981px) and (max-width: 1200px) {
+  /* The status column is hidden in this range only (it returns at 980px), so the text state fills in. */
   .workspace .assessment-value .mobile-state {
     display: block;
     font-size: 10px;
@@ -2645,12 +2742,14 @@ button .icon {
     color: var(--muted);
   }
 }
+/* --- Up to 700px: workspace record order --- */
 @media (max-width: 700px) {
   .workspace .capture-layout .record {
     display: flex;
     flex-direction: column;
     gap: 0;
   }
+  /* display: contents lifts the stage's children into the record's flex column, so the tabs (order 5) sit before the note (order 6). */
   .workspace .vehicle-stage {
     display: contents;
   }
@@ -2695,6 +2794,7 @@ button .icon {
     font-size: 14px;
   }
 }
+/* --- Up to 360px: top navigation without icons --- */
 @media (max-width: 360px) {
   .top-navigation nav button > .icon {
     display: none;

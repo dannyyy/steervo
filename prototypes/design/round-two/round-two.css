@@ -1,3 +1,4 @@
+/* --- Webfont --- */
 @font-face {
   font-family: Geist;
   src: url("assets/geist.woff2") format("woff2");
@@ -5,6 +6,7 @@
   font-style: normal;
   font-display: swap;
 }
+/* --- Design tokens --- */
 :root {
   font-family:
     Geist,
@@ -30,6 +32,7 @@
   color: var(--ink);
   background: #f1f3f8;
 }
+/* --- Base elements --- */
 body {
   background: #f1f3f8;
 }
@@ -63,6 +66,7 @@ textarea {
 * {
   scrollbar-color: #a7afc4 transparent;
 }
+/* --- Buttons --- */
 .button {
   min-height: 43px;
   padding: 10px 16px;
@@ -85,6 +89,7 @@ textarea {
 .button.text {
   font-weight: 550;
 }
+/* --- Brand --- */
 .brand {
   font-family: Geist, sans-serif;
   font-size: 28px;
@@ -98,6 +103,7 @@ textarea {
 .brand svg {
   width: 26px;
 }
+/* --- Status labels and pills --- */
 .status {
   border-radius: 6px;
   font-size: 11px;
@@ -112,6 +118,7 @@ textarea {
   border-radius: 4px;
   padding: 2px 5px;
 }
+/* --- Forms --- */
 .field label,
 .field-label {
   font-size: 13px;
@@ -135,6 +142,7 @@ textarea {
 .field-grid {
   gap: 16px;
 }
+/* --- Notes, avatar and page lock --- */
 .demo-note {
   font-size: 11px;
 }
@@ -145,10 +153,12 @@ textarea {
   height: 34px;
   font-size: 11px;
 }
+/* Set on body while the editor panel is open, so the page behind it does not scroll. */
 .editing {
   overflow: hidden;
 }
 /* Presentation shell */
+/* --- Review bar and note --- */
 .review-bar {
   background: #e4e8f0;
   color: #535b6e;
@@ -195,6 +205,7 @@ textarea {
   color: inherit;
   font-size: inherit;
 }
+/* --- Direction gallery --- */
 .gallery {
   max-width: 1560px;
   padding: 40px 48px 30px;
@@ -243,6 +254,7 @@ textarea {
   color: #1c2134;
   overflow: hidden;
 }
+/* Gallery cards carry the concept key as class and preview that concept's palette. */
 .direction.dossier {
   background: #efbd9e;
   --ink: #3f263d;
@@ -301,6 +313,7 @@ textarea {
   box-shadow: 0 8px 26px #17234114;
   background: #f4f6f9;
 }
+/* Draws the embedded concept (?concept=…&embed=1) at desktop width; 1120px × 0.285 ≈ the 320px preview height. */
 .direction-preview iframe {
   width: 1440px;
   height: 1120px;
@@ -348,6 +361,8 @@ textarea {
   font-weight: 520;
 }
 /* Shared product surfaces */
+/* --- Product shell and context bar --- */
+/* Fills the viewport below the 51px review bar. */
 .product {
   color: var(--ink);
   background: var(--canvas);
@@ -376,6 +391,7 @@ textarea {
 .context-bar svg.icon {
   width: 14px;
 }
+/* --- Shortlist and candidate chips --- */
 .shortlist {
   display: flex;
   align-items: center;
@@ -443,6 +459,7 @@ textarea {
   border-radius: 6px;
   flex-shrink: 0;
 }
+/* --- Record: vehicle stage --- */
 .capture-layout {
   display: block;
   min-height: 0;
@@ -526,6 +543,7 @@ textarea {
 .vehicle-stage .row-actions .button {
   flex: 1;
 }
+/* --- Record content: tabs, toolbar and filters --- */
 .record-content {
   min-width: 0;
   background: var(--white);
@@ -574,6 +592,7 @@ textarea {
   background: var(--white);
   box-shadow: 0 2px 5px #182c4410;
 }
+/* --- Assessment list --- */
 .assessment-heading {
   padding: 11px 0;
   background: transparent;
@@ -588,6 +607,7 @@ textarea {
 .assessment-heading > span {
   font-size: 10px;
 }
+/* Columns: criterion, value, status label, edit icon. */
 .assessment-row {
   grid-template-columns: minmax(110px, 1fr) minmax(85px, 0.65fr) auto 13px;
   padding: 18px 0;
@@ -629,6 +649,7 @@ textarea {
   font-size: 10px;
   line-height: 1.6;
 }
+/* --- Record notes and details --- */
 .record-bottom-note {
   font-size: 11px;
   line-height: 1.7;
@@ -648,6 +669,7 @@ textarea {
   font-size: 14px;
   line-height: 1.8;
 }
+/* --- Records outside the capture layout (offers, criteria) --- */
 .finance-record {
   display: block;
   background: var(--white);
@@ -665,6 +687,7 @@ textarea {
   border: 1px solid var(--line);
   border-radius: 16px;
 }
+/* --- Empty vehicle image --- */
 .image-empty {
   background: var(--soft);
   display: flex;
@@ -678,12 +701,14 @@ textarea {
   width: 30px;
   height: 30px;
 }
+/* --- A · Studio: rail --- */
 /* A — Studio: a compact blue rail and two distinct working areas. */
 .product.workspace {
   display: grid;
   grid-template-columns: 90px minmax(0, 1fr);
   background: #f1f3f8;
 }
+/* Rail fills the viewport below the 51px review bar. */
 .sidebar {
   width: auto;
   min-height: calc(100vh - 51px);
@@ -744,6 +769,7 @@ textarea {
   color: #fff;
   border: 1px solid #7d94f4;
 }
+/* --- A · Studio: work area --- */
 .work-area main {
   padding: 28px 32px 36px;
   max-width: 1540px;
@@ -752,7 +778,9 @@ textarea {
 .workspace .record-content {
   box-shadow: none;
 }
+/* --- B · Canvas: palette and top navigation --- */
 /* B — Canvas: an open, warm vehicle dossier with inline editing. */
+/* The editor panel is rendered outside .product with the concept class, so it repeats the palette. */
 .product.dossier,
 .editor-panel.dossier {
   --ink: #3e2a3c;
@@ -806,6 +834,7 @@ textarea {
   background: #62435d;
   color: #f9e5e9;
 }
+/* --- B · Context bar and shortlist --- */
 .dossier .context-bar {
   max-width: 1380px;
   height: 68px;
@@ -838,6 +867,7 @@ textarea {
 .dossier .candidate-chip small {
   display: none;
 }
+/* --- B · Vehicle stage --- */
 .dossier .record {
   display: block;
   padding: 0;
@@ -845,6 +875,7 @@ textarea {
   border: 0;
   border-radius: 0;
 }
+/* Title, facts and actions stack on the left; the image spans all three rows on the right. */
 .dossier .vehicle-stage {
   background: #efbd9e;
   padding: 32px 34px;
@@ -915,6 +946,7 @@ textarea {
   background: #59334f;
   color: white;
 }
+/* --- B · Record content, side column and inline editor --- */
 .dossier .record-content {
   background: transparent;
   border: 0;
@@ -979,6 +1011,7 @@ textarea {
   border: 0;
   margin: 10px 0 18px;
 }
+/* --- B · Comparison --- */
 .dossier .comparison-main {
   background: transparent;
   border: 0;
@@ -994,7 +1027,9 @@ textarea {
 .dossier .comparison-table thead th {
   background: #f7eee6;
 }
+/* --- C · Focus: dark palette and top navigation --- */
 /* C — Focus: dark comparison with lavender navigation and visual candidates. */
+/* The editor panel is rendered outside .product with the concept class, so it repeats the palette. */
 .product.matrix,
 .editor-panel.matrix {
   --ink: #f0eef7;
@@ -1038,6 +1073,7 @@ textarea {
   background: #41394f;
   color: #e8deff;
 }
+/* --- C · Main area --- */
 .matrix-main {
   padding: 0 38px 38px;
   max-width: 1560px;
@@ -1047,6 +1083,7 @@ textarea {
   padding: 0;
   border: 0;
 }
+/* --- C · Dark variants of shared controls --- */
 .matrix .button {
   background: #292b38;
   color: #e6e2f2;
@@ -1107,6 +1144,7 @@ textarea {
   color: #f0c487;
   border-color: #716044;
 }
+/* --- C · Comparison --- */
 .matrix .comparison-table thead th {
   background: #242632;
 }
@@ -1130,6 +1168,7 @@ textarea {
   background: #252733;
   color: #f0edf8;
 }
+/* --- C · Candidates and record --- */
 .matrix .candidate-chip.active {
   border-color: #8b79be;
   background: #292b38;
@@ -1149,6 +1188,7 @@ textarea {
 .matrix .vehicle-title h1 {
   font-size: 44px;
 }
+/* --- C · Fields and editor --- */
 .matrix .field select,
 .matrix .field input,
 .matrix .field textarea {
@@ -1169,6 +1209,7 @@ textarea {
 .matrix .editor-actions {
   border-color: #484557;
 }
+/* --- Comparison: heading and tools --- */
 /* Shared comparison: visual identity in the column headings, values kept compact. */
 .comparison-main {
   padding: 3px 0 0;
@@ -1205,6 +1246,7 @@ textarea {
   padding: 9px 13px;
   border-radius: 9px;
 }
+/* --- Comparison table --- */
 .comparison-scroll {
   border-radius: 16px;
   background: var(--white);
@@ -1221,6 +1263,7 @@ textarea {
 .comparison-table thead th:not(:first-child) {
   padding-top: 17px;
 }
+/* --- Comparison column heading: photo and candidate --- */
 .compare-visual {
   position: relative;
   overflow: hidden;
@@ -1235,6 +1278,7 @@ textarea {
   object-position: center 68%;
   border-radius: 10px;
 }
+/* Badge over the photo; !important overrides the per-status and per-concept status colours. */
 .compare-visual > .status {
   position: absolute;
   top: 9px;
@@ -1257,6 +1301,7 @@ textarea {
   font-size: 11px;
   margin: 6px 0 0;
 }
+/* !important: the label is a thead th and would otherwise take the header padding. */
 .comparison-table .comparison-label {
   vertical-align: bottom;
   font-size: 12px;
@@ -1269,6 +1314,7 @@ textarea {
   font-weight: 560;
   margin-bottom: 10px;
 }
+/* --- Comparison rows and cells --- */
 .comparison-table .group-label th {
   padding: 10px 20px;
   font-size: 11px;
@@ -1301,6 +1347,7 @@ textarea {
   width: 15px;
   opacity: 1;
 }
+/* --- Comparison footer --- */
 .comparison-footer {
   font-size: 11px;
   line-height: 1.7;
@@ -1356,11 +1403,13 @@ textarea {
 .inline-editor .editor-actions {
   gap: 9px;
 }
+/* --- Toast --- */
 .toast {
   background: #263348;
   font-size: 13px;
   border-radius: 10px;
 }
+/* --- Record details and empty thumbnails --- */
 .record .secondary-grid {
   grid-template-columns: 1fr;
   gap: 0;
@@ -1368,6 +1417,7 @@ textarea {
 .record .data-list div {
   padding: 13px 0;
 }
+/* Empty thumbnails keep only the car icon; the placeholder text does not fit. */
 .shortlist .thumbnail.image-empty {
   font-size: 0;
 }
@@ -1377,6 +1427,7 @@ textarea {
 .shortlist .thumbnail.image-empty span {
   display: none;
 }
+/* --- Responsive: from 1600px --- */
 @media (min-width: 1600px) {
   .gallery-options {
     gap: 26px;
@@ -1397,7 +1448,9 @@ textarea {
     grid-template-columns: 96px minmax(0, 1fr);
   }
 }
+/* --- Responsive: up to 1250px --- */
 @media (max-width: 1250px) {
+  /* --- Gallery --- */
   .gallery {
     padding: 30px;
   }
@@ -1421,6 +1474,7 @@ textarea {
     font-size: 12px;
     min-height: 100px;
   }
+  /* --- A · Studio --- */
   .work-area main {
     padding: 24px;
   }
@@ -1435,6 +1489,7 @@ textarea {
     padding-left: 7px;
     padding-right: 7px;
   }
+  /* --- Record and assessment list --- */
   .record {
     grid-template-columns: minmax(270px, 0.8fr) minmax(420px, 1.2fr);
     gap: 22px;
@@ -1464,6 +1519,7 @@ textarea {
   .assessment-row > .status {
     font-size: 9px;
   }
+  /* --- Shortlist --- */
   .candidate-chip .thumbnail {
     width: 52px;
     height: 40px;
@@ -1481,6 +1537,7 @@ textarea {
     font-size: 12px;
     padding: 10px;
   }
+  /* --- B · Canvas --- */
   .dossier-main {
     padding: 0 28px 35px;
   }
@@ -1495,6 +1552,7 @@ textarea {
     grid-template-columns: minmax(0, 1fr) 235px;
     gap: 30px;
   }
+  /* --- C · Focus and comparison --- */
   .matrix-main {
     padding: 0 28px 30px;
   }
@@ -1511,7 +1569,9 @@ textarea {
     font-size: 20px;
   }
 }
+/* --- Responsive: up to 1000px --- */
 @media (max-width: 1000px) {
+  /* --- Gallery --- */
   .gallery-heading {
     display: block;
   }
@@ -1531,6 +1591,7 @@ textarea {
   .direction p {
     min-height: 120px;
   }
+  /* --- Shortlist --- */
   .shortlist {
     align-items: stretch;
   }
@@ -1545,6 +1606,7 @@ textarea {
   .candidate-chip small {
     font-size: 9px;
   }
+  /* Icon-only add button: font-size 0 hides the label text next to the icon. */
   .shortlist > .button {
     font-size: 0;
     padding: 10px;
@@ -1553,6 +1615,7 @@ textarea {
   .shortlist > .button svg {
     width: 18px;
   }
+  /* --- Record: stage becomes a two-column grid --- */
   .record {
     display: block;
   }
@@ -1609,6 +1672,7 @@ textarea {
   .record-content {
     padding: 0 25px 25px;
   }
+  /* --- Assessment list --- */
   .assessment-row {
     grid-template-columns: minmax(150px, 1.2fr) minmax(100px, 0.7fr) 100px 16px;
     gap: 15px;
@@ -1628,6 +1692,7 @@ textarea {
   .tabs button {
     font-size: 13px;
   }
+  /* --- B · Canvas --- */
   .dossier-content {
     grid-template-columns: 1fr;
   }
@@ -1660,6 +1725,7 @@ textarea {
   .dossier .vehicle-stage .row-actions .button {
     flex: auto;
   }
+  /* --- B and C · Top navigation --- */
   .matrix .top-navigation,
   .dossier .top-navigation {
     gap: 25px;
@@ -1670,6 +1736,7 @@ textarea {
   .dossier .top-navigation nav {
     gap: 20px;
   }
+  /* --- Comparison --- */
   .comparison-heading h1 {
     font-size: 30px;
   }
@@ -1697,12 +1764,15 @@ textarea {
     font-size: 10px;
   }
 }
+/* --- Responsive: up to 700px --- */
 @media (max-width: 700px) {
+  /* --- Review bar and note --- */
   .review-bar {
     padding: 8px 13px;
     min-height: 44px;
     gap: 7px;
   }
+  /* The back link shrinks to its icon. */
   .review-bar > a {
     font-size: 0;
     gap: 0;
@@ -1731,6 +1801,7 @@ textarea {
     margin: 6px 0 10px;
     line-height: 1.7;
   }
+  /* --- Gallery --- */
   .gallery {
     padding: 25px 20px;
   }
@@ -1789,6 +1860,7 @@ textarea {
     display: block;
     margin-bottom: 10px;
   }
+  /* --- A · Studio: rail becomes a top bar --- */
   .product.workspace {
     display: block;
   }
@@ -1832,6 +1904,7 @@ textarea {
   .sidebar-bottom {
     display: none;
   }
+  /* --- Context bar and work area --- */
   .product .context-bar {
     height: 61px;
     padding: 0 18px;
@@ -1852,6 +1925,7 @@ textarea {
   .work-area main {
     padding: 20px 17px 28px;
   }
+  /* --- Shortlist --- */
   .shortlist {
     gap: 8px;
     margin-bottom: 24px;
@@ -1886,6 +1960,7 @@ textarea {
     min-height: 38px;
     padding: 8px;
   }
+  /* --- Record: stage stacks vertically --- */
   .vehicle-stage {
     display: flex;
     flex-direction: column;
@@ -1937,6 +2012,7 @@ textarea {
     font-size: 12px;
     min-height: 43px;
   }
+  /* --- Record content, tabs and filters --- */
   .record-content {
     padding: 0 17px 21px;
     border-radius: 14px;
@@ -1969,6 +2045,8 @@ textarea {
     padding: 4px 6px;
     min-height: 28px;
   }
+  /* --- Assessment list --- */
+  /* The status column is dropped; .mobile-state under the value takes its place. */
   .assessment-row,
   .dossier .assessment-row {
     grid-template-columns: minmax(105px, 1.15fr) minmax(85px, 0.85fr) 12px;
@@ -2002,6 +2080,7 @@ textarea {
     font-size: 10px;
     font-weight: 550;
   }
+  /* --- Assessment heading, summary and note --- */
   .assessment-heading {
     padding: 10px 0;
   }
@@ -2024,6 +2103,8 @@ textarea {
     margin-top: 17px;
     padding-top: 15px;
   }
+  /* --- B and C · Top navigation wraps, nav on its own row --- */
+  /* !important to win over the !important rule of the 960px block in design.css. */
   .dossier .top-navigation,
   .matrix .top-navigation {
     height: auto;
@@ -2055,6 +2136,7 @@ textarea {
     height: 30px;
     font-size: 10px;
   }
+  /* --- B · Canvas --- */
   .dossier .context-bar {
     height: 59px;
     padding: 0 20px;
@@ -2137,6 +2219,7 @@ textarea {
     padding: 20px 0;
     border-bottom: 1px solid var(--line);
   }
+  /* --- Inline editor --- */
   .dossier .inline-editor {
     margin: 10px -3px 15px;
     padding: 19px 14px;
@@ -2152,6 +2235,7 @@ textarea {
   .inline-editor .editor-heading p {
     font-size: 12px;
   }
+  /* --- C · Focus --- */
   .matrix-main {
     padding: 0 16px 30px;
   }
@@ -2169,6 +2253,7 @@ textarea {
   .matrix .record-content {
     padding: 0 16px 20px;
   }
+  /* --- Comparison --- */
   .comparison-main,
   .dossier .comparison-main,
   .matrix .comparison-main {
@@ -2278,6 +2363,7 @@ textarea {
     font-size: 10px;
     margin-top: 15px;
   }
+  /* --- Editor panel and fields --- */
   .editor-panel {
     width: 100%;
     max-width: none;
@@ -2306,6 +2392,7 @@ textarea {
   .field textarea {
     font-size: 15px;
   }
+  /* --- Offers --- */
   .finance-record {
     padding: 23px 18px;
   }
@@ -2329,14 +2416,17 @@ textarea {
     white-space: normal;
     font-size: 11px;
   }
+  /* --- Records outside the capture layout --- */
   .work-area main > .record {
     padding: 23px 17px;
   }
+  /* !important overrides the inline grid-template-columns that design.js sets on the criteria rows. */
   .work-area main > .record .assessment-row {
     grid-template-columns: minmax(95px, 1fr) minmax(90px, 1fr) 70px !important;
     font-size: 11px;
   }
 }
+/* --- Vehicle image entrance --- */
 @media (prefers-reduced-motion: no-preference) {
   .vehicle-image {
     animation: vehicle-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -2363,6 +2453,7 @@ textarea {
   background: #d1cfc6;
   object-position: center;
 }
+/* --- Responsive: up to 700px, B · Canvas stage --- */
 @media (max-width: 700px) {
   .dossier .vehicle-stage {
     gap: 0;
@@ -2374,7 +2465,9 @@ textarea {
     aspect-ratio: 1.65;
   }
 }
+/* --- Responsive: up to 700px, comparison with a sticky label column --- */
 @media (max-width: 700px) {
+  /* 136px label column + one candidate column fill the visible width; swipe for the second. */
   .comparison-table {
     width: calc(200% - 136px);
     min-width: 0;

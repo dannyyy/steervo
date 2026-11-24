@@ -1,3 +1,4 @@
+/* --- Design tokens --- */
 :root {
   font-family:
     "Avenir Next",
@@ -25,6 +26,7 @@
   --focus: #307b5b;
   --radius: 7px;
 }
+/* --- Base elements --- */
 * {
   box-sizing: border-box;
 }
@@ -106,6 +108,7 @@ textarea {
   scrollbar-width: thin;
   scrollbar-color: #b7c5bc transparent;
 }
+/* --- Icons --- */
 svg.icon {
   width: 18px;
   height: 18px;
@@ -120,6 +123,7 @@ button svg.icon {
   width: 16px;
   height: 16px;
 }
+/* --- Utilities --- */
 [hidden] {
   display: none !important;
 }
@@ -149,6 +153,7 @@ button svg.icon {
 .mono {
   font-variant-numeric: tabular-nums;
 }
+/* --- Brand --- */
 .brand {
   display: flex;
   align-items: center;
@@ -164,6 +169,7 @@ button svg.icon {
 .brand-dot {
   color: #98bc69;
 }
+/* --- Buttons --- */
 .button {
   display: inline-flex;
   justify-content: center;
@@ -206,6 +212,7 @@ button svg.icon {
 .icon-button:hover {
   background: var(--soft);
 }
+/* --- Status labels and pills --- */
 .status {
   display: inline-flex;
   align-items: center;
@@ -246,6 +253,7 @@ button svg.icon {
   color: #815820;
   background: #fffaf1;
 }
+/* --- Action rows and form fields --- */
 .row-actions {
   display: flex;
   align-items: center;
@@ -293,6 +301,7 @@ button svg.icon {
   color: var(--negative);
   font-size: 12px;
 }
+/* --- Notices, empty states and notes --- */
 .notice {
   padding: 11px 14px;
   border: 1px solid #e8d8b5;
@@ -325,6 +334,7 @@ button svg.icon {
   font-size: 11px;
   color: var(--muted);
 }
+/* --- Review bar and note --- */
 /* The review surface is outside the product UI. */
 .review-bar {
   min-height: 48px;
@@ -376,6 +386,7 @@ button svg.icon {
 .review-note span {
   color: var(--muted);
 }
+/* --- Direction gallery --- */
 .gallery {
   max-width: 1280px;
   padding: 54px 38px 45px;
@@ -418,6 +429,7 @@ button svg.icon {
   background: white;
   position: relative;
 }
+/* Each card embeds the whole concept (?concept=…&embed=1) at desktop size and scales it to a thumbnail; the surrounding link takes the clicks. */
 .direction-preview iframe {
   width: 1440px;
   height: 920px;
@@ -497,7 +509,9 @@ button svg.icon {
   font-size: 11px;
   color: var(--muted);
 }
+/* --- A · Workspace: shell and sidebar --- */
 /* A: a persistent workspace. */
+/* Fills the viewport below the 48px review bar. */
 .product {
   min-height: calc(100vh - 48px);
 }
@@ -578,6 +592,7 @@ button svg.icon {
   font-size: 11px;
   font-weight: 650;
 }
+/* --- A · Work area and context bar --- */
 .work-area {
   min-width: 0;
 }
@@ -605,6 +620,8 @@ button svg.icon {
   width: 13px;
   height: 13px;
 }
+/* --- A · Capture layout and candidate list --- */
+/* Viewport minus the 48px review bar and the 65px context bar. */
 .capture-layout {
   display: grid;
   grid-template-columns: 224px minmax(0, 1fr);
@@ -665,6 +682,7 @@ button svg.icon {
   color: var(--muted);
   line-height: 1.8;
 }
+/* --- Record: heading and tabs --- */
 .record {
   padding: 29px 32px 35px;
   background: #fff;
@@ -711,6 +729,7 @@ button svg.icon {
 .tabs button:hover {
   color: var(--accent);
 }
+/* --- Section toolbar and filters --- */
 .section-toolbar {
   display: flex;
   align-items: center;
@@ -744,6 +763,7 @@ button svg.icon {
 .filter-button:hover {
   background: var(--soft);
 }
+/* --- Assessment list --- */
 .assessment-heading {
   display: flex;
   justify-content: space-between;
@@ -760,6 +780,7 @@ button svg.icon {
   color: var(--ink);
   font-weight: 600;
 }
+/* Columns: criterion, value, status label, edit icon. */
 .assessment-row {
   width: 100%;
   display: grid;
@@ -806,6 +827,7 @@ button svg.icon {
   font-size: 11px;
   color: var(--muted);
 }
+/* --- Record notes, details and data lists --- */
 .record .notice {
   margin-bottom: 20px;
 }
@@ -851,6 +873,7 @@ button svg.icon {
   color: var(--muted);
   max-width: 65ch;
 }
+/* --- Offers --- */
 .offer-row {
   display: flex;
   justify-content: space-between;
@@ -891,6 +914,7 @@ button svg.icon {
 .offer-detail p {
   margin-bottom: 8px;
 }
+/* --- Settings and criteria --- */
 .settings-form {
   max-width: 480px;
   padding-top: 24px;
@@ -900,7 +924,9 @@ button svg.icon {
   font-size: 12px;
   color: var(--muted);
 }
+/* --- B · Dossier: palette and top navigation --- */
 /* B: a focused dossier with horizontal navigation and inline editing. */
+/* B re-tints the shared tokens; the components above pick them up through var(). */
 .dossier {
   --ink: #263c3d;
   --muted: #637170;
@@ -944,6 +970,7 @@ button svg.icon {
   margin-left: auto;
   background: #e7eeeb;
 }
+/* --- B · Context bar and candidate ribbon --- */
 .dossier .context-bar {
   border: 0;
   background: transparent;
@@ -984,6 +1011,7 @@ button svg.icon {
 .candidate-ribbon > .button {
   margin-left: auto;
 }
+/* --- B · Record and side column --- */
 .dossier .record {
   padding: 34px 38px 30px;
   border-radius: 9px;
@@ -1031,6 +1059,8 @@ button svg.icon {
   gap: 10px;
   padding: 16px 8px;
 }
+/* --- B · Inline editor --- */
+/* Opens inside the list, directly below the assessment row being edited. */
 .inline-editor {
   padding: 23px 22px;
   background: #eff4f2;
@@ -1060,12 +1090,14 @@ button svg.icon {
 .inline-editor .editor-form {
   max-width: none;
 }
+/* --- B · Comparison panel --- */
 .dossier .comparison-main {
   padding: 24px 32px 35px;
   background: #fff;
   border: 1px solid var(--line);
   border-radius: 9px;
 }
+/* --- C · Matrix: palette and top navigation --- */
 /* C: a wide, comparison-first desk. */
 .matrix {
   --ink: #263444;
@@ -1104,6 +1136,7 @@ button svg.icon {
   background: #d5e2ed;
   color: #22364b;
 }
+/* --- C · Main area, record and ribbon --- */
 .matrix-main {
   padding: 26px 36px 35px;
   max-width: 1500px;
@@ -1132,6 +1165,7 @@ button svg.icon {
   padding: 0;
   background: transparent;
 }
+/* --- Comparison: heading, tools and tabs --- */
 .comparison-main {
   padding: 28px 30px 40px;
   min-width: 0;
@@ -1171,6 +1205,7 @@ button svg.icon {
   color: var(--accent);
   font-weight: 600;
 }
+/* --- Comparison table --- */
 .comparison-scroll {
   overflow-x: auto;
   border: 1px solid var(--line);
@@ -1257,6 +1292,7 @@ button svg.icon {
   color: var(--muted);
   margin-top: 5px;
 }
+/* --- Comparison cells --- */
 .comparison-table .cell-edit {
   width: 100%;
   min-height: 78px;
@@ -1296,6 +1332,7 @@ button svg.icon {
   padding: 18px 22px;
   font-size: 13px;
 }
+/* --- Comparison footer --- */
 .comparison-footer {
   display: flex;
   justify-content: space-between;
@@ -1307,6 +1344,7 @@ button svg.icon {
 .comparison-footer p {
   max-width: 70ch;
 }
+/* --- C · Comparison overrides --- */
 .matrix .comparison-table thead th {
   padding: 24px 25px;
 }
@@ -1319,15 +1357,19 @@ button svg.icon {
 .matrix .comparison-tools {
   padding: 12px 0 0;
 }
+/* --- Comparison: inline editor row and empty state --- */
+/* In B the editor opens in a full-width row (colspan 3) and brings its own padding. */
 .comparison-editor-row > td {
   padding: 0 !important;
 }
+/* One full-width cell when a filter has no matches; !important beats the left alignment of .comparison-table td. */
 .compare-empty {
   padding: 30px !important;
   text-align: center !important;
   font-weight: 400 !important;
   color: var(--muted);
 }
+/* --- Editor panel --- */
 /* Shared contextual editing, also used to add a candidate. */
 .editor-shade {
   position: fixed;
@@ -1385,6 +1427,7 @@ button svg.icon {
 .editor-panel .demo-note {
   margin-top: 20px;
 }
+/* --- Toast --- */
 .toast {
   position: fixed;
   bottom: 24px;
@@ -1405,6 +1448,7 @@ button svg.icon {
   width: 15px;
   height: 15px;
 }
+/* --- Animations --- */
 @keyframes panel-in {
   from {
     transform: translateX(30px);
@@ -1423,6 +1467,7 @@ button svg.icon {
     opacity: 1;
   }
 }
+/* --- Responsive: from 1550px --- */
 @media (min-width: 1550px) {
   .record {
     padding: 36px 45px;
@@ -1434,7 +1479,9 @@ button svg.icon {
     grid-template-columns: 210px minmax(0, 1fr);
   }
 }
+/* --- Responsive: up to 1200px --- */
 @media (max-width: 1200px) {
+  /* --- A · Workspace --- */
   .product.workspace {
     grid-template-columns: 168px minmax(0, 1fr);
   }
@@ -1457,6 +1504,7 @@ button svg.icon {
     align-items: flex-end;
     padding-top: 0;
   }
+  /* --- B · Dossier --- */
   .dossier-main {
     padding: 0 28px 35px;
   }
@@ -1467,6 +1515,7 @@ button svg.icon {
   .dossier .record {
     padding: 28px;
   }
+  /* --- Gallery --- */
   .gallery {
     padding-left: 28px;
     padding-right: 28px;
@@ -1477,11 +1526,14 @@ button svg.icon {
   .direction-preview iframe {
     transform: scale(0.23);
   }
+  /* --- B · Candidate chips --- */
   .candidate-chip .status {
     display: none;
   }
 }
+/* --- Responsive: up to 960px --- */
 @media (max-width: 960px) {
+  /* --- A · Workspace --- */
   .product.workspace {
     grid-template-columns: 145px minmax(0, 1fr);
   }
@@ -1497,6 +1549,7 @@ button svg.icon {
     font-size: 11px;
     gap: 8px;
   }
+  /* Candidates become a horizontal strip above the record. */
   .capture-layout {
     display: block;
   }
@@ -1530,6 +1583,7 @@ button svg.icon {
     flex-direction: row;
     padding-top: 15px;
   }
+  /* --- B · Dossier --- */
   .dossier-content {
     grid-template-columns: 1fr;
   }
@@ -1544,6 +1598,7 @@ button svg.icon {
     border: 0;
     padding: 0;
   }
+  /* --- Gallery --- */
   .gallery-options {
     gap: 18px;
   }
@@ -1566,14 +1621,18 @@ button svg.icon {
   .direction p {
     min-height: 90px;
   }
+  /* --- B and C · Top navigation --- */
+  /* !important: this plain selector has to beat .dossier and .matrix .top-navigation. */
   .top-navigation {
     gap: 22px !important;
     padding-left: 26px !important;
     padding-right: 26px !important;
   }
+  /* --- C · Matrix --- */
   .matrix-main {
     padding: 24px;
   }
+  /* --- Review note --- */
   .review-note {
     padding: 12px 22px;
     gap: 14px;
@@ -1581,6 +1640,7 @@ button svg.icon {
   .review-note span {
     max-width: 60%;
   }
+  /* --- Comparison table --- */
   .comparison-table thead th {
     padding: 16px;
   }
@@ -1591,7 +1651,9 @@ button svg.icon {
     padding: 16px;
   }
 }
+/* --- Responsive: up to 700px --- */
 @media (max-width: 700px) {
+  /* --- Type and review bar --- */
   h1 {
     font-size: 25px;
   }
@@ -1622,6 +1684,7 @@ button svg.icon {
     font-size: 11px;
     margin-top: 3px;
   }
+  /* --- A · Sidebar becomes a scrolling tab strip --- */
   .product.workspace {
     display: block;
   }
@@ -1653,6 +1716,7 @@ button svg.icon {
   .side-nav .nav-count {
     display: none;
   }
+  /* --- A · Context bar and candidates --- */
   .context-bar {
     height: 51px;
     padding: 0 18px;
@@ -1667,6 +1731,7 @@ button svg.icon {
   .candidate-link {
     min-width: 157px;
   }
+  /* --- Record and assessment list --- */
   .record {
     padding: 22px 17px;
   }
@@ -1701,6 +1766,7 @@ button svg.icon {
     font-size: 10px;
     padding: 5px 7px;
   }
+  /* The status column is dropped; .mobile-state under the value takes its place. */
   .assessment-row,
   .dossier .assessment-row {
     grid-template-columns: minmax(120px, 1.1fr) minmax(75px, 0.8fr) 16px;
@@ -1730,6 +1796,8 @@ button svg.icon {
   .record-bottom-note {
     font-size: 10px;
   }
+  /* --- B and C · Top navigation wraps, nav on its own row --- */
+  /* !important to win over the !important rule of the 960px block. */
   .dossier .top-navigation,
   .matrix .top-navigation {
     height: auto;
@@ -1750,6 +1818,7 @@ button svg.icon {
   .top-navigation .avatar {
     margin-bottom: 3px;
   }
+  /* --- B · Dossier --- */
   .dossier .context-bar {
     height: 55px;
     padding: 0 18px;
@@ -1791,6 +1860,7 @@ button svg.icon {
     padding: 15px 0;
     border-bottom: 1px solid var(--line);
   }
+  /* --- Forms and inline editor --- */
   .inline-editor {
     padding: 18px 12px;
   }
@@ -1808,6 +1878,7 @@ button svg.icon {
   .inline-editor .editor-heading h2 {
     font-size: 17px;
   }
+  /* --- C · Matrix --- */
   .matrix-main {
     padding: 18px 14px 30px;
   }
@@ -1817,6 +1888,7 @@ button svg.icon {
   .matrix .record {
     padding: 20px 16px;
   }
+  /* --- Comparison --- */
   .comparison-main,
   .dossier .comparison-main {
     padding: 22px 16px;
@@ -1842,6 +1914,7 @@ button svg.icon {
   .comparison-scroll {
     border-radius: 5px;
   }
+  /* Keeps both candidate columns readable; .comparison-scroll scrolls sideways. */
   .comparison-table {
     min-width: 580px;
   }
@@ -1875,10 +1948,12 @@ button svg.icon {
     margin-top: 10px;
     color: var(--accent);
   }
+  /* --- Editor panel --- */
   .editor-panel {
     width: 100%;
     padding: 24px 20px;
   }
+  /* --- Gallery --- */
   .gallery {
     padding: 27px 20px;
   }
@@ -1932,6 +2007,7 @@ button svg.icon {
     display: block;
     line-height: 1.8;
   }
+  /* --- Toast and offers --- */
   .toast {
     width: max-content;
     max-width: calc(100% - 30px);
@@ -1948,6 +2024,7 @@ button svg.icon {
     font-size: 9px;
   }
 }
+/* --- Reduced motion --- */
 @media (prefers-reduced-motion: reduce) {
   *,
   *:before,
@@ -1958,6 +2035,8 @@ button svg.icon {
   }
 }
 
+/* --- Phone status text and comparison swipe hint --- */
+/* Hidden by default; shown below 700px, where the status column is dropped. */
 .assessment-row .mobile-state {
   display: none;
 }
@@ -1983,6 +2062,7 @@ button svg.icon {
   }
 }
 
+/* --- Skip link: visually hidden until focused --- */
 .skip-link:not(:focus) {
   clip-path: inset(50%);
   width: 1px;
@@ -1990,7 +2070,9 @@ button svg.icon {
   padding: 0;
   overflow: hidden;
 }
+/* --- Candidate strip heading up to 960px --- */
 @media (max-width: 960px) {
+  /* Only the add button remains, pinned to the left edge of the horizontally scrolling strip. */
   .candidate-list-heading {
     display: flex;
     flex: 0 0 40px;

@@ -5,6 +5,7 @@
 - Der gesamte Code ist mit CSharpier und Prettier formatiert und auf Lesbarkeit überarbeitet; Regeln und Befehle stehen in [Code-Stil und Lesbarkeit](docs/code-style.md). `scripts/test.sh` prüft die Formatierung mit.
 - Ein abgelehntes Umbenennen einer Evaluation lässt Name und Zweck unverändert. Eine Datei mit unzulässiger Grösse wird beim Ersetzen eines Dokuments wie beim Hinzufügen als ungültiges Dokument abgelehnt.
 - Die Browserprüfungen laufen auch im HTTPS-Modus wieder vollständig durch.
+- Die Designprototypen unter `prototypes/design/` sind ebenfalls auf Lesbarkeit überarbeitet; zwei von keiner Seite geladene Stylesheet-Kopien sind entfernt.
 - Raten-Kontrolle: Leasing- und Finanzierungsofferten zeigen, ob die erfasste Rate aus Preis, Anzahlung, Restwert, Laufzeit und Zins folgt, und nennen sonst die Differenz.
 - Gratisleistungen einer Offerte mit Kostenbereich und Laufzeit decken im Kostenvergleich die passenden Zusatzkosten für diese Monate; das Szenario nennt die gedeckten Bereiche, eine eigene Anpassung hat Vorrang.
 - Kriterien sind in Fahrzeugkriterien und Offertenkriterien gegliedert; Gruppen sind sichtbar abgesetzt, sortiert wird innerhalb eines Abschnitts. Der dauerhaft sichtbare Sortierhinweis entfällt.
