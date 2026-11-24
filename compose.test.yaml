@@ -2,7 +2,8 @@ name: steervo-tests
 services:
   postgres17:
     image: postgres:17-alpine@sha256:c7526c0f6c3f30260a563d7bcf8ad778effac59a44f8ffa86678c35418338609
-    environment: { POSTGRES_USER: steervo, POSTGRES_PASSWORD: steervo-local-only, POSTGRES_DB: steervo }
+    environment:
+      { POSTGRES_USER: steervo, POSTGRES_PASSWORD: steervo-local-only, POSTGRES_DB: steervo }
     ports: ["127.0.0.1:55437:5432"]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U steervo -d steervo"]
@@ -11,7 +12,8 @@ services:
       retries: 30
   postgres18:
     image: postgres:18-alpine@sha256:d3e1620b530c944afa6e887d22eb899824da68e19c52024bf98f5220c88a65b2
-    environment: { POSTGRES_USER: steervo, POSTGRES_PASSWORD: steervo-local-only, POSTGRES_DB: steervo }
+    environment:
+      { POSTGRES_USER: steervo, POSTGRES_PASSWORD: steervo-local-only, POSTGRES_DB: steervo }
     ports: ["127.0.0.1:55438:5432"]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U steervo -d steervo"]

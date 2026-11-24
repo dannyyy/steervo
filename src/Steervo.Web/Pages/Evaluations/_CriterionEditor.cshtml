@@ -1,15 +1,19 @@
 @model Steervo.Web.Pages.Evaluations.CriterionEditor
-@using Steervo.Web.Pages.Shared
-@{
-    var c = Model.Criterion; var workspace = Model.Workspace; var e = workspace.Evaluation;
-    var prefix = c?.Id.ToString() ?? "new"; var action = c is null ? "add-criterion" : "edit-criterion";
-    var failed = workspace.DraftFor(action, c?.Id ?? default) is not null || (c is not null && workspace.FailedAction == "remove-criterion" && workspace.FailedItemId == c.Id);
-}
-@if (c is null)
+@if (Model.IsNew)
 {
     <partial name="_CriterionEditorFields" model="Model" />
 }
 else
 {
-    <div id="criterion-editor-@prefix" class="inline-editor" data-editor data-opener="edit-criterion-@prefix" data-focus-fallback="criteria-title" hidden="@(!failed)" aria-labelledby="criterion-title-@prefix"><partial name="_CriterionEditorFields" model="Model" /></div>
+    <div
+        id="criterion-editor-@Model.Prefix"
+        class="inline-editor"
+        data-editor
+        data-opener="edit-criterion-@Model.Prefix"
+        data-focus-fallback="criteria-title"
+        hidden="@(!Model.Failed)"
+        aria-labelledby="criterion-title-@Model.Prefix"
+    >
+        <partial name="_CriterionEditorFields" model="Model" />
+    </div>
 }

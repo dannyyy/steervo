@@ -49,6 +49,6 @@ Fachregeln und Zugriffsrechte werden mit automatisierten Tests geprüft, einschl
 
 ## Stil
 
-Richte dich am umgebenden Code aus. Kein eigener Formatierungsstil, keine grossflächigen Umformatierungen in einem inhaltlichen Pull Request.
+Formatierung und Lesbarkeit sind in [Code-Stil und Lesbarkeit](docs/code-style.md) festgelegt. `./scripts/format.sh` formatiert mit CSharpier und Prettier; `./scripts/format.sh --check` muss vor einem Pull Request fehlerfrei durchlaufen. Aufräumen und inhaltliche Änderung gehören in getrennte Commits.
 
 Code, Kommentare und Datenbankbezeichner bleiben Englisch. Die Oberfläche ist zuerst Deutsch; sichtbare Texte gehören in die Ressourcen unter `src/Steervo.Web/Resources/Ui.resx`.

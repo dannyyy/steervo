@@ -1,48 +1,451 @@
 @page "/evaluations/{id:guid}/scenarios/{scenarioId:guid}"
 @model Steervo.Web.Pages.Evaluations.Scenarios.DetailsModel
 @using Steervo.Web.Pages.Evaluations.Scenarios
-@{ var e = Model.Evaluation; var s = Model.Scenario; var offer = e.FindOffer(s.OfferId); var edit = Model.Access >= AccessLevel.Editor; ViewData["Title"] = s.Name; string Money(decimal? value) => value.HasValue ? $"{value:N2} {e.Currency}" : T["OfferOpen"].Value; }
-<div id="scenario-detail" data-version="@e.Version">
-<partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "scenarios")' />
-<a class="back-link" asp-page="Index" asp-route-id="@e.Id"><partial name="/Pages/Shared/_Icon.cshtml" model='"back"' />@T["ScenarioAll"]</a>
-<section class="workspace-surface scenario-record"><div class="surface-heading scenario-introduction"><div><h2 id="scenario-title" tabindex="-1" data-return-focus>@s.Name</h2><p class="muted">@e.FindCandidate(offer.CandidateId).DisplayName · <a asp-page="/Evaluations/Offers/Details" asp-route-id="@e.Id" asp-route-offerId="@offer.Id" asp-route-revision="@s.RevisionNumber">@offer.Revision(s.RevisionNumber).Terms.Name · @T["ScenarioVersion", s.RevisionNumber] ↗</a></p></div><div class="surface-actions">@if (edit) { <a class="button primary" asp-page="Edit" asp-route-id="@e.Id" asp-route-scenarioId="@s.Id" asp-route-leftId="@Model.LeftId" asp-route-rightId="@Model.RightId" asp-route-month="@Model.Month" asp-route-period="@Model.Period" asp-route-pageNumber="@Model.PageNumber">@T["ScenarioEdit"]</a> }<a class="button secondary" asp-page="Compare" asp-route-id="@e.Id" asp-route-leftId="@Model.LeftId" asp-route-rightId="@Model.RightId" asp-route-focus="@s.Id" asp-route-month="@Model.Month">@T["ScenarioCompare"]</a></div></div>
-<nav class="record-sections" aria-label="@T["ScenarioContents"]"><a href="#scenario-result">@T["ScenarioResultTitle"]</a>@if (s.Terms.Mode != AcquisitionMode.LeaseReturn) { <a href="#scenario-residuals">@T["ScenarioResiduals"]</a> }<a href="#scenario-adjustments">@T["ScenarioAdjustments"]</a><a href="#scenario-payments">@T["ScenarioPaymentSchedule"]</a></nav>
-@if (offer.Latest.Number != s.RevisionNumber) { <p class="notice scenario-convention">@T["ScenarioNewOfferVersion", offer.Latest.Number]</p> }
-@if (Model.Notice is not null && Model.FailedAction is not ("residual" or "adjustment" or "copy")) { <p class="notice failure" role="alert">@Model.Notice</p> }
-<form method="get" class="scenario-horizon"><input name="leftId" value="@Model.LeftId" type="hidden" /><input name="rightId" value="@Model.RightId" type="hidden" /><input name="period" value="@Model.Period" type="hidden" /><div><label for="scenario-month">@T["ScenarioCheckpoint"]</label><input id="scenario-month" name="month" value="@Model.Month" type="number" min="1" max="@e.CostPlanning!.Months" required /></div><button class="button secondary">@T["ScenarioCalculate"]</button><p class="micro">@T["ScenarioHorizonHelp", e.CostPlanning!.Start.ToString("MM.yyyy"), e.CostPlanning!.Months]</p></form>
-<div class="scenario-detail-grid" id="scenario-result"><partial name="_Result" model="new ScenarioPanel(e, s, Model.Result)" />
-<section class="scenario-components"><h3>@T["CalculationComposition"]</h3><p class="micro">@T["CalculationCompositionHelp"]</p><dl class="scenario-result-values">@foreach (var component in Model.Result.Components) { <div><dt>@(component.Name ?? T[component.Code].Value)</dt><dd>@(component.Complete ? Money(component.NetPayments) : T["OfferOpen"].Value)<small>@T["CalculationOpportunityShort"]: @(component.Complete && Model.Result.Issues.Count == 0 ? Money(component.OpportunityCost) : T["OfferOpen"].Value)</small></dd></div> }</dl>
-@if (s.Notes.Length > 0) { <h4>@T["ScenarioNotes"]</h4><p class="scenario-note">@s.Notes</p> }
-<p class="micro">@T["ScenarioLiveCosts"] <a asp-page="/Evaluations/Costs/Index" asp-route-id="@e.Id" asp-route-candidateId="@offer.CandidateId">@T["Costs"] →</a></p></section></div>
-@if (s.Terms.Mode != AcquisitionMode.LeaseReturn)
-{
-<section class="record-section scenario-section" id="scenario-residuals" tabindex="-1" data-return-focus><div class="surface-heading"><h3>@T["ScenarioResiduals"]</h3>@if (edit) { <button type="button" class="button secondary" id="open-residual" data-editor-open="residual-editor" aria-controls="residual-editor" aria-expanded="false">@T["ResidualAdd"]</button> }</div><p class="muted">@T["ScenarioResidualHelp"]</p>
-@if (s.Terms.AnnualKilometres is { } kilometres) { <p class="micro">@T["ScenarioResidualMileage", kilometres.ToString("N0")]</p> }
-<p class="micro">@T["ScenarioResidualMileageHelp"]</p>
-<div class="scenario-checkpoints">@foreach (var point in s.Residuals.OrderBy(r => r.Month)) { <article data-residual-month="@point.Month"><div><strong>@T["CostFromMonth", point.Month] · @e.CostPlanning!.DateFor(point.Month).ToString("MM.yyyy")</strong><p class="micro">@T["ResidualLow"]: @Money(point.Low) · @T["ResidualExpected"]: @Money(point.Expected) · @T["ResidualHigh"]: @Money(point.High)</p>@if (point.Notes.Length > 0) { <p class="scenario-note">@point.Notes</p> }</div>
-@if (edit) { <div class="scenario-inline-actions"><a asp-page="Details" asp-route-id="@e.Id" asp-route-scenarioId="@s.Id" asp-route-month="@Model.Month" id="edit-residual-@point.Month" asp-route-residualMonth="@point.Month" asp-route-leftId="@Model.LeftId" asp-route-rightId="@Model.RightId" asp-route-period="@Model.Period" asp-route-pageNumber="@Model.PageNumber" asp-fragment="residual-form">@T["Edit"]</a><form id="remove-residual-@point.Month" method="post" hx-post="@Model.ContextUrl" hx-swap="none" hx-sync="this:drop" hx-disabled-elt="find button[type=submit]" data-operation data-retain-on-error data-confirm-action="@T["ResidualDeleteNamed", T["CostFromMonth", point.Month].Value]" data-confirm-description="@T["ResidualDeleteConfirm"]"><input type="hidden" name="action" value="remove-residual" /><input type="hidden" name="Version" value="@e.Version" /><input type="hidden" name="residualMonth" value="@point.Month" /><button type="submit" class="text-button danger">@T["ResidualDelete"]</button></form></div> }</article> }</div>
-@if (edit)
-{
-<partial name="_ResidualEditor" model="Model" />
+@{
+    var evaluation = Model.Evaluation;
+    var scenario = Model.Scenario;
+    var offer = Model.Offer;
+    var openLabel = T["OfferOpen"].Value;
+    ViewData["Title"] = scenario.Name;
+
+    string Money(decimal? value) =>
+        value.HasValue ? $"{value:N2} {evaluation.Currency}" : openLabel;
+
+    // Amounts that depend on the opportunity calculation stay open while the calculation has issues.
+    string MoneyWhenCalculated(decimal? value) =>
+        Model.CalculationComplete ? Money(value) : openLabel;
 }
-</section>
-}
-<section class="record-section scenario-section" id="scenario-adjustments" tabindex="-1" data-return-focus><div class="surface-heading"><h3>@T["ScenarioAdjustments"]</h3>@if (edit && Model.Costs.Count > 0) { <button type="button" class="button secondary" id="open-adjustment" data-editor-open="adjustment-editor" aria-controls="adjustment-editor" aria-expanded="false">@T["AdjustmentAdd"]</button> }</div><p class="muted">@T["ScenarioAdjustmentsHelp"]</p>
-@{ var coveredCosts = Steervo.Calculations.ScenarioCalculation.CoveredCosts(e, s); }
-@if (coveredCosts.Count > 0) { <div class="scenario-covered" data-covered-costs><p class="micro">@T["ScenarioCoveredCosts"]</p><ul>@foreach (var item in coveredCosts) { <li>@T["ScenarioCoveredCost", item.Name, T["CostCategory" + item.Category].Value, item.Months]</li> }</ul></div> }
-<div class="scenario-checkpoints">@foreach (var adjustment in s.CostAdjustments.OrderBy(a => e.FindCost(a.CostId).Name)) { <article data-adjusted-cost="@adjustment.CostId"><div><strong>@e.FindCost(adjustment.CostId).Name · @Money(adjustment.Amount)</strong><p class="micro">@T["CostFromMonth", adjustment.StartMonth] @if (adjustment.EndMonth.HasValue) { <span>– @T["CostThroughMonth", adjustment.EndMonth.Value]</span> }</p>@if (adjustment.Notes.Length > 0) { <p class="scenario-note">@adjustment.Notes</p> }</div>
-@if (edit) { <div class="scenario-inline-actions"><a asp-page="Details" asp-route-id="@e.Id" asp-route-scenarioId="@s.Id" asp-route-month="@Model.Month" id="edit-adjustment-@adjustment.CostId" asp-route-costId="@adjustment.CostId" asp-route-leftId="@Model.LeftId" asp-route-rightId="@Model.RightId" asp-route-period="@Model.Period" asp-route-pageNumber="@Model.PageNumber" asp-fragment="adjustment-form">@T["Edit"]</a><form id="remove-adjustment-@adjustment.CostId" method="post" hx-post="@Model.ContextUrl" hx-swap="none" hx-sync="this:drop" hx-disabled-elt="find button[type=submit]" data-operation data-retain-on-error data-confirm-action="@T["AdjustmentDeleteNamed", e.FindCost(adjustment.CostId).Name]" data-confirm-description="@T["AdjustmentDeleteConfirm"]"><input type="hidden" name="action" value="remove-adjustment" /><input type="hidden" name="Version" value="@e.Version" /><input type="hidden" name="costId" value="@adjustment.CostId" /><button type="submit" class="text-button danger">@T["AdjustmentDelete"]</button></form></div> }</article> }</div>
-@if (edit && Model.Costs.Count > 0)
-{
-<partial name="_AdjustmentEditor" model="Model" />
-}
-</section>
-<section class="record-section scenario-section"><div class="cost-timeline-heading"><div><h3>@T["ScenarioPaymentSchedule"]</h3><p class="micro">@T["ScenarioScheduleHelp"]</p></div><nav class="cost-period-switch" aria-label="@T["CostDisplay"]"><a asp-page="Details" asp-route-id="@e.Id" asp-route-scenarioId="@s.Id" asp-route-month="@Model.Month" asp-route-leftId="@Model.LeftId" asp-route-rightId="@Model.RightId" asp-route-period="month" asp-fragment="scenario-payments" aria-current="@(Model.Period == "month" ? "page" : null)">@T["CostMonthlyView"]</a><a asp-page="Details" asp-route-id="@e.Id" asp-route-scenarioId="@s.Id" asp-route-month="@Model.Month" asp-route-leftId="@Model.LeftId" asp-route-rightId="@Model.RightId" asp-route-period="year" asp-fragment="scenario-payments" aria-current="@(Model.Period == "year" ? "page" : null)">@T["CostYearlyView"]</a></nav></div>
-<p class="comparison-scroll-hint" id="scenario-payments-hint">@T["FinancialScrollHint"]</p>
-<div id="scenario-payments" class="cost-table-scroll" tabindex="0" role="region" aria-describedby="scenario-payments-hint" aria-label="@T["ScenarioPaymentSchedule"]"><table class="cost-table scenario-payment-table"><thead><tr><th scope="col">@T["CostPeriod"]</th><th scope="col">@T["ScenarioStartPayments"]</th><th scope="col">@T["ScenarioEndPayments"]</th><th scope="col">@T["ScenarioAccountInterest"]</th><th scope="col">@T["CalculationAccount"]</th><th scope="col">@T["CalculationRemainingDebt"]</th></tr></thead><tbody>
-@foreach (var rows in Model.Periods) { var last = rows[^1]; <tr data-payment-month="@rows[0].Month"><th scope="row">@e.CostPlanning!.DateFor(rows[0].Month).ToString(Model.Period == "year" ? "yyyy" : "MM.yyyy")<span class="micro">@T["CostMonthRange", rows[0].Month, last.Month]</span></th><td>@Money(rows.Sum(m => m.StartExpenses - m.StartIncome))</td><td>@Money(rows.Sum(m => m.EndExpenses - m.EndIncome))</td><td>@(Model.Result.Issues.Count == 0 ? Money(rows.Sum(m => m.Interest)) : T["OfferOpen"].Value)</td><td>@(Model.Result.Issues.Count == 0 ? Money(last.Account) : T["OfferOpen"].Value)</td><td>@(Model.Result.Issues.Count == 0 ? Money(last.Debt) : T["OfferOpen"].Value)</td></tr> }
-</tbody></table></div>
-@if (Model.PageCount > 1) { <nav class="cost-pagination" aria-label="@T["CostPages"]">@if (Model.PageNumber > 1) { <a asp-page="Details" asp-route-id="@e.Id" asp-route-scenarioId="@s.Id" asp-route-month="@Model.Month" asp-route-period="@Model.Period" asp-route-leftId="@Model.LeftId" asp-route-rightId="@Model.RightId" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-fragment="scenario-payments">← @T["CostPrevious"]</a> }<span>@T["CostPage", Model.PageNumber, Model.PageCount]</span>@if (Model.PageNumber < Model.PageCount) { <a asp-page="Details" asp-route-id="@e.Id" asp-route-scenarioId="@s.Id" asp-route-month="@Model.Month" asp-route-period="@Model.Period" asp-route-leftId="@Model.LeftId" asp-route-rightId="@Model.RightId" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-fragment="scenario-payments">@T["CostNext"] →</a> }</nav> }</section>
-@if (edit) { <button type="button" class="text-button" id="open-scenario-copy" data-editor-open="scenario-copy-editor" aria-controls="scenario-copy-editor" aria-expanded="false">@T["ScenarioCopy"]</button><partial name="_CopyEditor" model="Model" /> }
-</section>
+<div id="scenario-detail" data-version="@evaluation.Version">
+    <partial
+        name="/Pages/Evaluations/_EvaluationHeader.cshtml"
+        model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(evaluation, Model.Access, "scenarios")'
+    />
+    <a class="back-link" asp-page="Index" asp-route-id="@evaluation.Id">
+        <partial name="/Pages/Shared/_Icon.cshtml" model='"back"' />@T["ScenarioAll"]
+    </a>
+    <section class="workspace-surface scenario-record">
+        <div class="surface-heading scenario-introduction">
+            <div>
+                <h2 id="scenario-title" tabindex="-1" data-return-focus>@scenario.Name</h2>
+                <p class="muted">
+                    @evaluation.FindCandidate(offer.CandidateId).DisplayName ·
+                    <a
+                        asp-page="/Evaluations/Offers/Details"
+                        asp-route-id="@evaluation.Id"
+                        asp-route-offerId="@offer.Id"
+                        asp-route-revision="@scenario.RevisionNumber"
+                    >@offer.Revision(scenario.RevisionNumber).Terms.Name · @T["ScenarioVersion", scenario.RevisionNumber] ↗</a>
+                </p>
+            </div>
+            <div class="surface-actions">
+                @if (Model.CanEdit)
+                {
+                    <a
+                        class="button primary"
+                        asp-page="Edit"
+                        asp-route-id="@evaluation.Id"
+                        asp-route-scenarioId="@scenario.Id"
+                        asp-route-leftId="@Model.LeftId"
+                        asp-route-rightId="@Model.RightId"
+                        asp-route-month="@Model.Month"
+                        asp-route-period="@Model.Period"
+                        asp-route-pageNumber="@Model.PageNumber"
+                    >
+                        @T["ScenarioEdit"]
+                    </a>
+                }
+                <a
+                    class="button secondary"
+                    asp-page="Compare"
+                    asp-route-id="@evaluation.Id"
+                    asp-route-leftId="@Model.LeftId"
+                    asp-route-rightId="@Model.RightId"
+                    asp-route-focus="@scenario.Id"
+                    asp-route-month="@Model.Month"
+                >
+                    @T["ScenarioCompare"]
+                </a>
+            </div>
+        </div>
+        <nav class="record-sections" aria-label="@T["ScenarioContents"]">
+            <a href="#scenario-result">@T["ScenarioResultTitle"]</a>
+            @if (Model.KeepsVehicle)
+            {
+                <a href="#scenario-residuals">@T["ScenarioResiduals"]</a>
+            }
+            <a href="#scenario-adjustments">@T["ScenarioAdjustments"]</a>
+            <a href="#scenario-payments">@T["ScenarioPaymentSchedule"]</a>
+        </nav>
+        @if (Model.OfferHasNewerRevision)
+        {
+            <p class="notice scenario-convention">@T["ScenarioNewOfferVersion", offer.Latest.Number]</p>
+        }
+        @if (Model.ShowPageNotice)
+        {
+            <p class="notice failure" role="alert">@Model.Notice</p>
+        }
+        <form method="get" class="scenario-horizon">
+            <input name="leftId" value="@Model.LeftId" type="hidden" />
+            <input name="rightId" value="@Model.RightId" type="hidden" />
+            <input name="period" value="@Model.Period" type="hidden" />
+            <div>
+                <label for="scenario-month">@T["ScenarioCheckpoint"]</label>
+                <input
+                    id="scenario-month"
+                    name="month"
+                    value="@Model.Month"
+                    type="number"
+                    min="1"
+                    max="@evaluation.CostPlanning!.Months"
+                    required
+                />
+            </div>
+            <button class="button secondary">@T["ScenarioCalculate"]</button>
+            <p class="micro">@T["ScenarioHorizonHelp", evaluation.CostPlanning!.Start.ToString("MM.yyyy"), evaluation.CostPlanning!.Months]</p>
+        </form>
+        <div class="scenario-detail-grid" id="scenario-result">
+            <partial name="_Result" model="new ScenarioPanel(evaluation, scenario, Model.Result)" />
+            <section class="scenario-components">
+                <h3>@T["CalculationComposition"]</h3>
+                <p class="micro">@T["CalculationCompositionHelp"]</p>
+                <dl class="scenario-result-values">
+                    @foreach (var component in Model.Result.Components)
+                    {
+                        var netPayments = component.Complete ? Money(component.NetPayments) : openLabel;
+                        var opportunityCost = component.Complete ? MoneyWhenCalculated(component.OpportunityCost) : openLabel;
+                        <div>
+                            <dt>@(component.Name ?? T[component.Code].Value)</dt>
+                            <dd>@netPayments<small>@T["CalculationOpportunityShort"]: @opportunityCost</small></dd>
+                        </div>
+                    }
+                </dl>
+                @if (scenario.Notes.Length > 0)
+                {
+                    <h4>@T["ScenarioNotes"]</h4>
+                    <p class="scenario-note">@scenario.Notes</p>
+                }
+                <p class="micro">
+                    @T["ScenarioLiveCosts"]
+                    <a
+                        asp-page="/Evaluations/Costs/Index"
+                        asp-route-id="@evaluation.Id"
+                        asp-route-candidateId="@offer.CandidateId"
+                    >@T["Costs"] →</a>
+                </p>
+            </section>
+        </div>
+        @if (Model.KeepsVehicle)
+        {
+            <section
+                class="record-section scenario-section"
+                id="scenario-residuals"
+                tabindex="-1"
+                data-return-focus
+            >
+                <div class="surface-heading">
+                    <h3>@T["ScenarioResiduals"]</h3>
+                    @if (Model.CanEdit)
+                    {
+                        <button
+                            type="button"
+                            class="button secondary"
+                            id="open-residual"
+                            data-editor-open="residual-editor"
+                            aria-controls="residual-editor"
+                            aria-expanded="false"
+                        >
+                            @T["ResidualAdd"]
+                        </button>
+                    }
+                </div>
+                <p class="muted">@T["ScenarioResidualHelp"]</p>
+                @if (scenario.Terms.AnnualKilometres is { } kilometres)
+                {
+                    <p class="micro">@T["ScenarioResidualMileage", kilometres.ToString("N0")]</p>
+                }
+                <p class="micro">@T["ScenarioResidualMileageHelp"]</p>
+                <div class="scenario-checkpoints">
+                    @foreach (var checkpoint in Model.SortedResiduals)
+                    {
+                        <article data-residual-month="@checkpoint.Month">
+                            <div>
+                                <strong>@T["CostFromMonth", checkpoint.Month] · @Model.MonthLabel(checkpoint.Month)</strong>
+                                <p class="micro">
+                                    @T["ResidualLow"]: @Money(checkpoint.Low) ·
+                                    @T["ResidualExpected"]: @Money(checkpoint.Expected) ·
+                                    @T["ResidualHigh"]: @Money(checkpoint.High)
+                                </p>
+                                @if (checkpoint.Notes.Length > 0)
+                                {
+                                    <p class="scenario-note">@checkpoint.Notes</p>
+                                }
+                            </div>
+                            @if (Model.CanEdit)
+                            {
+                                <div class="scenario-inline-actions">
+                                    <a
+                                        asp-page="Details"
+                                        asp-route-id="@evaluation.Id"
+                                        asp-route-scenarioId="@scenario.Id"
+                                        asp-route-month="@Model.Month"
+                                        id="edit-residual-@checkpoint.Month"
+                                        asp-route-residualMonth="@checkpoint.Month"
+                                        asp-route-leftId="@Model.LeftId"
+                                        asp-route-rightId="@Model.RightId"
+                                        asp-route-period="@Model.Period"
+                                        asp-route-pageNumber="@Model.PageNumber"
+                                        asp-fragment="residual-form"
+                                    >
+                                        @T["Edit"]
+                                    </a>
+                                    <form
+                                        id="remove-residual-@checkpoint.Month"
+                                        method="post"
+                                        hx-post="@Model.ContextUrl"
+                                        hx-swap="none"
+                                        hx-sync="this:drop"
+                                        hx-disabled-elt="find button[type=submit]"
+                                        data-operation
+                                        data-retain-on-error
+                                        data-confirm-action="@T["ResidualDeleteNamed", T["CostFromMonth", checkpoint.Month].Value]"
+                                        data-confirm-description="@T["ResidualDeleteConfirm"]"
+                                    >
+                                        <input type="hidden" name="action" value="remove-residual" />
+                                        <input type="hidden" name="Version" value="@evaluation.Version" />
+                                        <input type="hidden" name="residualMonth" value="@checkpoint.Month" />
+                                        <button type="submit" class="text-button danger">@T["ResidualDelete"]</button>
+                                    </form>
+                                </div>
+                            }
+                        </article>
+                    }
+                </div>
+                @if (Model.CanEdit)
+                {
+                    <partial name="_ResidualEditor" model="Model" />
+                }
+            </section>
+        }
+        <section
+            class="record-section scenario-section"
+            id="scenario-adjustments"
+            tabindex="-1"
+            data-return-focus
+        >
+            <div class="surface-heading">
+                <h3>@T["ScenarioAdjustments"]</h3>
+                @if (Model.CanEdit && Model.Costs.Count > 0)
+                {
+                    <button
+                        type="button"
+                        class="button secondary"
+                        id="open-adjustment"
+                        data-editor-open="adjustment-editor"
+                        aria-controls="adjustment-editor"
+                        aria-expanded="false"
+                    >
+                        @T["AdjustmentAdd"]
+                    </button>
+                }
+            </div>
+            <p class="muted">@T["ScenarioAdjustmentsHelp"]</p>
+            @{
+                var coveredCosts = Model.CoveredCosts;
+            }
+            @if (coveredCosts.Count > 0)
+            {
+                <div class="scenario-covered" data-covered-costs>
+                    <p class="micro">@T["ScenarioCoveredCosts"]</p>
+                    <ul>
+                        @foreach (var covered in coveredCosts)
+                        {
+                            <li>@T["ScenarioCoveredCost", covered.Name, T["CostCategory" + covered.Category].Value, covered.Months]</li>
+                        }
+                    </ul>
+                </div>
+            }
+            <div class="scenario-checkpoints">
+                @foreach (var adjustment in Model.SortedAdjustments)
+                {
+                    var costName = evaluation.FindCost(adjustment.CostId).Name;
+                    <article data-adjusted-cost="@adjustment.CostId">
+                        <div>
+                            <strong>@costName · @Money(adjustment.Amount)</strong>
+                            <p class="micro">@T["CostFromMonth", adjustment.StartMonth] @if (adjustment.EndMonth.HasValue) { <span>– @T["CostThroughMonth", adjustment.EndMonth.Value]</span> }</p>
+                            @if (adjustment.Notes.Length > 0)
+                            {
+                                <p class="scenario-note">@adjustment.Notes</p>
+                            }
+                        </div>
+                        @if (Model.CanEdit)
+                        {
+                            <div class="scenario-inline-actions">
+                                <a
+                                    asp-page="Details"
+                                    asp-route-id="@evaluation.Id"
+                                    asp-route-scenarioId="@scenario.Id"
+                                    asp-route-month="@Model.Month"
+                                    id="edit-adjustment-@adjustment.CostId"
+                                    asp-route-costId="@adjustment.CostId"
+                                    asp-route-leftId="@Model.LeftId"
+                                    asp-route-rightId="@Model.RightId"
+                                    asp-route-period="@Model.Period"
+                                    asp-route-pageNumber="@Model.PageNumber"
+                                    asp-fragment="adjustment-form"
+                                >
+                                    @T["Edit"]
+                                </a>
+                                <form
+                                    id="remove-adjustment-@adjustment.CostId"
+                                    method="post"
+                                    hx-post="@Model.ContextUrl"
+                                    hx-swap="none"
+                                    hx-sync="this:drop"
+                                    hx-disabled-elt="find button[type=submit]"
+                                    data-operation
+                                    data-retain-on-error
+                                    data-confirm-action="@T["AdjustmentDeleteNamed", costName]"
+                                    data-confirm-description="@T["AdjustmentDeleteConfirm"]"
+                                >
+                                    <input type="hidden" name="action" value="remove-adjustment" />
+                                    <input type="hidden" name="Version" value="@evaluation.Version" />
+                                    <input type="hidden" name="costId" value="@adjustment.CostId" />
+                                    <button type="submit" class="text-button danger">@T["AdjustmentDelete"]</button>
+                                </form>
+                            </div>
+                        }
+                    </article>
+                }
+            </div>
+            @if (Model.CanEdit && Model.Costs.Count > 0)
+            {
+                <partial name="_AdjustmentEditor" model="Model" />
+            }
+        </section>
+        <section class="record-section scenario-section">
+            <div class="cost-timeline-heading">
+                <div>
+                    <h3>@T["ScenarioPaymentSchedule"]</h3>
+                    <p class="micro">@T["ScenarioScheduleHelp"]</p>
+                </div>
+                <nav class="cost-period-switch" aria-label="@T["CostDisplay"]">
+                    <a
+                        asp-page="Details"
+                        asp-route-id="@evaluation.Id"
+                        asp-route-scenarioId="@scenario.Id"
+                        asp-route-month="@Model.Month"
+                        asp-route-leftId="@Model.LeftId"
+                        asp-route-rightId="@Model.RightId"
+                        asp-route-period="month"
+                        asp-fragment="scenario-payments"
+                        aria-current="@(Model.Period == "month" ? "page" : null)"
+                    >
+                        @T["CostMonthlyView"]
+                    </a>
+                    <a
+                        asp-page="Details"
+                        asp-route-id="@evaluation.Id"
+                        asp-route-scenarioId="@scenario.Id"
+                        asp-route-month="@Model.Month"
+                        asp-route-leftId="@Model.LeftId"
+                        asp-route-rightId="@Model.RightId"
+                        asp-route-period="year"
+                        asp-fragment="scenario-payments"
+                        aria-current="@(Model.Period == "year" ? "page" : null)"
+                    >
+                        @T["CostYearlyView"]
+                    </a>
+                </nav>
+            </div>
+            <p class="comparison-scroll-hint" id="scenario-payments-hint">@T["FinancialScrollHint"]</p>
+            <div
+                id="scenario-payments"
+                class="cost-table-scroll"
+                tabindex="0"
+                role="region"
+                aria-describedby="scenario-payments-hint"
+                aria-label="@T["ScenarioPaymentSchedule"]"
+            >
+                <table class="cost-table scenario-payment-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">@T["CostPeriod"]</th>
+                            <th scope="col">@T["ScenarioStartPayments"]</th>
+                            <th scope="col">@T["ScenarioEndPayments"]</th>
+                            <th scope="col">@T["ScenarioAccountInterest"]</th>
+                            <th scope="col">@T["CalculationAccount"]</th>
+                            <th scope="col">@T["CalculationRemainingDebt"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var months in Model.Periods)
+                        {
+                            var firstMonth = months[0];
+                            var lastMonth = months[^1];
+                            <tr data-payment-month="@firstMonth.Month">
+                                <th scope="row">@Model.PeriodLabel(months)<span class="micro">@T["CostMonthRange", firstMonth.Month, lastMonth.Month]</span></th>
+                                <td>@Money(DetailsModel.StartPayments(months))</td>
+                                <td>@Money(DetailsModel.EndPayments(months))</td>
+                                <td>@MoneyWhenCalculated(DetailsModel.Interest(months))</td>
+                                <td>@MoneyWhenCalculated(lastMonth.Account)</td>
+                                <td>@MoneyWhenCalculated(lastMonth.Debt)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @if (Model.PageCount > 1)
+            {
+                <nav class="cost-pagination" aria-label="@T["CostPages"]">
+                    @if (Model.PageNumber > 1)
+                    {
+                        <a
+                            asp-page="Details"
+                            asp-route-id="@evaluation.Id"
+                            asp-route-scenarioId="@scenario.Id"
+                            asp-route-month="@Model.Month"
+                            asp-route-period="@Model.Period"
+                            asp-route-leftId="@Model.LeftId"
+                            asp-route-rightId="@Model.RightId"
+                            asp-route-pageNumber="@(Model.PageNumber - 1)"
+                            asp-fragment="scenario-payments"
+                        >
+                            ← @T["CostPrevious"]
+                        </a>
+                    }
+                    <span>@T["CostPage", Model.PageNumber, Model.PageCount]</span>
+                    @if (Model.PageNumber < Model.PageCount)
+                    {
+                        <a
+                            asp-page="Details"
+                            asp-route-id="@evaluation.Id"
+                            asp-route-scenarioId="@scenario.Id"
+                            asp-route-month="@Model.Month"
+                            asp-route-period="@Model.Period"
+                            asp-route-leftId="@Model.LeftId"
+                            asp-route-rightId="@Model.RightId"
+                            asp-route-pageNumber="@(Model.PageNumber + 1)"
+                            asp-fragment="scenario-payments"
+                        >
+                            @T["CostNext"] →
+                        </a>
+                    }
+                </nav>
+            }
+        </section>
+        @if (Model.CanEdit)
+        {
+            <button
+                type="button"
+                class="text-button"
+                id="open-scenario-copy"
+                data-editor-open="scenario-copy-editor"
+                aria-controls="scenario-copy-editor"
+                aria-expanded="false"
+            >
+                @T["ScenarioCopy"]
+            </button>
+            <partial name="_CopyEditor" model="Model" />
+        }
+    </section>
 </div>

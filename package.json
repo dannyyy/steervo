@@ -2,6 +2,13 @@
   "name": "steervo-browser-tests",
   "private": true,
   "type": "module",
-  "scripts": { "test:e2e": "node tests/browser/journey.mjs" },
-  "devDependencies": { "playwright": "1.65.0" }
+  "scripts": {
+    "test:e2e": "node tests/browser/journey.mjs",
+    "format": "bash scripts/format.sh",
+    "format:check": "bash scripts/format.sh --check"
+  },
+  "devDependencies": {
+    "playwright": "1.65.0",
+    "prettier": "3.9.10"
+  }
 }

@@ -1,0 +1,18 @@
+# Generated, vendored or local runtime state
+.artifacts/
+.data/
+node_modules/
+**/bin/
+**/obj/
+**/packages.lock.json
+package-lock.json
+src/Steervo.Web/wwwroot/lib/
+
+# Helm templates contain Go template syntax
+deploy/helm/steervo/templates/
+
+# Prose is written and wrapped by hand
+*.md
+
+# Razor has no reliable formatter; see docs/code-style.md
+*.cshtml

@@ -3,30 +3,175 @@
 @using Steervo.Web.Pages.Shared
 @using Steervo.Web.Pages.Evaluations.Candidates
 @using Steervo.Web.Pages.Evaluations.Offers
-@{ ViewData["Title"] = T["Offers"]; var e = Model.Evaluation; var edit = Model.Access >= AccessLevel.Editor; var offers = Model.Offers.ToList(); var criteria = e.Criteria.Where(criterion => criterion.Scope == CriterionScope.Offer).OrderBy(criterion => criterion.Position).ToList(); }
-<partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "offers")' />
-<div class="surface-heading offer-heading"><div><h2>@T["Offers"]</h2></div><div class="surface-actions">@if (offers.Count > 1) { <form id="compare-selection" method="get" action="/evaluations/@e.Id/offers/compare" data-compare-form data-compare-maximum="@ComparisonSelection.Maximum"><button class="button secondary" id="compare-selected" data-compare-label="@T["CompareCandidates"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"compare"' /><span>@T["CompareCandidates"] (0/@ComparisonSelection.Maximum)</span></button></form> }@if (edit && e.Candidates.Count > 0) { <a asp-page="Edit" asp-route-id="@e.Id" asp-route-candidateId="@Model.CandidateId" class="button primary"><partial name="/Pages/Shared/_Icon.cshtml" model='"plus"' />@T["NewOffer"]</a> }</div></div>
-@if (e.Candidates.Count == 0) { <p class="notice">@T["OffersNeedCandidate"] <a asp-page="/Evaluations/Candidates/Index" asp-route-id="@e.Id">@T["Candidates"] →</a></p> }
+@{
+    ViewData["Title"] = T["Offers"];
+
+    var evaluation = Model.Evaluation;
+    var canEdit = Model.CanEdit;
+    var offers = Model.Offers.ToList();
+    var criteria = Model.OfferCriteria;
+}
+<partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(evaluation, Model.Access, "offers")' />
+<div class="surface-heading offer-heading">
+    <div>
+        <h2>@T["Offers"]</h2>
+    </div>
+    <div class="surface-actions">
+        @if (offers.Count > 1)
+        {
+            <form
+                id="compare-selection"
+                method="get"
+                action="/evaluations/@evaluation.Id/offers/compare"
+                data-compare-form
+                data-compare-maximum="@ComparisonSelection.Maximum">
+                <button class="button secondary" id="compare-selected" data-compare-label="@T["CompareCandidates"]">
+                    <partial name="/Pages/Shared/_Icon.cshtml" model='"compare"' /><span>@T["CompareCandidates"] (0/@ComparisonSelection.Maximum)</span>
+                </button>
+            </form>
+        }
+        @if (canEdit && evaluation.Candidates.Count > 0)
+        {
+            <a asp-page="Edit" asp-route-id="@evaluation.Id" asp-route-candidateId="@Model.CandidateId" class="button primary">
+                <partial name="/Pages/Shared/_Icon.cshtml" model='"plus"' />@T["NewOffer"]
+            </a>
+        }
+    </div>
+</div>
+@if (evaluation.Candidates.Count == 0)
+{
+    <p class="notice">@T["OffersNeedCandidate"] <a asp-page="/Evaluations/Candidates/Index" asp-route-id="@evaluation.Id">@T["Candidates"] →</a></p>
+}
 else
 {
-<section class="workspace-surface offer-collection">
-<form method="get" class="offer-filter"><div><label for="offer-candidate-filter">@T["OfferCandidate"]</label><select id="offer-candidate-filter" name="candidateId"><option value="">@T["AllCandidates"]</option>@foreach (var candidate in e.Candidates.OrderBy(candidate => candidate.Position)) { <option value="@candidate.Id" selected="@(candidate.Id == Model.CandidateId)">@candidate.DisplayName</option> }</select></div><button class="button secondary">@T["ApplyOfferFilter"]</button></form>
-@if (offers.Count == 0) { <div class="canvas-empty"><h3>@T["NoOffers"]</h3>@if (Model.CandidateId.HasValue) { <a class="text-link" asp-page="Index" asp-route-id="@e.Id">@T["OfferAllFilters"]</a> }</div> }
-<div class="offer-list">
-@foreach (var offer in offers)
-{
-    var revision = offer.Latest; var candidate = e.FindCandidate(offer.CandidateId); var missing = revision.MissingFields().ToArray(); var pricing = revision.Pricing;
-    var entries = criteria.Select(criterion => { var row = new OfferAssessmentRow(e, offer, criterion, Model.Access); return new FulfillmentEntry(criterion, row.Result, row.Result == Fulfillment.Rated && row.Assessment?.RatingValue is { } rating ? $"{rating} / 5" : null); }).ToList();
-    var failures = entries.Where(entry => entry.Criterion.Priority == Priority.Required && entry.Result == Fulfillment.Unmet).Select(entry => entry.Criterion.Name).ToList();
-    <article class="offer-card" data-offer-id="@offer.Id">
-    <div class="offer-card-heading"><p class="eyebrow">@candidate.DisplayName</p><h3><a asp-page="Details" asp-route-id="@e.Id" asp-route-offerId="@offer.Id">@revision.Terms.Name</a></h3><div class="offer-badges"><span class="badge">@T["OfferKind" + revision.Terms.Kind]</span><span class="badge">@T["OfferCommitment" + revision.Terms.Commitment]</span><span class="badge">@T["OfferVersion", revision.Number]</span></div>@if (!string.IsNullOrEmpty(revision.Terms.Provider)) { <p class="offer-card-provider">@OfferParties.Summary(revision.Terms, T)</p> }</div>
-    <div class="offer-card-summary"><dl class="offer-card-prices"><div data-offer-price="Total"><dt>@T["OfferPriceTotal"]</dt><dd class="@(pricing.Known ? null : "offer-open")">@(pricing.Known ? $"{OfferPrices.Format(pricing.Total)} {e.Currency}" : T["OfferOpen"].Value)</dd></div>@if (revision.Terms.Kind is OfferKind.Leasing or OfferKind.Financing) { <div><dt>@T["OfferMonthlyPayment"]</dt><dd class="@(revision.Terms.MonthlyPayment.HasValue ? null : "offer-open")">@(revision.Terms.MonthlyPayment.HasValue ? $"{revision.Terms.MonthlyPayment:N2} {e.Currency}" : T["OfferOpen"].Value)</dd></div> }@if (pricing.Concession > 0) { <div data-offer-price="Concession"><dt>@T["OfferPriceConcession"]</dt><dd>@OfferPrices.Format(pricing.Concession) @e.Currency@if (pricing.ConcessionPercent is { } percent) { <span class="offer-percent"> · @percent.ToString("0.#") %</span> }</dd></div> }</dl>
-    @if (entries.Count > 0) { <partial name="/Pages/Shared/_FulfillmentSummary.cshtml" model="new FulfillmentSummary(offer.Id.ToString(), entries)" /> }
-    @if (failures.Count > 0) { <p class="candidate-warning"><strong>@T["RequiredNotMet"]:</strong> @string.Join(" · ", failures)</p> }
-    @if (missing.Length > 0) { <p class="offer-gaps"><strong>@T["OfferOpenFields"]:</strong> @string.Join(" · ", missing.Select(field => T["Offer" + field].Value))</p> }
-    </div>
-    <div class="candidate-side">@if (edit && offers.Count > 1) { <div class="row-actions">@foreach (var direction in new[] { -1, 1 }) { <form method="post" asp-page="Index" asp-route-id="@e.Id" asp-route-candidateId="@Model.CandidateId"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="move-offer" /><input type="hidden" name="itemId" value="@offer.Id" /><input type="hidden" name="direction" value="@direction" /><button id="move-offer-@offer.Id-@direction" class="icon-button" aria-label="@T[direction == -1 ? "CandidateUp" : "CandidateDown", revision.Terms.Name]" disabled="@(direction == -1 ? offer == offers[0] : offer == offers[^1])"><partial name="/Pages/Shared/_Icon.cshtml" model='(direction == -1 ? "up" : "down")' /></button></form> }</div> }@if (offers.Count > 1) { <label class="candidate-compare" for="compare-@offer.Id"><input type="checkbox" id="compare-@offer.Id" form="compare-selection" name="more" value="@offer.Id" data-compare-select /><span>@T["CompareCandidates"]</span></label> }</div>
-    </article>
-}
-</div></section>
+    <section class="workspace-surface offer-collection">
+        <form method="get" class="offer-filter">
+            <div>
+                <label for="offer-candidate-filter">@T["OfferCandidate"]</label>
+                <select id="offer-candidate-filter" name="candidateId">
+                    <option value="">@T["AllCandidates"]</option>
+                    @foreach (var candidate in evaluation.Candidates.OrderBy(candidate => candidate.Position))
+                    {
+                        <option value="@candidate.Id" selected="@(candidate.Id == Model.CandidateId)">@candidate.DisplayName</option>
+                    }
+                </select>
+            </div>
+            <button class="button secondary">@T["ApplyOfferFilter"]</button>
+        </form>
+        @if (offers.Count == 0)
+        {
+            <div class="canvas-empty">
+                <h3>@T["NoOffers"]</h3>
+                @if (Model.CandidateId.HasValue)
+                {
+                    <a class="text-link" asp-page="Index" asp-route-id="@evaluation.Id">@T["OfferAllFilters"]</a>
+                }
+            </div>
+        }
+        <div class="offer-list">
+            @foreach (var offer in offers)
+            {
+                var revision = offer.Latest;
+                var terms = revision.Terms;
+                var candidate = evaluation.FindCandidate(offer.CandidateId);
+                var missing = revision.MissingFields().ToArray();
+                var pricing = revision.Pricing;
+                var entries = Model.FulfillmentEntries(offer, criteria);
+                var failures = Model.UnmetRequirements(entries);
+
+                <article class="offer-card" data-offer-id="@offer.Id">
+                    <div class="offer-card-heading">
+                        <p class="eyebrow">@candidate.DisplayName</p>
+                        <h3>
+                            <a asp-page="Details" asp-route-id="@evaluation.Id" asp-route-offerId="@offer.Id">@terms.Name</a>
+                        </h3>
+                        <div class="offer-badges">
+                            <span class="badge">@T["OfferKind" + terms.Kind]</span>
+                            <span class="badge">@T["OfferCommitment" + terms.Commitment]</span>
+                            <span class="badge">@T["OfferVersion", revision.Number]</span>
+                        </div>
+                        @if (!string.IsNullOrEmpty(terms.Provider))
+                        {
+                            <p class="offer-card-provider">@OfferParties.Summary(terms, T)</p>
+                        }
+                    </div>
+                    <div class="offer-card-summary">
+                        <dl class="offer-card-prices">
+                            <div data-offer-price="Total">
+                                <dt>@T["OfferPriceTotal"]</dt>
+                                <dd class="@(pricing.Known ? null : "offer-open")">@(pricing.Known ? $"{OfferPrices.Format(pricing.Total)} {evaluation.Currency}" : T["OfferOpen"].Value)</dd>
+                            </div>
+                            @if (terms.Kind is OfferKind.Leasing or OfferKind.Financing)
+                            {
+                                var monthlyPayment = terms.MonthlyPayment;
+
+                                <div>
+                                    <dt>@T["OfferMonthlyPayment"]</dt>
+                                    <dd class="@(monthlyPayment.HasValue ? null : "offer-open")">@(monthlyPayment.HasValue ? $"{monthlyPayment:N2} {evaluation.Currency}" : T["OfferOpen"].Value)</dd>
+                                </div>
+                            }
+                            @if (pricing.Concession > 0)
+                            {
+                                <div data-offer-price="Concession">
+                                    <dt>@T["OfferPriceConcession"]</dt>
+                                    <dd>
+                                        @OfferPrices.Format(pricing.Concession) @evaluation.Currency
+                                        @if (pricing.ConcessionPercent is { } percent)
+                                        {
+                                            <span class="offer-percent"> · @percent.ToString("0.#") %</span>
+                                        }
+                                    </dd>
+                                </div>
+                            }
+                        </dl>
+                        @if (entries.Count > 0)
+                        {
+                            <partial name="/Pages/Shared/_FulfillmentSummary.cshtml" model="new FulfillmentSummary(offer.Id.ToString(), entries)" />
+                        }
+                        @if (failures.Count > 0)
+                        {
+                            <p class="candidate-warning"><strong>@T["RequiredNotMet"]:</strong> @string.Join(" · ", failures)</p>
+                        }
+                        @if (missing.Length > 0)
+                        {
+                            <p class="offer-gaps"><strong>@T["OfferOpenFields"]:</strong> @string.Join(" · ", missing.Select(field => T["Offer" + field].Value))</p>
+                        }
+                    </div>
+                    <div class="candidate-side">
+                        @if (canEdit && offers.Count > 1)
+                        {
+                            <div class="row-actions">
+                                @foreach (var direction in Model.MoveDirections)
+                                {
+                                    var movesUp = Model.MovesUp(direction);
+                                    var isAtEnd = movesUp ? offer == offers[0] : offer == offers[^1];
+
+                                    <form method="post" asp-page="Index" asp-route-id="@evaluation.Id" asp-route-candidateId="@Model.CandidateId">
+                                        <input type="hidden" name="version" value="@evaluation.Version" />
+                                        <input type="hidden" name="action" value="move-offer" />
+                                        <input type="hidden" name="itemId" value="@offer.Id" />
+                                        <input type="hidden" name="direction" value="@direction" />
+                                        <button
+                                            id="move-offer-@offer.Id-@direction"
+                                            class="icon-button"
+                                            aria-label="@T[movesUp ? "CandidateUp" : "CandidateDown", terms.Name]"
+                                            disabled="@isAtEnd">
+                                            <partial name="/Pages/Shared/_Icon.cshtml" model='(movesUp ? "up" : "down")' />
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        }
+                        @if (offers.Count > 1)
+                        {
+                            <label class="candidate-compare" for="compare-@offer.Id">
+                                <input type="checkbox" id="compare-@offer.Id" form="compare-selection" name="more" value="@offer.Id" data-compare-select />
+                                <span>@T["CompareCandidates"]</span>
+                            </label>
+                        }
+                    </div>
+                </article>
+            }
+        </div>
+    </section>
 }

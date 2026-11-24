@@ -1,11 +1,65 @@
 @model Steervo.Web.Pages.Evaluations.DetailsModel
-@{ var e = Model.Evaluation; }
-<section id="evaluation-data" class="workspace-surface evaluation-data" data-evaluation-section="settings" hidden="@(Model.Section != "settings")" aria-labelledby="evaluation-data-title">
-    <div class="surface-heading"><div><h2 id="evaluation-data-title">@T["EvaluationData"]</h2></div></div>
-    <div class="evaluation-transfer"><div><h3>@T["ImportAction"]</h3><p>@T["ImportDataHelp"]</p></div><a class="button secondary" asp-page="/Index" asp-fragment="import-evaluation" aria-label="@T["ImportEvaluation"]">@T["ImportAction"]</a></div>
-    <div class="evaluation-transfer"><div><h3>@T["ExportEvaluation"]</h3><p>@T["ExportHelp"]</p></div><a class="button secondary" asp-page="/Evaluations/Details" asp-page-handler="Export" asp-route-id="@e.Id" download>@T["ExportEvaluation"]</a></div>
-    @if (Model.Access == AccessLevel.Owner)
+@{
+    var evaluation = Model.Evaluation;
+}
+<section
+    id="evaluation-data"
+    class="workspace-surface evaluation-data"
+    data-evaluation-section="settings"
+    hidden="@(Model.Section != "settings")"
+    aria-labelledby="evaluation-data-title"
+>
+    <div class="surface-heading">
+        <div>
+            <h2 id="evaluation-data-title">@T["EvaluationData"]</h2>
+        </div>
+    </div>
+    <div class="evaluation-transfer">
+        <div>
+            <h3>@T["ImportAction"]</h3>
+            <p>@T["ImportDataHelp"]</p>
+        </div>
+        <a
+            class="button secondary"
+            asp-page="/Index"
+            asp-fragment="import-evaluation"
+            aria-label="@T["ImportEvaluation"]"
+        >@T["ImportAction"]</a>
+    </div>
+    <div class="evaluation-transfer">
+        <div>
+            <h3>@T["ExportEvaluation"]</h3>
+            <p>@T["ExportHelp"]</p>
+        </div>
+        <a
+            class="button secondary"
+            asp-page="/Evaluations/Details"
+            asp-page-handler="Export"
+            asp-route-id="@evaluation.Id"
+            download
+        >@T["ExportEvaluation"]</a>
+    </div>
+    @if (Model.IsOwner)
     {
-        <div class="evaluation-danger"><div><h3>@T["DeleteAction"]</h3><p>@T["DeleteDataHelp"]</p></div><form method="post" hx-post="/evaluations/@e.Id?section=settings" data-confirm-action="@T["DeleteEvaluationNamed", e.Name]" data-confirm-description="@T["DeleteEvaluationConfirm"]"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="delete" /><button type="submit" class="button secondary danger" aria-label="@T["DeleteEvaluation"]">@T["DeleteAction"]</button></form></div>
+        <div class="evaluation-danger">
+            <div>
+                <h3>@T["DeleteAction"]</h3>
+                <p>@T["DeleteDataHelp"]</p>
+            </div>
+            <form
+                method="post"
+                hx-post="/evaluations/@evaluation.Id?section=settings"
+                data-confirm-action="@T["DeleteEvaluationNamed", evaluation.Name]"
+                data-confirm-description="@T["DeleteEvaluationConfirm"]"
+            >
+                <input type="hidden" name="version" value="@evaluation.Version" />
+                <input type="hidden" name="action" value="delete" />
+                <button
+                    type="submit"
+                    class="button secondary danger"
+                    aria-label="@T["DeleteEvaluation"]"
+                >@T["DeleteAction"]</button>
+            </form>
+        </div>
     }
 </section>

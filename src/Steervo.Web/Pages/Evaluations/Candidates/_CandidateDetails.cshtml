@@ -1,81 +1,370 @@
 @model Steervo.Web.Pages.Evaluations.Candidates.DetailsModel
 @using Steervo.Web.Pages.Shared
+@using Steervo.Web.Pages.Evaluations.Candidates
 @{
-    var e = Model.Evaluation; var c = Model.Candidate; var edit = Model.Access >= AccessLevel.Editor;
-    var url = $"/evaluations/{e.Id}/candidates/{c.Id}?{Model.ComparisonQuery}";
-    var comparisonUrl = $"/evaluations/{e.Id}/compare?{Model.ComparisonQuery}";
-    var vehicleCriteria = e.Criteria.Where(x => x.Scope == CriterionScope.Vehicle).ToList();
-    var failures = vehicleCriteria.Where(x => x.Priority == Priority.Required && e.ResultFor(c.Id, x.Id) == Fulfillment.Unmet).ToList();
-    var optional = vehicleCriteria.Where(x => x.Priority == Priority.Required && e.ResultFor(c.Id, x.Id) == Fulfillment.Optional).ToList();
-    var open = vehicleCriteria.Count(x => e.ResultFor(c.Id, x.Id) == Fulfillment.Unknown);
-    // Technical data opens first; a returned assessment draft keeps its requirements in view.
-    var requirementsFirst = Model.Draft is not null;
+    var evaluation = Model.Evaluation;
+    var candidate = Model.Candidate;
+    var postUrl = Model.PostUrl;
+    var vehicleCriteria = Model.VehicleCriteria;
+    var unmetRequired = Model.UnmetRequired;
+    var optionalRequired = Model.OptionalRequired;
+    var requirementsFirst = Model.RequirementsFirst;
+    var statusClass = candidate.Status.ToString().ToLowerInvariant();
+    var notSpecified = T["NotSpecified"].Value;
+    var yearText = candidate.Year?.ToString() ?? notSpecified;
+    var mileageText = candidate.Mileage is { } mileage ? mileage.ToString("N0") : notSpecified;
 }
-<div id="candidate-workspace" data-version="@e.Version" data-preserve-viewport hx-target="#candidate-workspace" hx-swap="outerHTML show:none focus-scroll:false" hx-sync="this:drop">
-<partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "candidates", c.Id, Model.ComparisonFirst, Model.ComparisonSecond, Model.ComparisonMore)' />
-@if (Model.Notice is not null && !Model.Failed) { <div class="notice workspace-notice success" role="status" tabindex="-1">@Model.Notice</div> }
-@if (Model.Failed && Model.FailedAction == "remove-candidate") { <div class="notice workspace-notice failure" role="alert" tabindex="-1">@Model.Notice</div> }
-<nav class="candidate-ribbon" aria-label="@T["CandidateSelection"]" id="candidate-ribbon" data-preserve-scroll>
-    <a asp-page="Index" asp-route-id="@e.Id" class="candidate-index-link"><partial name="/Pages/Shared/_Icon.cshtml" model='"list"' /><span>@T["AllCandidates"]</span></a>
-    @foreach (var candidate in e.Candidates.OrderBy(x => x.Position))
+<div
+    id="candidate-workspace"
+    data-version="@evaluation.Version"
+    data-preserve-viewport
+    hx-target="#candidate-workspace"
+    hx-swap="outerHTML show:none focus-scroll:false"
+    hx-sync="this:drop">
+    <partial
+        name="/Pages/Evaluations/_EvaluationHeader.cshtml"
+        model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(evaluation, Model.Access, "candidates", candidate.Id, Model.ComparisonFirst, Model.ComparisonSecond, Model.ComparisonMore)' />
+    @if (Model.Notice is not null && !Model.Failed)
     {
-        var first = candidate.Id == Model.ComparisonFirst || candidate.Id == Model.ComparisonSecond ? Model.ComparisonFirst : candidate.Id;
-        var second = candidate.Id == Model.ComparisonFirst || candidate.Id == Model.ComparisonSecond ? Model.ComparisonSecond : Model.ComparisonFirst;
-        <a href="/evaluations/@e.Id/candidates/@candidate.Id?first=@first&second=@second@(Steervo.Web.Pages.Evaluations.Candidates.ComparisonSelection.More(Model.ComparisonMore))" aria-current="@(candidate.Id == c.Id ? "page" : null)"><strong>@candidate.DisplayName</strong><span>@T["CandidateStatus" + candidate.Status]</span></a>
+        <div class="notice workspace-notice success" role="status" tabindex="-1">@Model.Notice</div>
     }
-</nav>
-<article class="vehicle-record">
-    <header class="vehicle-introduction">
-        <div><div class="vehicle-kicker"><span>@T["VehicleRecord"]</span><span class="candidate-status @c.Status.ToString().ToLowerInvariant()">@T["CandidateStatus" + c.Status]</span></div><h2>@c.DisplayName</h2>
-            <div class="vehicle-actions"><a href="@comparisonUrl" class="button primary"><partial name="/Pages/Shared/_Icon.cshtml" model='"compare"' />@T["CompareCandidate"]</a>@if (edit) { <button type="button" id="copy-candidate" class="button secondary" data-dialog-open="candidate-copy" aria-haspopup="dialog">@T["CopyCandidate"]</button><form method="post" hx-post="@url" class="vehicle-remove" data-confirm-action="@T["RemoveCandidateNamed", c.DisplayName]" data-confirm-description="@T["RemoveCandidateConfirm"]"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="remove-candidate" /><button type="submit" id="remove-candidate" class="button secondary danger">@T["RemoveCandidate"]</button></form> }</div>
+    @if (Model.RemoveFailed)
+    {
+        <div class="notice workspace-notice failure" role="alert" tabindex="-1">@Model.Notice</div>
+    }
+    <nav class="candidate-ribbon" aria-label="@T["CandidateSelection"]" id="candidate-ribbon" data-preserve-scroll>
+        <a asp-page="Index" asp-route-id="@evaluation.Id" class="candidate-index-link">
+            <partial name="/Pages/Shared/_Icon.cshtml" model='"list"' />
+            <span>@T["AllCandidates"]</span>
+        </a>
+        @foreach (var listed in Model.OrderedCandidates)
+        {
+            var pair = Model.ComparisonWith(listed);
+
+            <a
+                href="/evaluations/@evaluation.Id/candidates/@listed.Id?first=@pair.First&second=@pair.Second@(ComparisonSelection.More(Model.ComparisonMore))"
+                aria-current="@(listed.Id == candidate.Id ? "page" : null)">
+                <strong>@listed.DisplayName</strong>
+                <span>@T["CandidateStatus" + listed.Status]</span>
+            </a>
+        }
+    </nav>
+    <article class="vehicle-record">
+        <header class="vehicle-introduction">
+            <div>
+                <div class="vehicle-kicker">
+                    <span>@T["VehicleRecord"]</span>
+                    <span class="candidate-status @statusClass">@T["CandidateStatus" + candidate.Status]</span>
+                </div>
+                <h2>@candidate.DisplayName</h2>
+                <div class="vehicle-actions">
+                    <a href="@Model.ComparisonUrl" class="button primary">
+                        <partial name="/Pages/Shared/_Icon.cshtml" model='"compare"' />
+                        @T["CompareCandidate"]
+                    </a>
+                    @if (Model.CanEdit)
+                    {
+                        <button
+                            type="button"
+                            id="copy-candidate"
+                            class="button secondary"
+                            data-dialog-open="candidate-copy"
+                            aria-haspopup="dialog">@T["CopyCandidate"]</button>
+                        <form
+                            method="post"
+                            hx-post="@postUrl"
+                            class="vehicle-remove"
+                            data-confirm-action="@T["RemoveCandidateNamed", candidate.DisplayName]"
+                            data-confirm-description="@T["RemoveCandidateConfirm"]">
+                            <input type="hidden" name="version" value="@evaluation.Version" />
+                            <input type="hidden" name="action" value="remove-candidate" />
+                            <button type="submit" id="remove-candidate" class="button secondary danger">@T["RemoveCandidate"]</button>
+                        </form>
+                    }
+                </div>
+            </div>
+            <dl class="vehicle-facts">
+                <div>
+                    <dt>@T["CandidateCondition"]</dt>
+                    <dd>@T["Condition" + candidate.Condition]</dd>
+                </div>
+                <div>
+                    <dt>@T["CandidateYear"]</dt>
+                    <dd>@yearText</dd>
+                </div>
+                <div>
+                    <dt>@T["CandidateMileage"]</dt>
+                    <dd>@mileageText</dd>
+                </div>
+            </dl>
+        </header>
+        <div class="record-navigation">
+            <div role="tablist" aria-label="@T["VehicleRecord"]">
+                <button
+                    type="button"
+                    id="tab-specifications"
+                    role="tab"
+                    data-record-tab="record-specifications"
+                    aria-controls="record-specifications"
+                    aria-selected="@(requirementsFirst ? "false" : "true")"
+                    tabindex="@(requirementsFirst ? "-1" : null)">@T["VehicleSpecifications"]</button>
+                <button
+                    type="button"
+                    id="tab-assessments"
+                    role="tab"
+                    data-record-tab="record-assessments"
+                    aria-controls="record-assessments"
+                    aria-selected="@(requirementsFirst ? "true" : "false")"
+                    tabindex="@(requirementsFirst ? null : "-1")">@T["VehicleRequirements"]</button>
+            </div>
+            <a asp-page="/Evaluations/Offers/Index" asp-route-id="@evaluation.Id" asp-route-candidateId="@candidate.Id">
+                @T["OfferForCandidate"]
+                <partial name="/Pages/Shared/_Icon.cshtml" model='"arrow"' />
+            </a>
         </div>
-        <dl class="vehicle-facts"><div><dt>@T["CandidateCondition"]</dt><dd>@T["Condition" + c.Condition]</dd></div><div><dt>@T["CandidateYear"]</dt><dd>@(c.Year?.ToString() ?? T["NotSpecified"].Value)</dd></div><div><dt>@T["CandidateMileage"]</dt><dd>@(c.Mileage is { } mileage ? mileage.ToString("N0") : T["NotSpecified"].Value)</dd></div></dl>
-    </header>
-    <div class="record-navigation"><div role="tablist" aria-label="@T["VehicleRecord"]"><button type="button" id="tab-specifications" role="tab" data-record-tab="record-specifications" aria-controls="record-specifications" aria-selected="@(requirementsFirst ? "false" : "true")" tabindex="@(requirementsFirst ? "-1" : null)">@T["VehicleSpecifications"]</button><button type="button" id="tab-assessments" role="tab" data-record-tab="record-assessments" aria-controls="record-assessments" aria-selected="@(requirementsFirst ? "true" : "false")" tabindex="@(requirementsFirst ? null : "-1")">@T["VehicleRequirements"]</button></div><a asp-page="/Evaluations/Offers/Index" asp-route-id="@e.Id" asp-route-candidateId="@c.Id">@T["OfferForCandidate"]<partial name="/Pages/Shared/_Icon.cshtml" model='"arrow"' /></a></div>
-    <div class="record-body">
-        <div class="record-main">
-            <section id="record-specifications" role="tabpanel" aria-labelledby="tab-specifications" tabindex="0" hidden="@requirementsFirst"><partial name="_Specifications" model="c.Specifications" />@if (edit) { <button type="button" id="edit-specifications" class="button secondary" data-dialog-open="candidate-edit" data-focus-id="spec-Propulsion" aria-haspopup="dialog"><partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' />@T["EditSpecifications"]</button> }</section>
-            <section id="record-assessments" role="tabpanel" aria-labelledby="tab-assessments" tabindex="0" hidden="@(!requirementsFirst)">
-                <div class="record-section-heading"><h3>@T["VehicleRequirements"]</h3><span>@T["OpenAssessmentCount", open, vehicleCriteria.Count]</span></div>
-                @if (failures.Count > 0) { <div class="candidate-warning"><strong>@T["RequiredNotMet"]</strong><p>@string.Join(" · ", failures.Select(x => x.Name))</p><p class="micro">@T["NoAutomaticExclusion"]</p></div> }
-                @if (optional.Count > 0) { <div class="candidate-optional"><strong>@T["RequiredOptional"]</strong><p>@string.Join(" · ", optional.Select(x => x.Name))</p><p class="micro">@T["RequiredOptionalHelp"]</p></div> }
-                @if (vehicleCriteria.Count == 0) { <div class="empty-state"><h3>@T["NoVehicleCriteria"]</h3><p>@T["NoVehicleCriteriaHelp"]</p><a asp-page="/Evaluations/Details" asp-route-id="@e.Id" asp-route-section="criteria" class="button secondary">@T["EditCriteria"]</a></div> }
-                @foreach (var group in e.Groups.OrderBy(x => x.Position).Cast<CriterionGroup?>().Append(null))
-                {
-                    var criteria = vehicleCriteria.Where(x => x.GroupId == group?.Id).OrderBy(x => x.Position).ToList();
-                    if (criteria.Count == 0) { continue; }
-                    <section class="record-assessment-group"><h4>@(group?.Name ?? T["Ungrouped"].Value)</h4><div class="assessment-list">@foreach (var criterion in criteria) { <partial name="_AssessmentRow" model="new Steervo.Web.Pages.Evaluations.Candidates.AssessmentRow(e, c, criterion, Model.Access, url, Model.Draft)" /> }</div></section>
-                }
-            </section>
+        <div class="record-body">
+            <div class="record-main">
+                <section
+                    id="record-specifications"
+                    role="tabpanel"
+                    aria-labelledby="tab-specifications"
+                    tabindex="0"
+                    hidden="@requirementsFirst">
+                    <partial name="_Specifications" model="candidate.Specifications" />
+                    @if (Model.CanEdit)
+                    {
+                        <button
+                            type="button"
+                            id="edit-specifications"
+                            class="button secondary"
+                            data-dialog-open="candidate-edit"
+                            data-focus-id="spec-Propulsion"
+                            aria-haspopup="dialog">
+                            <partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' />
+                            @T["EditSpecifications"]
+                        </button>
+                    }
+                </section>
+                <section
+                    id="record-assessments"
+                    role="tabpanel"
+                    aria-labelledby="tab-assessments"
+                    tabindex="0"
+                    hidden="@(!requirementsFirst)">
+                    <div class="record-section-heading">
+                        <h3>@T["VehicleRequirements"]</h3>
+                        <span>@T["OpenAssessmentCount", Model.OpenAssessmentCount, vehicleCriteria.Count]</span>
+                    </div>
+                    @if (unmetRequired.Count > 0)
+                    {
+                        <div class="candidate-warning">
+                            <strong>@T["RequiredNotMet"]</strong>
+                            <p>@string.Join(" · ", unmetRequired.Select(criterion => criterion.Name))</p>
+                            <p class="micro">@T["NoAutomaticExclusion"]</p>
+                        </div>
+                    }
+                    @if (optionalRequired.Count > 0)
+                    {
+                        <div class="candidate-optional">
+                            <strong>@T["RequiredOptional"]</strong>
+                            <p>@string.Join(" · ", optionalRequired.Select(criterion => criterion.Name))</p>
+                            <p class="micro">@T["RequiredOptionalHelp"]</p>
+                        </div>
+                    }
+                    @if (vehicleCriteria.Count == 0)
+                    {
+                        <div class="empty-state">
+                            <h3>@T["NoVehicleCriteria"]</h3>
+                            <p>@T["NoVehicleCriteriaHelp"]</p>
+                            <a
+                                asp-page="/Evaluations/Details"
+                                asp-route-id="@evaluation.Id"
+                                asp-route-section="criteria"
+                                class="button secondary">@T["EditCriteria"]</a>
+                        </div>
+                    }
+                    @foreach (var group in Model.RequirementGroups)
+                    {
+                        <section class="record-assessment-group">
+                            <h4>@(group.Group?.Name ?? T["Ungrouped"].Value)</h4>
+                            <div class="assessment-list">
+                                @foreach (var criterion in group.Criteria)
+                                {
+                                    <partial
+                                        name="_AssessmentRow"
+                                        model="new AssessmentRow(evaluation, candidate, criterion, Model.Access, postUrl, Model.Draft)" />
+                                }
+                            </div>
+                        </section>
+                    }
+                </section>
+            </div>
+            <aside class="record-notes" aria-label="@T["CandidateNotes"]">
+                <section>
+                    <div class="record-section-heading">
+                        <h3>@T["CandidateNotes"]</h3>
+                        @if (Model.CanEdit)
+                        {
+                            <button
+                                type="button"
+                                id="edit-notes"
+                                class="icon-button"
+                                data-dialog-open="candidate-edit"
+                                data-focus-id="candidate-notes"
+                                aria-haspopup="dialog"
+                                aria-label="@T["EditCandidateNotes"]">
+                                <partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' />
+                            </button>
+                        }
+                    </div>
+                    <p class="candidate-notes">@(candidate.Notes.Length > 0 ? candidate.Notes : T["NoCandidateNotes"].Value)</p>
+                    @if (candidate.SourceLinks.Any())
+                    {
+                        <h4>@T["CandidateLinks"]</h4>
+                        <ul class="candidate-links">
+                            @foreach (var link in candidate.SourceLinks)
+                            {
+                                <li><a href="@link" target="_blank" rel="noopener noreferrer">@link</a></li>
+                            }
+                        </ul>
+                    }
+                </section>
+                <section>
+                    <div class="record-section-heading">
+                        <h3>@T["CandidateClassification"]</h3>
+                        @if (Model.CanEdit)
+                        {
+                            <button
+                                type="button"
+                                id="edit-classification"
+                                class="icon-button"
+                                data-dialog-open="candidate-classification"
+                                aria-haspopup="dialog"
+                                aria-label="@T["EditClassification"]">
+                                <partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' />
+                            </button>
+                        }
+                    </div>
+                    <span class="candidate-status @statusClass">@T["CandidateStatus" + candidate.Status]</span>
+                    <p class="candidate-reason">@(candidate.StatusReason.Length > 0 ? candidate.StatusReason : T["NoCandidateReason"].Value)</p>
+                </section>
+            </aside>
         </div>
-        <aside class="record-notes" aria-label="@T["CandidateNotes"]">
-            <section><div class="record-section-heading"><h3>@T["CandidateNotes"]</h3>@if (edit) { <button type="button" id="edit-notes" class="icon-button" data-dialog-open="candidate-edit" data-focus-id="candidate-notes" aria-haspopup="dialog" aria-label="@T["EditCandidateNotes"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' /></button> }</div><p class="candidate-notes">@(c.Notes.Length > 0 ? c.Notes : T["NoCandidateNotes"].Value)</p>
-                @if (c.SourceLinks.Any()) { <h4>@T["CandidateLinks"]</h4><ul class="candidate-links">@foreach (var link in c.SourceLinks) { <li><a href="@link" target="_blank" rel="noopener noreferrer">@link</a></li> }</ul> }
-            </section>
-            <section><div class="record-section-heading"><h3>@T["CandidateClassification"]</h3>@if (edit) { <button type="button" id="edit-classification" class="icon-button" data-dialog-open="candidate-classification" aria-haspopup="dialog" aria-label="@T["EditClassification"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' /></button> }</div><span class="candidate-status @c.Status.ToString().ToLowerInvariant()">@T["CandidateStatus" + c.Status]</span><p class="candidate-reason">@(c.StatusReason.Length > 0 ? c.StatusReason : T["NoCandidateReason"].Value)</p></section>
-        </aside>
-    </div>
-</article>
-@if (edit)
-{
-    <dialog id="candidate-edit" class="side-sheet" data-editor data-guard-draft data-opener="edit-specifications" data-open-on-load="@(Model.FailedAction == "edit-candidate" ? "true" : "false")" aria-labelledby="candidate-edit-title">
-        <div class="editor-heading"><div><p class="editor-context">@c.DisplayName</p><h2 id="candidate-edit-title">@T["EditCandidate"]</h2></div><button type="button" class="icon-button" data-editor-close aria-label="@T["Close"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"close"' /></button></div>
-        <div class="editor-error" role="alert" tabindex="-1" hidden="@(Model.FailedAction != "edit-candidate")">@(Model.FailedAction == "edit-candidate" ? Model.Notice : null)</div>
-        <form method="post" hx-post="@url" hx-disabled-elt="find button[type='submit']" data-guard-draft data-submitted-values="@(Model.FailedAction == "edit-candidate" ? System.Text.Json.JsonSerializer.Serialize(Context.Request.Form.ToDictionary(x => x.Key, x => x.Value.ToString())) : null)"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="edit-candidate" /><partial name="_CandidateFields" model="Steervo.Web.Pages.Evaluations.Candidates.CandidateForm.From(c)" /><partial name="/Pages/Shared/_EditorActions.cshtml" model='new EditorActions("save-candidate-details")' /></form>
-    </dialog>
-    <dialog id="candidate-classification" class="side-sheet" data-editor data-guard-draft data-opener="edit-classification" data-open-on-load="@(Model.FailedAction == "classify-candidate" ? "true" : "false")" aria-labelledby="candidate-classification-title">
-        <div class="editor-heading"><div><p class="editor-context">@c.DisplayName</p><h2 id="candidate-classification-title">@T["CandidateClassification"]</h2></div><button type="button" class="icon-button" data-editor-close aria-label="@T["Close"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"close"' /></button></div>
-        <div class="editor-error" role="alert" tabindex="-1" hidden="@(Model.FailedAction != "classify-candidate")">@(Model.FailedAction == "classify-candidate" ? Model.Notice : null)</div>
-        <form method="post" hx-post="@url" hx-disabled-elt="find button[type='submit']" data-guard-draft data-submitted-values="@(Model.FailedAction == "classify-candidate" ? System.Text.Json.JsonSerializer.Serialize(Context.Request.Form.ToDictionary(x => x.Key, x => x.Value.ToString())) : null)"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="classify-candidate" /><label for="candidate-status">@T["CandidateStatus"]</label><select id="candidate-status" name="status">@foreach (var status in Enum.GetValues<CandidateStatus>()) { <option value="@status" selected="@(status == c.Status)">@T["CandidateStatus" + status]</option> }</select><label for="candidate-reason">@T["CandidateReason"]</label><textarea id="candidate-reason" name="reason" maxlength="2000" rows="4" aria-describedby="candidate-reason-help">@c.StatusReason</textarea><p id="candidate-reason-help" class="micro">@T["CandidateReasonHelp"]</p><partial name="/Pages/Shared/_EditorActions.cshtml" model='new EditorActions("save-classification")' /></form>
-    </dialog>
-}
-@if (edit)
-{
-    var copyFailed = Model.FailedAction == "copy-candidate";
-    <dialog id="candidate-copy" class="side-sheet" data-editor data-guard-draft data-opener="copy-candidate" data-open-on-load="@(copyFailed ? "true" : "false")" aria-labelledby="candidate-copy-title">
-        <div class="editor-heading"><div><p class="editor-context">@c.DisplayName</p><h2 id="candidate-copy-title">@T["CopyCandidate"]</h2></div><button type="button" class="icon-button" data-editor-close aria-label="@T["Close"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"close"' /></button></div>
-        <div class="editor-error" role="alert" tabindex="-1" hidden="@(!copyFailed)">@(copyFailed ? Model.Notice : null)</div>
-        <form method="post" hx-post="@url" hx-disabled-elt="find button[type=submit]" data-guard-draft data-submitted-values="@(copyFailed ? System.Text.Json.JsonSerializer.Serialize(new { copyName = Model.CopyName }) : null)"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="copy-candidate" /><label for="copy-name">@T["CopyCandidateName"]</label><input id="copy-name" name="copyName" value="@c.Model" required maxlength="160" /><p class="micro">@T["CopyCandidateHelp"]</p><partial name="/Pages/Shared/_EditorActions.cshtml" model='new EditorActions("copy-submit", T["CopyCandidate"].Value)' /></form>
-    </dialog>
-}
+    </article>
+    @if (Model.CanEdit)
+    {
+        <dialog
+            id="candidate-edit"
+            class="side-sheet"
+            data-editor
+            data-guard-draft
+            data-opener="edit-specifications"
+            data-open-on-load="@(Model.EditFailed ? "true" : "false")"
+            aria-labelledby="candidate-edit-title">
+            <div class="editor-heading">
+                <div>
+                    <p class="editor-context">@candidate.DisplayName</p>
+                    <h2 id="candidate-edit-title">@T["EditCandidate"]</h2>
+                </div>
+                <button type="button" class="icon-button" data-editor-close aria-label="@T["Close"]">
+                    <partial name="/Pages/Shared/_Icon.cshtml" model='"close"' />
+                </button>
+            </div>
+            <div class="editor-error" role="alert" tabindex="-1" hidden="@(!Model.EditFailed)">@(Model.EditFailed ? Model.Notice : null)</div>
+            <form
+                method="post"
+                hx-post="@postUrl"
+                hx-disabled-elt="find button[type='submit']"
+                data-guard-draft
+                data-submitted-values="@(Model.EditFailed ? Model.SubmittedFormJson : null)">
+                <input type="hidden" name="version" value="@evaluation.Version" />
+                <input type="hidden" name="action" value="edit-candidate" />
+                <partial name="_CandidateFields" model="CandidateForm.From(candidate)" />
+                <partial name="/Pages/Shared/_EditorActions.cshtml" model='new EditorActions("save-candidate-details")' />
+            </form>
+        </dialog>
+        <dialog
+            id="candidate-classification"
+            class="side-sheet"
+            data-editor
+            data-guard-draft
+            data-opener="edit-classification"
+            data-open-on-load="@(Model.ClassifyFailed ? "true" : "false")"
+            aria-labelledby="candidate-classification-title">
+            <div class="editor-heading">
+                <div>
+                    <p class="editor-context">@candidate.DisplayName</p>
+                    <h2 id="candidate-classification-title">@T["CandidateClassification"]</h2>
+                </div>
+                <button type="button" class="icon-button" data-editor-close aria-label="@T["Close"]">
+                    <partial name="/Pages/Shared/_Icon.cshtml" model='"close"' />
+                </button>
+            </div>
+            <div class="editor-error" role="alert" tabindex="-1" hidden="@(!Model.ClassifyFailed)">@(Model.ClassifyFailed ? Model.Notice : null)</div>
+            <form
+                method="post"
+                hx-post="@postUrl"
+                hx-disabled-elt="find button[type='submit']"
+                data-guard-draft
+                data-submitted-values="@(Model.ClassifyFailed ? Model.SubmittedFormJson : null)">
+                <input type="hidden" name="version" value="@evaluation.Version" />
+                <input type="hidden" name="action" value="classify-candidate" />
+                <label for="candidate-status">@T["CandidateStatus"]</label>
+                <select id="candidate-status" name="status">
+                    @foreach (var status in Enum.GetValues<CandidateStatus>())
+                    {
+                        <option value="@status" selected="@(status == candidate.Status)">@T["CandidateStatus" + status]</option>
+                    }
+                </select>
+                <label for="candidate-reason">@T["CandidateReason"]</label>
+                <textarea
+                    id="candidate-reason"
+                    name="reason"
+                    maxlength="2000"
+                    rows="4"
+                    aria-describedby="candidate-reason-help">@candidate.StatusReason</textarea>
+                <p id="candidate-reason-help" class="micro">@T["CandidateReasonHelp"]</p>
+                <partial name="/Pages/Shared/_EditorActions.cshtml" model='new EditorActions("save-classification")' />
+            </form>
+        </dialog>
+        <dialog
+            id="candidate-copy"
+            class="side-sheet"
+            data-editor
+            data-guard-draft
+            data-opener="copy-candidate"
+            data-open-on-load="@(Model.CopyFailed ? "true" : "false")"
+            aria-labelledby="candidate-copy-title">
+            <div class="editor-heading">
+                <div>
+                    <p class="editor-context">@candidate.DisplayName</p>
+                    <h2 id="candidate-copy-title">@T["CopyCandidate"]</h2>
+                </div>
+                <button type="button" class="icon-button" data-editor-close aria-label="@T["Close"]">
+                    <partial name="/Pages/Shared/_Icon.cshtml" model='"close"' />
+                </button>
+            </div>
+            <div class="editor-error" role="alert" tabindex="-1" hidden="@(!Model.CopyFailed)">@(Model.CopyFailed ? Model.Notice : null)</div>
+            <form
+                method="post"
+                hx-post="@postUrl"
+                hx-disabled-elt="find button[type=submit]"
+                data-guard-draft
+                data-submitted-values="@(Model.CopyFailed ? Model.SubmittedCopyJson : null)">
+                <input type="hidden" name="version" value="@evaluation.Version" />
+                <input type="hidden" name="action" value="copy-candidate" />
+                <label for="copy-name">@T["CopyCandidateName"]</label>
+                <input
+                    id="copy-name"
+                    name="copyName"
+                    value="@candidate.Model"
+                    required
+                    maxlength="160" />
+                <p class="micro">@T["CopyCandidateHelp"]</p>
+                <partial
+                    name="/Pages/Shared/_EditorActions.cshtml"
+                    model='new EditorActions("copy-submit", T["CopyCandidate"].Value)' />
+            </form>
+        </dialog>
+    }
 </div>

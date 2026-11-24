@@ -1,16 +1,45 @@
 @model Steervo.Web.Pages.Evaluations.Offers.OfferAssessmentRow
 @using Steervo.Web.Pages.Shared
-@{ var c = Model.Criterion; var a = Model.Assessment; var field = Model.FieldId; var edit = Model.Access >= AccessLevel.Editor; }
-<article class="assessment-row" id="@field" data-offer-assessment="@c.Id" data-result="@Model.Result" data-stale="@Model.Stale.ToString().ToLowerInvariant()">
-@if (edit)
-{
-    <button type="button" class="assessment-summary" id="open-@field" data-editor-open="editor-@field" aria-expanded="@Model.HasDraft.ToString().ToLowerInvariant()" aria-controls="editor-@field" aria-label="@T["EditAssessmentFor", c.Name, Model.Offer.Latest.Terms.Name]"><partial name="_OfferAssessmentSummary" model="Model" /></button>
+@{
+    var criterion = Model.Criterion;
+    var assessment = Model.Assessment;
+    var fieldId = Model.FieldId;
 }
-else { <div class="assessment-summary"><partial name="_OfferAssessmentSummary" model="Model" /></div> }
-@if (Model.Stale) { <p class="offer-review">@T["OfferAssessmentStale", a!.RevisionNumber]</p> }
-@if (!string.IsNullOrEmpty(a?.Notes)) { <p class="assessment-notes-text">@a.Notes</p> }
-@if (edit)
-{
-    <partial name="/Pages/Shared/_AssessmentEditor.cshtml" model='new AssessmentEditor(Model.Evaluation, c, Model.Offer.Id, Model.Offer.Latest.Terms.Name, "offerId", "assess-offer", field, Model.PostUrl) { BooleanValue = a?.BooleanValue, OptionalAvailable = a?.OptionalAvailable ?? false, MeasurementValue = a?.MeasurementValue, RatingValue = a?.RatingValue, Source = a?.Source ?? AssessmentSource.Unknown, Notes = a?.Notes, HasAssessment = a is not null, Draft = Model.HasDraft ? Model.Draft : null, ReviewNotice = Model.Stale ? T["OfferAssessmentStale", a!.RevisionNumber].Value : null, SubmitLabel = Model.Stale ? T["OfferAssessmentReview"].Value : null }' />
-}
+<article
+    class="assessment-row"
+    id="@fieldId"
+    data-offer-assessment="@criterion.Id"
+    data-result="@Model.Result"
+    data-stale="@Model.Stale.ToString().ToLowerInvariant()">
+    @if (Model.CanEdit)
+    {
+        <button
+            type="button"
+            class="assessment-summary"
+            id="open-@fieldId"
+            data-editor-open="editor-@fieldId"
+            aria-expanded="@Model.HasDraft.ToString().ToLowerInvariant()"
+            aria-controls="editor-@fieldId"
+            aria-label="@T["EditAssessmentFor", criterion.Name, Model.Offer.Latest.Terms.Name]">
+            <partial name="_OfferAssessmentSummary" model="Model" />
+        </button>
+    }
+    else
+    {
+        <div class="assessment-summary">
+            <partial name="_OfferAssessmentSummary" model="Model" />
+        </div>
+    }
+    @if (Model.Stale)
+    {
+        <p class="offer-review">@T["OfferAssessmentStale", assessment!.RevisionNumber]</p>
+    }
+    @if (!string.IsNullOrEmpty(assessment?.Notes))
+    {
+        <p class="assessment-notes-text">@assessment.Notes</p>
+    }
+    @if (Model.CanEdit)
+    {
+        <partial name="/Pages/Shared/_AssessmentEditor.cshtml" model="Model.Editor(T)" />
+    }
 </article>

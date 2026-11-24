@@ -1,20 +1,46 @@
 @model Steervo.Web.Pages.Evaluations.Offers.OfferSnapshot
 @using Steervo.Web.Pages.Evaluations.Offers
-@{ var contract = Model.Revision.Terms.Kind is OfferKind.Leasing or OfferKind.Financing; }
-@if (Model.Revision.Lines.Count == 0) { <p class="muted">@T["OfferNoLines"]</p> }
+@if (Model.Revision.Lines.Count == 0)
+{
+    <p class="muted">@T["OfferNoLines"]</p>
+}
 else
 {
-<ul class="offer-lines">
-@foreach (var line in Model.Revision.Lines.OrderBy(line => line.Position))
-{
-    var criterion = line.CriterionId.HasValue ? Model.Criteria?.FirstOrDefault(item => item.Id == line.CriterionId) : null;
-<li data-offer-line-kind="@line.Kind" data-offer-line-price="@line.PriceKind"><div><span class="micro">@T["OfferLineKind" + line.Kind]</span><strong>@line.Name</strong><span class="offer-line-price">@(line.PriceKind == OfferPriceKind.Amount ? $"{OfferPrices.Format(line.Kind == OfferLineKind.Discount ? -line.Amount!.Value : line.Amount!.Value)} {Model.Currency}" : T["OfferPriceKind" + line.PriceKind].Value)</span></div>
-@if (line.Value.HasValue) { <p class="micro">@T["OfferLineValueOf", $"{line.Value:N2} {Model.Currency}"]</p> }
-@if (contract && line.PriceKind == OfferPriceKind.Amount && !line.Financed) { <p class="micro" data-offer-line-handover>@T["OfferLineAtHandover"]</p> }
-@if (line.Kind == OfferLineKind.Benefit && (line.Effect.HasValue || line.CostCategory.HasValue || line.DurationMonths.HasValue)) { <p class="micro">@(line.Effect.HasValue ? T["OfferBenefitEffect" + line.Effect].Value : T["OfferOpen"].Value) @if (line.CostCategory.HasValue) { <span> · @T["CostCategory" + line.CostCategory]</span> } · @(line.DurationMonths.HasValue ? T["OfferDuration", line.DurationMonths.Value].Value : T["OfferDurationOpen"].Value)</p> }
-@if (criterion is not null) { <p class="micro offer-line-criterion">@T["OfferLineFulfils", criterion.Name]</p> }
-@if (line.Notes.Length > 0) { <p class="offer-note">@line.Notes</p> }
-</li>
-}
-</ul>
+    <ul class="offer-lines">
+        @foreach (var line in Model.OrderedLines)
+        {
+            var criterion = Model.CriterionOf(line);
+
+            <li data-offer-line-kind="@line.Kind" data-offer-line-price="@line.PriceKind">
+                <div><span class="micro">@T["OfferLineKind" + line.Kind]</span><strong>@line.Name</strong><span class="offer-line-price">@Model.LinePrice(line, T)</span></div>
+                @if (line.Value.HasValue)
+                {
+                    <p class="micro">@T["OfferLineValueOf", $"{line.Value:N2} {Model.Currency}"]</p>
+                }
+                @if (Model.IsDueAtHandover(line))
+                {
+                    <p class="micro" data-offer-line-handover>@T["OfferLineAtHandover"]</p>
+                }
+                @if (OfferSnapshot.HasBenefitDetails(line))
+                {
+                    <p class="micro">
+                        @(line.Effect.HasValue ? T["OfferBenefitEffect" + line.Effect].Value : T["OfferOpen"].Value)
+                        @if (line.CostCategory.HasValue)
+                        {
+                            <span> · @T["CostCategory" + line.CostCategory]</span>
+                        }
+                        · @(line.DurationMonths.HasValue ? T["OfferDuration", line.DurationMonths.Value].Value : T["OfferDurationOpen"].Value)
+                    </p>
+                }
+                @if (criterion is not null)
+                {
+                    <p class="micro offer-line-criterion">@T["OfferLineFulfils", criterion.Name]</p>
+                }
+                @if (line.Notes.Length > 0)
+                {
+                    <p class="offer-note">@line.Notes</p>
+                }
+            </li>
+        }
+    </ul>
 }

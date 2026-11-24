@@ -1,36 +1,83 @@
 @model IReadOnlyList<Candidate>
 @using Steervo.Web.Pages.Evaluations.Candidates
+@{
+    // Every row spans the label column and one column per car.
+    var columnCount = Model.Count + 1;
+}
 @if (Model.Any(candidate => candidate.Specifications.HasValues()))
 {
-    <tbody class="specification-comparison" id="comparison-specifications"><tr class="vehicle-group-heading comparison-section-heading"><th scope="colgroup" colspan="@(Model.Count + 1)"><span class="comparison-group-label">@T["VehicleSpecifications"]</span></th></tr></tbody>
-    @foreach (var group in SpecificationFields.All.GroupBy(field => field.Group))
+    <tbody class="specification-comparison" id="comparison-specifications">
+        <tr class="vehicle-group-heading comparison-section-heading">
+            <th scope="colgroup" colspan="@columnCount">
+                <span class="comparison-group-label">@T["VehicleSpecifications"]</span>
+            </th>
+        </tr>
+    </tbody>
+    @foreach (var group in SpecificationFields.Groups)
     {
-        var fields = group.Where(field => Model.Any(candidate => field.Value(candidate.Specifications).HasValue)).ToList();
-        var hasDrive = group.Key == "Performance" && Model.Any(candidate => candidate.Specifications.Propulsion.HasValue || candidate.Specifications.Drive.HasValue);
-        if (fields.Count == 0 && !hasDrive) { continue; }
-        <tbody class="specification-comparison"><tr class="specification-group-heading"><th scope="colgroup" colspan="@(Model.Count + 1)"><span class="comparison-group-label">@T["SpecGroup" + group.Key]</span></th></tr>
-        @if (hasDrive)
+        // A value appears as a row as soon as one of the compared cars states it.
+        var fields = group
+            .Where(field => Model.Any(candidate => field.Value(candidate.Specifications).HasValue))
+            .ToList();
+        var showsDriveChoices =
+            group.Key == SpecificationFields.PerformanceGroup
+            && Model.Any(candidate => SpecificationFields.HasDriveChoice(candidate.Specifications));
+
+        if (fields.Count == 0 && !showsDriveChoices)
         {
-            @foreach (var name in new[] { "Propulsion", "Drive" })
-            {
-                if (!Model.Any(candidate => name == "Drive" ? candidate.Specifications.Drive.HasValue : candidate.Specifications.Propulsion.HasValue)) { continue; }
-                <tr><th scope="row" class="vehicle-criterion">@T["Spec" + name]</th>@foreach (var candidate in Model)
-                {
-                    var value = name == "Drive" ? candidate.Specifications.Drive?.ToString() : candidate.Specifications.Propulsion?.ToString();
-                    <td class="vehicle-value">@(value is null ? T["NotSpecified"] : T[name + value])</td>
-                }</tr>
-            }
+            continue;
         }
-        @foreach (var field in fields)
-        {
-            <tr data-specification="@field.Name"><th scope="row" class="vehicle-criterion">@T[field.Label] @if (field.Unit.Length > 0) { <span class="field-unit">(@field.Unit)</span> }</th>
-            @foreach (var candidate in Model)
-            {
-                var value = field.Value(candidate.Specifications);
-                <td class="vehicle-value" data-specification-candidate="@candidate.Id">@(value?.ToString("0.###") ?? T["NotSpecified"].Value) @if (field.IsCalculated(candidate.Specifications)) { <span class="calculated-badge">@T["Calculated"]</span> }</td>
-            }
+
+        <tbody class="specification-comparison">
+            <tr class="specification-group-heading">
+                <th scope="colgroup" colspan="@columnCount">
+                    <span class="comparison-group-label">@T["SpecGroup" + group.Key]</span>
+                </th>
             </tr>
-        }
+            @if (showsDriveChoices)
+            {
+                @foreach (var choice in SpecificationFields.DriveChoices)
+                {
+                    if (!Model.Any(candidate => choice.Read(candidate.Specifications) is not null))
+                    {
+                        continue;
+                    }
+
+                    <tr>
+                        <th scope="row" class="vehicle-criterion">@T["Spec" + choice.Name]</th>
+                        @foreach (var candidate in Model)
+                        {
+                            var value = choice.Read(candidate.Specifications);
+
+                            <td class="vehicle-value">@(value is null ? T["NotSpecified"] : T[choice.Name + value])</td>
+                        }
+                    </tr>
+                }
+            }
+            @foreach (var field in fields)
+            {
+                <tr data-specification="@field.Name">
+                    <th scope="row" class="vehicle-criterion">
+                        @T[field.Label]
+                        @if (field.Unit.Length > 0)
+                        {
+                            <span class="field-unit">(@field.Unit)</span>
+                        }
+                    </th>
+                    @foreach (var candidate in Model)
+                    {
+                        var value = field.Value(candidate.Specifications);
+
+                        <td class="vehicle-value" data-specification-candidate="@candidate.Id">
+                            @(value?.ToString("0.###") ?? T["NotSpecified"].Value)
+                            @if (field.IsCalculated(candidate.Specifications))
+                            {
+                                <span class="calculated-badge">@T["Calculated"]</span>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
         </tbody>
     }
 }

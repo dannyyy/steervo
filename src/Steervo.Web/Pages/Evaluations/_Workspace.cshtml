@@ -1,91 +1,292 @@
 @model Steervo.Web.Pages.Evaluations.DetailsModel
-@{ var e = Model.Evaluation; var edit = Model.Access >= AccessLevel.Editor; }
-<div id="evaluation-workspace" data-version="@e.Version" data-preserve-viewport hx-target="#evaluation-workspace" hx-swap="outerHTML show:none focus-scroll:false" hx-sync="this:drop" hx-disabled-elt="find button[type=submit]">
-<partial name="_EvaluationHeader" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, Model.Section)' />
-@if (Model.Notice is not null && (!Model.Failed || Model.FailedAction is null or "move-group" or "place-group" or "move-criterion" or "place-criterion" or "delete" or "revoke"))
-{ <div class="notice workspace-notice @(Model.Failed ? "failure" : "success")" role="@(Model.Failed ? "alert" : "status")" tabindex="-1">@Model.Notice</div> }
-@if (!edit) { <p class="notice">@T["ReadOnlyNotice"]</p> }
-<section class="workspace-surface criteria-main" data-evaluation-section="criteria" hidden="@(Model.Section != "criteria")" aria-labelledby="criteria-title">
-    <div class="surface-heading"><div><h2 id="criteria-title" tabindex="-1">@T["WhatMatters"]</h2><p class="muted">@T["WhatMattersHelp"]</p></div>
-    @if (edit)
+@using Steervo.Web.Pages.Evaluations
+@{
+    var evaluation = Model.Evaluation;
+    var canEdit = Model.CanEdit;
+    var header = new EvaluationHeader(evaluation, Model.Access, Model.Section);
+    var scopes = new[] { CriterionScope.Vehicle, CriterionScope.Offer };
+    var directions = new[] { -1, 1 };
+}
+<div
+    id="evaluation-workspace"
+    data-version="@evaluation.Version"
+    data-preserve-viewport
+    hx-target="#evaluation-workspace"
+    hx-swap="outerHTML show:none focus-scroll:false"
+    hx-sync="this:drop"
+    hx-disabled-elt="find button[type=submit]"
+>
+    <partial name="_EvaluationHeader" model="header" />
+    @if (Model.ShowsWorkspaceNotice)
     {
-        <div class="surface-actions"><button type="button" id="add-group" class="button secondary" data-editor-open="new-group-editor" aria-expanded="false">@T["AddGroup"]</button><button type="button" id="add-criterion" class="button primary" data-dialog-open="new-criterion-editor" aria-haspopup="dialog"><partial name="/Pages/Shared/_Icon.cshtml" model='"plus"' />@T["AddCriterion"]</button></div>
+        <div
+            class="notice workspace-notice @(Model.Failed ? "failure" : "success")"
+            role="@(Model.Failed ? "alert" : "status")"
+            tabindex="-1"
+        >@Model.Notice</div>
     }
-    </div>
-    @if (edit)
+    @if (!canEdit)
     {
-        <partial name="_GroupEditor" model='new Steervo.Web.Pages.Evaluations.GroupEditor(Model, null)' />
-        <p id="sorting-help" class="visually-hidden">@T["SortingHelp"]</p>
-        <form id="reorder-form" method="post" hx-post="/evaluations/@e.Id" data-sort hidden><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" /><input type="hidden" name="itemId" /><input type="hidden" name="groupId" /><input type="hidden" name="position" /></form>
+        <p class="notice">@T["ReadOnlyNotice"]</p>
     }
-    @if (e.Criteria.Count == 0 && e.Groups.Count == 0) { <div class="canvas-empty"><partial name="/Pages/Shared/_Icon.cshtml" model='"list"' /><h3>@T["EmptyCriteriaTitle"]</h3><p>@T["EmptyCriteria"]</p></div> }
-    @foreach (var scope in new[] { CriterionScope.Vehicle, CriterionScope.Offer })
-    {
-    var scoped = e.Criteria.Where(c => c.Scope == scope).ToList();
-    // A group appears where it has criteria; a group without any criteria is listed with the vehicle criteria.
-    var groups = e.Groups.OrderBy(x => x.Position).Where(g => scoped.Any(c => c.GroupId == g.Id) || scope == CriterionScope.Vehicle && e.Criteria.All(c => c.GroupId != g.Id)).ToList();
-    if (scoped.Count == 0 && groups.Count == 0) { continue; }
-    <section class="criteria-scope" id="criteria-scope-@scope" data-criteria-scope="@scope" aria-labelledby="criteria-scope-title-@scope">
-    <div class="scope-heading"><partial name="/Pages/Shared/_Icon.cshtml" model='(scope == CriterionScope.Vehicle ? "car" : "wallet")' /><h3 id="criteria-scope-title-@scope">@T["CriteriaScope" + scope]</h3><span class="group-count" aria-label="@T["CriterionCount", scoped.Count]">@scoped.Count</span></div>
-    @foreach (var group in groups.Cast<CriterionGroup?>().Append(null))
-    {
-        var criteria = scoped.Where(c => c.GroupId == group?.Id).OrderBy(c => c.Position).ToList();
-        // A group holding both kinds is listed twice; only its first listing can be renamed or removed.
-        var repeated = group is not null && scope == CriterionScope.Offer && e.Criteria.Any(c => c.GroupId == group.Id && c.Scope == CriterionScope.Vehicle);
-        var suffix = scope == CriterionScope.Offer && (group is null || repeated) ? "-offer" : "";
-        var groupIndex = group is null ? -1 : groups.IndexOf(group);
-        if (group is null && criteria.Count == 0) { continue; }
-        <section class="criterion-group" id="criterion-group-@group?.Id@suffix" data-group-id="@group?.Id" data-position="@group?.Position" data-sort-kind="@(edit && group is not null ? "group" : null)">
-            <div class="group-heading"><div class="group-title">
-            @if (edit && group is not null) { <button type="button" id="drag-group-@group.Id@suffix" class="drag-handle" data-drag-handle aria-label="@T["MoveGroup", group.Name]" aria-describedby="sorting-help"><partial name="_DragGrip" /></button> }
-            <h3>@(group?.Name ?? T["Ungrouped"].Value)</h3><span class="group-count" aria-label="@T["CriterionCount", criteria.Count]">@criteria.Count</span></div>
-            @if (edit && group is not null)
+    <section
+        class="workspace-surface criteria-main"
+        data-evaluation-section="criteria"
+        hidden="@(Model.Section != "criteria")"
+        aria-labelledby="criteria-title"
+    >
+        <div class="surface-heading">
+            <div>
+                <h2 id="criteria-title" tabindex="-1">@T["WhatMatters"]</h2>
+                <p class="muted">@T["WhatMattersHelp"]</p>
+            </div>
+            @if (canEdit)
             {
-                <div class="row-actions">
-                @foreach (var direction in new[] { -1, 1 })
-                {
-                    var neighbour = groups.ElementAtOrDefault(groupIndex + direction);
-                    <form method="post" hx-post="/evaluations/@e.Id" data-sort data-direction="@direction"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="place-group" /><input type="hidden" name="itemId" value="@group.Id" /><input type="hidden" name="position" value="@(neighbour?.Position ?? group.Position)" /><button type="submit" id="move-group-@group.Id-@direction@suffix" class="icon-button" aria-label="@T[direction == -1 ? "GroupUp" : "GroupDown", group.Name]" disabled="@(neighbour is null)"><partial name="/Pages/Shared/_Icon.cshtml" model='(direction == -1 ? "up" : "down")' /></button></form>
-                }
-                @if (!repeated) { <button type="button" class="icon-button" id="edit-group-@group.Id" data-editor-open="group-editor-@group.Id" aria-expanded="false" aria-label="@T["EditGroupNamed", group.Name]"><partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' /></button> }
+                <div class="surface-actions">
+                    <button
+                        type="button"
+                        id="add-group"
+                        class="button secondary"
+                        data-editor-open="new-group-editor"
+                        aria-expanded="false"
+                    >@T["AddGroup"]</button>
+                    <button
+                        type="button"
+                        id="add-criterion"
+                        class="button primary"
+                        data-dialog-open="new-criterion-editor"
+                        aria-haspopup="dialog"
+                    >
+                        <partial name="/Pages/Shared/_Icon.cshtml" model='"plus"' />
+                        @T["AddCriterion"]
+                    </button>
                 </div>
             }
+        </div>
+        @if (canEdit)
+        {
+            <partial name="_GroupEditor" model="new GroupEditor(Model, null)" />
+            <p id="sorting-help" class="visually-hidden">@T["SortingHelp"]</p>
+            @* Drag and drop fills in this form and submits it. *@
+            <form id="reorder-form" method="post" hx-post="/evaluations/@evaluation.Id" data-sort hidden>
+                <input type="hidden" name="version" value="@evaluation.Version" />
+                <input type="hidden" name="action" />
+                <input type="hidden" name="itemId" />
+                <input type="hidden" name="groupId" />
+                <input type="hidden" name="position" />
+            </form>
+        }
+        @if (evaluation.Criteria.Count == 0 && evaluation.Groups.Count == 0)
+        {
+            <div class="canvas-empty">
+                <partial name="/Pages/Shared/_Icon.cshtml" model='"list"' />
+                <h3>@T["EmptyCriteriaTitle"]</h3>
+                <p>@T["EmptyCriteria"]</p>
             </div>
-            @if (edit && group is not null && !repeated) { <partial name="_GroupEditor" model="new Steervo.Web.Pages.Evaluations.GroupEditor(Model, group)" /> }
-            <div class="criterion-list" data-count="@e.Criteria.Count(c => c.GroupId == group?.Id)">
-            @if (criteria.Count == 0) { <p class="group-empty">@T["EmptyGroup"]</p> }
-            @foreach (var criterion in criteria)
+        }
+        @foreach (var scope in scopes)
+        {
+            var scoped = Model.CriteriaIn(scope);
+            var groups = Model.GroupsListedIn(scope, scoped);
+            var scopeIcon = scope == CriterionScope.Vehicle ? "car" : "wallet";
+
+            if (scoped.Count == 0 && groups.Count == 0)
             {
-                <article class="criterion @(edit ? "editable" : null)" id="criterion-@criterion.Id" data-criterion-id="@criterion.Id" data-position="@criterion.Position" data-sort-kind="@(edit ? "criterion" : null)">
-                    <div class="criterion-top">
-                    @if (edit) { <button type="button" id="drag-criterion-@criterion.Id" class="drag-handle" data-drag-handle aria-label="@T["MoveCriterion", criterion.Name]" aria-describedby="sorting-help"><partial name="_DragGrip" /></button> }
-                    <div class="criterion-copy"><div class="criterion-title"><h4>@criterion.Name</h4><span class="priority @criterion.Priority.ToString().ToLowerInvariant()">@T[criterion.Priority.ToString()]</span></div><p>@T[criterion.Type.ToString()]@if (criterion.Type == CriterionType.Measurement) { <span> · @(criterion.Comparison == Comparison.AtLeast ? "≥" : "≤") @criterion.Threshold @criterion.Unit</span> }</p></div>
-                    @if (edit)
-                    {
-                        <div class="row-actions">
-                        @foreach (var direction in new[] { -1, 1 })
-                        {
-                            var neighbour = criteria.ElementAtOrDefault(criteria.IndexOf(criterion) + direction);
-                            <form method="post" hx-post="/evaluations/@e.Id" data-sort data-direction="@direction"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="place-criterion" /><input type="hidden" name="itemId" value="@criterion.Id" /><input type="hidden" name="groupId" value="@group?.Id" /><input type="hidden" name="position" value="@(neighbour?.Position ?? criterion.Position)" /><button type="submit" id="move-criterion-@criterion.Id-@direction" class="icon-button" aria-label="@T[direction == -1 ? "CriterionUp" : "CriterionDown", criterion.Name]" disabled="@(neighbour is null)"><partial name="/Pages/Shared/_Icon.cshtml" model='(direction == -1 ? "up" : "down")' /></button></form>
-                        }
-                        <button type="button" class="icon-button criterion-open" id="edit-criterion-@criterion.Id" data-editor-open="criterion-editor-@criterion.Id" aria-expanded="false" aria-label="@T["EditCriterionNamed", criterion.Name]"><partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' /></button>
-                        </div>
-                    }
-                    </div>
-                    @if (edit) { <partial name="_CriterionEditor" model="new Steervo.Web.Pages.Evaluations.CriterionEditor(Model, criterion)" /> }
-                </article>
+                continue;
             }
-            </div>
-        </section>
-    }
+
+            <section
+                class="criteria-scope"
+                id="criteria-scope-@scope"
+                data-criteria-scope="@scope"
+                aria-labelledby="criteria-scope-title-@scope"
+            >
+                <div class="scope-heading">
+                    <partial name="/Pages/Shared/_Icon.cshtml" model="scopeIcon" />
+                    <h3 id="criteria-scope-title-@scope">@T["CriteriaScope" + scope]</h3>
+                    <span class="group-count" aria-label="@T["CriterionCount", scoped.Count]">@scoped.Count</span>
+                </div>
+                @* The ungrouped criteria follow the groups as a last listing without a group. *@
+                @foreach (var group in groups.Cast<CriterionGroup?>().Append(null))
+                {
+                    var criteria = Model.CriteriaOf(group, scoped);
+                    var repeated = Model.IsRepeatedListing(group, scope);
+                    var suffix = Model.ListingIdSuffix(group, scope);
+                    var groupIndex = group is null ? -1 : groups.IndexOf(group);
+
+                    if (group is null && criteria.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    <section
+                        class="criterion-group"
+                        id="criterion-group-@group?.Id@suffix"
+                        data-group-id="@group?.Id"
+                        data-position="@group?.Position"
+                        data-sort-kind="@(canEdit && group is not null ? "group" : null)"
+                    >
+                        <div class="group-heading">
+                            <div class="group-title">
+                                @if (canEdit && group is not null)
+                                {
+                                    <button
+                                        type="button"
+                                        id="drag-group-@group.Id@suffix"
+                                        class="drag-handle"
+                                        data-drag-handle
+                                        aria-label="@T["MoveGroup", group.Name]"
+                                        aria-describedby="sorting-help"
+                                    >
+                                        <partial name="_DragGrip" />
+                                    </button>
+                                }
+                                <h3>@(group?.Name ?? T["Ungrouped"].Value)</h3>
+                                <span class="group-count" aria-label="@T["CriterionCount", criteria.Count]">@criteria.Count</span>
+                            </div>
+                            @if (canEdit && group is not null)
+                            {
+                                <div class="row-actions">
+                                    @foreach (var direction in directions)
+                                    {
+                                        var neighbour = groups.ElementAtOrDefault(groupIndex + direction);
+                                        var arrowIcon = direction == -1 ? "up" : "down";
+
+                                        <form method="post" hx-post="/evaluations/@evaluation.Id" data-sort data-direction="@direction">
+                                            <input type="hidden" name="version" value="@evaluation.Version" />
+                                            <input type="hidden" name="action" value="place-group" />
+                                            <input type="hidden" name="itemId" value="@group.Id" />
+                                            <input type="hidden" name="position" value="@(neighbour?.Position ?? group.Position)" />
+                                            <button
+                                                type="submit"
+                                                id="move-group-@group.Id-@direction@suffix"
+                                                class="icon-button"
+                                                aria-label="@T[direction == -1 ? "GroupUp" : "GroupDown", group.Name]"
+                                                disabled="@(neighbour is null)"
+                                            >
+                                                <partial name="/Pages/Shared/_Icon.cshtml" model="arrowIcon" />
+                                            </button>
+                                        </form>
+                                    }
+                                    @if (!repeated)
+                                    {
+                                        <button
+                                            type="button"
+                                            class="icon-button"
+                                            id="edit-group-@group.Id"
+                                            data-editor-open="group-editor-@group.Id"
+                                            aria-expanded="false"
+                                            aria-label="@T["EditGroupNamed", group.Name]"
+                                        >
+                                            <partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' />
+                                        </button>
+                                    }
+                                </div>
+                            }
+                        </div>
+                        @if (canEdit && group is not null && !repeated)
+                        {
+                            <partial name="_GroupEditor" model="new GroupEditor(Model, group)" />
+                        }
+                        <div class="criterion-list" data-count="@Model.CriterionCountIn(group)">
+                            @if (criteria.Count == 0)
+                            {
+                                <p class="group-empty">@T["EmptyGroup"]</p>
+                            }
+                            @foreach (var criterion in criteria)
+                            {
+                                <article
+                                    class="criterion @(canEdit ? "editable" : null)"
+                                    id="criterion-@criterion.Id"
+                                    data-criterion-id="@criterion.Id"
+                                    data-position="@criterion.Position"
+                                    data-sort-kind="@(canEdit ? "criterion" : null)"
+                                >
+                                    <div class="criterion-top">
+                                        @if (canEdit)
+                                        {
+                                            <button
+                                                type="button"
+                                                id="drag-criterion-@criterion.Id"
+                                                class="drag-handle"
+                                                data-drag-handle
+                                                aria-label="@T["MoveCriterion", criterion.Name]"
+                                                aria-describedby="sorting-help"
+                                            >
+                                                <partial name="_DragGrip" />
+                                            </button>
+                                        }
+                                        <div class="criterion-copy">
+                                            <div class="criterion-title">
+                                                <h4>@criterion.Name</h4>
+                                                <span class="priority @criterion.Priority.ToString().ToLowerInvariant()">@T[criterion.Priority.ToString()]</span>
+                                            </div>
+                                            <p>@T[criterion.Type.ToString()]@if (criterion.Type == CriterionType.Measurement) { <span> · @(criterion.Comparison == Comparison.AtLeast ? "≥" : "≤") @criterion.Threshold @criterion.Unit</span> }</p>
+                                        </div>
+                                        @if (canEdit)
+                                        {
+                                            <div class="row-actions">
+                                                @foreach (var direction in directions)
+                                                {
+                                                    var neighbour = criteria.ElementAtOrDefault(criteria.IndexOf(criterion) + direction);
+                                                    var arrowIcon = direction == -1 ? "up" : "down";
+
+                                                    <form method="post" hx-post="/evaluations/@evaluation.Id" data-sort data-direction="@direction">
+                                                        <input type="hidden" name="version" value="@evaluation.Version" />
+                                                        <input type="hidden" name="action" value="place-criterion" />
+                                                        <input type="hidden" name="itemId" value="@criterion.Id" />
+                                                        <input type="hidden" name="groupId" value="@group?.Id" />
+                                                        <input type="hidden" name="position" value="@(neighbour?.Position ?? criterion.Position)" />
+                                                        <button
+                                                            type="submit"
+                                                            id="move-criterion-@criterion.Id-@direction"
+                                                            class="icon-button"
+                                                            aria-label="@T[direction == -1 ? "CriterionUp" : "CriterionDown", criterion.Name]"
+                                                            disabled="@(neighbour is null)"
+                                                        >
+                                                            <partial name="/Pages/Shared/_Icon.cshtml" model="arrowIcon" />
+                                                        </button>
+                                                    </form>
+                                                }
+                                                <button
+                                                    type="button"
+                                                    class="icon-button criterion-open"
+                                                    id="edit-criterion-@criterion.Id"
+                                                    data-editor-open="criterion-editor-@criterion.Id"
+                                                    aria-expanded="false"
+                                                    aria-label="@T["EditCriterionNamed", criterion.Name]"
+                                                >
+                                                    <partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' />
+                                                </button>
+                                            </div>
+                                        }
+                                    </div>
+                                    @if (canEdit)
+                                    {
+                                        <partial name="_CriterionEditor" model="new CriterionEditor(Model, criterion)" />
+                                    }
+                                </article>
+                            }
+                        </div>
+                    </section>
+                }
+            </section>
+        }
     </section>
+    @if (canEdit)
+    {
+        <dialog
+            id="new-criterion-editor"
+            class="side-sheet"
+            data-editor
+            data-opener="add-criterion"
+            data-open-on-load="@(Model.FailedAction == "add-criterion" ? "true" : "false")"
+            aria-labelledby="new-criterion-title"
+        >
+            <partial name="_CriterionEditor" model="new CriterionEditor(Model, null)" />
+        </dialog>
     }
-</section>
-@if (edit)
-{
-    <dialog id="new-criterion-editor" class="side-sheet" data-editor data-opener="add-criterion" data-open-on-load="@(Model.FailedAction == "add-criterion" ? "true" : "false")" aria-labelledby="new-criterion-title"><partial name="_CriterionEditor" model="new Steervo.Web.Pages.Evaluations.CriterionEditor(Model, null)" /></dialog>
-}
-<partial name="_EvaluationSettings" model="Model" />
-<partial name="_Sharing" model="Model" />
-<partial name="_EvaluationTransfer" model="Model" />
+    <partial name="_EvaluationSettings" model="Model" />
+    <partial name="_Sharing" model="Model" />
+    <partial name="_EvaluationTransfer" model="Model" />
 </div>

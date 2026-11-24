@@ -1,14 +1,35 @@
 @model Steervo.Web.Pages.Evaluations.Candidates.AssessmentRow
-@{ var field = Model.FieldId; }
-<article class="assessment-row" id="@field" data-assessment-criterion="@Model.Criterion.Id" data-assessment-candidate="@Model.Candidate.Id" data-result="@Model.Result">
-    @if (Model.Access >= AccessLevel.Editor)
+@{
+    var field = Model.FieldId;
+}
+<article
+    class="assessment-row"
+    id="@field"
+    data-assessment-criterion="@Model.Criterion.Id"
+    data-assessment-candidate="@Model.Candidate.Id"
+    data-result="@Model.Result">
+    @if (Model.CanEdit)
     {
-        <button type="button" id="open-@field" class="assessment-summary" data-editor-open="editor-@field" aria-controls="editor-@field" aria-expanded="@(Model.HasDraft ? "true" : "false")" aria-label="@T["EditAssessmentFor", Model.Criterion.Name, Model.Candidate.DisplayName]"><partial name="_AssessmentSummary" model="Model" /></button>
+        <button
+            type="button"
+            id="open-@field"
+            class="assessment-summary"
+            data-editor-open="editor-@field"
+            aria-controls="editor-@field"
+            aria-expanded="@(Model.HasDraft ? "true" : "false")"
+            aria-label="@T["EditAssessmentFor", Model.Criterion.Name, Model.Candidate.DisplayName]">
+            <partial name="_AssessmentSummary" model="Model" />
+        </button>
         <partial name="_AssessmentEditor" model="Model" />
     }
     else
     {
-        <div class="assessment-summary"><partial name="_AssessmentSummary" model="Model" /></div>
+        <div class="assessment-summary">
+            <partial name="_AssessmentSummary" model="Model" />
+        </div>
     }
-    @if (!string.IsNullOrEmpty(Model.Assessment?.Notes)) { <p class="assessment-notes-text">@Model.Assessment.Notes</p> }
+    @if (!string.IsNullOrEmpty(Model.Assessment?.Notes))
+    {
+        <p class="assessment-notes-text">@Model.Assessment.Notes</p>
+    }
 </article>

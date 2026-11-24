@@ -1,13 +1,18 @@
 #!/usr/bin/env bash
+# Creates the .env file for local development with a fresh database password and installation key.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+
 if [[ -e .env ]]; then
   echo '.env already exists; leaving it unchanged.'
   exit 0
 fi
+
+# The file holds secrets, so only the owner may read it.
 umask 077
 database_password=$(openssl rand -hex 24)
 setup_token=$(openssl rand -hex 32)
+
 cat > .env <<EOF
 POSTGRES_PASSWORD=$database_password
 Setup__Token=$setup_token
@@ -25,4 +30,5 @@ DataProtection__Path=.data/keys
 DocumentStorage__Provider=FileSystem
 DocumentStorage__Path=.data/documents
 EOF
+
 echo 'Created .env. The single-use installation key is stored in Setup__Token.'

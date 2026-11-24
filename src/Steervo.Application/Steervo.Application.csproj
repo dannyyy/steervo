@@ -1,3 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup><ProjectReference Include="../Steervo.Core/Steervo.Core.csproj" /><ProjectReference Include="../Steervo.Calculations/Steervo.Calculations.csproj" /></ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Steervo.Core/Steervo.Core.csproj" />
+    <ProjectReference Include="../Steervo.Calculations/Steervo.Calculations.csproj" />
+  </ItemGroup>
 </Project>

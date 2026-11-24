@@ -1,14 +1,98 @@
 @model Steervo.Web.Pages.Evaluations.DetailsModel
 @using Steervo.Web.Pages.Shared
-@{ var e = Model.Evaluation; var failed = Model.FailedAction == "rename"; var edit = Model.Access >= AccessLevel.Editor; }
-<section id="case-settings" class="workspace-surface" data-evaluation-section="settings" hidden="@(Model.Section != "settings")" aria-labelledby="settings-title">
-    <div class="surface-heading"><div><h2 id="settings-title" tabindex="-1">@T["General"]</h2><p class="muted">@T["EvaluationSettingsHelp"]</p></div>@if (edit) { <button type="button" id="edit-evaluation" class="button secondary" data-editor-open="evaluation-editor" aria-expanded="false"><partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' />@T["Edit"]</button> }</div>
-    <dl class="evaluation-facts"><div><dt>@T["EvaluationName"]</dt><dd>@e.Name</dd></div><div><dt>@T["Purpose"]</dt><dd>@(string.IsNullOrEmpty(e.Purpose) ? T["NotSpecified"].Value : e.Purpose)</dd></div><div><dt>@T["EvaluationCountry"]</dt><dd>@(e.Country is null ? T["NotSpecified"].Value : EvaluationCountries.DisplayName(e.Country))</dd></div><div><dt>@T["EvaluationCurrency"]</dt><dd>@(e.Currency ?? T["NotSpecified"].Value)</dd></div></dl>
-    @if (edit) {
-    <div id="evaluation-editor" class="inline-editor" data-editor data-opener="edit-evaluation" hidden="@(!failed && e.HasRegionalSettings)" aria-labelledby="evaluation-editor-title">
-        <div class="editor-heading"><h3 id="evaluation-editor-title">@T["CaseSettings"]</h3><button type="button" class="icon-button" data-editor-close aria-label="@T["Close"]"><partial name="/Pages/Shared/_Icon.cshtml" model='"close"' /></button></div>
-        <div class="editor-error" role="alert" tabindex="-1" hidden="@(!failed)">@(failed ? Model.Notice : null)</div>
-        <form method="post" hx-post="/evaluations/@e.Id?section=settings" data-guard-draft data-submitted-values="@Model.DraftFor("rename")"><input type="hidden" name="version" value="@e.Version" /><input type="hidden" name="action" value="rename" /><label for="case-name">@T["EvaluationName"]</label><input id="case-name" name="name" value="@e.Name" required maxlength="160" /><label for="case-purpose">@T["Purpose"] <span class="optional">@T["OptionalField"]</span></label><textarea id="case-purpose" name="purpose" maxlength="2000">@e.Purpose</textarea><partial name="/Pages/Shared/_EvaluationRegionFields.cshtml" model='new EvaluationRegionFields("case-region", e.Country, e.Currency, e.IsCurrencyFixed)' /><partial name="/Pages/Shared/_EditorActions.cshtml" model='new EditorActions("save-evaluation")' /></form>
+@{
+    var evaluation = Model.Evaluation;
+    var failed = Model.FailedAction == "rename";
+    var notSpecified = T["NotSpecified"].Value;
+    var regionFields = new EvaluationRegionFields(
+        "case-region",
+        evaluation.Country,
+        evaluation.Currency,
+        evaluation.IsCurrencyFixed
+    );
+}
+<section
+    id="case-settings"
+    class="workspace-surface"
+    data-evaluation-section="settings"
+    hidden="@(Model.Section != "settings")"
+    aria-labelledby="settings-title"
+>
+    <div class="surface-heading">
+        <div>
+            <h2 id="settings-title" tabindex="-1">@T["General"]</h2>
+            <p class="muted">@T["EvaluationSettingsHelp"]</p>
+        </div>
+        @if (Model.CanEdit)
+        {
+            <button
+                type="button"
+                id="edit-evaluation"
+                class="button secondary"
+                data-editor-open="evaluation-editor"
+                aria-expanded="false"
+            >
+                <partial name="/Pages/Shared/_Icon.cshtml" model='"edit"' />
+                @T["Edit"]
+            </button>
+        }
     </div>
+    <dl class="evaluation-facts">
+        <div>
+            <dt>@T["EvaluationName"]</dt>
+            <dd>@evaluation.Name</dd>
+        </div>
+        <div>
+            <dt>@T["Purpose"]</dt>
+            <dd>@(string.IsNullOrEmpty(evaluation.Purpose) ? notSpecified : evaluation.Purpose)</dd>
+        </div>
+        <div>
+            <dt>@T["EvaluationCountry"]</dt>
+            <dd>@(evaluation.Country is null ? notSpecified : EvaluationCountries.DisplayName(evaluation.Country))</dd>
+        </div>
+        <div>
+            <dt>@T["EvaluationCurrency"]</dt>
+            <dd>@(evaluation.Currency ?? notSpecified)</dd>
+        </div>
+    </dl>
+    @if (Model.CanEdit)
+    {
+        @* The editor opens by itself while country and currency are still missing. *@
+        <div
+            id="evaluation-editor"
+            class="inline-editor"
+            data-editor
+            data-opener="edit-evaluation"
+            hidden="@(!failed && evaluation.HasRegionalSettings)"
+            aria-labelledby="evaluation-editor-title"
+        >
+            <div class="editor-heading">
+                <h3 id="evaluation-editor-title">@T["CaseSettings"]</h3>
+                <button type="button" class="icon-button" data-editor-close aria-label="@T["Close"]">
+                    <partial name="/Pages/Shared/_Icon.cshtml" model='"close"' />
+                </button>
+            </div>
+            <div
+                class="editor-error"
+                role="alert"
+                tabindex="-1"
+                hidden="@(!failed)"
+            >@(failed ? Model.Notice : null)</div>
+            <form
+                method="post"
+                hx-post="/evaluations/@evaluation.Id?section=settings"
+                data-guard-draft
+                data-submitted-values="@Model.DraftFor("rename")"
+            >
+                <input type="hidden" name="version" value="@evaluation.Version" />
+                <input type="hidden" name="action" value="rename" />
+                <label for="case-name">@T["EvaluationName"]</label>
+                <input id="case-name" name="name" value="@evaluation.Name" required maxlength="160" />
+                <label for="case-purpose">@T["Purpose"] <span class="optional">@T["OptionalField"]</span></label>
+                <textarea id="case-purpose" name="purpose" maxlength="2000">@evaluation.Purpose</textarea>
+                <partial name="/Pages/Shared/_EvaluationRegionFields.cshtml" model="regionFields" />
+                <partial name="/Pages/Shared/_EditorActions.cshtml" model='new EditorActions("save-evaluation")' />
+            </form>
+        </div>
     }
 </section>

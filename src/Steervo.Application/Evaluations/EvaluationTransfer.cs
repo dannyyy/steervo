@@ -6,190 +6,491 @@ using Steervo.Core;
 namespace Steervo.Application.Evaluations;
 
 public sealed record GroupExport(Guid Id, string Name, int Position);
-public sealed record CriterionExport(Guid Id, string Name, CriterionType Type, Priority Priority, CriterionScope Scope, Guid? GroupId, decimal? Threshold, string? Unit, Comparison Comparison, int Position);
-public sealed record CandidateExport(Guid Id, string Model, string Brand, string Variant, CandidateCondition Condition, int? Year, int? Mileage,
-    string Notes, string Links, CandidateStatus Status, string StatusReason, int Position, VehicleSpecifications? Specifications = null);
-public sealed record AssessmentExport(Guid CandidateId, Guid CriterionId, bool? BooleanValue, decimal? MeasurementValue, int? RatingValue, AssessmentSource Source, string Notes, bool OptionalAvailable = false);
-public sealed record OfferRevisionExport(int Number, DateTimeOffset CreatedAt, string ChangeNote, OfferTerms Terms, OfferLineInput[] Lines);
-public sealed record OfferExport(Guid Id, Guid CandidateId, OfferRevisionExport[] Revisions);
-public sealed record OfferAssessmentExport(Guid OfferId, Guid CriterionId, int RevisionNumber, bool? BooleanValue, decimal? MeasurementValue, int? RatingValue, AssessmentSource Source, string Notes, bool OptionalAvailable = false);
-public sealed record CostPlanningExport(DateOnly Start, int Months);
-public sealed record CostExport(Guid Id, CostInput Input);
-public sealed record ScenarioExport(Guid Id, ScenarioInput Input, ResidualInput[] Residuals, CostAdjustmentInput[] CostAdjustments);
-public sealed record CalculationSettingsExport(decimal AnnualReturnPercent);
-public sealed record EvaluationExport(string Format, int Version, string Name, string Purpose, GroupExport[] Groups, CriterionExport[] Criteria,
-    CandidateExport[]? Candidates = null, AssessmentExport[]? Assessments = null, string? Currency = null, OfferExport[]? Offers = null, OfferAssessmentExport[]? OfferAssessments = null,
-    CostPlanningExport? CostPlanning = null, CostExport[]? Costs = null, CalculationSettingsExport? CalculationSettings = null, ScenarioExport[]? Scenarios = null, string? Country = null);
 
-public sealed class EvaluationTransfer(EvaluationWorkspace workspace, IEvaluationStore store, ICurrentUser current)
+public sealed record CriterionExport(
+    Guid Id,
+    string Name,
+    CriterionType Type,
+    Priority Priority,
+    CriterionScope Scope,
+    Guid? GroupId,
+    decimal? Threshold,
+    string? Unit,
+    Comparison Comparison,
+    int Position
+);
+
+public sealed record CandidateExport(
+    Guid Id,
+    string Model,
+    string Brand,
+    string Variant,
+    CandidateCondition Condition,
+    int? Year,
+    int? Mileage,
+    string Notes,
+    string Links,
+    CandidateStatus Status,
+    string StatusReason,
+    int Position,
+    VehicleSpecifications? Specifications = null
+);
+
+public sealed record AssessmentExport(
+    Guid CandidateId,
+    Guid CriterionId,
+    bool? BooleanValue,
+    decimal? MeasurementValue,
+    int? RatingValue,
+    AssessmentSource Source,
+    string Notes,
+    bool OptionalAvailable = false
+);
+
+public sealed record OfferRevisionExport(
+    int Number,
+    DateTimeOffset CreatedAt,
+    string ChangeNote,
+    OfferTerms Terms,
+    OfferLineInput[] Lines
+);
+
+public sealed record OfferExport(Guid Id, Guid CandidateId, OfferRevisionExport[] Revisions);
+
+public sealed record OfferAssessmentExport(
+    Guid OfferId,
+    Guid CriterionId,
+    int RevisionNumber,
+    bool? BooleanValue,
+    decimal? MeasurementValue,
+    int? RatingValue,
+    AssessmentSource Source,
+    string Notes,
+    bool OptionalAvailable = false
+);
+
+public sealed record CostPlanningExport(DateOnly Start, int Months);
+
+public sealed record CostExport(Guid Id, CostInput Input);
+
+public sealed record ScenarioExport(
+    Guid Id,
+    ScenarioInput Input,
+    ResidualInput[] Residuals,
+    CostAdjustmentInput[] CostAdjustments
+);
+
+public sealed record CalculationSettingsExport(decimal AnnualReturnPercent);
+
+public sealed record EvaluationExport(
+    string Format,
+    int Version,
+    string Name,
+    string Purpose,
+    GroupExport[] Groups,
+    CriterionExport[] Criteria,
+    CandidateExport[]? Candidates = null,
+    AssessmentExport[]? Assessments = null,
+    string? Currency = null,
+    OfferExport[]? Offers = null,
+    OfferAssessmentExport[]? OfferAssessments = null,
+    CostPlanningExport? CostPlanning = null,
+    CostExport[]? Costs = null,
+    CalculationSettingsExport? CalculationSettings = null,
+    ScenarioExport[]? Scenarios = null,
+    string? Country = null
+);
+
+/// <summary>
+/// Exports an evaluation as a JSON file and imports such files, including those written by
+/// earlier format versions.
+/// </summary>
+public sealed class EvaluationTransfer(
+    EvaluationWorkspace workspace,
+    IEvaluationStore store,
+    ICurrentUser current
+)
 {
     public const int MaximumBytes = 5_000_000;
+
+    public const string LegacyVehicleLine = "Fahrzeug";
+
+    internal const string FormatName = "steervo-evaluation";
+    internal const int CurrentVersion = 9;
+    internal const string InvalidImport = "InvalidImport";
+
+    private const int MaximumDepth = 16;
+
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web)
     {
-        WriteIndented = true, MaxDepth = 16, UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
-        Converters = { new JsonStringEnumConverter(allowIntegerValues: false) }
+        WriteIndented = true,
+        MaxDepth = MaximumDepth,
+        UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+        Converters = { new JsonStringEnumConverter(allowIntegerValues: false) },
     };
+
     public async Task<byte[]> ExportAsync(Guid id)
     {
         var evaluation = await workspace.ReadAsync(id);
-        if (evaluation.Documents.Count > 0) throw new RuleException("DocumentsRequireArchive");
+
+        // Documents do not fit into a plain JSON file; they are exported as an archive.
+        if (evaluation.Documents.Count > 0)
+        {
+            throw new RuleException("DocumentsRequireArchive");
+        }
+
         return Serialize(evaluation);
     }
-    internal static byte[] Serialize(Evaluation evaluation)
-    {
-        // Stored versions never change, so a line may still name a requirement that was deleted later.
-        var known = evaluation.Criteria.Select(criterion => criterion.Id).ToHashSet();
-        var content = new EvaluationExport("steervo-evaluation", 9, evaluation.Name, evaluation.Purpose,
-            evaluation.Groups.OrderBy(x => x.Position).Select(x => new GroupExport(x.Id, x.Name, x.Position)).ToArray(),
-            evaluation.Criteria.OrderBy(x => x.Position).Select(x => new CriterionExport(x.Id, x.Name, x.Type, x.Priority, x.Scope, x.GroupId, x.Threshold, x.Unit, x.Comparison, x.Position)).ToArray(),
-            evaluation.Candidates.OrderBy(x => x.Position).Select(x => new CandidateExport(x.Id, x.Model, x.Brand, x.Variant, x.Condition, x.Year, x.Mileage, x.Notes, x.Links, x.Status, x.StatusReason, x.Position, x.Specifications)).ToArray(),
-            evaluation.Assessments.OrderBy(x => x.CandidateId).ThenBy(x => x.CriterionId).Select(x => new AssessmentExport(x.CandidateId, x.CriterionId, x.BooleanValue, x.MeasurementValue, x.RatingValue, x.Source, x.Notes, x.OptionalAvailable)).ToArray(), evaluation.Currency,
-            evaluation.Offers.OrderBy(offer => offer.Position).Select(offer => new OfferExport(offer.Id, offer.CandidateId,
-                offer.Revisions.OrderBy(revision => revision.Number).Select(revision => new OfferRevisionExport(revision.Number, revision.CreatedAt, revision.ChangeNote, revision.Terms,
-                    revision.Lines.OrderBy(line => line.Position).Select(line => line.ToInput()).Select(line => line.CriterionId is { } linked && !known.Contains(linked) ? line with { CriterionId = null } : line).ToArray())).ToArray())).ToArray(),
-            evaluation.OfferAssessments.Select(value => new OfferAssessmentExport(value.OfferId, value.CriterionId, value.RevisionNumber, value.BooleanValue, value.MeasurementValue, value.RatingValue, value.Source, value.Notes, value.OptionalAvailable)).ToArray(),
-            evaluation.CostPlanning is { } plan ? new(plan.Start, plan.Months) : null,
-            evaluation.Costs.Select(cost => new CostExport(cost.Id, cost.ToInput())).ToArray(),
-            evaluation.CalculationSettings is { } settings ? new(settings.AnnualReturnPercent) : null,
-            evaluation.Scenarios.Select(s => new ScenarioExport(s.Id, s.ToInput(), s.Residuals.Select(r => r.ToInput()).ToArray(), s.CostAdjustments.Select(a => a.ToInput()).ToArray())).ToArray(), evaluation.Country);
-        return JsonSerializer.SerializeToUtf8Bytes(content, Json);
-    }
+
     public async Task<Guid> ImportAsync(byte[] data)
     {
         var prepared = PrepareImport(data);
+
         await store.CreateAsync(prepared.Evaluation);
+
         return prepared.Evaluation.Id;
     }
-    // Files written before version 9 carried one base price and an archive flag per offer.
-    // The base price becomes the vehicle line; archived offers are imported like any other.
-    private static JsonNode? Upgrade(JsonNode? root)
+
+    internal static byte[] Serialize(Evaluation evaluation)
     {
-        if (root is not JsonObject content || content["version"] is not JsonValue number || !number.TryGetValue<int>(out var version) || version >= 9
-            || content["offers"] is not JsonArray offers) return root;
-        foreach (var offer in offers.OfType<JsonObject>())
-        {
-            offer.Remove("archived");
-            if (offer["revisions"] is not JsonArray revisions) continue;
-            foreach (var revision in revisions.OfType<JsonObject>())
-            {
-                if (revision["terms"] is not JsonObject terms || !terms.Remove("basePrice", out var price) || price is null || revision["lines"] is not JsonArray lines) continue;
-                var name = terms["vehicleDescription"] is JsonValue text && text.TryGetValue<string>(out var description) && !string.IsNullOrWhiteSpace(description) ? description.Trim() : LegacyVehicleLine;
-                lines.Insert(0, new JsonObject { ["name"] = name[..Math.Min(name.Length, 300)], ["kind"] = nameof(OfferLineKind.Vehicle), ["priceKind"] = nameof(OfferPriceKind.Amount), ["amount"] = price.DeepClone() });
-            }
-        }
-        return root;
+        var content = EvaluationExportMapping.ToExport(evaluation);
+
+        return JsonSerializer.SerializeToUtf8Bytes(content, Json);
     }
-    public const string LegacyVehicleLine = "Fahrzeug";
+
+    /// <summary>
+    /// Builds a new evaluation owned by the current user from an exported file without storing
+    /// it. Every entity receives a new id; the returned map leads from exported to new offer ids.
+    /// </summary>
     internal (Evaluation Evaluation, Dictionary<Guid, Guid> OfferIds) PrepareImport(byte[] data)
     {
-        if (data.Length > MaximumBytes) throw new RuleException("InvalidImport");
-        EvaluationExport content;
-        try { content = Upgrade(JsonNode.Parse(data, documentOptions: new() { MaxDepth = 16 })).Deserialize<EvaluationExport>(Json) ?? throw new RuleException("InvalidImport"); }
-        catch (Exception error) when (error is JsonException or InvalidOperationException or FormatException) { throw new RuleException("InvalidImport"); }
-        if (content.Format != "steervo-evaluation" || content.Version is not (1 or 2 or 3 or 4 or 5 or 6 or 7 or 8 or 9) || content.Groups is null || content.Criteria is null || content.Groups.Length > 100 || content.Criteria.Length > 1000
-            || content.Groups.Any(x => x is null || x.Id == Guid.Empty || x.Position < 0) || content.Criteria.Any(x => x is null || x.Id == Guid.Empty || x.Position < 0)
-            || content.Groups.DistinctBy(x => x.Id).Count() != content.Groups.Length || content.Criteria.DistinctBy(x => x.Id).Count() != content.Criteria.Length
-            || (content.Version == 1 && (content.Candidates is not null || content.Assessments is not null))
-            || (content.Version >= 2 && (content.Candidates is null || content.Assessments is null))) throw new RuleException("InvalidImport");
-        if ((content.Version < 4 && (content.Currency is not null || content.Offers is not null || content.OfferAssessments is not null))
-            || (content.Version >= 4 && (content.Offers is null || content.OfferAssessments is null))) throw new RuleException("InvalidImport");
-        if ((content.Version < 5 && (content.CostPlanning is not null || content.Costs is not null)) || (content.Version >= 5 && content.Costs is null)) throw new RuleException("InvalidImport");
-        if ((content.Version < 6 && (content.CalculationSettings is not null || content.Scenarios is not null)) || (content.Version >= 6 && content.Scenarios is null)) throw new RuleException("InvalidImport");
-        var scenarios = content.Scenarios ?? [];
-        if (scenarios.Length > 200 || scenarios.Any(s => s is null || s.Id == Guid.Empty || s.Input is null || s.Input.Terms is null
-                || s.Residuals is null || s.CostAdjustments is null || s.Residuals.Length > 100 || s.CostAdjustments.Length > 1000
-                || s.Residuals.Any(r => r is null) || s.CostAdjustments.Any(a => a is null)
-                || s.Residuals.DistinctBy(r => r.Month).Count() != s.Residuals.Length || s.CostAdjustments.DistinctBy(a => a.CostId).Count() != s.CostAdjustments.Length)
-            || scenarios.DistinctBy(s => s.Id).Count() != scenarios.Length) throw new RuleException("InvalidImport");
-        var costs = content.Costs ?? [];
-        if (costs.Length > 1000 || costs.Any(c => c is null || c.Id == Guid.Empty || c.Input is null)
-            || costs.DistinctBy(c => c.Id).Count() != costs.Length || (costs.Length > 0 && (content.CostPlanning is null || content.Currency is null))) throw new RuleException("InvalidImport");
-        var offers = content.Offers ?? [];
-        var offerAssessments = content.OfferAssessments ?? [];
-        if (offers.Length > 1000 || offerAssessments.Length > 100_000 || offers.Any(offer => offer is null || offer.Id == Guid.Empty || offer.Revisions is null || offer.Revisions.Length is < 1 or > 1000)
-            || offers.DistinctBy(offer => offer.Id).Count() != offers.Length || offers.Sum(offer => offer.Revisions.Length) > 5000
-            || offers.SelectMany(offer => offer.Revisions).Any(revision => revision is null || revision.Terms is null || revision.Lines is null || revision.Lines.Length > 500 || revision.Lines.Any(line => line is null))
-            || offerAssessments.Any(value => value is null) || offerAssessments.DistinctBy(value => (value.OfferId, value.CriterionId)).Count() != offerAssessments.Length
-            || (offers.Length > 0 && content.Currency is null)) throw new RuleException("InvalidImport");
-        var candidates = content.Candidates ?? [];
-        var assessments = content.Assessments ?? [];
-        if (candidates.Length > 100 || assessments.Length > 100_000
-            || candidates.Any(x => x is null || x.Id == Guid.Empty || x.Position < 0)
-            || candidates.DistinctBy(x => x.Id).Count() != candidates.Length
-            || assessments.Any(x => x is null)
-            || assessments.DistinctBy(x => (x.CandidateId, x.CriterionId)).Count() != assessments.Length) throw new RuleException("InvalidImport");
-        if (content.Version < 7 && (assessments.Any(x => x.OptionalAvailable) || offerAssessments.Any(x => x.OptionalAvailable))) throw new RuleException("InvalidImport");
-        if (content.Version < 8 && content.Country is not null) throw new RuleException("InvalidImport");
+        var content = ReadContent(data);
+        EvaluationImportValidation.Validate(content);
+
         var evaluation = new Evaluation(current.Id, content.Name, content.Purpose);
-        if (content.Country is not null) evaluation.SetCountry(content.Country);
-        var groups = content.Groups.OrderBy(x => x.Position).ToDictionary(x => x.Id, x => evaluation.AddGroup(x.Name));
-        var criteria = new Dictionary<Guid, Guid>();
-        foreach (var criterion in content.Criteria.OrderBy(x => x.Position))
+
+        if (content.Country is not null)
+        {
+            evaluation.SetCountry(content.Country);
+        }
+
+        // Each step maps exported ids to the new ones; later steps resolve their references
+        // through these maps, so the order follows the dependencies.
+        var groupIds = ImportGroups(evaluation, content.Groups);
+        var criterionIds = ImportCriteria(evaluation, content.Criteria, groupIds);
+        var candidateIds = ImportCandidates(evaluation, content.Candidates ?? []);
+        ImportAssessments(evaluation, content.Assessments ?? [], candidateIds, criterionIds);
+
+        if (content.Currency is not null)
+        {
+            evaluation.SetCurrency(content.Currency);
+        }
+
+        var offerIds = ImportOffers(evaluation, content.Offers ?? [], candidateIds, criterionIds);
+        ImportOfferAssessments(evaluation, content.OfferAssessments ?? [], offerIds, criterionIds);
+
+        if (content.CostPlanning is { } plan)
+        {
+            evaluation.SetCostPlanning(plan.Start, plan.Months);
+        }
+
+        var costIds = ImportCosts(evaluation, content.Costs ?? [], candidateIds);
+
+        if (content.CalculationSettings is { } calculation)
+        {
+            evaluation.SetCalculationSettings(calculation.AnnualReturnPercent);
+        }
+
+        ImportScenarios(evaluation, content.Scenarios ?? [], offerIds, costIds);
+
+        return (evaluation, offerIds);
+    }
+
+    private static EvaluationExport ReadContent(byte[] data)
+    {
+        if (data.Length > MaximumBytes)
+        {
+            throw new RuleException(InvalidImport);
+        }
+
+        try
+        {
+            var root = JsonNode.Parse(data, documentOptions: new() { MaxDepth = MaximumDepth });
+            var upgraded = LegacyExportUpgrade.Apply(root);
+
+            return upgraded.Deserialize<EvaluationExport>(Json)
+                ?? throw new RuleException(InvalidImport);
+        }
+        catch (Exception error)
+            when (error is JsonException or InvalidOperationException or FormatException)
+        {
+            throw new RuleException(InvalidImport);
+        }
+    }
+
+    private static Dictionary<Guid, Guid> ImportGroups(Evaluation evaluation, GroupExport[] groups)
+    {
+        var groupIds = new Dictionary<Guid, Guid>();
+
+        foreach (var group in groups.OrderBy(group => group.Position))
+        {
+            groupIds.Add(group.Id, evaluation.AddGroup(group.Name));
+        }
+
+        return groupIds;
+    }
+
+    private static Dictionary<Guid, Guid> ImportCriteria(
+        Evaluation evaluation,
+        CriterionExport[] criteria,
+        Dictionary<Guid, Guid> groupIds
+    )
+    {
+        var criterionIds = new Dictionary<Guid, Guid>();
+
+        foreach (var criterion in criteria.OrderBy(criterion => criterion.Position))
         {
             Guid? groupId = null;
-            if (criterion.GroupId is { } original)
+
+            if (criterion.GroupId is { } exportedGroupId)
             {
-                if (!groups.TryGetValue(original, out var mapped)) throw new RuleException("InvalidImport");
-                groupId = mapped;
+                groupId = Resolve(groupIds, exportedGroupId);
             }
-            criteria.Add(criterion.Id, evaluation.AddCriterion(new(criterion.Name, criterion.Type, criterion.Priority, criterion.Scope, groupId, criterion.Threshold, criterion.Unit, criterion.Comparison)));
+
+            var input = new CriterionInput(
+                criterion.Name,
+                criterion.Type,
+                criterion.Priority,
+                criterion.Scope,
+                groupId,
+                criterion.Threshold,
+                criterion.Unit,
+                criterion.Comparison
+            );
+
+            criterionIds.Add(criterion.Id, evaluation.AddCriterion(input));
         }
+
+        return criterionIds;
+    }
+
+    private static Dictionary<Guid, Guid> ImportCandidates(
+        Evaluation evaluation,
+        CandidateExport[] candidates
+    )
+    {
         var candidateIds = new Dictionary<Guid, Guid>();
-        foreach (var candidate in candidates.OrderBy(x => x.Position))
+
+        foreach (var candidate in candidates.OrderBy(candidate => candidate.Position))
         {
-            var id = evaluation.AddCandidate(new(candidate.Model, candidate.Brand, candidate.Variant, candidate.Condition, candidate.Year, candidate.Mileage, candidate.Notes, candidate.Links, candidate.Specifications));
-            evaluation.ClassifyCandidate(id, candidate.Status, candidate.StatusReason);
-            candidateIds.Add(candidate.Id, id);
+            var input = new CandidateInput(
+                candidate.Model,
+                candidate.Brand,
+                candidate.Variant,
+                candidate.Condition,
+                candidate.Year,
+                candidate.Mileage,
+                candidate.Notes,
+                candidate.Links,
+                candidate.Specifications
+            );
+
+            var candidateId = evaluation.AddCandidate(input);
+            evaluation.ClassifyCandidate(candidateId, candidate.Status, candidate.StatusReason);
+            candidateIds.Add(candidate.Id, candidateId);
         }
+
+        return candidateIds;
+    }
+
+    private static void ImportAssessments(
+        Evaluation evaluation,
+        AssessmentExport[] assessments,
+        Dictionary<Guid, Guid> candidateIds,
+        Dictionary<Guid, Guid> criterionIds
+    )
+    {
         foreach (var assessment in assessments)
         {
-            if (!candidateIds.TryGetValue(assessment.CandidateId, out var candidateId) || !criteria.TryGetValue(assessment.CriterionId, out var criterionId)) throw new RuleException("InvalidImport");
-            evaluation.AssessCandidate(candidateId, criterionId, new(assessment.BooleanValue, assessment.MeasurementValue, assessment.RatingValue, assessment.Source, assessment.Notes, assessment.OptionalAvailable));
+            var candidateId = Resolve(candidateIds, assessment.CandidateId);
+            var criterionId = Resolve(criterionIds, assessment.CriterionId);
+
+            var input = new AssessmentInput(
+                assessment.BooleanValue,
+                assessment.MeasurementValue,
+                assessment.RatingValue,
+                assessment.Source,
+                assessment.Notes,
+                assessment.OptionalAvailable
+            );
+
+            evaluation.AssessCandidate(candidateId, criterionId, input);
         }
-        if (content.Currency is not null) evaluation.SetCurrency(content.Currency);
+    }
+
+    private static Dictionary<Guid, Guid> ImportOffers(
+        Evaluation evaluation,
+        OfferExport[] offers,
+        Dictionary<Guid, Guid> candidateIds,
+        Dictionary<Guid, Guid> criterionIds
+    )
+    {
         var offerIds = new Dictionary<Guid, Guid>();
+
         foreach (var offer in offers)
         {
-            if (!candidateIds.TryGetValue(offer.CandidateId, out var candidateId)) throw new RuleException("InvalidImport");
+            var candidateId = Resolve(candidateIds, offer.CandidateId);
             var history = offer.Revisions.OrderBy(revision => revision.Number).ToArray();
-            if (!history.Select(revision => revision.Number).SequenceEqual(Enumerable.Range(1, history.Length))) throw new RuleException("InvalidImport");
+
+            // The versions of an offer are numbered 1, 2, 3, ... without gaps.
+            var isNumberedWithoutGaps = history
+                .Select(revision => revision.Number)
+                .SequenceEqual(Enumerable.Range(1, history.Length));
+
+            if (!isNumberedWithoutGaps)
+            {
+                throw new RuleException(InvalidImport);
+            }
+
             var first = history[0];
-            OfferLineInput[] Lines(OfferRevisionExport revision) => revision.Lines.Select(line => line.CriterionId is { } linked
-                ? line with { CriterionId = criteria.TryGetValue(linked, out var mapped) ? mapped : throw new RuleException("InvalidImport") } : line).ToArray();
-            var id = evaluation.AddOffer(candidateId, first.Terms, Lines(first), changeNote: first.ChangeNote, createdAt: first.CreatedAt);
-            foreach (var revision in history.Skip(1)) evaluation.ReviseOffer(id, revision.Terms, Lines(revision), revision.ChangeNote, revision.CreatedAt);
-            offerIds.Add(offer.Id, id);
+            var offerId = evaluation.AddOffer(
+                candidateId,
+                first.Terms,
+                LinesWithNewCriterionIds(first, criterionIds),
+                changeNote: first.ChangeNote,
+                createdAt: first.CreatedAt
+            );
+
+            foreach (var revision in history.Skip(1))
+            {
+                evaluation.ReviseOffer(
+                    offerId,
+                    revision.Terms,
+                    LinesWithNewCriterionIds(revision, criterionIds),
+                    revision.ChangeNote,
+                    revision.CreatedAt
+                );
+            }
+
+            offerIds.Add(offer.Id, offerId);
         }
-        foreach (var value in offerAssessments)
+
+        return offerIds;
+    }
+
+    private static OfferLineInput[] LinesWithNewCriterionIds(
+        OfferRevisionExport revision,
+        Dictionary<Guid, Guid> criterionIds
+    )
+    {
+        var lines = new List<OfferLineInput>();
+
+        foreach (var line in revision.Lines)
         {
-            if (!offerIds.TryGetValue(value.OfferId, out var offerId) || !criteria.TryGetValue(value.CriterionId, out var criterionId)) throw new RuleException("InvalidImport");
-            evaluation.AssessOffer(offerId, criterionId, new(value.BooleanValue, value.MeasurementValue, value.RatingValue, value.Source, value.Notes, value.OptionalAvailable));
-            evaluation.OfferAssessments.Single(assessment => assessment.OfferId == offerId && assessment.CriterionId == criterionId).RestoreRevision(evaluation.FindOffer(offerId), value.RevisionNumber);
+            if (line.CriterionId is { } exportedCriterionId)
+            {
+                lines.Add(line with { CriterionId = Resolve(criterionIds, exportedCriterionId) });
+            }
+            else
+            {
+                lines.Add(line);
+            }
         }
-        if (content.CostPlanning is { } plan) evaluation.SetCostPlanning(plan.Start, plan.Months);
+
+        return lines.ToArray();
+    }
+
+    private static void ImportOfferAssessments(
+        Evaluation evaluation,
+        OfferAssessmentExport[] offerAssessments,
+        Dictionary<Guid, Guid> offerIds,
+        Dictionary<Guid, Guid> criterionIds
+    )
+    {
+        foreach (var exported in offerAssessments)
+        {
+            var offerId = Resolve(offerIds, exported.OfferId);
+            var criterionId = Resolve(criterionIds, exported.CriterionId);
+
+            var input = new AssessmentInput(
+                exported.BooleanValue,
+                exported.MeasurementValue,
+                exported.RatingValue,
+                exported.Source,
+                exported.Notes,
+                exported.OptionalAvailable
+            );
+
+            evaluation.AssessOffer(offerId, criterionId, input);
+
+            // Assessing binds the value to the latest offer version; the file states the version
+            // it was actually made for.
+            var imported = evaluation.OfferAssessments.Single(assessment =>
+                assessment.OfferId == offerId && assessment.CriterionId == criterionId
+            );
+            imported.RestoreRevision(evaluation.FindOffer(offerId), exported.RevisionNumber);
+        }
+    }
+
+    private static Dictionary<Guid, Guid> ImportCosts(
+        Evaluation evaluation,
+        CostExport[] costs,
+        Dictionary<Guid, Guid> candidateIds
+    )
+    {
         var costIds = new Dictionary<Guid, Guid>();
+
         foreach (var cost in costs)
         {
             Guid? candidateId = null;
-            if (cost.Input.CandidateId is { } original)
+
+            if (cost.Input.CandidateId is { } exportedCandidateId)
             {
-                if (!candidateIds.TryGetValue(original, out var mapped)) throw new RuleException("InvalidImport");
-                candidateId = mapped;
+                candidateId = Resolve(candidateIds, exportedCandidateId);
             }
-            costIds.Add(cost.Id, evaluation.AddCost(cost.Input with { CandidateId = candidateId }));
+
+            var input = cost.Input with { CandidateId = candidateId };
+
+            costIds.Add(cost.Id, evaluation.AddCost(input));
         }
-        if (content.CalculationSettings is { } calculation) evaluation.SetCalculationSettings(calculation.AnnualReturnPercent);
+
+        return costIds;
+    }
+
+    private static void ImportScenarios(
+        Evaluation evaluation,
+        ScenarioExport[] scenarios,
+        Dictionary<Guid, Guid> offerIds,
+        Dictionary<Guid, Guid> costIds
+    )
+    {
         foreach (var scenario in scenarios)
         {
-            if (!offerIds.TryGetValue(scenario.Input.OfferId, out var offerId)) throw new RuleException("InvalidImport");
+            var offerId = Resolve(offerIds, scenario.Input.OfferId);
             var scenarioId = evaluation.AddScenario(scenario.Input with { OfferId = offerId });
-            foreach (var residual in scenario.Residuals) evaluation.SetResidual(scenarioId, residual);
+
+            foreach (var residual in scenario.Residuals)
+            {
+                evaluation.SetResidual(scenarioId, residual);
+            }
+
             foreach (var adjustment in scenario.CostAdjustments)
             {
-                if (!costIds.TryGetValue(adjustment.CostId, out var costId)) throw new RuleException("InvalidImport");
+                var costId = Resolve(costIds, adjustment.CostId);
+
                 evaluation.SetCostAdjustment(scenarioId, adjustment with { CostId = costId });
             }
         }
-        return (evaluation, offerIds);
+    }
+
+    /// <summary>Translates an exported id into the id of the imported entity.</summary>
+    private static Guid Resolve(Dictionary<Guid, Guid> newIds, Guid exportedId)
+    {
+        if (!newIds.TryGetValue(exportedId, out var newId))
+        {
+            throw new RuleException(InvalidImport);
+        }
+
+        return newId;
     }
 }

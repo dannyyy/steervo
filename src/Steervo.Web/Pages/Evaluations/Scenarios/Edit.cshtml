@@ -1,38 +1,154 @@
 @page "/evaluations/{id:guid}/scenarios/edit/{scenarioId:guid?}"
 @model Steervo.Web.Pages.Evaluations.Scenarios.EditModel
 @using Steervo.Web.Pages.Evaluations.Scenarios
-@{ ViewData["Title"] = T[Model.Scenario is null ? "ScenarioAdd" : "ScenarioEdit"].Value; var e = Model.Evaluation; }
-<partial name="/Pages/Evaluations/_EvaluationHeader.cshtml" model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(e, Model.Access, "scenarios")' />
-<a class="back-link" href="@Model.ReturnUrl"><partial name="/Pages/Shared/_Icon.cshtml" model='"back"' />@T[Model.Scenario is null ? "Calculations" : "ScenarioOpen"]</a>
+@{
+    ViewData["Title"] = T[Model.TitleLabel].Value;
+    var evaluation = Model.Evaluation;
+}
+<partial
+    name="/Pages/Evaluations/_EvaluationHeader.cshtml"
+    model='new Steervo.Web.Pages.Evaluations.EvaluationHeader(evaluation, Model.Access, "scenarios")'
+/>
+<a class="back-link" href="@Model.ReturnUrl">
+    <partial name="/Pages/Shared/_Icon.cshtml" model='"back"' />@T[Model.BackLinkLabel]
+</a>
 @if (Model.Offer is not { } offer)
 {
-<section class="workspace-surface scenario-editor"><h1>@T["ScenarioChooseOffer"]</h1><p class="muted">@T["ScenarioChooseOfferHelp"]</p>
-<div class="scenario-offer-picker">@foreach (var option in e.Offers.OrderBy(o => e.FindCandidate(o.CandidateId).DisplayName).ThenBy(o => o.Latest.Terms.Name))
-{ <a class="scenario-offer-option" asp-page="Edit" asp-route-id="@e.Id" asp-route-offerId="@option.Id"><strong>@option.Latest.Terms.Name</strong><span>@e.FindCandidate(option.CandidateId).DisplayName · @T["ScenarioVersion", option.Latest.Number]</span><span>→</span></a> }</div>
-@if (e.Offers.Count == 0) { <a class="button primary" asp-page="/Evaluations/Offers/Index" asp-route-id="@e.Id">@T["Offers"] →</a> }</section>
+    <section class="workspace-surface scenario-editor">
+        <h1>@T["ScenarioChooseOffer"]</h1>
+        <p class="muted">@T["ScenarioChooseOfferHelp"]</p>
+        <div class="scenario-offer-picker">
+            @foreach (var option in Model.OfferOptions)
+            {
+                <a
+                    class="scenario-offer-option"
+                    asp-page="Edit"
+                    asp-route-id="@evaluation.Id"
+                    asp-route-offerId="@option.Id"
+                >
+                    <strong>@option.Latest.Terms.Name</strong>
+                    <span>@evaluation.FindCandidate(option.CandidateId).DisplayName · @T["ScenarioVersion", option.Latest.Number]</span>
+                    <span>→</span>
+                </a>
+            }
+        </div>
+        @if (evaluation.Offers.Count == 0)
+        {
+            <a class="button primary" asp-page="/Evaluations/Offers/Index" asp-route-id="@evaluation.Id">
+                @T["Offers"] →
+            </a>
+        }
+    </section>
 }
 else
 {
-<section id="scenario-page-editor" class="workspace-surface page-editor scenario-editor" data-editor data-page-editor data-return-url="@Model.ReturnUrl" aria-labelledby="scenario-editor-title"><p class="editor-context">@e.FindCandidate(offer.CandidateId).DisplayName · @e.Currency</p><h2 id="scenario-editor-title">@ViewData["Title"]</h2><p class="muted">@T["ScenarioEditHelp"]</p>
-<div class="editor-error notice failure" role="alert" tabindex="-1" hidden="@(Model.Notice is null)">@Model.Notice</div>
-<form method="post" data-scenario-form data-guard-draft data-retain-on-error hx-post="@Request.Path@Request.QueryString" hx-swap="none" hx-sync="this:drop" hx-disabled-elt="find button[type=submit]"><input asp-for="Version" type="hidden" /><input asp-for="Input.OfferId" type="hidden" />
-<section class="form-section"><h3>@T["ScenarioIdentity"]</h3><label asp-for="Input.Name">@T["ScenarioName"]</label><input asp-for="Input.Name" maxlength="160" required />
-<div class="field-pair"><div><label asp-for="Input.Mode">@T["ScenarioMode"]</label><select asp-for="Input.Mode" data-scenario-mode>@foreach (var mode in Enum.GetValues<AcquisitionMode>()) { <option value="@mode">@T["Acquisition" + mode]</option> }</select></div>
-<div><label asp-for="Input.RevisionNumber">@T["ScenarioSourceVersion"]</label><select asp-for="Input.RevisionNumber" data-scenario-revision>@foreach (var revision in offer.Revisions.OrderByDescending(r => r.Number)) { <option value="@revision.Number">@T["ScenarioVersion", revision.Number] · @revision.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</option> }</select></div></div>
-<p class="micro">@T["ScenarioSourceHelp"] <a asp-page="/Evaluations/Offers/Details" asp-route-id="@e.Id" asp-route-offerId="@offer.Id" asp-route-revision="@Model.Input.RevisionNumber" target="_blank" rel="noopener" data-scenario-source>@T["ScenarioOpenSource"] ↗</a></p>
-</section>
-@foreach (var group in ScenarioForm.Fields.GroupBy(field => field.Group))
-{
-<section class="form-section" data-scenario-group><h3>@T["ScenarioGroup" + group.Key]</h3><div class="scenario-number-grid">
-@foreach (var field in group)
-{ <div data-scenario-modes="@field.Modes"><label for="scenario-@field.Name">@T["Scenario" + field.Name] @if (field.Monetary) { <span class="field-unit">@e.Currency</span> }</label><input id="scenario-@field.Name" name="Input.Values[@field.Name]" value="@Model.Input.Value(field.Name)" type="number" min="0" max="@field.Max" step="@field.Step" inputmode="decimal" /><p class="micro">@T["Scenario" + field.Name + "Help"]</p></div> }
-</div></section>
+    <section
+        id="scenario-page-editor"
+        class="workspace-surface page-editor scenario-editor"
+        data-editor
+        data-page-editor
+        data-return-url="@Model.ReturnUrl"
+        aria-labelledby="scenario-editor-title"
+    >
+        <p class="editor-context">@evaluation.FindCandidate(offer.CandidateId).DisplayName · @evaluation.Currency</p>
+        <h2 id="scenario-editor-title">@ViewData["Title"]</h2>
+        <p class="muted">@T["ScenarioEditHelp"]</p>
+        <div
+            class="editor-error notice failure"
+            role="alert"
+            tabindex="-1"
+            hidden="@(Model.Notice is null)"
+        >@Model.Notice</div>
+        <form
+            method="post"
+            data-scenario-form
+            data-guard-draft
+            data-retain-on-error
+            hx-post="@Request.Path@Request.QueryString"
+            hx-swap="none"
+            hx-sync="this:drop"
+            hx-disabled-elt="find button[type=submit]"
+        >
+            <input asp-for="Version" type="hidden" />
+            <input asp-for="Input.OfferId" type="hidden" />
+            <section class="form-section">
+                <h3>@T["ScenarioIdentity"]</h3>
+                <label asp-for="Input.Name">@T["ScenarioName"]</label>
+                <input asp-for="Input.Name" maxlength="160" required />
+                <div class="field-pair">
+                    <div>
+                        <label asp-for="Input.Mode">@T["ScenarioMode"]</label>
+                        <select asp-for="Input.Mode" data-scenario-mode>
+                            @foreach (var mode in Enum.GetValues<AcquisitionMode>())
+                            {
+                                <option value="@mode">@T["Acquisition" + mode]</option>
+                            }
+                        </select>
+                    </div>
+                    <div>
+                        <label asp-for="Input.RevisionNumber">@T["ScenarioSourceVersion"]</label>
+                        <select asp-for="Input.RevisionNumber" data-scenario-revision>
+                            @foreach (var revision in EditModel.NewestRevisionsFirst(offer))
+                            {
+                                <option value="@revision.Number">@T["ScenarioVersion", revision.Number] · @revision.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <p class="micro">
+                    @T["ScenarioSourceHelp"]
+                    <a
+                        asp-page="/Evaluations/Offers/Details"
+                        asp-route-id="@evaluation.Id"
+                        asp-route-offerId="@offer.Id"
+                        asp-route-revision="@Model.Input.RevisionNumber"
+                        target="_blank"
+                        rel="noopener"
+                        data-scenario-source
+                    >@T["ScenarioOpenSource"] ↗</a>
+                </p>
+            </section>
+            @foreach (var group in EditModel.FieldGroups)
+            {
+                <section class="form-section" data-scenario-group>
+                    <h3>@T["ScenarioGroup" + group.Key]</h3>
+                    <div class="scenario-number-grid">
+                        @foreach (var field in group)
+                        {
+                            <div data-scenario-modes="@field.Modes">
+                                <label for="scenario-@field.Name">@T["Scenario" + field.Name] @if (field.Monetary) { <span class="field-unit">@evaluation.Currency</span> }</label>
+                                <input
+                                    id="scenario-@field.Name"
+                                    name="Input.Values[@field.Name]"
+                                    value="@Model.Input.Value(field.Name)"
+                                    type="number"
+                                    min="0"
+                                    max="@field.Max"
+                                    step="@field.Step"
+                                    inputmode="decimal"
+                                />
+                                <p class="micro">@T["Scenario" + field.Name + "Help"]</p>
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
+            <div class="notice scenario-convention" data-scenario-modes="Financing">@T["ScenarioCreditConvention"]</div>
+            <div class="notice scenario-convention" data-scenario-modes="LeaseReturn LeaseBuyout">@T["ScenarioLeaseConvention"]</div>
+            <section class="form-section">
+                <h3>@T["ScenarioReview"]</h3>
+                <label asp-for="Input.Notes">@T["ScenarioNotes"]</label>
+                <textarea asp-for="Input.Notes" rows="3" maxlength="4000"></textarea>
+                <label class="scenario-check"><input asp-for="Input.CostsReviewed" /> <span>@T["ScenarioCostsReviewed"]</span></label>
+                <p class="micro">@T["ScenarioCostsReviewedHelp"]</p>
+            </section>
+            <partial
+                name="/Pages/Shared/_PageEditorActions.cshtml"
+                model='new Steervo.Web.Pages.Shared.PageEditorActions(Model.ReturnUrl, "save-scenario", T["Save"].Value)'
+            />
+        </form>
+    </section>
 }
-<div class="notice scenario-convention" data-scenario-modes="Financing">@T["ScenarioCreditConvention"]</div>
-<div class="notice scenario-convention" data-scenario-modes="LeaseReturn LeaseBuyout">@T["ScenarioLeaseConvention"]</div>
-<section class="form-section"><h3>@T["ScenarioReview"]</h3><label asp-for="Input.Notes">@T["ScenarioNotes"]</label><textarea asp-for="Input.Notes" rows="3" maxlength="4000"></textarea>
-<label class="scenario-check"><input asp-for="Input.CostsReviewed" /> <span>@T["ScenarioCostsReviewed"]</span></label><p class="micro">@T["ScenarioCostsReviewedHelp"]</p>
-</section><partial name="/Pages/Shared/_PageEditorActions.cshtml" model='new Steervo.Web.Pages.Shared.PageEditorActions(Model.ReturnUrl, "save-scenario", T["Save"].Value)' />
-</form></section>
+@section Scripts {
+    <script src="~/js/scenarios.js" asp-append-version="true" defer></script>
 }
-@section Scripts { <script src="~/js/scenarios.js" asp-append-version="true" defer></script> }
