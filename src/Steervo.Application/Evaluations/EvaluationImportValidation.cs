@@ -196,9 +196,8 @@ internal static class EvaluationImportValidation
 
         RejectIf(offerAssessments.Any(assessment => assessment is null));
         RejectIf(
-            HasDuplicates(
-                offerAssessments,
-                assessment => (assessment.OfferId, assessment.CriterionId)
+            HasDuplicates(offerAssessments, assessment =>
+                (assessment.OfferId, assessment.CriterionId)
             )
         );
 
@@ -239,9 +238,8 @@ internal static class EvaluationImportValidation
 
         RejectIf(assessments.Any(assessment => assessment is null));
         RejectIf(
-            HasDuplicates(
-                assessments,
-                assessment => (assessment.CandidateId, assessment.CriterionId)
+            HasDuplicates(assessments, assessment =>
+                (assessment.CandidateId, assessment.CriterionId)
             )
         );
     }

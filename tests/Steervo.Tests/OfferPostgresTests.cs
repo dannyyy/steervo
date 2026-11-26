@@ -23,30 +23,21 @@ public sealed class OfferPostgresTests
         var owner = await fixture.SetupAsync();
         var reader = await fixture.InviteAsync(owner, "reader@example.test");
         var editor = await fixture.InviteAsync(owner, "editor@example.test");
-        var evaluationId = await fixture.AsAsync(
-            owner,
-            workspace => workspace.CreateAsync("Decision", null, "CH", "EUR")
+        var evaluationId = await fixture.AsAsync(owner, workspace =>
+            workspace.CreateAsync("Decision", null, "CH", "EUR")
         );
 
         Guid candidate = default;
-        await fixture.ActAsync(
-            owner,
-            workspace =>
-                workspace.EditAsync(
-                    evaluationId,
-                    1,
-                    evaluation => candidate = evaluation.AddCandidate(new("Vehicle"))
-                )
+        await fixture.ActAsync(owner, workspace =>
+            workspace.EditAsync(evaluationId, 1, evaluation =>
+                candidate = evaluation.AddCandidate(new("Vehicle"))
+            )
         );
-        await fixture.ActAsync(
-            owner,
-            workspace =>
-                workspace.ShareAsync(evaluationId, 2, "reader@example.test", AccessLevel.Reader)
+        await fixture.ActAsync(owner, workspace =>
+            workspace.ShareAsync(evaluationId, 2, "reader@example.test", AccessLevel.Reader)
         );
-        await fixture.ActAsync(
-            owner,
-            workspace =>
-                workspace.ShareAsync(evaluationId, 3, "editor@example.test", AccessLevel.Editor)
+        await fixture.ActAsync(owner, workspace =>
+            workspace.ShareAsync(evaluationId, 3, "editor@example.test", AccessLevel.Editor)
         );
 
         var terms = new OfferTerms
@@ -61,49 +52,43 @@ public sealed class OfferPostgresTests
 
         // A reader may not add an offer.
         await Assert.ThrowsAsync<RuleException>(() =>
-            fixture.AsAsync(
-                reader,
-                workspace =>
-                    new OfferWorkspace(workspace).AddAsync(
-                        evaluationId,
-                        4,
-                        candidate,
-                        terms,
-                        [],
-                        "EUR",
-                        null
-                    )
-            )
-        );
-
-        // The editor adds the offer and then revises it.
-        var offerId = await fixture.AsAsync(
-            editor,
-            workspace =>
+            fixture.AsAsync(reader, workspace =>
                 new OfferWorkspace(workspace).AddAsync(
                     evaluationId,
                     4,
                     candidate,
                     terms,
-                    [new("Fee", OfferLineKind.Fee, OfferPriceKind.Amount, 275)],
+                    [],
                     "EUR",
                     null
                 )
+            )
         );
-        await fixture.ActAsync(
-            editor,
-            workspace =>
-                new OfferWorkspace(workspace).ReviseAsync(
-                    evaluationId,
-                    5,
-                    offerId,
-                    terms with
-                    {
-                        MonthlyPayment = 610,
-                    },
-                    [new("Fee", OfferLineKind.Fee, OfferPriceKind.Included)],
-                    "Negotiated"
-                )
+
+        // The editor adds the offer and then revises it.
+        var offerId = await fixture.AsAsync(editor, workspace =>
+            new OfferWorkspace(workspace).AddAsync(
+                evaluationId,
+                4,
+                candidate,
+                terms,
+                [new("Fee", OfferLineKind.Fee, OfferPriceKind.Amount, 275)],
+                "EUR",
+                null
+            )
+        );
+        await fixture.ActAsync(editor, workspace =>
+            new OfferWorkspace(workspace).ReviseAsync(
+                evaluationId,
+                5,
+                offerId,
+                terms with
+                {
+                    MonthlyPayment = 610,
+                },
+                [new("Fee", OfferLineKind.Fee, OfferPriceKind.Included)],
+                "Negotiated"
+            )
         );
 
         // Both versions are stored; the first one is unchanged.
@@ -116,17 +101,8 @@ public sealed class OfferPostgresTests
 
         // A revision based on an outdated evaluation version is rejected.
         await Assert.ThrowsAsync<RuleException>(() =>
-            fixture.ActAsync(
-                editor,
-                workspace =>
-                    new OfferWorkspace(workspace).ReviseAsync(
-                        evaluationId,
-                        5,
-                        offerId,
-                        terms,
-                        [],
-                        null
-                    )
+            fixture.ActAsync(editor, workspace =>
+                new OfferWorkspace(workspace).ReviseAsync(evaluationId, 5, offerId, terms, [], null)
             )
         );
 
@@ -146,19 +122,12 @@ public sealed class OfferPostgresTests
         Assert.Equal(PostgresErrorCodes.CheckViolation, lineError.SqlState);
 
         // Once the share is revoked the former editor can no longer remove the offer.
-        await fixture.ActAsync(
-            owner,
-            workspace => workspace.RevokeAsync(evaluationId, saved.Version, editor)
+        await fixture.ActAsync(owner, workspace =>
+            workspace.RevokeAsync(evaluationId, saved.Version, editor)
         );
         await Assert.ThrowsAsync<RuleException>(() =>
-            fixture.ActAsync(
-                editor,
-                workspace =>
-                    new OfferWorkspace(workspace).RemoveAsync(
-                        evaluationId,
-                        saved.Version + 1,
-                        offerId
-                    )
+            fixture.ActAsync(editor, workspace =>
+                new OfferWorkspace(workspace).RemoveAsync(evaluationId, saved.Version + 1, offerId)
             )
         );
     }
@@ -169,20 +138,17 @@ public sealed class OfferPostgresTests
         // Arrange: three offers, the first with two versions, an assessment and a linked line.
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync();
-        var evaluationId = await fixture.AsAsync(
-            owner,
-            workspace => workspace.CreateAsync("Decision", null, "CH", "EUR")
+        var evaluationId = await fixture.AsAsync(owner, workspace =>
+            workspace.CreateAsync("Decision", null, "CH", "EUR")
         );
-        await fixture.ActAsync(
-            owner,
-            workspace => workspace.EditAsync(evaluationId, 1, AddOffersWithHistory)
+        await fixture.ActAsync(owner, workspace =>
+            workspace.EditAsync(evaluationId, 1, AddOffersWithHistory)
         );
         var original = await fixture.AsAsync(owner, workspace => workspace.ReadAsync(evaluationId));
 
         // Act: export the evaluation and import the file as a copy.
-        var bytes = await fixture.TransferAsync(
-            owner,
-            transfer => transfer.ExportAsync(evaluationId)
+        var bytes = await fixture.TransferAsync(owner, transfer =>
+            transfer.ExportAsync(evaluationId)
         );
         var copyId = await fixture.TransferAsync(owner, transfer => transfer.ImportAsync(bytes));
         var copy = await fixture.AsAsync(owner, workspace => workspace.ReadAsync(copyId));
@@ -373,14 +339,8 @@ public sealed class OfferPostgresTests
         Assert.Equal(PostgresErrorCodes.ForeignKeyViolation, assessmentError.SqlState);
 
         // Removing the car takes its offers, versions, lines and assessments with it.
-        await fixture.ActAsync(
-            owner,
-            workspace =>
-                workspace.EditAsync(
-                    first.Id,
-                    1,
-                    evaluation => evaluation.RemoveCandidate(candidate)
-                )
+        await fixture.ActAsync(owner, workspace =>
+            workspace.EditAsync(first.Id, 1, evaluation => evaluation.RemoveCandidate(candidate))
         );
 
         var saved = await fixture.AsAsync(owner, workspace => workspace.ReadAsync(first.Id));
@@ -403,9 +363,8 @@ public sealed class OfferPostgresTests
         // Arrange: an evaluation with one car that carries technical data.
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync();
-        var evaluationId = await fixture.AsAsync(
-            owner,
-            workspace => workspace.CreateAsync("Existing", null, "CH", "EUR")
+        var evaluationId = await fixture.AsAsync(owner, workspace =>
+            workspace.CreateAsync("Existing", null, "CH", "EUR")
         );
         var vehicle = new CandidateInput(
             "Vehicle",
@@ -416,10 +375,8 @@ public sealed class OfferPostgresTests
                 GrossWeightKg = 2250,
             }
         );
-        await fixture.ActAsync(
-            owner,
-            workspace =>
-                workspace.EditAsync(evaluationId, 1, evaluation => evaluation.AddCandidate(vehicle))
+        await fixture.ActAsync(owner, workspace =>
+            workspace.EditAsync(evaluationId, 1, evaluation => evaluation.AddCandidate(vehicle))
         );
 
         // Act: go back to the schema before offers existed, then forward to the current one.
@@ -445,27 +402,20 @@ public sealed class OfferPostgresTests
         // Arrange: export an evaluation with one offer.
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync();
-        var evaluationId = await fixture.AsAsync(
-            owner,
-            workspace => workspace.CreateAsync("Decision", null, "CH", "EUR")
+        var evaluationId = await fixture.AsAsync(owner, workspace =>
+            workspace.CreateAsync("Decision", null, "CH", "EUR")
         );
-        await fixture.ActAsync(
-            owner,
-            workspace =>
-                workspace.EditAsync(
-                    evaluationId,
-                    1,
-                    evaluation =>
-                    {
-                        var candidate = evaluation.AddCandidate(new("Vehicle"));
-                        evaluation.AddOffer(
-                            candidate,
-                            new() { Name = "Request", VehicleDescription = "Vehicle Long Range" },
-                            [new("Mats", OfferLineKind.Accessory, OfferPriceKind.Included)],
-                            "EUR"
-                        );
-                    }
-                )
+        await fixture.ActAsync(owner, workspace =>
+            workspace.EditAsync(evaluationId, 1, evaluation =>
+            {
+                var candidate = evaluation.AddCandidate(new("Vehicle"));
+                evaluation.AddOffer(
+                    candidate,
+                    new() { Name = "Request", VehicleDescription = "Vehicle Long Range" },
+                    [new("Mats", OfferLineKind.Accessory, OfferPriceKind.Included)],
+                    "EUR"
+                );
+            })
         );
         var content = JsonNode.Parse(
             await fixture.TransferAsync(owner, transfer => transfer.ExportAsync(evaluationId))
@@ -508,9 +458,8 @@ public sealed class OfferPostgresTests
 
     private static Task<Guid> ImportAsync(PostgresFixture fixture, string actor, JsonNode file)
     {
-        return fixture.TransferAsync(
-            actor,
-            transfer => transfer.ImportAsync(Encoding.UTF8.GetBytes(file.ToJsonString()))
+        return fixture.TransferAsync(actor, transfer =>
+            transfer.ImportAsync(Encoding.UTF8.GetBytes(file.ToJsonString()))
         );
     }
 }

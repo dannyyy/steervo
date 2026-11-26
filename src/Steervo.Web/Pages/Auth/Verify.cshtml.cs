@@ -34,8 +34,8 @@ public sealed class VerifyModel(
         try
         {
             var userId = await accounts.VerifyCodeAsync(Id, Code);
-            var user =
-                await users.FindByIdAsync(userId) ?? throw new RuleException("InvalidAccount");
+            var user = await users.FindByIdAsync(userId)
+                ?? throw new RuleException("InvalidAccount");
 
             await signIn.SignInAsync(user, false, "email-code");
 

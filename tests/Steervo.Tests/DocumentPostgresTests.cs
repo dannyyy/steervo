@@ -25,20 +25,15 @@ public sealed class DocumentPostgresTests
         // Arrange: an evaluation with one car and an uploaded file that is not attached yet.
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync();
-        var evaluationId = await fixture.AsAsync(
-            owner,
-            workspace => workspace.CreateAsync("Attached quote", null, "CH", "CHF")
+        var evaluationId = await fixture.AsAsync(owner, workspace =>
+            workspace.CreateAsync("Attached quote", null, "CH", "CHF")
         );
 
         Guid car = default;
-        await fixture.ActAsync(
-            owner,
-            workspace =>
-                workspace.EditAsync(
-                    evaluationId,
-                    1,
-                    evaluation => car = evaluation.AddCandidate(new("Test car"))
-                )
+        await fixture.ActAsync(owner, workspace =>
+            workspace.EditAsync(evaluationId, 1, evaluation =>
+                car = evaluation.AddCandidate(new("Test car"))
+            )
         );
 
         Task<DocumentFile> SaveAttachmentAsync(string name)
@@ -56,22 +51,20 @@ public sealed class DocumentPostgresTests
 
         // An invalid attachment stores neither the offer nor the document.
         await Assert.ThrowsAsync<RuleException>(() =>
-            fixture.AsAsync(
-                owner,
-                workspace =>
-                    new OfferWorkspace(workspace).AddAsync(
-                        evaluationId,
-                        2,
-                        car,
-                        new() { Name = "Invalid attachment" },
-                        [],
-                        "CHF",
-                        null,
-                        file with
-                        {
-                            Length = 0,
-                        }
-                    )
+            fixture.AsAsync(owner, workspace =>
+                new OfferWorkspace(workspace).AddAsync(
+                    evaluationId,
+                    2,
+                    car,
+                    new() { Name = "Invalid attachment" },
+                    [],
+                    "CHF",
+                    null,
+                    file with
+                    {
+                        Length = 0,
+                    }
+                )
             )
         );
         var before = await fixture.AsAsync(owner, workspace => workspace.ReadAsync(evaluationId));
@@ -80,19 +73,17 @@ public sealed class DocumentPostgresTests
         Assert.Equal(2, before.Version);
 
         // A valid attachment is stored together with the first version of the offer.
-        var offer = await fixture.AsAsync(
-            owner,
-            workspace =>
-                new OfferWorkspace(workspace).AddAsync(
-                    evaluationId,
-                    2,
-                    car,
-                    new() { Name = "Quote" },
-                    [],
-                    "CHF",
-                    null,
-                    file
-                )
+        var offer = await fixture.AsAsync(owner, workspace =>
+            new OfferWorkspace(workspace).AddAsync(
+                evaluationId,
+                2,
+                car,
+                new() { Name = "Quote" },
+                [],
+                "CHF",
+                null,
+                file
+            )
         );
         var saved = await fixture.AsAsync(owner, workspace => workspace.ReadAsync(evaluationId));
         Assert.Single(saved.Offers);
@@ -106,18 +97,16 @@ public sealed class DocumentPostgresTests
         // A revision based on an outdated version stores no second document either.
         var revision = await SaveAttachmentAsync("revised.pdf");
         await Assert.ThrowsAsync<RuleException>(() =>
-            fixture.ActAsync(
-                owner,
-                workspace =>
-                    new OfferWorkspace(workspace).ReviseAsync(
-                        evaluationId,
-                        2,
-                        offer,
-                        new() { Name = "Stale" },
-                        [],
-                        null,
-                        revision
-                    )
+            fixture.ActAsync(owner, workspace =>
+                new OfferWorkspace(workspace).ReviseAsync(
+                    evaluationId,
+                    2,
+                    offer,
+                    new() { Name = "Stale" },
+                    [],
+                    null,
+                    revision
+                )
             )
         );
         Assert.Single(
@@ -125,27 +114,23 @@ public sealed class DocumentPostgresTests
         );
 
         // The valid revision adds the second version and its attachment in one step.
-        await fixture.ActAsync(
-            owner,
-            workspace =>
-                new OfferWorkspace(workspace).ReviseAsync(
-                    evaluationId,
-                    3,
-                    offer,
-                    new() { Name = "Updated" },
-                    [],
-                    null,
-                    revision
-                )
+        await fixture.ActAsync(owner, workspace =>
+            new OfferWorkspace(workspace).ReviseAsync(
+                evaluationId,
+                3,
+                offer,
+                new() { Name = "Updated" },
+                [],
+                null,
+                revision
+            )
         );
         saved = await fixture.AsAsync(owner, workspace => workspace.ReadAsync(evaluationId));
         Assert.Equal(2, saved.FindOffer(offer).Latest.Number);
         Assert.Equal(2, saved.Documents.Count);
-        Assert.Contains(
-            saved.Documents,
-            document =>
-                document.Latest.OfferRevisionNumber == 2
-                && document.Latest.File.FileName == "revised.pdf"
+        Assert.Contains(saved.Documents, document =>
+            document.Latest.OfferRevisionNumber == 2
+            && document.Latest.File.FileName == "revised.pdf"
         );
     }
 
@@ -155,26 +140,20 @@ public sealed class DocumentPostgresTests
     )
     {
         var owner = await fixture.SetupAsync();
-        var evaluationId = await fixture.AsAsync(
-            owner,
-            workspace => workspace.CreateAsync("Decision", null, "CH", "EUR")
+        var evaluationId = await fixture.AsAsync(owner, workspace =>
+            workspace.CreateAsync("Decision", null, "CH", "EUR")
         );
 
         var offer = Guid.Empty;
-        await fixture.ActAsync(
-            owner,
-            workspace =>
-                workspace.EditAsync(
-                    evaluationId,
-                    1,
-                    evaluation =>
-                        offer = evaluation.AddOffer(
-                            evaluation.AddCandidate(new("Vehicle")),
-                            new() { Name = "Offer" },
-                            [],
-                            "EUR"
-                        )
+        await fixture.ActAsync(owner, workspace =>
+            workspace.EditAsync(evaluationId, 1, evaluation =>
+                offer = evaluation.AddOffer(
+                    evaluation.AddCandidate(new("Vehicle")),
+                    new() { Name = "Offer" },
+                    [],
+                    "EUR"
                 )
+            )
         );
 
         return (owner, evaluationId, offer);
@@ -194,24 +173,21 @@ public sealed class DocumentPostgresTests
         Guid? document = null
     )
     {
-        return fixture.DocumentsAsync(
-            actor,
-            async documents =>
-            {
-                using var input = new MemoryStream(Encoding.UTF8.GetBytes(contents));
-                await documents.UploadAsync(
-                    evaluationId,
-                    version,
-                    offer,
-                    document,
-                    "Contract",
-                    input,
-                    "contract.pdf",
-                    "Uploaded"
-                );
-                return true;
-            }
-        );
+        return fixture.DocumentsAsync(actor, async documents =>
+        {
+            using var input = new MemoryStream(Encoding.UTF8.GetBytes(contents));
+            await documents.UploadAsync(
+                evaluationId,
+                version,
+                offer,
+                document,
+                "Contract",
+                input,
+                "contract.pdf",
+                "Uploaded"
+            );
+            return true;
+        });
     }
 
     /// <summary>Downloads one version of a document and returns its content as text.</summary>
@@ -223,9 +199,8 @@ public sealed class DocumentPostgresTests
         int version
     )
     {
-        var result = await fixture.DocumentsAsync(
-            actor,
-            documents => documents.DownloadAsync(evaluationId, document, version)
+        var result = await fixture.DocumentsAsync(actor, documents =>
+            documents.DownloadAsync(evaluationId, document, version)
         );
 
         await using var stream = result.Content;
@@ -244,24 +219,11 @@ public sealed class DocumentPostgresTests
         var (owner, evaluationId, offer) = await SetupAsync(fixture);
         var reader = await fixture.InviteAsync(owner, "reader@example.test");
         var editor = await fixture.InviteAsync(owner, "editor@example.test");
-        await fixture.ActAsync(
-            owner,
-            async workspace =>
-            {
-                await workspace.ShareAsync(
-                    evaluationId,
-                    2,
-                    "reader@example.test",
-                    AccessLevel.Reader
-                );
-                await workspace.ShareAsync(
-                    evaluationId,
-                    3,
-                    "editor@example.test",
-                    AccessLevel.Editor
-                );
-            }
-        );
+        await fixture.ActAsync(owner, async workspace =>
+        {
+            await workspace.ShareAsync(evaluationId, 2, "reader@example.test", AccessLevel.Reader);
+            await workspace.ShareAsync(evaluationId, 3, "editor@example.test", AccessLevel.Editor);
+        });
 
         // Only an editor may upload; a reader may download.
         await Assert.ThrowsAsync<RuleException>(() =>
@@ -273,14 +235,10 @@ public sealed class DocumentPostgresTests
         Assert.Equal("first", await DownloadAsync(fixture, reader, evaluationId, document.Id, 1));
 
         // A replacement after a new offer version keeps the first file downloadable.
-        await fixture.ActAsync(
-            owner,
-            workspace =>
-                workspace.EditAsync(
-                    evaluationId,
-                    5,
-                    evaluation => evaluation.ReviseOffer(offer, new() { Name = "Revised" }, [])
-                )
+        await fixture.ActAsync(owner, workspace =>
+            workspace.EditAsync(evaluationId, 5, evaluation =>
+                evaluation.ReviseOffer(offer, new() { Name = "Revised" }, [])
+            )
         );
         await UploadAsync(fixture, editor, evaluationId, 6, offer, "second", document.Id);
         saved = await fixture.AsAsync(owner, workspace => workspace.ReadAsync(evaluationId));
@@ -307,9 +265,8 @@ public sealed class DocumentPostgresTests
         await Assert.ThrowsAsync<RuleException>(() =>
             DownloadAsync(fixture, reader, evaluationId, document.Id, 1)
         );
-        var foreign = await fixture.AsAsync(
-            owner,
-            workspace => workspace.CreateAsync("Other", null, "CH", "EUR")
+        var foreign = await fixture.AsAsync(owner, workspace =>
+            workspace.CreateAsync("Other", null, "CH", "EUR")
         );
         await Assert.ThrowsAsync<RuleException>(() =>
             DownloadAsync(fixture, owner, foreign, document.Id, 1)
@@ -348,9 +305,8 @@ public sealed class DocumentPostgresTests
         await UploadAsync(fixture, owner, evaluationId, 3, offer, "second", document.Id);
 
         // Act: export the evaluation as an archive and import it as a copy.
-        var export = await fixture.ArchiveAsync(
-            owner,
-            archives => archives.ExportAsync(evaluationId)
+        var export = await fixture.ArchiveAsync(owner, archives =>
+            archives.ExportAsync(evaluationId)
         );
         await using var archive = export.Content;
         Assert.Equal("application/zip", export.ContentType);
@@ -437,14 +393,10 @@ public sealed class DocumentPostgresTests
 
         // An expired file can no longer be attached.
         await Assert.ThrowsAsync<RuleException>(() =>
-            fixture.ActAsync(
-                owner,
-                workspace =>
-                    workspace.EditAsync(
-                        evaluationId,
-                        3,
-                        evaluation => evaluation.AddDocument(offer, "Expired", abandoned)
-                    )
+            fixture.ActAsync(owner, workspace =>
+                workspace.EditAsync(evaluationId, 3, evaluation =>
+                    evaluation.AddDocument(offer, "Expired", abandoned)
+                )
             )
         );
 

@@ -28,17 +28,14 @@ public sealed class CompareModel(ScenarioWorkspace workspace, ICurrentUser curre
     /// </summary>
     public static IReadOnlyList<ComparisonRow> CostRows { get; } =
     [
-        new(
-            "CalculationNetPayments",
-            panel => panel.Result.Months.Count == 0 ? null : panel.Result.NetPayments
+        new("CalculationNetPayments", panel =>
+            panel.Result.Months.Count == 0 ? null : panel.Result.NetPayments
         ),
-        new(
-            "CalculationOpportunity",
-            panel => panel.Result.Issues.Count == 0 ? panel.Result.OpportunityCost : null
+        new("CalculationOpportunity", panel =>
+            panel.Result.Issues.Count == 0 ? panel.Result.OpportunityCost : null
         ),
-        new(
-            "CalculationRemainingDebt",
-            panel => panel.Result.Issues.Count == 0 ? panel.Result.Debt : null
+        new("CalculationRemainingDebt", panel =>
+            panel.Result.Issues.Count == 0 ? panel.Result.Debt : null
         ),
         new("CalculationResidualDeduction", panel => panel.Result.ExpectedResidual),
     ];

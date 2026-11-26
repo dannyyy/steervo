@@ -157,8 +157,7 @@ public sealed class IndexModel(
         {
             var user = await CurrentAsync();
             var credentialId = WebEncoders.Base64UrlDecode(id);
-            var passkey =
-                await users.GetPasskeyAsync(user, credentialId)
+            var passkey = await users.GetPasskeyAsync(user, credentialId)
                 ?? throw new RuleException("NotFound");
 
             var result = await ChangePasskeyAsync(user, passkey, credentialId, action, name);

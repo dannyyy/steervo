@@ -138,9 +138,8 @@ public sealed class PostgresTests
         var invited = await fixture.InviteAsync(owner, "invited@example.test");
 
         // An invited user does not see the owner's evaluations.
-        var caseId = await fixture.AsAsync(
-            owner,
-            workspace => workspace.CreateAsync("Private decision", null, "CH", "EUR")
+        var caseId = await fixture.AsAsync(owner, workspace =>
+            workspace.CreateAsync("Private decision", null, "CH", "EUR")
         );
         Assert.Empty(await fixture.AsAsync(invited, workspace => workspace.ListAsync()));
         await Assert.ThrowsAsync<RuleException>(() =>
@@ -190,9 +189,8 @@ public sealed class PostgresTests
         var owner = await fixture.SetupAsync();
         var editor = await fixture.InviteAsync(owner, "editor@example.test");
         var reader = await fixture.InviteAsync(owner, "reader@example.test");
-        var evaluationId = await fixture.AsAsync(
-            editor,
-            workspace => workspace.CreateAsync("Owned by invited user", null, "CH", "EUR")
+        var evaluationId = await fixture.AsAsync(editor, workspace =>
+            workspace.CreateAsync("Owned by invited user", null, "CH", "EUR")
         );
 
         // The primary account has no access to it.
@@ -201,34 +199,22 @@ public sealed class PostgresTests
         );
 
         // A reader cannot edit.
-        await fixture.ActAsync(
-            editor,
-            workspace =>
-                workspace.ShareAsync(evaluationId, 1, "reader@example.test", AccessLevel.Reader)
+        await fixture.ActAsync(editor, workspace =>
+            workspace.ShareAsync(evaluationId, 1, "reader@example.test", AccessLevel.Reader)
         );
         await Assert.ThrowsAsync<RuleException>(() =>
-            fixture.ActAsync(
-                reader,
-                workspace =>
-                    workspace.EditAsync(
-                        evaluationId,
-                        2,
-                        evaluation => evaluation.AddGroup("Blocked")
-                    )
+            fixture.ActAsync(reader, workspace =>
+                workspace.EditAsync(evaluationId, 2, evaluation => evaluation.AddGroup("Blocked"))
             )
         );
 
         // Raised to editor, the same user may still neither share nor delete.
-        await fixture.ActAsync(
-            editor,
-            workspace =>
-                workspace.ShareAsync(evaluationId, 2, "reader@example.test", AccessLevel.Editor)
+        await fixture.ActAsync(editor, workspace =>
+            workspace.ShareAsync(evaluationId, 2, "reader@example.test", AccessLevel.Editor)
         );
         await Assert.ThrowsAsync<RuleException>(() =>
-            fixture.ActAsync(
-                reader,
-                workspace =>
-                    workspace.ShareAsync(evaluationId, 3, "owner@example.test", AccessLevel.Reader)
+            fixture.ActAsync(reader, workspace =>
+                workspace.ShareAsync(evaluationId, 3, "owner@example.test", AccessLevel.Reader)
             )
         );
         await Assert.ThrowsAsync<RuleException>(() =>
@@ -236,36 +222,19 @@ public sealed class PostgresTests
         );
 
         // Two writers start from the same version; exactly one of them succeeds.
-        var results = await Task.WhenAll(
-            Attempt(() =>
-                fixture.AsAsync(
-                    editor,
-                    async workspace =>
-                    {
-                        await workspace.EditAsync(
-                            evaluationId,
-                            3,
-                            evaluation => evaluation.AddGroup("First writer")
-                        );
-                        return true;
-                    }
-                )
-            ),
-            Attempt(() =>
-                fixture.AsAsync(
-                    reader,
-                    async workspace =>
-                    {
-                        await workspace.EditAsync(
-                            evaluationId,
-                            3,
-                            evaluation => evaluation.AddGroup("Second writer")
-                        );
-                        return true;
-                    }
-                )
-            )
-        );
+        var results = await Task.WhenAll(Attempt(() => fixture.AsAsync(editor, async workspace =>
+                {
+                    await workspace.EditAsync(evaluationId, 3, evaluation =>
+                        evaluation.AddGroup("First writer")
+                    );
+                    return true;
+                })), Attempt(() => fixture.AsAsync(reader, async workspace =>
+                {
+                    await workspace.EditAsync(evaluationId, 3, evaluation =>
+                        evaluation.AddGroup("Second writer")
+                    );
+                    return true;
+                })));
 
         Assert.Single(results, succeeded => succeeded);
         var saved = await fixture.AsAsync(editor, workspace => workspace.ReadAsync(evaluationId));
@@ -273,23 +242,18 @@ public sealed class PostgresTests
         Assert.Single(saved.Groups);
 
         // Removing a group keeps its criterion and only clears the assignment.
-        await fixture.ActAsync(
-            editor,
-            workspace => workspace.EditAsync(evaluationId, 4, AddCriterionToOnlyGroup)
+        await fixture.ActAsync(editor, workspace =>
+            workspace.EditAsync(evaluationId, 4, AddCriterionToOnlyGroup)
         );
         var criterionId = (
             await fixture.AsAsync(reader, workspace => workspace.ReadAsync(evaluationId))
         )
             .Criteria.Single()
             .Id;
-        await fixture.ActAsync(
-            reader,
-            workspace =>
-                workspace.EditAsync(
-                    evaluationId,
-                    5,
-                    evaluation => evaluation.RemoveGroup(evaluation.Groups.Single().Id)
-                )
+        await fixture.ActAsync(reader, workspace =>
+            workspace.EditAsync(evaluationId, 5, evaluation =>
+                evaluation.RemoveGroup(evaluation.Groups.Single().Id)
+            )
         );
 
         saved = await fixture.AsAsync(reader, workspace => workspace.ReadAsync(evaluationId));
@@ -303,15 +267,10 @@ public sealed class PostgresTests
         );
 
         // Deleting the evaluation removes its groups and criteria as well.
-        await fixture.ActAsync(
-            editor,
-            workspace =>
-                workspace.EditAsync(
-                    evaluationId,
-                    7,
-                    evaluation =>
-                        evaluation.Reassign(criterionId, evaluation.AddGroup("Final group"))
-                )
+        await fixture.ActAsync(editor, workspace =>
+            workspace.EditAsync(evaluationId, 7, evaluation =>
+                evaluation.Reassign(criterionId, evaluation.AddGroup("Final group"))
+            )
         );
         await fixture.ActAsync(editor, workspace => workspace.DeleteAsync(evaluationId, 8));
 
@@ -354,13 +313,11 @@ public sealed class PostgresTests
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync();
         var invited = await fixture.InviteAsync(owner, "reader@example.test");
-        var evaluationId = await fixture.AsAsync(
-            owner,
-            workspace => workspace.CreateAsync("Export test", "User-entered purpose", "CH", "EUR")
+        var evaluationId = await fixture.AsAsync(owner, workspace =>
+            workspace.CreateAsync("Export test", "User-entered purpose", "CH", "EUR")
         );
-        await fixture.ActAsync(
-            owner,
-            workspace => workspace.EditAsync(evaluationId, 1, AddGroupWithMeasurement)
+        await fixture.ActAsync(owner, workspace =>
+            workspace.EditAsync(evaluationId, 1, AddGroupWithMeasurement)
         );
 
         // Without a share there is nothing to export.
@@ -369,18 +326,14 @@ public sealed class PostgresTests
         );
 
         // Act: as a reader, export the evaluation and import the file again.
-        await fixture.ActAsync(
-            owner,
-            workspace =>
-                workspace.ShareAsync(evaluationId, 2, "reader@example.test", AccessLevel.Reader)
+        await fixture.ActAsync(owner, workspace =>
+            workspace.ShareAsync(evaluationId, 2, "reader@example.test", AccessLevel.Reader)
         );
-        var data = await fixture.TransferAsync(
-            invited,
-            transfer => transfer.ExportAsync(evaluationId)
+        var data = await fixture.TransferAsync(invited, transfer =>
+            transfer.ExportAsync(evaluationId)
         );
-        var importedId = await fixture.TransferAsync(
-            invited,
-            transfer => transfer.ImportAsync(data)
+        var importedId = await fixture.TransferAsync(invited, transfer =>
+            transfer.ImportAsync(data)
         );
 
         // Assert: the copy belongs to the importing user alone and has ids of its own.

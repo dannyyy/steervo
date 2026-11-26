@@ -162,10 +162,9 @@ public sealed class AccountAccess(
         await LockAccountsAsync();
         await RequirePrimaryAsync(actorId);
 
-        var invitation =
-            await db.Invitations.SingleOrDefaultAsync(pending =>
-                pending.Id == id && pending.AcceptedAt == null
-            ) ?? throw new RuleException("NotFound");
+        var invitation = await db.Invitations.SingleOrDefaultAsync(pending =>
+            pending.Id == id && pending.AcceptedAt == null
+        ) ?? throw new RuleException("NotFound");
 
         // Revoking keeps the row and lets it expire at once.
         invitation.ExpiresAt = clock.GetUtcNow();
@@ -326,12 +325,11 @@ public sealed class AccountAccess(
         }
         else if (user is null)
         {
-            var invitation =
-                await db.Invitations.SingleOrDefaultAsync(pending =>
-                    pending.Email == challenge.Email
-                    && pending.AcceptedAt == null
-                    && pending.ExpiresAt > now
-                ) ?? throw new RuleException("InvitationExpired");
+            var invitation = await db.Invitations.SingleOrDefaultAsync(pending =>
+                pending.Email == challenge.Email
+                && pending.AcceptedAt == null
+                && pending.ExpiresAt > now
+            ) ?? throw new RuleException("InvitationExpired");
 
             user = await CreateUserAsync(challenge.Email, invitation.Name);
             invitation.AcceptedAt = now;

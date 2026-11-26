@@ -12,10 +12,8 @@ public sealed class CostWorkspace(EvaluationWorkspace evaluations)
 
     public Task PlanAsync(Guid id, long version, DateOnly start, int months)
     {
-        return evaluations.EditAsync(
-            id,
-            version,
-            evaluation => evaluation.SetCostPlanning(start, months)
+        return evaluations.EditAsync(id, version, evaluation =>
+            evaluation.SetCostPlanning(start, months)
         );
     }
 

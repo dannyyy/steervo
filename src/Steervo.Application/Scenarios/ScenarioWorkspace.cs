@@ -13,10 +13,8 @@ public sealed class ScenarioWorkspace(EvaluationWorkspace evaluations)
 
     public Task SettingsAsync(Guid id, long version, decimal annualReturn)
     {
-        return evaluations.EditAsync(
-            id,
-            version,
-            evaluation => evaluation.SetCalculationSettings(annualReturn)
+        return evaluations.EditAsync(id, version, evaluation =>
+            evaluation.SetCalculationSettings(annualReturn)
         );
     }
 
@@ -24,10 +22,8 @@ public sealed class ScenarioWorkspace(EvaluationWorkspace evaluations)
     {
         var scenarioId = Guid.Empty;
 
-        await evaluations.EditAsync(
-            id,
-            version,
-            evaluation => scenarioId = evaluation.AddScenario(input)
+        await evaluations.EditAsync(id, version, evaluation =>
+            scenarioId = evaluation.AddScenario(input)
         );
 
         return scenarioId;
@@ -35,19 +31,15 @@ public sealed class ScenarioWorkspace(EvaluationWorkspace evaluations)
 
     public Task EditAsync(Guid id, long version, Guid scenarioId, ScenarioInput input)
     {
-        return evaluations.EditAsync(
-            id,
-            version,
-            evaluation => evaluation.EditScenario(scenarioId, input)
+        return evaluations.EditAsync(id, version, evaluation =>
+            evaluation.EditScenario(scenarioId, input)
         );
     }
 
     public Task RemoveAsync(Guid id, long version, Guid scenarioId)
     {
-        return evaluations.EditAsync(
-            id,
-            version,
-            evaluation => evaluation.RemoveScenario(scenarioId)
+        return evaluations.EditAsync(id, version, evaluation =>
+            evaluation.RemoveScenario(scenarioId)
         );
     }
 
@@ -55,10 +47,8 @@ public sealed class ScenarioWorkspace(EvaluationWorkspace evaluations)
     {
         var copyId = Guid.Empty;
 
-        await evaluations.EditAsync(
-            id,
-            version,
-            evaluation => copyId = evaluation.CopyScenario(scenarioId, name)
+        await evaluations.EditAsync(id, version, evaluation =>
+            copyId = evaluation.CopyScenario(scenarioId, name)
         );
 
         return copyId;
@@ -66,37 +56,29 @@ public sealed class ScenarioWorkspace(EvaluationWorkspace evaluations)
 
     public Task ResidualAsync(Guid id, long version, Guid scenarioId, ResidualInput input)
     {
-        return evaluations.EditAsync(
-            id,
-            version,
-            evaluation => evaluation.SetResidual(scenarioId, input)
+        return evaluations.EditAsync(id, version, evaluation =>
+            evaluation.SetResidual(scenarioId, input)
         );
     }
 
     public Task RemoveResidualAsync(Guid id, long version, Guid scenarioId, int month)
     {
-        return evaluations.EditAsync(
-            id,
-            version,
-            evaluation => evaluation.RemoveResidual(scenarioId, month)
+        return evaluations.EditAsync(id, version, evaluation =>
+            evaluation.RemoveResidual(scenarioId, month)
         );
     }
 
     public Task AdjustmentAsync(Guid id, long version, Guid scenarioId, CostAdjustmentInput input)
     {
-        return evaluations.EditAsync(
-            id,
-            version,
-            evaluation => evaluation.SetCostAdjustment(scenarioId, input)
+        return evaluations.EditAsync(id, version, evaluation =>
+            evaluation.SetCostAdjustment(scenarioId, input)
         );
     }
 
     public Task RemoveAdjustmentAsync(Guid id, long version, Guid scenarioId, Guid costId)
     {
-        return evaluations.EditAsync(
-            id,
-            version,
-            evaluation => evaluation.RemoveCostAdjustment(scenarioId, costId)
+        return evaluations.EditAsync(id, version, evaluation =>
+            evaluation.RemoveCostAdjustment(scenarioId, costId)
         );
     }
 }

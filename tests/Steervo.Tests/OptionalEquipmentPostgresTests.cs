@@ -23,18 +23,14 @@ public sealed class OptionalEquipmentPostgresTests
     {
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync();
-        var id = await fixture.AsAsync(
-            owner,
-            workspace => workspace.CreateAsync("Existing answers", null, "CH", "EUR")
+        var id = await fixture.AsAsync(owner, workspace =>
+            workspace.CreateAsync("Existing answers", null, "CH", "EUR")
         );
-        await fixture.AsAsync(
-            owner,
-            async workspace =>
-            {
-                await workspace.EditAsync(id, 1, AddYesNoAndUnknownAnswers);
-                return true;
-            }
-        );
+        await fixture.AsAsync(owner, async workspace =>
+        {
+            await workspace.EditAsync(id, 1, AddYesNoAndUnknownAnswers);
+            return true;
+        });
 
         // Go back to the schema before optional answers and upgrade again.
         await fixture.RunAsync(async services =>
@@ -86,58 +82,40 @@ public sealed class OptionalEquipmentPostgresTests
     {
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync();
-        var id = await fixture.AsAsync(
-            owner,
-            workspace => workspace.CreateAsync("Optional equipment", null, "CH", "EUR")
+        var id = await fixture.AsAsync(owner, workspace =>
+            workspace.CreateAsync("Optional equipment", null, "CH", "EUR")
         );
         Guid offerId = default;
-        await fixture.AsAsync(
-            owner,
-            async workspace =>
+        await fixture.AsAsync(owner, async workspace =>
+        {
+            await workspace.EditAsync(id, 1, evaluation =>
             {
-                await workspace.EditAsync(
-                    id,
-                    1,
-                    evaluation =>
-                    {
-                        var candidate = evaluation.AddCandidate(new("Vehicle"));
-                        var criterion = evaluation.AddCriterion(
-                            new(
-                                "Physical key",
-                                CriterionType.Boolean,
-                                Priority.Required,
-                                CriterionScope.Vehicle
-                            )
-                        );
-                        var offerCriterion = evaluation.AddCriterion(
-                            new(
-                                "Accessory",
-                                CriterionType.Boolean,
-                                Priority.Required,
-                                CriterionScope.Offer
-                            )
-                        );
-                        offerId = evaluation.AddOffer(
-                            candidate,
-                            new() { Name = "Offer" },
-                            [],
-                            "EUR"
-                        );
-                        evaluation.AssessCandidate(
-                            candidate,
-                            criterion,
-                            new(OptionalAvailable: true, Notes: "Separate purchase")
-                        );
-                        evaluation.AssessOffer(
-                            offerId,
-                            offerCriterion,
-                            new(OptionalAvailable: true, Source: AssessmentSource.Manufacturer)
-                        );
-                    }
+                var candidate = evaluation.AddCandidate(new("Vehicle"));
+                var criterion = evaluation.AddCriterion(
+                    new(
+                        "Physical key",
+                        CriterionType.Boolean,
+                        Priority.Required,
+                        CriterionScope.Vehicle
+                    )
                 );
-                return true;
-            }
-        );
+                var offerCriterion = evaluation.AddCriterion(
+                    new("Accessory", CriterionType.Boolean, Priority.Required, CriterionScope.Offer)
+                );
+                offerId = evaluation.AddOffer(candidate, new() { Name = "Offer" }, [], "EUR");
+                evaluation.AssessCandidate(
+                    candidate,
+                    criterion,
+                    new(OptionalAvailable: true, Notes: "Separate purchase")
+                );
+                evaluation.AssessOffer(
+                    offerId,
+                    offerCriterion,
+                    new(OptionalAvailable: true, Source: AssessmentSource.Manufacturer)
+                );
+            });
+            return true;
+        });
 
         // The current format keeps optional answers.
         var exported = await fixture.TransferAsync(owner, transfer => transfer.ExportAsync(id));
@@ -173,30 +151,26 @@ public sealed class OptionalEquipmentPostgresTests
         Assert.Equal(3, evaluations.Count);
 
         // The archive with documents keeps optional answers as well.
-        await fixture.DocumentsAsync(
-            owner,
-            async documents =>
-            {
-                using var content = new MemoryStream(Encoding.UTF8.GetBytes("Accessory details"));
-                await documents.UploadAsync(
-                    id,
-                    2,
-                    offerId,
-                    null,
-                    "Accessory",
-                    content,
-                    "accessory.txt",
-                    null
-                );
-                return true;
-            }
-        );
+        await fixture.DocumentsAsync(owner, async documents =>
+        {
+            using var content = new MemoryStream(Encoding.UTF8.GetBytes("Accessory details"));
+            await documents.UploadAsync(
+                id,
+                2,
+                offerId,
+                null,
+                "Accessory",
+                content,
+                "accessory.txt",
+                null
+            );
+            return true;
+        });
         var export = await fixture.ArchiveAsync(owner, archives => archives.ExportAsync(id));
         await using var archive = export.Content;
         Assert.Equal("application/zip", export.ContentType);
-        var archiveId = await fixture.ArchiveAsync(
-            owner,
-            archives => archives.ImportAsync(archive)
+        var archiveId = await fixture.ArchiveAsync(owner, archives =>
+            archives.ImportAsync(archive)
         );
         var archived = await fixture.AsAsync(owner, workspace => workspace.ReadAsync(archiveId));
         AssertOptional(archived);
@@ -232,9 +206,8 @@ public sealed class OptionalEquipmentPostgresTests
 
     private static Task<Guid> ImportAsync(PostgresFixture fixture, string owner, JsonNode file)
     {
-        return fixture.TransferAsync(
-            owner,
-            transfer => transfer.ImportAsync(Encoding.UTF8.GetBytes(file.ToJsonString()))
+        return fixture.TransferAsync(owner, transfer =>
+            transfer.ImportAsync(Encoding.UTF8.GetBytes(file.ToJsonString()))
         );
     }
 

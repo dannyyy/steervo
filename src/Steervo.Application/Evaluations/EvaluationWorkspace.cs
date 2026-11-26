@@ -75,15 +75,11 @@ public sealed class EvaluationWorkspace(
 
     public Task EditAsync(Guid id, long version, Action<Evaluation> change)
     {
-        return store.ChangeAsync(
-            id,
-            version,
-            evaluation =>
-            {
-                evaluation.Require(current.Id, AccessLevel.Editor);
-                change(evaluation);
-            }
-        );
+        return store.ChangeAsync(id, version, evaluation =>
+        {
+            evaluation.Require(current.Id, AccessLevel.Editor);
+            change(evaluation);
+        });
     }
 
     public Task DeleteAsync(Guid id, long version)
@@ -102,31 +98,22 @@ public sealed class EvaluationWorkspace(
         var evaluationToShare = await ReadAsync(id);
         evaluationToShare.Require(current.Id, AccessLevel.Owner);
 
-        var userId =
-            await accounts.FindConfirmedUserIdAsync(email)
+        var userId = await accounts.FindConfirmedUserIdAsync(email)
             ?? throw new RuleException("AccountNotFound");
 
-        await store.ChangeAsync(
-            id,
-            version,
-            evaluation =>
-            {
-                evaluation.Require(current.Id, AccessLevel.Owner);
-                evaluation.Grant(userId, access);
-            }
-        );
+        await store.ChangeAsync(id, version, evaluation =>
+        {
+            evaluation.Require(current.Id, AccessLevel.Owner);
+            evaluation.Grant(userId, access);
+        });
     }
 
     public Task RevokeAsync(Guid id, long version, string userId)
     {
-        return store.ChangeAsync(
-            id,
-            version,
-            evaluation =>
-            {
-                evaluation.Require(current.Id, AccessLevel.Owner);
-                evaluation.Revoke(userId);
-            }
-        );
+        return store.ChangeAsync(id, version, evaluation =>
+        {
+            evaluation.Require(current.Id, AccessLevel.Owner);
+            evaluation.Revoke(userId);
+        });
     }
 }

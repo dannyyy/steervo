@@ -131,8 +131,8 @@ public sealed class IndexModel(
 
             if (action == SettingsAction)
             {
-                var annualReturn =
-                    ScenarioForm.Number(AnnualReturn) ?? throw new RuleException("InvalidReturn");
+                var annualReturn = ScenarioForm.Number(AnnualReturn)
+                    ?? throw new RuleException("InvalidReturn");
 
                 await workspace.SettingsAsync(id, Version, annualReturn);
             }

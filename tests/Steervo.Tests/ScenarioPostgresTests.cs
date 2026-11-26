@@ -43,55 +43,34 @@ public sealed class ScenarioPostgresTests
         var offer = evaluation.Offers.Single().Id;
         var car = evaluation.Candidates.Single().Id;
         await StoreAsync(fixture, evaluation);
-        await fixture.AsAsync(
-            owner,
-            async workspace =>
-            {
-                await workspace.ShareAsync(id, 1, "reader@example.test", AccessLevel.Reader);
-                await workspace.ShareAsync(id, 2, "editor@example.test", AccessLevel.Editor);
-                return true;
-            }
-        );
+        await fixture.AsAsync(owner, async workspace =>
+        {
+            await workspace.ShareAsync(id, 1, "reader@example.test", AccessLevel.Reader);
+            await workspace.ShareAsync(id, 2, "editor@example.test", AccessLevel.Editor);
+            return true;
+        });
 
         // A reader may not add scenarios.
         await Assert.ThrowsAsync<RuleException>(() =>
-            fixture.AsAsync(
-                reader,
-                workspace =>
-                    new ScenarioWorkspace(workspace).AddAsync(
-                        id,
-                        3,
-                        new("Denied", offer, 1, PurchaseTerms)
-                    )
+            fixture.AsAsync(reader, workspace =>
+                new ScenarioWorkspace(workspace).AddAsync(
+                    id,
+                    3,
+                    new("Denied", offer, 1, PurchaseTerms)
+                )
             )
         );
 
         // An editor sets up a cash scenario with a residual value and a cost adjustment.
         await ScenariosAsync(fixture, editor, scenarios => scenarios.SettingsAsync(id, 3, 0));
-        var scenarioId = await fixture.AsAsync(
-            editor,
-            workspace =>
-                new ScenarioWorkspace(workspace).AddAsync(
-                    id,
-                    4,
-                    new("Cash", offer, 1, PurchaseTerms)
-                )
+        var scenarioId = await fixture.AsAsync(editor, workspace =>
+            new ScenarioWorkspace(workspace).AddAsync(id, 4, new("Cash", offer, 1, PurchaseTerms))
         );
-        await ScenariosAsync(
-            fixture,
-            editor,
-            scenarios => scenarios.ResidualAsync(id, 5, scenarioId, new(12, 500, 600, 700))
+        await ScenariosAsync(fixture, editor, scenarios =>
+            scenarios.ResidualAsync(id, 5, scenarioId, new(12, 500, 600, 700))
         );
-        await ScenariosAsync(
-            fixture,
-            editor,
-            scenarios =>
-                scenarios.AdjustmentAsync(
-                    id,
-                    6,
-                    scenarioId,
-                    new(evaluation.Costs.Single().Id, 0, 1, 6)
-                )
+        await ScenariosAsync(fixture, editor, scenarios =>
+            scenarios.AdjustmentAsync(id, 6, scenarioId, new(evaluation.Costs.Single().Id, 0, 1, 6))
         );
 
         // 1500 price + 6 x 20 shared cost (months 1 to 6 are waived) - 600 residual.
@@ -100,10 +79,8 @@ public sealed class ScenarioPostgresTests
 
         // An outdated version number is rejected, and a reader may not remove scenarios.
         await Assert.ThrowsAsync<RuleException>(() =>
-            ScenariosAsync(
-                fixture,
-                editor,
-                scenarios => scenarios.ResidualAsync(id, 5, scenarioId, new(12, 0, 0, 0))
+            ScenariosAsync(fixture, editor, scenarios =>
+                scenarios.ResidualAsync(id, 5, scenarioId, new(12, 0, 0, 0))
             )
         );
         await Assert.ThrowsAsync<RuleException>(() =>
@@ -121,36 +98,25 @@ public sealed class ScenarioPostgresTests
         );
         Assert.Equal(PostgresErrorCodes.ForeignKeyViolation, error.SqlState);
         await Assert.ThrowsAsync<RuleException>(() =>
-            ScenariosAsync(
-                fixture,
-                editor,
-                scenarios =>
-                    scenarios.AdjustmentAsync(id, 7, scenarioId, new(foreign.Costs.Single().Id, 0))
+            ScenariosAsync(fixture, editor, scenarios =>
+                scenarios.AdjustmentAsync(id, 7, scenarioId, new(foreign.Costs.Single().Id, 0))
             )
         );
 
         // Revising the offer leaves the scenario on the version it was built on.
-        await EditAsync(
-            fixture,
-            owner,
-            id,
-            7,
-            current =>
-                current.ReviseOffer(offer, new() { Name = "Revised", StatedTotal = 2000 }, [])
+        await EditAsync(fixture, owner, id, 7, current =>
+            current.ReviseOffer(offer, new() { Name = "Revised", StatedTotal = 2000 }, [])
         );
         saved = await fixture.AsAsync(reader, workspace => workspace.ReadAsync(id));
         Assert.Equal(1, saved.FindScenario(scenarioId).RevisionNumber);
         Assert.Equal(1020, ScenarioCalculation.Calculate(saved, scenarioId, 12).ExpectedCost);
 
         // A revoked editor loses access.
-        await fixture.AsAsync(
-            owner,
-            async workspace =>
-            {
-                await workspace.RevokeAsync(id, 8, editor);
-                return true;
-            }
-        );
+        await fixture.AsAsync(owner, async workspace =>
+        {
+            await workspace.RevokeAsync(id, 8, editor);
+            return true;
+        });
         await Assert.ThrowsAsync<RuleException>(() =>
             fixture.AsAsync(editor, workspace => workspace.ReadAsync(id))
         );
@@ -200,14 +166,12 @@ public sealed class ScenarioPostgresTests
         await StoreAsync(fixture, evaluation);
 
         // Export and import as a new evaluation.
-        var exported = await fixture.TransferAsync(
-            owner,
-            transfer => transfer.ExportAsync(evaluation.Id)
+        var exported = await fixture.TransferAsync(owner, transfer =>
+            transfer.ExportAsync(evaluation.Id)
         );
         Assert.Equal(9, JsonNode.Parse(exported)!["version"]!.GetValue<int>());
-        var importedId = await fixture.TransferAsync(
-            owner,
-            transfer => transfer.ImportAsync(exported)
+        var importedId = await fixture.TransferAsync(owner, transfer =>
+            transfer.ImportAsync(exported)
         );
         var imported = await fixture.AsAsync(owner, workspace => workspace.ReadAsync(importedId));
 
@@ -219,9 +183,8 @@ public sealed class ScenarioPostgresTests
         foreach (var importedScenario in imported.Scenarios)
         {
             Assert.NotEqual(offer, importedScenario.OfferId);
-            Assert.DoesNotContain(
-                evaluation.Scenarios,
-                original => original.Id == importedScenario.Id
+            Assert.DoesNotContain(evaluation.Scenarios, original =>
+                original.Id == importedScenario.Id
             );
             Assert.Equal(
                 imported.Costs.Single().Id,
@@ -253,9 +216,8 @@ public sealed class ScenarioPostgresTests
         legacy.AsObject().Remove("calculationSettings");
         legacy.AsObject().Remove("scenarios");
         var legacyId = await ImportAsync(fixture, owner, legacy);
-        var importedLegacy = await fixture.AsAsync(
-            owner,
-            workspace => workspace.ReadAsync(legacyId)
+        var importedLegacy = await fixture.AsAsync(owner, workspace =>
+            workspace.ReadAsync(legacyId)
         );
 
         Assert.Empty(importedLegacy.Scenarios);
@@ -288,19 +250,13 @@ public sealed class ScenarioPostgresTests
 
         // The upgraded schema accepts scenarios, but no residual band with low above expected.
         Guid scenario = default;
-        await EditAsync(
-            fixture,
-            owner,
-            evaluation.Id,
-            1,
-            current =>
-            {
-                scenario = current.AddScenario(
-                    new("Cash", current.Offers.Single().Id, 1, PurchaseTerms)
-                );
-                current.SetResidual(scenario, new(12, 500, 600, 700));
-            }
-        );
+        await EditAsync(fixture, owner, evaluation.Id, 1, current =>
+        {
+            scenario = current.AddScenario(
+                new("Cash", current.Offers.Single().Id, 1, PurchaseTerms)
+            );
+            current.SetResidual(scenario, new(12, 500, 600, 700));
+        });
         var error = await Assert.ThrowsAsync<PostgresException>(() =>
             ExecuteSqlAsync(
                 fixture,
@@ -339,14 +295,11 @@ public sealed class ScenarioPostgresTests
         Func<ScenarioWorkspace, Task> action
     )
     {
-        return fixture.AsAsync(
-            actor,
-            async workspace =>
-            {
-                await action(new ScenarioWorkspace(workspace));
-                return true;
-            }
-        );
+        return fixture.AsAsync(actor, async workspace =>
+        {
+            await action(new ScenarioWorkspace(workspace));
+            return true;
+        });
     }
 
     private static Task<bool> EditAsync(
@@ -357,14 +310,11 @@ public sealed class ScenarioPostgresTests
         Action<Evaluation> change
     )
     {
-        return fixture.AsAsync(
-            actor,
-            async workspace =>
-            {
-                await workspace.EditAsync(evaluationId, version, change);
-                return true;
-            }
-        );
+        return fixture.AsAsync(actor, async workspace =>
+        {
+            await workspace.EditAsync(evaluationId, version, change);
+            return true;
+        });
     }
 
     private static Task<bool> ExecuteSqlAsync(PostgresFixture fixture, FormattableString sql)
@@ -380,9 +330,8 @@ public sealed class ScenarioPostgresTests
 
     private static Task<Guid> ImportAsync(PostgresFixture fixture, string owner, JsonNode file)
     {
-        return fixture.TransferAsync(
-            owner,
-            transfer => transfer.ImportAsync(Encoding.UTF8.GetBytes(file.ToJsonString()))
+        return fixture.TransferAsync(owner, transfer =>
+            transfer.ImportAsync(Encoding.UTF8.GetBytes(file.ToJsonString()))
         );
     }
 

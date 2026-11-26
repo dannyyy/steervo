@@ -90,57 +90,34 @@ public static class OfferFields
         Text(nameof(OfferTerms.Name), HeaderGroup, TextType, 160, terms => terms.Name),
         Text(nameof(OfferTerms.Provider), HeaderGroup, TextType, 200, terms => terms.Provider),
         Text(nameof(OfferTerms.Lender), HeaderGroup, TextType, 200, terms => terms.Lender),
-        Text(
-            nameof(OfferTerms.Intermediary),
-            HeaderGroup,
-            TextType,
-            200,
-            terms => terms.Intermediary
+        Text(nameof(OfferTerms.Intermediary), HeaderGroup, TextType, 200, terms =>
+            terms.Intermediary
         ),
-        Text(
-            nameof(OfferTerms.VehicleDescription),
-            HeaderGroup,
-            TextType,
-            400,
-            terms => terms.VehicleDescription
+        Text(nameof(OfferTerms.VehicleDescription), HeaderGroup, TextType, 400, terms =>
+            terms.VehicleDescription
         ),
         Date(nameof(OfferTerms.IssuedOn), DeliveryGroup, terms => terms.IssuedOn),
         Date(nameof(OfferTerms.ValidUntil), DeliveryGroup, terms => terms.ValidUntil),
         Date(nameof(OfferTerms.DeliveryOn), DeliveryGroup, terms => terms.DeliveryOn),
-        Text(
-            nameof(OfferTerms.DeliveryNotes),
-            DeliveryGroup,
-            TextAreaType,
-            1000,
-            terms => terms.DeliveryNotes
+        Text(nameof(OfferTerms.DeliveryNotes), DeliveryGroup, TextAreaType, 1000, terms =>
+            terms.DeliveryNotes
         ),
         Money(nameof(OfferTerms.StatedTotal), PriceGroup, terms => terms.StatedTotal),
         Count(nameof(OfferTerms.TermMonths), ContractGroup, terms => terms.TermMonths),
-        Quantity(
-            nameof(OfferTerms.AnnualInterestPercent),
-            ContractGroup,
-            NumberType,
-            terms => terms.AnnualInterestPercent
+        Quantity(nameof(OfferTerms.AnnualInterestPercent), ContractGroup, NumberType, terms =>
+            terms.AnnualInterestPercent
         ),
         Money(nameof(OfferTerms.MonthlyPayment), ContractGroup, terms => terms.MonthlyPayment),
         Money(nameof(OfferTerms.DownPayment), ContractGroup, terms => terms.DownPayment),
         Money(nameof(OfferTerms.ResidualPayment), ContractGroup, terms => terms.ResidualPayment),
-        Count(
-            nameof(OfferTerms.IncludedKilometresPerYear),
-            MileageGroup,
-            terms => terms.IncludedKilometresPerYear
+        Count(nameof(OfferTerms.IncludedKilometresPerYear), MileageGroup, terms =>
+            terms.IncludedKilometresPerYear
         ),
-        Quantity(
-            nameof(OfferTerms.ExcessKilometrePrice),
-            MileageGroup,
-            UnitPriceType,
-            terms => terms.ExcessKilometrePrice
+        Quantity(nameof(OfferTerms.ExcessKilometrePrice), MileageGroup, UnitPriceType, terms =>
+            terms.ExcessKilometrePrice
         ),
-        Quantity(
-            nameof(OfferTerms.UnusedKilometreCredit),
-            MileageGroup,
-            UnitPriceType,
-            terms => terms.UnusedKilometreCredit
+        Quantity(nameof(OfferTerms.UnusedKilometreCredit), MileageGroup, UnitPriceType, terms =>
+            terms.UnusedKilometreCredit
         ),
         Text(nameof(OfferTerms.Notes), NotesGroup, TextAreaType, 4000, terms => terms.Notes),
     ];

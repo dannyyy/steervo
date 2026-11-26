@@ -84,13 +84,11 @@ public sealed class ScenarioCalculationTests
         Assert.Null(ScenarioCalculation.Calculate(evaluation, buyout, 15).ExpectedCost);
 
         // A returned lease cannot be evaluated beyond its term, a buyout not before it.
-        Assert.Contains(
-            ScenarioCalculation.Calculate(evaluation, lease, 18).Issues,
-            issue => issue.Code == LeaseHorizonIssue
+        Assert.Contains(ScenarioCalculation.Calculate(evaluation, lease, 18).Issues, issue =>
+            issue.Code == LeaseHorizonIssue
         );
-        Assert.Contains(
-            ScenarioCalculation.Calculate(evaluation, buyout, 6).Issues,
-            issue => issue.Code == LeaseHorizonIssue
+        Assert.Contains(ScenarioCalculation.Calculate(evaluation, buyout, 6).Issues, issue =>
+            issue.Code == LeaseHorizonIssue
         );
     }
 
@@ -199,9 +197,8 @@ public sealed class ScenarioCalculationTests
             }
         );
 
-        Assert.Contains(
-            ScenarioCalculation.Calculate(evaluation, credit, 2).Issues,
-            issue => issue.Code == "ScenarioCreditInconsistent"
+        Assert.Contains(ScenarioCalculation.Calculate(evaluation, credit, 2).Issues, issue =>
+            issue.Code == "ScenarioCreditInconsistent"
         );
     }
 
@@ -255,9 +252,8 @@ public sealed class ScenarioCalculationTests
         // Removing a cost removes the adjustments that referred to it.
         evaluation.RemoveCost(insurance);
 
-        Assert.DoesNotContain(
-            evaluation.FindScenario(cash).CostAdjustments,
-            adjustment => adjustment.CostId == insurance
+        Assert.DoesNotContain(evaluation.FindScenario(cash).CostAdjustments, adjustment =>
+            adjustment.CostId == insurance
         );
     }
 
@@ -351,9 +347,8 @@ public sealed class ScenarioCalculationTests
         // Driving more than included requires a price for the excess kilometres.
         var lease = AddScenario(evaluation, offer, LeaseTerms with { ExcessKilometrePrice = null });
 
-        Assert.Contains(
-            ScenarioCalculation.Calculate(evaluation, lease, 12).Issues,
-            issue => issue.Code == "ScenarioMissingExcessKilometrePrice"
+        Assert.Contains(ScenarioCalculation.Calculate(evaluation, lease, 12).Issues, issue =>
+            issue.Code == "ScenarioMissingExcessKilometrePrice"
         );
 
         // Driving 100 kilometres less earns the credit: 650 - 100 x 0.10.

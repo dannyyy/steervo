@@ -130,14 +130,11 @@ public sealed class PostgresFixture : IAsyncDisposable
     /// <summary>Like <see cref="AsAsync{T}"/>, for workspace actions that return nothing.</summary>
     public Task ActAsync(string actor, Func<EvaluationWorkspace, Task> action)
     {
-        return AsAsync(
-            actor,
-            async workspace =>
-            {
-                await action(workspace);
-                return true;
-            }
-        );
+        return AsAsync(actor, async workspace =>
+        {
+            await action(workspace);
+            return true;
+        });
     }
 
     public Task<T> TransferAsync<T>(string actor, Func<EvaluationTransfer, Task<T>> action)

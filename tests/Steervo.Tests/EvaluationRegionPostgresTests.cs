@@ -35,9 +35,8 @@ public sealed class EvaluationRegionPostgresTests
         Assert.Empty(await fixture.AsAsync(owner, workspace => workspace.ListAsync()));
 
         // Country and currency are stored independently of each other.
-        var id = await fixture.AsAsync(
-            owner,
-            workspace => workspace.CreateAsync("Decision", null, "LI", "CHF")
+        var id = await fixture.AsAsync(owner, workspace =>
+            workspace.CreateAsync("Decision", null, "LI", "CHF")
         );
         var original = await fixture.AsAsync(owner, workspace => workspace.ReadAsync(id));
         Assert.Equal("LI", original.Country);
@@ -64,21 +63,15 @@ public sealed class EvaluationRegionPostgresTests
     {
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync();
-        var id = await fixture.AsAsync(
-            owner,
-            workspace => workspace.CreateAsync("Existing", null, "LI", "CHF")
+        var id = await fixture.AsAsync(owner, workspace =>
+            workspace.CreateAsync("Existing", null, "LI", "CHF")
         );
-        await EditAsync(
-            fixture,
-            owner,
-            id,
-            1,
-            evaluation =>
-                evaluation.AddOffer(
-                    evaluation.AddCandidate(new("Car")),
-                    new() { Name = "Offer", StatedTotal = 23456 },
-                    []
-                )
+        await EditAsync(fixture, owner, id, 1, evaluation =>
+            evaluation.AddOffer(
+                evaluation.AddCandidate(new("Car")),
+                new() { Name = "Offer", StatedTotal = 23456 },
+                []
+            )
         );
 
         // Go back to the schema before the country existed and upgrade again.
@@ -109,12 +102,8 @@ public sealed class EvaluationRegionPostgresTests
 
         // The currency is fixed by the offer; a rejected change leaves everything as it was.
         await Assert.ThrowsAsync<RuleException>(() =>
-            EditAsync(
-                fixture,
-                owner,
-                id,
-                migrated.Version,
-                evaluation => evaluation.SetProperties("Wrong", null, "DE", "EUR")
+            EditAsync(fixture, owner, id, migrated.Version, evaluation =>
+                evaluation.SetProperties("Wrong", null, "DE", "EUR")
             )
         );
         var unchanged = await fixture.AsAsync(owner, workspace => workspace.ReadAsync(id));
@@ -123,12 +112,8 @@ public sealed class EvaluationRegionPostgresTests
         Assert.Equal(migrated.Version, unchanged.Version);
 
         // The missing country can be added afterwards.
-        await EditAsync(
-            fixture,
-            owner,
-            id,
-            migrated.Version,
-            evaluation => evaluation.SetProperties(evaluation.Name, evaluation.Purpose, "LI", "CHF")
+        await EditAsync(fixture, owner, id, migrated.Version, evaluation =>
+            evaluation.SetProperties(evaluation.Name, evaluation.Purpose, "LI", "CHF")
         );
         var completed = await fixture.AsAsync(owner, workspace => workspace.ReadAsync(id));
         Assert.Equal("LI", completed.Country);
@@ -136,13 +121,8 @@ public sealed class EvaluationRegionPostgresTests
 
         // The version number used above is outdated by now.
         await Assert.ThrowsAsync<RuleException>(() =>
-            EditAsync(
-                fixture,
-                owner,
-                id,
-                migrated.Version,
-                evaluation =>
-                    evaluation.SetProperties(evaluation.Name, evaluation.Purpose, "DE", "CHF")
+            EditAsync(fixture, owner, id, migrated.Version, evaluation =>
+                evaluation.SetProperties(evaluation.Name, evaluation.Purpose, "DE", "CHF")
             )
         );
     }
@@ -155,21 +135,17 @@ public sealed class EvaluationRegionPostgresTests
         Action<Evaluation> change
     )
     {
-        return fixture.AsAsync(
-            actor,
-            async workspace =>
-            {
-                await workspace.EditAsync(evaluationId, version, change);
-                return true;
-            }
-        );
+        return fixture.AsAsync(actor, async workspace =>
+        {
+            await workspace.EditAsync(evaluationId, version, change);
+            return true;
+        });
     }
 
     private static Task<Guid> ImportAsync(PostgresFixture fixture, string owner, JsonNode file)
     {
-        return fixture.TransferAsync(
-            owner,
-            transfer => transfer.ImportAsync(Encoding.UTF8.GetBytes(file.ToJsonString()))
+        return fixture.TransferAsync(owner, transfer =>
+            transfer.ImportAsync(Encoding.UTF8.GetBytes(file.ToJsonString()))
         );
     }
 }

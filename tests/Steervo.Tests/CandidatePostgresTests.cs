@@ -28,72 +28,47 @@ public sealed class CandidatePostgresTests
         var owner = await fixture.SetupAsync();
         var reader = await fixture.InviteAsync(owner, "reader@example.test");
         var editor = await fixture.InviteAsync(owner, "editor@example.test");
-        var caseId = await fixture.AsAsync(
-            owner,
-            workspace => workspace.CreateAsync("Decision", null, "CH", "EUR")
+        var caseId = await fixture.AsAsync(owner, workspace =>
+            workspace.CreateAsync("Decision", null, "CH", "EUR")
         );
         Guid candidate = default;
         Guid criterion = default;
-        await fixture.AsAsync(
-            owner,
-            async workspace =>
+        await fixture.AsAsync(owner, async workspace =>
+        {
+            await workspace.EditAsync(caseId, 1, evaluation =>
             {
-                await workspace.EditAsync(
-                    caseId,
-                    1,
-                    evaluation =>
-                    {
-                        candidate = evaluation.AddCandidate(new("Example model"));
-                        criterion = evaluation.AddCriterion(
-                            new(
-                                "Feature",
-                                CriterionType.Boolean,
-                                Priority.Required,
-                                CriterionScope.Vehicle
-                            )
-                        );
-                    }
+                candidate = evaluation.AddCandidate(new("Example model"));
+                criterion = evaluation.AddCriterion(
+                    new("Feature", CriterionType.Boolean, Priority.Required, CriterionScope.Vehicle)
                 );
-                return true;
-            }
-        );
-        await fixture.AsAsync(
-            owner,
-            async workspace =>
-            {
-                await workspace.ShareAsync(caseId, 2, "reader@example.test", AccessLevel.Reader);
-                return true;
-            }
-        );
-        await fixture.AsAsync(
-            owner,
-            async workspace =>
-            {
-                await workspace.ShareAsync(caseId, 3, "editor@example.test", AccessLevel.Editor);
-                return true;
-            }
-        );
+            });
+            return true;
+        });
+        await fixture.AsAsync(owner, async workspace =>
+        {
+            await workspace.ShareAsync(caseId, 2, "reader@example.test", AccessLevel.Reader);
+            return true;
+        });
+        await fixture.AsAsync(owner, async workspace =>
+        {
+            await workspace.ShareAsync(caseId, 3, "editor@example.test", AccessLevel.Editor);
+            return true;
+        });
 
         // A reader may not assess, an editor may.
         await Assert.ThrowsAsync<RuleException>(() =>
-            CandidatesAsync(
-                fixture,
-                reader,
-                candidates =>
-                    candidates.AssessAsync(caseId, 4, candidate, criterion, new(BooleanValue: true))
+            CandidatesAsync(fixture, reader, candidates =>
+                candidates.AssessAsync(caseId, 4, candidate, criterion, new(BooleanValue: true))
             )
         );
-        await CandidatesAsync(
-            fixture,
-            editor,
-            candidates =>
-                candidates.AssessAsync(
-                    caseId,
-                    4,
-                    candidate,
-                    criterion,
-                    new(BooleanValue: false, Source: AssessmentSource.TestDrive, Notes: "Observed")
-                )
+        await CandidatesAsync(fixture, editor, candidates =>
+            candidates.AssessAsync(
+                caseId,
+                4,
+                candidate,
+                criterion,
+                new(BooleanValue: false, Source: AssessmentSource.TestDrive, Notes: "Observed")
+            )
         );
 
         var saved = await fixture.AsAsync(reader, workspace => workspace.ReadAsync(caseId));
@@ -103,18 +78,12 @@ public sealed class CandidatePostgresTests
 
         // An outdated version number is rejected; the current one updates the same assessment.
         await Assert.ThrowsAsync<RuleException>(() =>
-            CandidatesAsync(
-                fixture,
-                editor,
-                candidates =>
-                    candidates.AssessAsync(caseId, 4, candidate, criterion, new(BooleanValue: true))
+            CandidatesAsync(fixture, editor, candidates =>
+                candidates.AssessAsync(caseId, 4, candidate, criterion, new(BooleanValue: true))
             )
         );
-        await CandidatesAsync(
-            fixture,
-            editor,
-            candidates =>
-                candidates.AssessAsync(caseId, 5, candidate, criterion, new(BooleanValue: true))
+        await CandidatesAsync(fixture, editor, candidates =>
+            candidates.AssessAsync(caseId, 5, candidate, criterion, new(BooleanValue: true))
         );
 
         saved = await fixture.AsAsync(reader, workspace => workspace.ReadAsync(caseId));
@@ -122,20 +91,14 @@ public sealed class CandidatePostgresTests
         Assert.Equal(Fulfillment.Met, saved.ResultFor(candidate, criterion));
 
         // A revoked editor can no longer change assessments.
-        await fixture.AsAsync(
-            owner,
-            async workspace =>
-            {
-                await workspace.RevokeAsync(caseId, saved.Version, editor);
-                return true;
-            }
-        );
+        await fixture.AsAsync(owner, async workspace =>
+        {
+            await workspace.RevokeAsync(caseId, saved.Version, editor);
+            return true;
+        });
         await Assert.ThrowsAsync<RuleException>(() =>
-            CandidatesAsync(
-                fixture,
-                editor,
-                candidates =>
-                    candidates.ClearAssessmentAsync(caseId, saved.Version + 1, candidate, criterion)
+            CandidatesAsync(fixture, editor, candidates =>
+                candidates.ClearAssessmentAsync(caseId, saved.Version + 1, candidate, criterion)
             )
         );
     }
@@ -216,18 +179,14 @@ public sealed class CandidatePostgresTests
     {
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync();
-        var id = await fixture.AsAsync(
-            owner,
-            workspace => workspace.CreateAsync("Decision", null, "CH", "EUR")
+        var id = await fixture.AsAsync(owner, workspace =>
+            workspace.CreateAsync("Decision", null, "CH", "EUR")
         );
-        await fixture.AsAsync(
-            owner,
-            async workspace =>
-            {
-                await workspace.EditAsync(id, 1, AddDeferredCandidateWithRating);
-                return true;
-            }
-        );
+        await fixture.AsAsync(owner, async workspace =>
+        {
+            await workspace.EditAsync(id, 1, AddDeferredCandidateWithRating);
+            return true;
+        });
 
         // Export and import as a new evaluation.
         var exported = await fixture.TransferAsync(owner, transfer => transfer.ExportAsync(id));
@@ -247,22 +206,19 @@ public sealed class CandidatePostgresTests
         var invalid = JsonNode.Parse(exported)!;
         invalid["assessments"]![0]!["candidateId"] = Guid.NewGuid();
         await Assert.ThrowsAsync<RuleException>(() =>
-            fixture.TransferAsync(
-                owner,
-                transfer => transfer.ImportAsync(Encoding.UTF8.GetBytes(invalid.ToJsonString()))
+            fixture.TransferAsync(owner, transfer =>
+                transfer.ImportAsync(Encoding.UTF8.GetBytes(invalid.ToJsonString()))
             )
         );
 
         // A file of the first format version has no cars at all.
         var legacy =
             """{"format":"steervo-evaluation","version":1,"name":"Legacy decision","purpose":"","groups":[],"criteria":[]}""";
-        var legacyId = await fixture.TransferAsync(
-            owner,
-            transfer => transfer.ImportAsync(Encoding.UTF8.GetBytes(legacy))
+        var legacyId = await fixture.TransferAsync(owner, transfer =>
+            transfer.ImportAsync(Encoding.UTF8.GetBytes(legacy))
         );
-        var importedLegacy = await fixture.AsAsync(
-            owner,
-            workspace => workspace.ReadAsync(legacyId)
+        var importedLegacy = await fixture.AsAsync(owner, workspace =>
+            workspace.ReadAsync(legacyId)
         );
         Assert.Empty(importedLegacy.Candidates);
     }
@@ -296,13 +252,10 @@ public sealed class CandidatePostgresTests
         Func<CandidateWorkspace, Task> action
     )
     {
-        return fixture.AsAsync(
-            actor,
-            async workspace =>
-            {
-                await action(new CandidateWorkspace(workspace));
-                return true;
-            }
-        );
+        return fixture.AsAsync(actor, async workspace =>
+        {
+            await action(new CandidateWorkspace(workspace));
+            return true;
+        });
     }
 }

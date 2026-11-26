@@ -96,9 +96,8 @@ app.UseRequestLocalization(GermanLocalization());
 app.UseStaticFiles();
 
 // Full browser pages get a useful error view; fragments and form responses keep their status and body.
-app.UseWhen(
-    IsBrowserPageRequest,
-    branch => branch.UseStatusCodePagesWithReExecute(ErrorPath, "?statusCode={0}")
+app.UseWhen(IsBrowserPageRequest, branch =>
+    branch.UseStatusCodePagesWithReExecute(ErrorPath, "?statusCode={0}")
 );
 
 app.UseRouting();
@@ -208,8 +207,8 @@ static void AddForwardedHeaders(WebApplicationBuilder builder)
         options.ForwardedHeaders =
             ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 
-        var trustedProxies =
-            builder.Configuration.GetSection("TrustedProxies").Get<string[]>() ?? [];
+        var trustedProxies = builder.Configuration.GetSection("TrustedProxies").Get<string[]>()
+            ?? [];
 
         foreach (var address in trustedProxies)
         {
@@ -283,9 +282,8 @@ static void AddRateLimits(WebApplicationBuilder builder)
                 : LimitPerClient(context, GeneralRequestsPerMinute);
         });
 
-        options.AddPolicy(
-            AuthenticationPolicy,
-            context => LimitPerClient(context, AuthenticationRequestsPerMinute)
+        options.AddPolicy(AuthenticationPolicy, context =>
+            LimitPerClient(context, AuthenticationRequestsPerMinute)
         );
     });
 }

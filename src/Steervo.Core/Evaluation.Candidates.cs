@@ -26,11 +26,8 @@ public sealed partial class Evaluation
     {
         var orderedCandidates = Candidates.OrderBy(candidate => candidate.Position).ToList();
 
-        Move(
-            orderedCandidates,
-            FindCandidate(id),
-            direction,
-            (candidate, position) => candidate.Position = position
+        Move(orderedCandidates, FindCandidate(id), direction, (candidate, position) =>
+            candidate.Position = position
         );
     }
 

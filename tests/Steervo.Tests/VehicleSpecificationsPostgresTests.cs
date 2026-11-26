@@ -24,17 +24,12 @@ public sealed class VehicleSpecificationsPostgresTests
     {
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync();
-        var id = await fixture.AsAsync(
-            owner,
-            workspace => workspace.CreateAsync("Decision", null, "CH", "EUR")
+        var id = await fixture.AsAsync(owner, workspace =>
+            workspace.CreateAsync("Decision", null, "CH", "EUR")
         );
         var specifications = CreateFullSpecifications();
-        await EditAsync(
-            fixture,
-            owner,
-            id,
-            1,
-            evaluation => evaluation.AddCandidate(new("Original", Specifications: specifications))
+        await EditAsync(fixture, owner, id, 1, evaluation =>
+            evaluation.AddCandidate(new("Original", Specifications: specifications))
         );
 
         // Every value survives saving and reloading.
@@ -43,28 +38,21 @@ public sealed class VehicleSpecificationsPostgresTests
 
         // The copied car and the exported file carry the same data. The payload was never
         // entered, so it stays empty and is still derived from the two weights.
-        await EditAsync(
-            fixture,
-            owner,
-            id,
-            saved.Version,
-            evaluation => evaluation.CopyCandidate(saved.Candidates.Single().Id, "Copy")
+        await EditAsync(fixture, owner, id, saved.Version, evaluation =>
+            evaluation.CopyCandidate(saved.Candidates.Single().Id, "Copy")
         );
         var exported = await fixture.TransferAsync(owner, transfer => transfer.ExportAsync(id));
         Assert.Equal(9, JsonNode.Parse(exported)!["version"]!.GetValue<int>());
         var copyId = await fixture.TransferAsync(owner, transfer => transfer.ImportAsync(exported));
         var imported = await fixture.AsAsync(owner, workspace => workspace.ReadAsync(copyId));
-        Assert.All(
-            imported.Candidates,
-            candidate => Assert.Equal(specifications, candidate.Specifications)
+        Assert.All(imported.Candidates, candidate =>
+            Assert.Equal(specifications, candidate.Specifications)
         );
-        Assert.All(
-            imported.Candidates,
-            candidate => Assert.Null(candidate.Specifications.PayloadKg)
+        Assert.All(imported.Candidates, candidate =>
+            Assert.Null(candidate.Specifications.PayloadKg)
         );
-        Assert.All(
-            imported.Candidates,
-            candidate => Assert.Equal(500, candidate.Specifications.GetPayloadKg())
+        Assert.All(imported.Candidates, candidate =>
+            Assert.Equal(500, candidate.Specifications.GetPayloadKg())
         );
         Assert.Empty(imported.Assessments);
 
@@ -94,13 +82,11 @@ public sealed class VehicleSpecificationsPostgresTests
         }
 
         var legacyId = await ImportAsync(fixture, owner, legacy);
-        var importedLegacy = await fixture.AsAsync(
-            owner,
-            workspace => workspace.ReadAsync(legacyId)
+        var importedLegacy = await fixture.AsAsync(owner, workspace =>
+            workspace.ReadAsync(legacyId)
         );
-        Assert.All(
-            importedLegacy.Candidates,
-            candidate => Assert.False(candidate.Specifications.HasValues())
+        Assert.All(importedLegacy.Candidates, candidate =>
+            Assert.False(candidate.Specifications.HasValues())
         );
 
         // Contradictory technical data makes a file invalid.
@@ -116,33 +102,19 @@ public sealed class VehicleSpecificationsPostgresTests
     {
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync();
-        var id = await fixture.AsAsync(
-            owner,
-            workspace => workspace.CreateAsync("Existing decision", null, "CH", "EUR")
+        var id = await fixture.AsAsync(owner, workspace =>
+            workspace.CreateAsync("Existing decision", null, "CH", "EUR")
         );
         Guid candidateId = default;
         Guid criterionId = default;
-        await EditAsync(
-            fixture,
-            owner,
-            id,
-            1,
-            evaluation =>
-            {
-                candidateId = evaluation.AddCandidate(
-                    new("Existing vehicle", Notes: "Keep this note")
-                );
-                criterionId = evaluation.AddCriterion(
-                    new(
-                        "Impression",
-                        CriterionType.Rating,
-                        Priority.Required,
-                        CriterionScope.Vehicle
-                    )
-                );
-                evaluation.AssessCandidate(candidateId, criterionId, new(RatingValue: 1));
-            }
-        );
+        await EditAsync(fixture, owner, id, 1, evaluation =>
+        {
+            candidateId = evaluation.AddCandidate(new("Existing vehicle", Notes: "Keep this note"));
+            criterionId = evaluation.AddCriterion(
+                new("Impression", CriterionType.Rating, Priority.Required, CriterionScope.Vehicle)
+            );
+            evaluation.AssessCandidate(candidateId, criterionId, new(RatingValue: 1));
+        });
 
         // Go back to the schema before technical data and upgrade again.
         await fixture.RunAsync(async services =>
@@ -203,21 +175,17 @@ public sealed class VehicleSpecificationsPostgresTests
         Action<Evaluation> change
     )
     {
-        return fixture.AsAsync(
-            actor,
-            async workspace =>
-            {
-                await workspace.EditAsync(evaluationId, version, change);
-                return true;
-            }
-        );
+        return fixture.AsAsync(actor, async workspace =>
+        {
+            await workspace.EditAsync(evaluationId, version, change);
+            return true;
+        });
     }
 
     private static Task<Guid> ImportAsync(PostgresFixture fixture, string owner, JsonNode file)
     {
-        return fixture.TransferAsync(
-            owner,
-            transfer => transfer.ImportAsync(Encoding.UTF8.GetBytes(file.ToJsonString()))
+        return fixture.TransferAsync(owner, transfer =>
+            transfer.ImportAsync(Encoding.UTF8.GetBytes(file.ToJsonString()))
         );
     }
 }

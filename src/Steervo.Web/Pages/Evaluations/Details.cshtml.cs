@@ -249,10 +249,8 @@ public sealed class DetailsModel(
             switch (action)
             {
                 case "rename":
-                    await workspace.EditAsync(
-                        id,
-                        version,
-                        evaluation => evaluation.SetProperties(name, purpose, country, currency)
+                    await workspace.EditAsync(id, version, evaluation =>
+                        evaluation.SetProperties(name, purpose, country, currency)
                     );
                     break;
 
@@ -261,74 +259,56 @@ public sealed class DetailsModel(
                     break;
 
                 case "rename-group":
-                    await workspace.EditAsync(
-                        id,
-                        version,
-                        evaluation => evaluation.RenameGroup(itemId, name)
+                    await workspace.EditAsync(id, version, evaluation =>
+                        evaluation.RenameGroup(itemId, name)
                     );
                     break;
 
                 case "move-group":
-                    await workspace.EditAsync(
-                        id,
-                        version,
-                        evaluation => evaluation.MoveGroup(itemId, direction)
+                    await workspace.EditAsync(id, version, evaluation =>
+                        evaluation.MoveGroup(itemId, direction)
                     );
                     break;
 
                 case "place-group":
-                    await workspace.EditAsync(
-                        id,
-                        version,
-                        evaluation => evaluation.PlaceGroup(itemId, position)
+                    await workspace.EditAsync(id, version, evaluation =>
+                        evaluation.PlaceGroup(itemId, position)
                     );
                     break;
 
                 case "remove-group":
-                    await workspace.EditAsync(
-                        id,
-                        version,
-                        evaluation => evaluation.RemoveGroup(itemId)
+                    await workspace.EditAsync(id, version, evaluation =>
+                        evaluation.RemoveGroup(itemId)
                     );
                     break;
 
                 case "add-criterion":
-                    await workspace.EditAsync(
-                        id,
-                        version,
-                        evaluation => evaluation.AddCriterion(criterion)
+                    await workspace.EditAsync(id, version, evaluation =>
+                        evaluation.AddCriterion(criterion)
                     );
                     break;
 
                 case "edit-criterion":
-                    await workspace.EditAsync(
-                        id,
-                        version,
-                        evaluation => evaluation.EditCriterion(itemId, criterion)
+                    await workspace.EditAsync(id, version, evaluation =>
+                        evaluation.EditCriterion(itemId, criterion)
                     );
                     break;
 
                 case "move-criterion":
-                    await workspace.EditAsync(
-                        id,
-                        version,
-                        evaluation => evaluation.MoveCriterion(itemId, direction)
+                    await workspace.EditAsync(id, version, evaluation =>
+                        evaluation.MoveCriterion(itemId, direction)
                     );
                     break;
 
                 case "place-criterion":
-                    await workspace.EditAsync(
-                        id,
-                        version,
-                        evaluation => evaluation.PlaceCriterion(itemId, groupId, position)
+                    await workspace.EditAsync(id, version, evaluation =>
+                        evaluation.PlaceCriterion(itemId, groupId, position)
                     );
                     break;
 
                 case "remove-criterion":
-                    await workspace.EditAsync(
-                        id,
-                        version,
-                        evaluation => evaluation.RemoveCriterion(itemId)
+                    await workspace.EditAsync(id, version, evaluation =>
+                        evaluation.RemoveCriterion(itemId)
                     );
                     break;
 

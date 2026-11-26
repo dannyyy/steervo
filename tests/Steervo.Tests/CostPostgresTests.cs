@@ -27,51 +27,33 @@ public sealed class CostPostgresTests
         var owner = await fixture.SetupAsync();
         var reader = await fixture.InviteAsync(owner, "reader@example.test");
         var editor = await fixture.InviteAsync(owner, "editor@example.test");
-        var id = await fixture.AsAsync(
-            owner,
-            workspace => workspace.CreateAsync("Planning", null, "CH", "EUR")
+        var id = await fixture.AsAsync(owner, workspace =>
+            workspace.CreateAsync("Planning", null, "CH", "EUR")
         );
         Guid car = default;
-        await EditAsync(
-            fixture,
-            owner,
-            id,
-            1,
-            evaluation =>
-            {
-                car = evaluation.AddCandidate(new("Vehicle"));
-                evaluation.AddOffer(car, new() { Name = "Offer" }, [], "EUR");
-            }
-        );
-        await fixture.AsAsync(
-            owner,
-            async workspace =>
-            {
-                await workspace.ShareAsync(id, 2, "reader@example.test", AccessLevel.Reader);
-                await workspace.ShareAsync(id, 3, "editor@example.test", AccessLevel.Editor);
-                return true;
-            }
-        );
+        await EditAsync(fixture, owner, id, 1, evaluation =>
+        {
+            car = evaluation.AddCandidate(new("Vehicle"));
+            evaluation.AddOffer(car, new() { Name = "Offer" }, [], "EUR");
+        });
+        await fixture.AsAsync(owner, async workspace =>
+        {
+            await workspace.ShareAsync(id, 2, "reader@example.test", AccessLevel.Reader);
+            await workspace.ShareAsync(id, 3, "editor@example.test", AccessLevel.Editor);
+            return true;
+        });
 
         // Only an editor may set up the cost plan and add costs.
         await Assert.ThrowsAsync<RuleException>(() =>
             CostsAsync(fixture, reader, costs => costs.PlanAsync(id, 4, new(2027, 1, 1), 24))
         );
         await CostsAsync(fixture, editor, costs => costs.PlanAsync(id, 4, new(2027, 1, 1), 24));
-        var cost = await fixture.AsAsync(
-            editor,
-            workspace =>
-                new CostWorkspace(workspace).AddAsync(
-                    id,
-                    5,
-                    new(
-                        "Cover",
-                        CostCategory.Insurance,
-                        CostFrequency.Yearly,
-                        180,
-                        CandidateId: car
-                    )
-                )
+        var cost = await fixture.AsAsync(editor, workspace =>
+            new CostWorkspace(workspace).AddAsync(
+                id,
+                5,
+                new("Cover", CostCategory.Insurance, CostFrequency.Yearly, 180, CandidateId: car)
+            )
         );
 
         // Two annual payments of 180 fall into the 24 months of the plan.
@@ -83,11 +65,8 @@ public sealed class CostPostgresTests
             CostsAsync(fixture, reader, costs => costs.RemoveAsync(id, 6, cost))
         );
         await Assert.ThrowsAsync<RuleException>(() =>
-            CostsAsync(
-                fixture,
-                editor,
-                costs =>
-                    costs.EditAsync(id, 5, cost, saved.FindCost(cost).ToInput() with { Amount = 1 })
+            CostsAsync(fixture, editor, costs =>
+                costs.EditAsync(id, 5, cost, saved.FindCost(cost).ToInput() with { Amount = 1 })
             )
         );
 
@@ -101,17 +80,15 @@ public sealed class CostPostgresTests
             return true;
         });
         await Assert.ThrowsAsync<RuleException>(() =>
-            fixture.AsAsync(
-                editor,
-                workspace =>
-                    new CostWorkspace(workspace).AddAsync(
-                        id,
-                        6,
-                        saved.FindCost(cost).ToInput() with
-                        {
-                            CandidateId = foreignCar,
-                        }
-                    )
+            fixture.AsAsync(editor, workspace =>
+                new CostWorkspace(workspace).AddAsync(
+                    id,
+                    6,
+                    saved.FindCost(cost).ToInput() with
+                    {
+                        CandidateId = foreignCar,
+                    }
+                )
             )
         );
         var error = await Assert.ThrowsAsync<PostgresException>(() =>
@@ -128,14 +105,11 @@ public sealed class CostPostgresTests
         Assert.Equal(PostgresErrorCodes.ForeignKeyViolation, error.SqlState);
 
         // A revoked editor loses access.
-        await fixture.AsAsync(
-            owner,
-            async workspace =>
-            {
-                await workspace.RevokeAsync(id, 6, editor);
-                return true;
-            }
-        );
+        await fixture.AsAsync(owner, async workspace =>
+        {
+            await workspace.RevokeAsync(id, 6, editor);
+            return true;
+        });
         await Assert.ThrowsAsync<RuleException>(() =>
             fixture.AsAsync(editor, workspace => workspace.ReadAsync(id))
         );
@@ -153,9 +127,8 @@ public sealed class CostPostgresTests
     {
         await using var fixture = await PostgresFixture.CreateAsync(port);
         var owner = await fixture.SetupAsync();
-        var id = await fixture.AsAsync(
-            owner,
-            workspace => workspace.CreateAsync("Planning", null, "CH", "EUR")
+        var id = await fixture.AsAsync(owner, workspace =>
+            workspace.CreateAsync("Planning", null, "CH", "EUR")
         );
         await EditAsync(fixture, owner, id, 1, AddCarWithEveryKindOfCost);
 
@@ -201,9 +174,8 @@ public sealed class CostPostgresTests
         legacy.AsObject().Remove("costPlanning");
         legacy.AsObject().Remove("costs");
         var legacyId = await ImportAsync(fixture, owner, legacy);
-        var importedLegacy = await fixture.AsAsync(
-            owner,
-            workspace => workspace.ReadAsync(legacyId)
+        var importedLegacy = await fixture.AsAsync(owner, workspace =>
+            workspace.ReadAsync(legacyId)
         );
 
         Assert.Null(importedLegacy.CostPlanning);
@@ -281,14 +253,11 @@ public sealed class CostPostgresTests
         Action<Evaluation> change
     )
     {
-        return fixture.AsAsync(
-            actor,
-            async workspace =>
-            {
-                await workspace.EditAsync(evaluationId, version, change);
-                return true;
-            }
-        );
+        return fixture.AsAsync(actor, async workspace =>
+        {
+            await workspace.EditAsync(evaluationId, version, change);
+            return true;
+        });
     }
 
     private static Task<bool> CostsAsync(
@@ -297,21 +266,17 @@ public sealed class CostPostgresTests
         Func<CostWorkspace, Task> action
     )
     {
-        return fixture.AsAsync(
-            actor,
-            async workspace =>
-            {
-                await action(new CostWorkspace(workspace));
-                return true;
-            }
-        );
+        return fixture.AsAsync(actor, async workspace =>
+        {
+            await action(new CostWorkspace(workspace));
+            return true;
+        });
     }
 
     private static Task<Guid> ImportAsync(PostgresFixture fixture, string owner, JsonNode file)
     {
-        return fixture.TransferAsync(
-            owner,
-            transfer => transfer.ImportAsync(Encoding.UTF8.GetBytes(file.ToJsonString()))
+        return fixture.TransferAsync(owner, transfer =>
+            transfer.ImportAsync(Encoding.UTF8.GetBytes(file.ToJsonString()))
         );
     }
 }

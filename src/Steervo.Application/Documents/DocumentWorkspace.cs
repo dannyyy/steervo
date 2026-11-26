@@ -63,21 +63,17 @@ public sealed class DocumentWorkspace(
 
         var file = await storage.SaveAsync(input, fileName, cancellationToken);
 
-        await evaluations.EditAsync(
-            evaluationId,
-            version,
-            edited =>
+        await evaluations.EditAsync(evaluationId, version, edited =>
+        {
+            if (documentId.HasValue)
             {
-                if (documentId.HasValue)
-                {
-                    edited.ReviseDocument(documentId.Value, file, note);
-                }
-                else
-                {
-                    edited.AddDocument(offerId, name, file, note);
-                }
+                edited.ReviseDocument(documentId.Value, file, note);
             }
-        );
+            else
+            {
+                edited.AddDocument(offerId, name, file, note);
+            }
+        });
     }
 
     public async Task<(Stream Content, string FileName)> DownloadAsync(
@@ -88,8 +84,9 @@ public sealed class DocumentWorkspace(
     )
     {
         var evaluation = await evaluations.ReadAsync(evaluationId);
-        var revision =
-            evaluation.FindDocument(documentId).Revisions.SingleOrDefault(r => r.Number == number)
+        var revision = evaluation
+            .FindDocument(documentId)
+            .Revisions.SingleOrDefault(r => r.Number == number)
             ?? throw new RuleException("NotFound");
 
         var content = await storage.OpenAsync(revision.File, cancellationToken);
@@ -99,10 +96,8 @@ public sealed class DocumentWorkspace(
 
     public Task RemoveAsync(Guid evaluationId, long version, Guid documentId)
     {
-        return evaluations.EditAsync(
-            evaluationId,
-            version,
-            evaluation => evaluation.RemoveDocument(documentId)
+        return evaluations.EditAsync(evaluationId, version, evaluation =>
+            evaluation.RemoveDocument(documentId)
         );
     }
 }

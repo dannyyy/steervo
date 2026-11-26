@@ -11,10 +11,8 @@ public sealed class CandidateWorkspace(EvaluationWorkspace evaluations)
     {
         var candidateId = Guid.Empty;
 
-        await evaluations.EditAsync(
-            evaluationId,
-            version,
-            evaluation => candidateId = evaluation.AddCandidate(input)
+        await evaluations.EditAsync(evaluationId, version, evaluation =>
+            candidateId = evaluation.AddCandidate(input)
         );
 
         return candidateId;
@@ -22,10 +20,8 @@ public sealed class CandidateWorkspace(EvaluationWorkspace evaluations)
 
     public Task EditAsync(Guid evaluationId, long version, Guid candidateId, CandidateInput input)
     {
-        return evaluations.EditAsync(
-            evaluationId,
-            version,
-            evaluation => evaluation.EditCandidate(candidateId, input)
+        return evaluations.EditAsync(evaluationId, version, evaluation =>
+            evaluation.EditCandidate(candidateId, input)
         );
     }
 
@@ -37,19 +33,15 @@ public sealed class CandidateWorkspace(EvaluationWorkspace evaluations)
         string? reason
     )
     {
-        return evaluations.EditAsync(
-            evaluationId,
-            version,
-            evaluation => evaluation.ClassifyCandidate(candidateId, status, reason)
+        return evaluations.EditAsync(evaluationId, version, evaluation =>
+            evaluation.ClassifyCandidate(candidateId, status, reason)
         );
     }
 
     public Task MoveAsync(Guid evaluationId, long version, Guid candidateId, int direction)
     {
-        return evaluations.EditAsync(
-            evaluationId,
-            version,
-            evaluation => evaluation.MoveCandidate(candidateId, direction)
+        return evaluations.EditAsync(evaluationId, version, evaluation =>
+            evaluation.MoveCandidate(candidateId, direction)
         );
     }
 
@@ -62,10 +54,8 @@ public sealed class CandidateWorkspace(EvaluationWorkspace evaluations)
     {
         var copyId = Guid.Empty;
 
-        await evaluations.EditAsync(
-            evaluationId,
-            version,
-            evaluation => copyId = evaluation.CopyCandidate(candidateId, model)
+        await evaluations.EditAsync(evaluationId, version, evaluation =>
+            copyId = evaluation.CopyCandidate(candidateId, model)
         );
 
         return copyId;
@@ -73,10 +63,8 @@ public sealed class CandidateWorkspace(EvaluationWorkspace evaluations)
 
     public Task RemoveAsync(Guid evaluationId, long version, Guid candidateId)
     {
-        return evaluations.EditAsync(
-            evaluationId,
-            version,
-            evaluation => evaluation.RemoveCandidate(candidateId)
+        return evaluations.EditAsync(evaluationId, version, evaluation =>
+            evaluation.RemoveCandidate(candidateId)
         );
     }
 
@@ -88,10 +76,8 @@ public sealed class CandidateWorkspace(EvaluationWorkspace evaluations)
         AssessmentInput input
     )
     {
-        return evaluations.EditAsync(
-            evaluationId,
-            version,
-            evaluation => evaluation.AssessCandidate(candidateId, criterionId, input)
+        return evaluations.EditAsync(evaluationId, version, evaluation =>
+            evaluation.AssessCandidate(candidateId, criterionId, input)
         );
     }
 
@@ -102,10 +88,8 @@ public sealed class CandidateWorkspace(EvaluationWorkspace evaluations)
         Guid criterionId
     )
     {
-        return evaluations.EditAsync(
-            evaluationId,
-            version,
-            evaluation => evaluation.ClearAssessment(candidateId, criterionId)
+        return evaluations.EditAsync(evaluationId, version, evaluation =>
+            evaluation.ClearAssessment(candidateId, criterionId)
         );
     }
 }
