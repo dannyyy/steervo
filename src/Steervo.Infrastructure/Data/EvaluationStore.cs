@@ -21,7 +21,14 @@ public sealed class EvaluationStore(AppDbContext db, DocumentCleanup? cleanup = 
         CancellationToken cancellationToken = default
     )
     {
-        return await db
+        // Split queries must observe one consistent set of evaluations: one created or shared
+        // between their statements would otherwise fail the whole list.
+        await using var transaction = await db.Database.BeginTransactionAsync(
+            IsolationLevel.RepeatableRead,
+            cancellationToken
+        );
+
+        var evaluations = await db
             .Evaluations.AsNoTracking()
             .Include(evaluation => evaluation.Shares)
             .Include(evaluation => evaluation.Criteria)
@@ -33,6 +40,10 @@ public sealed class EvaluationStore(AppDbContext db, DocumentCleanup? cleanup = 
             )
             .OrderByDescending(evaluation => evaluation.CreatedAt)
             .ToListAsync(cancellationToken);
+
+        await transaction.CommitAsync(cancellationToken);
+
+        return evaluations;
     }
 
     public async Task<Evaluation?> ReadAsync(Guid id, CancellationToken cancellationToken = default)
@@ -130,9 +141,7 @@ public sealed class EvaluationStore(AppDbContext db, DocumentCleanup? cleanup = 
     private async Task<Evaluation> LockAsync(Guid id, CancellationToken cancellationToken)
     {
         var evaluation = await db
-            .Evaluations.FromSqlInterpolated(
-                $"SELECT * FROM \"Evaluations\" WHERE \"Id\" = {id} FOR UPDATE"
-            )
+            .Evaluations.FromSql($"SELECT * FROM \"Evaluations\" WHERE \"Id\" = {id} FOR UPDATE")
             .SingleOrDefaultAsync(cancellationToken);
 
         return evaluation ?? throw new RuleException(NotFound);
@@ -193,7 +202,7 @@ public sealed class EvaluationStore(AppDbContext db, DocumentCleanup? cleanup = 
         foreach (var entry in addedRevisions)
         {
             var id = entry.Entity.File.ContentId;
-            var claimed = await db.Database.ExecuteSqlInterpolatedAsync(
+            var claimed = await db.Database.ExecuteSqlAsync(
                 $"DELETE FROM \"PendingDocumentDeletion\" WHERE \"Id\" = {id} AND \"AvailableAt\" > CURRENT_TIMESTAMP",
                 cancellationToken
             );

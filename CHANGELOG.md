@@ -2,6 +2,8 @@
 
 ## Unveröffentlicht
 
+- Umstellung auf .NET 11 (SDK 11.0.100, `net11.0`) mit ASP.NET Core, EF Core und Npgsql-Provider 11.0. Das Containerimage basiert auf `aspnet:11.0-resolute-chiseled-extra` (Ubuntu 26.04). Weitere Aktualisierungen: AWS SDK für S3 4.1 mit unveränderter Prüfsummenverwendung gegenüber S3-kompatiblen Speichern, xUnit v3, CSharpier 1.4.1, Prettier 3.10.1 und Playwright 1.65.1. Die Entwicklungs- und Testdienste verwenden MailDev 3, S3Mock 5.2.3 und aktuelle PostgreSQL-17/18-Images. Datenbankschema und Exportformat bleiben unverändert.
+- Die Evaluationsübersicht liest wie die Evaluationsakte einen in sich konsistenten Datenstand.
 - Der gesamte Code ist mit CSharpier und Prettier formatiert und auf Lesbarkeit überarbeitet; Regeln und Befehle stehen in [Code-Stil und Lesbarkeit](docs/code-style.md). `scripts/test.sh` prüft die Formatierung mit.
 - Ein abgelehntes Umbenennen einer Evaluation lässt Name und Zweck unverändert. Eine Datei mit unzulässiger Grösse wird beim Ersetzen eines Dokuments wie beim Hinzufügen als ungültiges Dokument abgelehnt.
 - Die Browserprüfungen laufen auch im HTTPS-Modus wieder vollständig durch.

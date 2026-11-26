@@ -33,7 +33,7 @@ Verbindliche Grundlagen: [Designsystem](DESIGN.md), [Interaktionsmuster](docs/in
 
 ## Lokal starten
 
-Voraussetzungen: vorhandenes .NET-10-SDK entsprechend `global.json`, Docker mit Compose sowie `openssl`. Der Startweg verändert oder installiert kein SDK.
+Voraussetzungen: vorhandenes .NET-11-SDK entsprechend `global.json`, Docker mit Compose sowie `openssl`. Der Startweg verändert oder installiert kein SDK.
 
 ```sh
 ./scripts/init-local.sh

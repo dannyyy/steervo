@@ -275,14 +275,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
         entity.Ignore(candidate => candidate.DisplayName);
         entity.Ignore(candidate => candidate.SourceLinks);
 
-        entity.ComplexProperty(
-            candidate => candidate.Specifications,
-            specifications =>
-            {
-                specifications.Property(values => values.Propulsion).HasConversion<string>();
-                specifications.Property(values => values.Drive).HasConversion<string>();
-            }
-        );
+        entity.Property(candidate => candidate.Specifications.Propulsion).HasConversion<string>();
+        entity.Property(candidate => candidate.Specifications.Drive).HasConversion<string>();
 
         entity.ToTable(table =>
         {
@@ -350,21 +344,15 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
         entity.Property(revision => revision.ChangeNote).HasMaxLength(NoteLength);
         entity.Ignore(revision => revision.Pricing);
 
-        entity.ComplexProperty(
-            revision => revision.Terms,
-            terms =>
-            {
-                terms.Property(values => values.Name).HasMaxLength(NameLength);
-                terms.Property(values => values.Provider).HasMaxLength(200);
-                terms.Property(values => values.Lender).HasMaxLength(200);
-                terms.Property(values => values.Intermediary).HasMaxLength(200);
-                terms.Property(values => values.VehicleDescription).HasMaxLength(400);
-                terms.Property(values => values.DeliveryNotes).HasMaxLength(1000);
-                terms.Property(values => values.Notes).HasMaxLength(LongNoteLength);
-                terms.Property(values => values.Kind).HasConversion<string>();
-                terms.Property(values => values.Commitment).HasConversion<string>();
-            }
-        );
+        entity.Property(revision => revision.Terms.Name).HasMaxLength(NameLength);
+        entity.Property(revision => revision.Terms.Provider).HasMaxLength(200);
+        entity.Property(revision => revision.Terms.Lender).HasMaxLength(200);
+        entity.Property(revision => revision.Terms.Intermediary).HasMaxLength(200);
+        entity.Property(revision => revision.Terms.VehicleDescription).HasMaxLength(400);
+        entity.Property(revision => revision.Terms.DeliveryNotes).HasMaxLength(1000);
+        entity.Property(revision => revision.Terms.Notes).HasMaxLength(LongNoteLength);
+        entity.Property(revision => revision.Terms.Kind).HasConversion<string>();
+        entity.Property(revision => revision.Terms.Commitment).HasConversion<string>();
 
         entity
             .HasMany(revision => revision.Lines)
@@ -563,14 +551,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
         entity.HasIndex(revision => new { revision.DocumentId, revision.Number }).IsUnique();
         entity.Property(revision => revision.Note).HasMaxLength(NoteLength);
 
-        entity.ComplexProperty(
-            revision => revision.File,
-            file =>
-            {
-                file.Property(values => values.FileName).HasMaxLength(200);
-                file.Property(values => values.Sha256).HasMaxLength(64);
-            }
-        );
+        entity.Property(revision => revision.File.FileName).HasMaxLength(200);
+        entity.Property(revision => revision.File.Sha256).HasMaxLength(64);
 
         entity
             .HasOne<OfferRevision>()
@@ -685,10 +667,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
         entity.Property(scenario => scenario.Name).HasMaxLength(NameLength);
         entity.Property(scenario => scenario.Notes).HasMaxLength(LongNoteLength);
 
-        entity.ComplexProperty(
-            scenario => scenario.Terms,
-            terms => terms.Property(values => values.Mode).HasConversion<string>()
-        );
+        entity.Property(scenario => scenario.Terms.Mode).HasConversion<string>();
 
         entity
             .HasOne<OfferRevision>()

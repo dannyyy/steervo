@@ -265,7 +265,7 @@ public sealed class DocumentCleanup(
             await objects.DeleteAsync(id, cancellationToken);
         }
 
-        await db.Database.ExecuteSqlInterpolatedAsync(
+        await db.Database.ExecuteSqlAsync(
             $"DELETE FROM \"PendingDocumentDeletion\" WHERE \"Id\" = {id}",
             cancellationToken
         );

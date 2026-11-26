@@ -94,7 +94,7 @@ const environment = {
   Smtp__HourlyLimit: SMTP_HOURLY_LIMIT,
   Smtp__DailyLimit: SMTP_DAILY_LIMIT,
 };
-const application = resolve("src/Steervo.Web/bin/Debug/net10.0/Steervo.Web.dll");
+const application = resolve("src/Steervo.Web/bin/Debug/net11.0/Steervo.Web.dll");
 const containerName = `steervo-browser-${process.pid}-${Date.now()}`;
 const migrationContainerName = `${containerName}-migrate`;
 const keyVolume = `${containerName}-keys`;
@@ -335,7 +335,7 @@ async function newUser() {
 
 async function latestCode(email) {
   for (let attempt = 0; attempt < MAIL_ATTEMPTS; attempt++) {
-    const messages = await (await fetch(`${mailOrigin}/email`)).json();
+    const messages = await (await fetch(`${mailOrigin}/api/email`)).json();
     const matching = messages.filter(
       (summary) =>
         summary.to?.some((recipient) => recipient.address.toLowerCase() === email.toLowerCase()) &&
@@ -346,7 +346,7 @@ async function latestCode(email) {
       const latest = matching.sort(
         (first, second) => new Date(second.time) - new Date(first.time),
       )[0];
-      const message = await (await fetch(`${mailOrigin}/email/${latest.id}`)).json();
+      const message = await (await fetch(`${mailOrigin}/api/email/${latest.id}`)).json();
       const code = message.text?.match(/\b\d{6}\b/);
       if (code) {
         return code[0];

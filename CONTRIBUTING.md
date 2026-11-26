@@ -41,7 +41,7 @@ Besonders willkommen sind:
 
 ## Tests
 
-Die Start- und Prüfbefehle stehen in der [README](README.md#prüfen). Benötigt werden ein vorhandenes .NET-10-SDK, Docker Compose und für Browserprüfungen Node.js mit Playwright.
+Die Start- und Prüfbefehle stehen in der [README](README.md#prüfen). Benötigt werden ein vorhandenes .NET-11-SDK, Docker Compose und für Browserprüfungen Node.js mit Playwright.
 
 Fachregeln und Zugriffsrechte werden mit automatisierten Tests geprüft, einschliesslich ungültiger Eingaben, gleichzeitiger Änderungen und unzulässiger direkter Requests. Die Integrationstests verwenden eigene Datenbanken auf PostgreSQL 17 und 18. Berechnungsänderungen mit unabhängig hergeleiteten Erwartungen für Zahlungszeitpunkte, Zinseszins, Restschuld und offene Angaben prüfen. Dokumenttests verwenden einen separaten S3-Testserver. Niemals eine Produktivdatenbank als Testinstanz verwenden.
 

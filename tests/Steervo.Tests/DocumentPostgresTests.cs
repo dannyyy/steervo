@@ -285,7 +285,9 @@ public sealed class DocumentPostgresTests
             foreach (var file in files)
             {
                 await Assert.ThrowsAsync<RuleException>(() =>
-                    provider.GetRequiredService<IDocumentStorage>().OpenAsync(file)
+                    provider
+                        .GetRequiredService<IDocumentStorage>()
+                        .OpenAsync(file, TestContext.Current.CancellationToken)
                 );
             }
         });
@@ -427,7 +429,9 @@ public sealed class DocumentPostgresTests
         Assert.Equal("first", await DownloadAsync(fixture, owner, evaluationId, live.Id, 1));
         await fixture.ExecuteAsync(provider =>
             Assert.ThrowsAsync<RuleException>(() =>
-                provider.GetRequiredService<IDocumentStorage>().OpenAsync(abandoned)
+                provider
+                    .GetRequiredService<IDocumentStorage>()
+                    .OpenAsync(abandoned, TestContext.Current.CancellationToken)
             )
         );
     }

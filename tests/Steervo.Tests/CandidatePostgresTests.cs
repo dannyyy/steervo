@@ -134,10 +134,10 @@ public sealed class CandidatePostgresTests
         await fixture.RunAsync(async services =>
         {
             var database = services.GetRequiredService<AppDbContext>();
-            await database.Database.ExecuteSqlInterpolatedAsync(
+            await database.Database.ExecuteSqlAsync(
                 $"INSERT INTO \"Evaluations\" (\"Id\", \"OwnerId\", \"Name\", \"Purpose\", \"Version\", \"CreatedAt\") VALUES ({original.Id}, {owner}, {original.Name}, '', 1, {original.CreatedAt})"
             );
-            await database.Database.ExecuteSqlInterpolatedAsync(
+            await database.Database.ExecuteSqlAsync(
                 $"INSERT INTO \"Criterion\" (\"Id\", \"EvaluationId\", \"Name\", \"Type\", \"Priority\", \"Scope\", \"Comparison\", \"Position\") VALUES ({criterion}, {original.Id}, 'Original requirement', 'Boolean', 'Required', 'Vehicle', 'AtLeast', 0)"
             );
             await database.Database.MigrateAsync();
@@ -163,7 +163,7 @@ public sealed class CandidatePostgresTests
             {
                 await services
                     .GetRequiredService<AppDbContext>()
-                    .Database.ExecuteSqlInterpolatedAsync(
+                    .Database.ExecuteSqlAsync(
                         $"INSERT INTO \"Assessment\" (\"Id\", \"EvaluationId\", \"CandidateId\", \"CriterionId\", \"Source\", \"Notes\") VALUES ({Guid.NewGuid()}, {original.Id}, {foreignCandidate}, {criterion}, 'Unknown', '')"
                     );
                 return true;

@@ -104,7 +104,7 @@ public sealed class PostgresFixture : IAsyncDisposable
     public Task ExecuteSqlAsync(FormattableString sql)
     {
         return ExecuteAsync(provider =>
-            provider.GetRequiredService<AppDbContext>().Database.ExecuteSqlInterpolatedAsync(sql)
+            provider.GetRequiredService<AppDbContext>().Database.ExecuteSqlAsync(sql)
         );
     }
 

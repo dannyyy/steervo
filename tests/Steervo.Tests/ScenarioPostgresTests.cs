@@ -321,9 +321,7 @@ public sealed class ScenarioPostgresTests
     {
         return fixture.RunAsync(async services =>
         {
-            await services
-                .GetRequiredService<AppDbContext>()
-                .Database.ExecuteSqlInterpolatedAsync(sql);
+            await services.GetRequiredService<AppDbContext>().Database.ExecuteSqlAsync(sql);
             return true;
         });
     }

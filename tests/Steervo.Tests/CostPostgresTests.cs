@@ -96,7 +96,7 @@ public sealed class CostPostgresTests
             {
                 await services
                     .GetRequiredService<AppDbContext>()
-                    .Database.ExecuteSqlInterpolatedAsync(
+                    .Database.ExecuteSqlAsync(
                         $"UPDATE \"CostItem\" SET \"CandidateId\" = {foreignCar} WHERE \"Id\" = {cost}"
                     );
                 return true;

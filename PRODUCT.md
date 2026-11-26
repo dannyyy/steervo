@@ -31,7 +31,7 @@ Der vorhandene Funktionsumfang ist im [README](README.md#was-bereits-funktionier
 - Import/Export einschliesslich bestehender Versionen und Anhänge; ein Import erzeugt eine neue private Evaluation.
 - Serverseitige Validierung, CSRF-Schutz, aktuelle Zugriffsprüfung und Schutz vor überschriebenen gleichzeitigen Änderungen. Installationsverwaltung gewährt keinen Zugriff auf fremde Evaluationen.
 
-ASP.NET Core Razor Pages mit HTMX auf .NET 10, PostgreSQL/EF Core und separaten Fach- und Berechnungsschichten sind der vorhandene Stack. Die Designmigration ist kein Frameworkwechsel. Sichtbare Texte gehören in `src/Steervo.Web/Resources/Ui.resx`; Code und Bezeichner bleiben Englisch.
+ASP.NET Core Razor Pages mit HTMX auf .NET 11, PostgreSQL/EF Core und separaten Fach- und Berechnungsschichten sind der vorhandene Stack. Die Designmigration ist kein Frameworkwechsel. Sichtbare Texte gehören in `src/Steervo.Web/Resources/Ui.resx`; Code und Bezeichner bleiben Englisch.
 
 ## Brand Commitments
 

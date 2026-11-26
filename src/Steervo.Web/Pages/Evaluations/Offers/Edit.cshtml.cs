@@ -239,7 +239,7 @@ public sealed class EditModel(
                 false,
                 HttpContext.RequestAborted
             );
-            if (count != header.Length || !header.AsSpan().SequenceEqual("%PDF-"u8))
+            if (count != header.Length || !header.SequenceEqual("%PDF-"u8))
             {
                 throw new RuleException(InvalidDocumentCode);
             }

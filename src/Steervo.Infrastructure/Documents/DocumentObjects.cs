@@ -127,6 +127,11 @@ public sealed class S3DocumentObjects : IDocumentObjects, IDisposable
                 MaxErrorRetry = 1,
                 LogResponse = false,
                 DisableLogging = true,
+
+                // S3 compatible stores differ in their support for the SDK's default flexible
+                // checksums, so they are only used where an operation requires one.
+                RequestChecksumCalculation = RequestChecksumCalculation.WHEN_REQUIRED,
+                ResponseChecksumValidation = ResponseChecksumValidation.WHEN_REQUIRED,
             }
         );
     }

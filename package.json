@@ -8,7 +8,7 @@
     "format:check": "bash scripts/format.sh --check"
   },
   "devDependencies": {
-    "playwright": "1.65.0",
-    "prettier": "3.9.10"
+    "playwright": "1.65.1",
+    "prettier": "3.10.1"
   }
 }
